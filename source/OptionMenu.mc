@@ -2,7 +2,7 @@ using Toybox.WatchUi as Ui;
 
 class OptionMenuDelegate extends Ui.MenuInputDelegate {
     var _controller;
-
+	
     function initialize(controller) {
         Ui.MenuInputDelegate.initialize();
         _controller = controller;
@@ -23,6 +23,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :open_frunk) {
             _controller._open_frunk = true;
             _controller.stateMachine();
+        } else if (item == :open_trunk) {
+            _controller._open_trunk = true;
+            _controller.stateMachine();
         } else if (item == :toggle_units) {
             var units = Application.getApp().getProperty("imperial");
             if (units) {
@@ -39,11 +42,30 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
         } else if (item == :swap_frunk_for_port) {
             var swap = Application.getApp().getProperty("swap_frunk_for_port");
-            if (swap) {
-                Application.getApp().setProperty("swap_frunk_for_port", false);
-            } else {
-                Application.getApp().setProperty("swap_frunk_for_port", true);
+            if (swap == 0) {
+                Application.getApp().setProperty("swap_frunk_for_port", 1);
+			}
+			else if (swap == 1) {
+				Application.getApp().setProperty("swap_frunk_for_port", 2);
+			}
+			else if (swap == 2) {
+				Application.getApp().setProperty("swap_frunk_for_port", 3);
+			}
+			else {
+                Application.getApp().setProperty("swap_frunk_for_port", 0);
+	        }
+        } else if (item == :set_temperature) {
+            var driver_temp = Application.getApp().getProperty("driver_temp");
+            var max_temp = Application.getApp().getProperty("max_temp");
+            var min_temp = Application.getApp().getProperty("min_temp");
+            
+            if (Application.getApp().getProperty("imperial")) {
+            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
+            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
+            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
             }
+
+            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(_controller), Ui.SLIDE_UP);
         }
     }
 

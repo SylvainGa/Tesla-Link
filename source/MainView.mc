@@ -66,8 +66,9 @@ class MainView extends Ui.View {
             Application.getApp().setProperty("image_view", use_image_layout);
 
             // Swap frunk for port?
-            var swap_frunk_for_port = Application.getApp().getProperty("swap_frunk_for_port") == true ? true : false;
-
+            // New value : Frunk = 0, Trunk = 1. Port = 2
+            var swap_frunk_for_port = Application.getApp().getProperty("swap_frunk_for_port");
+            
             if (use_image_layout)
             {
                 // We're loading the image layout
@@ -77,7 +78,7 @@ class MainView extends Ui.View {
                 View.onUpdate(dc);
             
                 // Draw the initial icons (in white) in case we don't have vehicle data
-                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port ?  Ui.loadResource(Rez.Drawables.charge_icon) : Ui.loadResource(Rez.Drawables.frunk_icon_white));
+                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : swap_frunk_for_port == 2 ?  Ui.loadResource(Rez.Drawables.charge_icon) : Ui.loadResource(Rez.Drawables.frunktrunkport_icon_white));
                 dc.drawBitmap(image_x_right,image_y_top,Ui.loadResource(Rez.Drawables.climate_on_icon_white));
                 dc.drawBitmap(image_x_left,image_y_bottom,Ui.loadResource(Rez.Drawables.locked_icon_white));
                 dc.drawBitmap(image_x_right,image_y_bottom,Ui.loadResource(is_touchscreen? Rez.Drawables.settings_icon : Rez.Drawables.back_icon));
@@ -87,7 +88,7 @@ class MainView extends Ui.View {
                 // We're loading the text based layout
                 setLayout(Rez.Layouts.TextLayout(dc));
                 var frunk_drawable = View.findDrawableById("frunk");
-                frunk_drawable.setText(swap_frunk_for_port ? Rez.Strings.label_port : Rez.Strings.label_frunk);
+                frunk_drawable.setText(swap_frunk_for_port == 0 ? Rez.Strings.label_frunk : swap_frunk_for_port == 1 ? Rez.Strings.label_trunk : Rez.Strings.label_port);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
                 dc.clear();
                 View.onUpdate(dc);
@@ -122,9 +123,15 @@ class MainView extends Ui.View {
                 var inside_temp = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
                 var inside_temp_local = Application.getApp().getProperty("imperial") ? ((inside_temp*9/5) + 32) + "°F" : inside_temp + "°C";
                 var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
+				var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
+				var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
+				
+	            Application.getApp().setProperty("driver_temp", driver_temp);
+	            Application.getApp().setProperty("max_temp", max_temp);
+	            Application.getApp().setProperty("min_temp", min_temp);
                 
                 // Draw the charge status
-                dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_BLACK);
+                dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
                 var charge_angle = 225 - (battery_level * 270 / 100);
                 charge_angle = charge_angle < 0 ? 360 + charge_angle : charge_angle;
                 dc.drawArc(center_x, center_y, radius, Graphics.ARC_CLOCKWISE, 225, charge_angle);
@@ -168,7 +175,7 @@ class MainView extends Ui.View {
                     // Text layout, so update the lock status text   
                     var status_drawable = View.findDrawableById("status");
                     if (_data._vehicle_data.get("vehicle_state").get("locked")) {
-                        status_drawable.setColor(Graphics.COLOR_GREEN);
+                        status_drawable.setColor(Graphics.COLOR_DK_GREEN);
                         status_drawable.setText(Rez.Strings.label_locked);
                     } else {
                         status_drawable.setColor(Graphics.COLOR_RED);

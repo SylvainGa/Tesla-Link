@@ -1,0 +1,5 @@
+<menu id="TrunksMenu">
+    <menu-item id="frunk" label="@Strings.frunk" />
+    <menu-item id="trunk" label="@Strings.trunk" />
+    <menu-item id="port" label="@Strings.port" />
+</menu>

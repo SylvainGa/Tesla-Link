@@ -25,7 +25,7 @@
     <string id="menu_label_open_frunk">Open Frunk</string>
     <string id="menu_label_toggle_units">Toggle °C/°F</string>
     <string id="menu_label_toggle_view">Toggle View</string>
-    <string id="menu_label_swap_frunk_for_port">Swap Frunk/Port</string>
+    <string id="menu_label_swap_frunk_for_port">Alternate Trunk/Frunk/Port</string>
     <string id="menu_label_select_car">Select Vehicle</string>
 
     <string id="setting_token_label">API Token</string>
@@ -55,4 +55,14 @@
     <string id="label_unlocked">Unlocked</string>
     <string id="label_waking_vehicle">Waking vehicle</string>
     <string id="label_no_vehicles">No vehicles</string>
+    <string id="menu_set_temp">Set temperature</string>
+    <string id="temp_chooser_title">Set Temperature at<!--  Glance view--></string>
+    <string id="label_honk_horn">Hunk horn?</string>
+    <string id="label_trunk">Trunk</string>
+    <string id="menu_label_open_trunk">Open Trunk</string>
+    <string id="label_open_trunk">Open Trunk?</string>
+    <string id="trunk_chooser_title">Which one?</string>
+	<string id="frunk">Frunk</string>
+	<string id="trunk">Trunk</string>
+	<string id="port">Port</string>
 </strings>

@@ -20,12 +20,12 @@
 
 	<!--  Option menu -->
     <string id="menu_label_reset">Remise à zéro</string>
-    <string id="menu_label_honk">Klaxon</string>
-    <string id="menu_label_open_port">Port ouvert</string>
-    <string id="menu_label_open_frunk">Frunk ouvert</string>
+    <string id="menu_label_honk">Klaxonner</string>
+    <string id="menu_label_open_port">Ouvrir Port</string>
+    <string id="menu_label_open_frunk">Ouvrir Frunk</string>
     <string id="menu_label_toggle_units">Temp. °C/°F</string>
     <string id="menu_label_toggle_view">Change de vue</string>
-    <string id="menu_label_swap_frunk_for_port">Frunk/Port</string>
+    <string id="menu_label_swap_frunk_for_port">Valise arrière/Avant/Port</string>
     <string id="menu_label_select_car">Sélectionnez le véhicule</string>
 
     <string id="setting_token_label">Jeton d'API</string>
@@ -55,4 +55,14 @@
     <string id="label_unlocked">Ouverte</string>
     <string id="label_waking_vehicle">Réveil du vehicule</string>
     <string id="label_no_vehicles">Pas de véhicule</string>
+    <string id="menu_set_temp">Température à</string>
+    <string id="temp_chooser_title">Température à?</string>
+    <string id="label_honk_horn">Klaxonner?</string>
+    <string id="label_trunk">Valise actionnée</string>
+    <string id="menu_label_open_trunk">Actionner Valise</string>
+    <string id="label_open_trunk">Actionner la Valise ?</string>
+    <string id="trunk_chooser_title">Lequel ?</string>
+	<string id="frunk">Coffre avant</string>
+	<string id="trunk">Valise</string>
+	<string id="port">Port</string>
 </strings>

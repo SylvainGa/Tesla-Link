@@ -1,10 +1,13 @@
 <menu id="OptionMenu">
     <menu-item id="honk" label="@Strings.menu_label_honk" />
     <menu-item id="open_frunk" label="@Strings.menu_label_open_frunk" />
+    <menu-item id="open_trunk" label="@Strings.menu_label_open_trunk" />
     <menu-item id="open_port" label="@Strings.menu_label_open_port" />
+    <menu-item id="set_temperature" label="@Strings.menu_set_temp" />
     <menu-item id="toggle_view" label="@Strings.menu_label_toggle_view" />
     <menu-item id="swap_frunk_for_port" label="@Strings.menu_label_swap_frunk_for_port" />
     <menu-item id="toggle_units" label="@Strings.menu_label_toggle_units" />
     <menu-item id="select_car" label="@Strings.menu_label_select_car" />
-    <menu-item id="reset" label="@Strings.menu_label_reset" />
+    <menu-item id="reset" label="@Strings.menu_label_reset" >
+</menu-item>
 </menu>
