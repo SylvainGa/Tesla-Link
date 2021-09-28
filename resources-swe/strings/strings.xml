@@ -55,4 +55,14 @@
     <string id="label_unlocked">Olåst</string>
     <string id="label_waking_vehicle">Väcker fordon</string>
     <string id="label_no_vehicles">Inga fordon</string>
+    <string id="menu_set_temp">Set temperature</string>
+    <string id="temp_chooser_title">Set Temperature at<!--  Glance view--></string>
+    <string id="label_honk_horn">Hunk horn?</string>
+    <string id="label_trunk">Trunk</string>
+    <string id="menu_label_open_trunk">Open Trunk</string>
+    <string id="label_open_trunk">Open Trunk?</string>
+    <string id="trunk_chooser_title">Which one?</string>
+	<string id="frunk">Frunk</string>
+	<string id="trunk">Trunk</string>
+	<string id="port">Port</string>
 </strings>

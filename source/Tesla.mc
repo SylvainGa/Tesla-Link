@@ -69,6 +69,25 @@ class Tesla {
         genericPost(url, notify);
     }
 
+    function climateSet(vehicle, notify, temperature) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_temps";
+        Communications.makeWebRequest(
+            url,
+            {
+                "driver_temp" => temperature,
+                "passenger_temp" => temperature,
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
     function honkHorn(vehicle, notify) {
         var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/honk_horn";
         genericPost(url, notify);
@@ -90,12 +109,12 @@ class Tesla {
         genericPost(url, notify);
     }
 
-    function openFrunk(vehicle, notify) {
+    function openTrunk(vehicle, notify, which) {
         var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/actuate_trunk";
         Communications.makeWebRequest(
             url,
             {
-                "which_trunk" => "front"
+                "which_trunk" => which
             },
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,

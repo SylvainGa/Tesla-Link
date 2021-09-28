@@ -3,6 +3,7 @@ using Toybox.Timer;
 using Toybox.System;
 using Toybox.Communications as Communications;
 using Toybox.Cryptography;
+using  Toybox.Graphics;
 
 const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
@@ -20,14 +21,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
     var _set_climate_on;
     var _set_climate_off;
+    var _set_climate_set;
     var _get_vehicle_data;
     var _honk_horn;
     var _open_port;
     var _open_frunk;
+    var _open_trunk;
+    var _bypass_confirmation;
     var _unlock;
     var _lock;
     var _settings;
-
+	
     var _data;
 
     var _code_verifier;
@@ -54,12 +58,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         _set_climate_on = false;
         _set_climate_off = false;
+        _set_climate_set = false;
+		
         _get_vehicle_data = true;
         _honk_horn = false;
         _open_port = false;
         _open_frunk = false;
+        _open_trunk = false;
         _unlock = false;
         _lock = false;
+		_bypass_confirmation = false;
 
         stateMachine();
     }
@@ -223,10 +231,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _tesla.climateOff(_vehicle_id, method(:onClimateDone));
         }
 
+        if (_set_climate_set) {
+            _set_climate_set = false;
+            var temperature = Application.getApp().getProperty("driver_temp");
+            _tesla.climateSet(_vehicle_id, method(:onClimateDone), temperature);
+        }
+
         if (_honk_horn) {
             _honk_horn = false;
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_honk));
-            _tesla.honkHorn(_vehicle_id, method(:genericHandler));
+            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
+            var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed));
+            Ui.pushView(view, delegate, Ui.SLIDE_UP);
         }
 
         if (_open_port) {
@@ -249,15 +264,42 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         if (_open_frunk) {
             _open_frunk = false;
-            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
-            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed));
-            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+            if (_bypass_confirmation) {
+				frunkConfirmed();
+			}
+			else {
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
+	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed));
+	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+	        }
+        }
+
+        if (_open_trunk) {
+            _open_trunk = false;
+            if (_bypass_confirmation) {
+				trunkConfirmed();
+			}
+			else {
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_trunk));
+	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed));
+	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+	        }
         }
     }
 
     function frunkConfirmed() {
         _handler.invoke(Ui.loadResource(Rez.Strings.label_frunk));
-        _tesla.openFrunk(_vehicle_id, method(:genericHandler));
+        _tesla.openTrunk(_vehicle_id, method(:genericHandler), "front");
+    }
+
+    function trunkConfirmed() {
+        _handler.invoke(Ui.loadResource(Rez.Strings.label_trunk));
+        _tesla.openTrunk(_vehicle_id, method(:onClimateDone), "rear");
+    }
+
+    function honkHornConfirmed() {
+        _handler.invoke(Ui.loadResource(Rez.Strings.label_honk));
+        _tesla.honkHorn(_vehicle_id, method(:genericHandler));
     }
 
     function timerRefresh() {
@@ -316,13 +358,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function doPreviousPage() {
-        if (Application.getApp().getProperty("swap_frunk_for_port"))
-        {
-            _open_port = true;
+    	if (Application.getApp().getProperty("swap_frunk_for_port") == 0) {
+   			_open_frunk = true;
         }
-        else
-        {
-            _open_frunk = true;
+        else if (Application.getApp().getProperty("swap_frunk_for_port") == 1) {
+        	_open_trunk = true;
+        }
+        else if (Application.getApp().getProperty("swap_frunk_for_port") == 2) {
+	        _open_port = true;
+		}
+		else {
+			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
         stateMachine();
     }
@@ -382,6 +428,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
         } else {
             _resetToken();
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -404,6 +460,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
             if (responseCode == 408) {
                 stateMachine();
             }
+
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -426,6 +492,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
                     _resetToken();
                 }
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+
+//	            var alert = new Alert({
+//					:timeout => 4000,
+//					:font => Graphics.FONT_TINY,
+//					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//					:fgcolor => Graphics.COLOR_RED,
+//					:bgcolor => Graphics.COLOR_WHITE
+//				});
+//				
+//				alert.pushView(Ui.SLIDE_IMMEDIATE);
             }
         }
     }
@@ -447,6 +523,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _wake_done = false;
                 _sleep_timer.start(method(:delayedWake), 500, false);
             }
+
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -461,6 +547,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _resetToken();
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+            
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -475,6 +571,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _resetToken();
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+            
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -488,6 +594,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _resetToken();
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+
+//            var alert = new Alert({
+//				:timeout => 4000,
+//				:font => Graphics.FONT_TINY,
+//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+//				:fgcolor => Graphics.COLOR_RED,
+//				:bgcolor => Graphics.COLOR_WHITE
+//			});
+//			
+//			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 

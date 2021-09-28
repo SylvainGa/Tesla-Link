@@ -1,6 +1,21 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    <bitmap id="frunktrunkport_icon_white" filename="frunktrunkport.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>FFFFFF</color>
+            <color>000000</color>
+            <color>AAAAAA</color>
+            <color>00AA00</color>
+        </palette>
+    </bitmap>
     <bitmap id="frunk_icon_white" filename="frunk.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>FFFFFF</color>
+            <color>000000</color>
+            <color>AAAAAA</color>
+        </palette>
+    </bitmap>
+    <bitmap id="trunk_icon_white" filename="trunk.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="true">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -9,7 +24,7 @@
     </bitmap>
     <bitmap id="climate_off_icon" filename="climateoff.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="true">
-            <color>00FF00</color>
+            <color>00AA00</color>
             <color>000000</color>
         </palette>
     </bitmap>
@@ -34,7 +49,7 @@
     </bitmap>
     <bitmap id="locked_icon" filename="locked.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="true">
-            <color>00FF00</color>
+            <color>00AA00</color>
             <color>000000</color>
         </palette>
     </bitmap>

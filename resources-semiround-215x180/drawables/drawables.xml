@@ -1,6 +1,20 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="../../resources/drawables/launcher_icon.png" />
+    <bitmap id="frunktrunkport_icon_white" filename="../../resources/drawables/frunktrunkport.png" dithering="none" scaleX="24%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>FFFFFF</color>
+            <color>000000</color>
+            <color>AAAAAA</color>
+        </palette>
+    </bitmap>
     <bitmap id="frunk_icon_white" filename="../../resources/drawables/frunk.png" dithering="none" scaleX="24%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>FFFFFF</color>
+            <color>000000</color>
+            <color>AAAAAA</color>
+        </palette>
+    </bitmap>
+    <bitmap id="trunk_icon_white" filename="../../resources/drawables/trunk.png" dithering="none" scaleX="24%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="true">
             <color>FFFFFF</color>
             <color>000000</color>
