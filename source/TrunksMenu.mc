@@ -1,5 +1,6 @@
 using Toybox.WatchUi as Ui;
 
+
 class TrunksMenuDelegate extends Ui.MenuInputDelegate {
     var _controller;
 	
@@ -17,6 +18,8 @@ class TrunksMenuDelegate extends Ui.MenuInputDelegate {
         	_controller._bypass_confirmation = true;
         } else if (item == :port) {
         	_controller._open_port = true;
+        } else if (item == :vent) {
+        	_controller._vent = true;
         }
 
         _controller.stateMachine();

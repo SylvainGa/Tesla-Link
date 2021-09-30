@@ -65,4 +65,8 @@
 	<string id="frunk">Coffre avant</string>
 	<string id="trunk">Valise</string>
 	<string id="port">Port</string>
+	<string id="vent">Ventilé</string>
+	<string id="label_open_vent">Ventiler ?</string>
+	<string id="label_close_vent">Fermer fenêtre ?</string>
+    <string id="label_vent">Ventilé</string>
 </strings>

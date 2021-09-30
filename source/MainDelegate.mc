@@ -31,6 +31,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _unlock;
     var _lock;
     var _settings;
+    var _vent;
 	
     var _data;
 
@@ -45,7 +46,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _sleep_timer = new Timer.Timer();
         _handler = handler;
         _tesla = null;
-
+		
         if (_token != null && _token.length() != 0) {
             _need_auth = false;
             _auth_done = true;
@@ -68,6 +69,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _unlock = false;
         _lock = false;
 		_bypass_confirmation = false;
+		_vent = false;
 
         stateMachine();
     }
@@ -285,6 +287,34 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	        }
         }
+
+        if (_vent) {
+            _vent = false;
+            var venting = Application.getApp().getProperty("venting");
+
+            if (venting == 0) {
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
+	            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed));
+	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+            }
+            else {
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
+	            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed));
+	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+            }
+        }
+    }
+
+    function openVentConfirmed() {
+		_handler.invoke(Ui.loadResource(Rez.Strings.label_vent));
+        Application.getApp().setProperty("venting", 4);
+        _tesla.vent(_vehicle_id, method(:genericHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+    }
+
+    function closeVentConfirmed() {
+	    _handler.invoke(Ui.loadResource(Rez.Strings.label_vent));
+        Application.getApp().setProperty("venting", 0);
+        _tesla.vent(_vehicle_id, method(:genericHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function frunkConfirmed() {
@@ -429,15 +459,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _resetToken();
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -461,15 +491,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 stateMachine();
             }
 
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -493,15 +523,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 }
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-//	            var alert = new Alert({
-//					:timeout => 4000,
-//					:font => Graphics.FONT_TINY,
-//					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//					:fgcolor => Graphics.COLOR_RED,
-//					:bgcolor => Graphics.COLOR_WHITE
-//				});
-//				
-//				alert.pushView(Ui.SLIDE_IMMEDIATE);
+	            var alert = new Alert({
+					:timeout => 4000,
+					:font => Graphics.FONT_TINY,
+					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+					:fgcolor => Graphics.COLOR_RED,
+					:bgcolor => Graphics.COLOR_WHITE
+				});
+				
+				alert.pushView(Ui.SLIDE_IMMEDIATE);
             }
         }
     }
@@ -524,15 +554,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _sleep_timer.start(method(:delayedWake), 500, false);
             }
 
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -548,15 +578,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
             
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -572,15 +602,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
             
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 
@@ -595,15 +625,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-//            var alert = new Alert({
-//				:timeout => 4000,
-//				:font => Graphics.FONT_TINY,
-//				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
-//				:fgcolor => Graphics.COLOR_RED,
-//				:bgcolor => Graphics.COLOR_WHITE
-//			});
-//			
-//			alert.pushView(Ui.SLIDE_IMMEDIATE);
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
 

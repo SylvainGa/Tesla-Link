@@ -125,10 +125,16 @@ class MainView extends Ui.View {
                 var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
 				var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
 				var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
+				var latitude = _data._vehicle_data.get("drive_state").get("latitude");
+				var longitude = _data._vehicle_data.get("drive_state").get("longitude");
+			    var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 				
 	            Application.getApp().setProperty("driver_temp", driver_temp);
 	            Application.getApp().setProperty("max_temp", max_temp);
 	            Application.getApp().setProperty("min_temp", min_temp);
+	            Application.getApp().setProperty("venting", venting);
+	            Application.getApp().setProperty("latitude", latitude);
+	            Application.getApp().setProperty("longitude", longitude);
                 
                 // Draw the charge status
                 dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);

@@ -41,6 +41,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var battery_level = vehicle_data.get("charge_state").get("battery_level");
             var battery_range = vehicle_data.get("charge_state").get("battery_range");
             var charging_state = vehicle_data.get("charge_state").get("charging_state");
+		    var venting = vehicle_data.get("vehicle_state").get("fd_window").toNumber() + vehicle_data.get("vehicle_state").get("rd_window").toNumber() + vehicle_data.get("vehicle_state").get("fp_window").toNumber() + vehicle_data.get("vehicle_state").get("rp_window").toNumber();
+            Application.getApp().setProperty("venting", venting);
+
             data.put("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + " @ " + System.getClockTime().hour.format("%d")+":"+System.getClockTime().min.format("%02d"));
             Background.exit(data);
         } else if (responseCode == 408) {

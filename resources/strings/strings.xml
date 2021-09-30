@@ -65,4 +65,8 @@
 	<string id="frunk">Frunk</string>
 	<string id="trunk">Trunk</string>
 	<string id="port">Port</string>
+	<string id="vent">Vent</string>
+    <string id="label_open_vent">Vent ?</string>
+    <string id="label_close_vent">Close windows ?</string>
+    <string id="label_vent">Vent</string>
 </strings>
