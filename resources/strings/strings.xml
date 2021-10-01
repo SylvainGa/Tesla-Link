@@ -55,8 +55,10 @@
     <string id="label_unlocked">Unlocked</string>
     <string id="label_waking_vehicle">Waking vehicle</string>
     <string id="label_no_vehicles">No vehicles</string>
+
+	<!--  SG Addition. Needs to be moved to their corresponding section -->
     <string id="menu_set_temp">Set temperature</string>
-    <string id="temp_chooser_title">Set Temperature at<!--  Glance view--></string>
+    <string id="temp_chooser_title">Set Temperature at</string>
     <string id="label_honk_horn">Hunk horn?</string>
     <string id="label_trunk">Trunk</string>
     <string id="menu_label_open_trunk">Open Trunk</string>
@@ -69,4 +71,5 @@
     <string id="label_open_vent">Vent ?</string>
     <string id="label_close_vent">Close windows ?</string>
     <string id="label_vent">Vent</string>
+    <string id="label_frunktrunkport">Select</string>
 </strings>

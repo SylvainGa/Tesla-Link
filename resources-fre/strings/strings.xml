@@ -55,10 +55,12 @@
     <string id="label_unlocked">Ouverte</string>
     <string id="label_waking_vehicle">Réveil du vehicule</string>
     <string id="label_no_vehicles">Pas de véhicule</string>
+
+	<!--  SG Addition. Needs to be moved to their corresponding section -->
     <string id="menu_set_temp">Température à</string>
     <string id="temp_chooser_title">Température à?</string>
     <string id="label_honk_horn">Klaxonner?</string>
-    <string id="label_trunk">Valise actionnée</string>
+    <string id="label_trunk">Valise</string>
     <string id="menu_label_open_trunk">Actionner Valise</string>
     <string id="label_open_trunk">Actionner la Valise ?</string>
     <string id="trunk_chooser_title">Lequel ?</string>
@@ -69,4 +71,5 @@
 	<string id="label_open_vent">Ventiler ?</string>
 	<string id="label_close_vent">Fermer fenêtre ?</string>
     <string id="label_vent">Ventilé</string>
+    <string id="label_frunktrunkport">Choisir</string>
 </strings>

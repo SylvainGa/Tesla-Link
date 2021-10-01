@@ -88,7 +88,8 @@ class MainView extends Ui.View {
                 // We're loading the text based layout
                 setLayout(Rez.Layouts.TextLayout(dc));
                 var frunk_drawable = View.findDrawableById("frunk");
-                frunk_drawable.setText(swap_frunk_for_port == 0 ? Rez.Strings.label_frunk : swap_frunk_for_port == 1 ? Rez.Strings.label_trunk : Rez.Strings.label_port);
+                
+                frunk_drawable.setText(swap_frunk_for_port == 0 ?  Rez.Strings.label_frunk : swap_frunk_for_port == 1 ?  Rez.Strings.label_trunk : swap_frunk_for_port == 2 ?  Rez.Strings.label_port : Rez.Strings.label_frunktrunkport);
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
                 dc.clear();
                 View.onUpdate(dc);
