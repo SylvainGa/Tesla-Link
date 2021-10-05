@@ -126,4 +126,25 @@ class Tesla {
             notify
         );
     }
+
+    function vent(vehicle, notify, which, lat, lon) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/window_control";
+        Communications.makeWebRequest(
+            url,
+            {
+                "command" => which,
+                "lat" => lat,
+                "lon" => lon
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
 }
