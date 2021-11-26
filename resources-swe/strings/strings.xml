@@ -94,4 +94,22 @@
 	<string id="label_defrost_off">Defrost Off</string>
 	<string id="label_defrost">Defrost</string>
 	<string id="menu_label_vent">Vent</string>
+	<string id="menu_option_title">Options</string>
+	<string id="AppName">Crystal</string>
+	<string id="AppVersionTitle">App Version</string>
+	<string id="number_of_slots">How many filled slots?</string>
+	<string id="OptionMenu_1">Slot 1</string>
+	<string id="OptionMenu_2">Slot 2</string>
+	<string id="OptionMenu_3">Slot 3</string>
+	<string id="OptionMenu_4">Slot 4</string>
+	<string id="OptionMenu_5">Slot 5</string>
+	<string id="OptionMenu_6">Slot 6</string>
+	<string id="OptionMenu_7">Slot 7</string>
+	<string id="OptionMenu_8">Slot 8</string>
+	<string id="OptionMenu_9">Slot 9</string>
+	<string id="OptionMenu_10">Slot 10</string>
+	<string id="OptionMenu_11">Slot 11</string>
+	<string id="OptionMenu_12">Slot 12</string>
+	<string id="OptionMenu_13">Slot 13</string>
+	<string id="OptionMenu_14">Slot 14</string>
 </strings>

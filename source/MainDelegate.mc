@@ -458,13 +458,99 @@ class MainDelegate extends Ui.BehaviorDelegate {
         return true;
     }
 
+	function addMenuItem(menu, slot)
+	{
+		var _slot_str = "option_slot" + slot;
+		var _index = Application.getApp().getProperty(_slot_str);
+		if (_index == null) {
+			return;
+		} else if (!(_index instanceof Number)) {
+			_index = _index.toNumber();
+		}
+
+		if (_index < 0) {
+			_index = 0;
+		}
+		else if (_index > 13) {
+			_index = 13;
+		}
+		
+		switch (_index) {
+			case 0:
+				menu.addItem(Rez.Strings.menu_label_defrost, :defrost);
+				break;
+			case 1:
+				menu.addItem(Rez.Strings.menu_set_seat_heat, :set_seat_heat);
+				break;
+			case 2:
+				menu.addItem(Rez.Strings.menu_set_charging_amps, :set_charging_amps);
+				break;
+			case 3:
+				menu.addItem(Rez.Strings.menu_set_temp, :set_temperature);
+				break;
+			case 4:
+				menu.addItem(Rez.Strings.menu_label_honk, :honk);
+				break;
+			case 5:
+				menu.addItem(Rez.Strings.menu_label_open_frunk, :open_frunk);
+				break;
+			case 6:
+				menu.addItem(Rez.Strings.menu_label_open_trunk, :open_trunk);
+				break;
+			case 7:
+				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
+				break;
+			case 8:
+				menu.addItem(Rez.Strings.menu_label_vent, :vent);
+				break;
+			case 9:
+				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
+				break;
+			case 10:
+				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
+				break;
+			case 11:
+				menu.addItem(Rez.Strings.menu_label_toggle_units, :toggle_units);
+				break;
+			case 12:
+				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
+				break;
+			case 13:
+				menu.addItem(Rez.Strings.menu_label_reset, :reset);
+				break;
+		}
+	}
+	
     function doMenu() {
         if (!_auth_done) {
             return;
         }
 
     	_noTimer = true;
-        Ui.pushView(new Rez.Menus.OptionMenu(), new OptionMenuDelegate(self), Ui.SLIDE_UP);
+
+		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
+		if (_slot_count == null) {
+			_slot_count = 14;
+		} else if (!(_slot_count instanceof Number)) {
+			_slot_count = _slot_count.toNumber();
+		}
+
+		if (_slot_count < 1) {
+			_slot_count = 1;
+		}
+		else if (_slot_count > 14) {
+			_slot_count = 14;
+		}
+		
+		var thisMenu = new WatchUi.Menu();
+		
+		thisMenu.setTitle(Rez.Strings.menu_option_title);
+		for (var i = 1; i <= _slot_count; i++) {
+			addMenuItem(thisMenu, i);
+		}
+		
+		WatchUi.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
+//        Ui.pushView(new Rez.Menus.OptionMenu(), new OptionMenuDelegate(self), Ui.SLIDE_UP);
         _noTimer = false; 
     }
 

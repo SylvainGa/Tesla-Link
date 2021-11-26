@@ -94,4 +94,22 @@
 	<string id="label_defrost_off">Dégivrage éteint</string>
 	<string id="label_defrost">Dégivrage</string>
 	<string id="menu_label_vent">Ventilé</string>
+	<string id="menu_option_title">Options</string>
+	<string id="AppName">Crystal</string>
+	<string id="AppVersionTitle">Version de l'appli</string>
+	<string id="number_of_slots">Combien d'emplacement utilisés ?</string>
+	<string id="OptionMenu_1">Emplacement 1</string>
+	<string id="OptionMenu_2">Emplacement 2</string>
+	<string id="OptionMenu_3">Emplacement 3</string>
+	<string id="OptionMenu_4">Emplacement 4</string>
+	<string id="OptionMenu_5">Emplacement 5</string>
+	<string id="OptionMenu_6">Emplacement 6</string>
+	<string id="OptionMenu_7">Emplacement 7</string>
+	<string id="OptionMenu_8">Emplacement 8</string>
+	<string id="OptionMenu_9">Emplacement 9</string>
+	<string id="OptionMenu_10">Emplacement 10</string>
+	<string id="OptionMenu_11">Emplacement 11</string>
+	<string id="OptionMenu_12">Emplacement 12</string>
+	<string id="OptionMenu_13">Emplacement 13</string>
+	<string id="OptionMenu_14">Emplacement 14</string>
 </strings>
