@@ -147,4 +147,60 @@ class Tesla {
         );
     }
 
+    function climateDefrost(vehicle, notify, defrost_mode) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_preconditioning_max";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "on" => defrost_mode != 2
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+    
+    function climateSeatHeat(vehicle, notify, seat_chosen, heat_chosen) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/remote_seat_heater_request";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "heater" => seat_chosen,
+                "level" => heat_chosen
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+    
+    function setChargingAmps(vehicle, notify, charging_amps) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_charging_amps";
+        Communications.makeWebRequest(
+            url,
+            {
+                "charging_amps" => charging_amps
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
 }

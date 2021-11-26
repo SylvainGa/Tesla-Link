@@ -27,7 +27,6 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             _controller._open_trunk = true;
             _controller.stateMachine();
         } else if (item == :toggle_units) {
-            var units = Application.getApp().getProperty("imperial");
             if (units) {
                 Application.getApp().setProperty("imperial", false);
             } else {
@@ -56,8 +55,8 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 	        }
         } else if (item == :set_temperature) {
             var driver_temp = Application.getApp().getProperty("driver_temp");
-            var max_temp = Application.getApp().getProperty("max_temp");
-            var min_temp = Application.getApp().getProperty("min_temp");
+            var max_temp = _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
+            var min_temp = _controller._data._vehicle_data.get("climate_state").get("min_avail_temp");
             
             if (Application.getApp().getProperty("imperial")) {
             	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
@@ -66,6 +65,46 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
 
             Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :set_charging_amps) {
+        	var max_amps = _controller._data._vehicle_data.get("charge_state").get("charge_current_request_max");
+            var charging_amps = _controller._data._vehicle_data.get("charge_state").get("charge_current_request");
+            if (charging_amps == null) {
+            	if (max_amps == null) {
+            		charging_amps = 32;
+            	}
+            	else {
+            		charging_amps = max_amps;
+            	}
+            }
+            
+            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :set_seat_heat) {
+	        var heat = 0;
+            Ui.pushView(new SeatHeatPicker(heat), new SeatHeatPickerDelegate(_controller), Ui.SLIDE_UP);
+
+			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
+	        var seats = new [rear_seats_avail != null ? 7 : 3];
+
+	        seats[0] = Rez.Strings.seat_driver;
+	        seats[1] = Rez.Strings.seat_passenger;
+	        if (rear_seats_avail != null) {
+		        seats[2] = Rez.Strings.seat_rear_left;
+		        seats[3] = Rez.Strings.seat_rear_center;
+		        seats[4] = Rez.Strings.seat_rear_right;
+		        seats[5] = Rez.Strings.seat_front;
+		        seats[6] = Rez.Strings.seat_rear;
+	        }
+	        else {
+		        seats[2] = Rez.Strings.seat_front;
+	        }
+
+	        Ui.pushView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :defrost) {
+            _controller._set_climate_defrost = true;
+            _controller.stateMachine();
+        } else if (item == :vent) {
+            _controller._vent = true;
+            _controller.stateMachine();
         }
     }
 

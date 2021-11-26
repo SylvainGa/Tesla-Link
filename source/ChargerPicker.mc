@@ -10,16 +10,19 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 
-//! Picker that allows the user to choose a temperature
-class TemperaturePicker extends WatchUi.Picker {
-	var _temperature;
+//! Picker that allows the user to choose a charging curremt
+class ChargerPicker extends WatchUi.Picker {
+	var _charging_amps;
 
     //! Constructor
-    public function initialize(temperature, max_temp, min_temp) {
-    	_temperature = temperature;
-    	var startPos = [temperature.toNumber() - min_temp.toNumber()];
+    public function initialize(charging_amps, max_amps) {
+    	var _min_amps = 5;
+    	var _max_amps = max_amps;
+    	_charging_amps = charging_amps;
+
+    	var startPos = [_charging_amps.toNumber() - _min_amps];
         var title = new WatchUi.Text({:text=>Rez.Strings.temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
-        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(min_temp.toNumber(), max_temp.toNumber(), 0.5, {})], :defaults=>startPos});
+        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(_min_amps.toNumber(), _max_amps.toNumber(), 1, {})], :defaults=>startPos});
     }
 
     //! Update the view
@@ -31,10 +34,10 @@ class TemperaturePicker extends WatchUi.Picker {
     }
 }
 
-//! Responds to a temperature picker selection or cancellation
-class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
+//! Responds to a charger picker selection or cancellation
+class ChargerPickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
-	var _temperature;
+	var _charging_amps;
 	
     //! Constructor
     function initialize(controller) {
@@ -52,14 +55,10 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
     //! @param values The values chosen in the picker
     //! @return true if handled, false otherwise
     function onAccept (values) {
-        _temperature = values[0];
+        _charging_amps = values[0];
         
-        if (Application.getApp().getProperty("imperial")) {
-			_temperature = (_temperature - 32.0) * 5.0 / 9.0;	
-        }
-        
-        Application.getApp().setProperty("driver_temp", _temperature);
-        _controller._set_climate_set = true;
+        Application.getApp().setProperty("charging_amps", _charging_amps);
+        _controller._set_charging_amps_set = true;
         _controller.stateMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }

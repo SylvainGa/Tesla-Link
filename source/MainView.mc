@@ -124,15 +124,11 @@ class MainView extends Ui.View {
                 var inside_temp = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
                 var inside_temp_local = Application.getApp().getProperty("imperial") ? ((inside_temp*9/5) + 32) + "°F" : inside_temp + "°C";
                 var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
-				var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
-				var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
 				var latitude = _data._vehicle_data.get("drive_state").get("latitude");
 				var longitude = _data._vehicle_data.get("drive_state").get("longitude");
 			    var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 				
 	            Application.getApp().setProperty("driver_temp", driver_temp);
-	            Application.getApp().setProperty("max_temp", max_temp);
-	            Application.getApp().setProperty("min_temp", min_temp);
 	            Application.getApp().setProperty("venting", venting);
 	            Application.getApp().setProperty("latitude", latitude);
 	            Application.getApp().setProperty("longitude", longitude);
@@ -163,18 +159,27 @@ class MainView extends Ui.View {
                     status_drawable.draw(dc);
 
                     // Update the climate state indicator, note we have blue or red icons depending on heating or cooling
-                    var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");          
+                    var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
+                    var climate_defrost = _data._vehicle_data.get("climate_state").get("defrost_mode");
                     if (climate_state == false)
                     {
-                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon));
+                    	if (climate_defrost == 2) {
+	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon_defrost));
+	                    } else {
+	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon));
+	                    }
                     }
-                    else if (climate_state == true && driver_temp > inside_temp)
+                    else if (climate_state == true && driver_temp < inside_temp && !climate_defrost)  // Was reversed. If I ask for 21 and in the car it's 30, then show blue because it should cool it.
                     {
                         dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_blue));
                     }
                     else
                     {
-                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_red));
+                    	if (climate_defrost == 2) {
+	                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_red_defrost));
+	                    } else {
+	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_red));
+	                    }
                     }
                 }
                 else
@@ -196,7 +201,7 @@ class MainView extends Ui.View {
 
                     // Update the climate state text
                     var climate_state_drawable = View.findDrawableById("climate_state");
-                    var climate_state = Ui.loadResource(Rez.Strings.label_climate) + (_data._vehicle_data.get("climate_state").get("is_climate_on") ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off));
+                    var climate_state = Ui.loadResource(Rez.Strings.label_climate) + (_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Ui.loadResource(Rez.Strings.label_defrost) : _data._vehicle_data.get("climate_state").get("is_climate_on") ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off));
                     climate_state_drawable.setText(climate_state);
 
                     // Update the battery level text

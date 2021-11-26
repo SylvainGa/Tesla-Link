@@ -40,10 +40,21 @@
             <color>000000</color>
         </palette>
     </bitmap>
-
     <bitmap id="climate_on_icon_white" filename="climateon.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="true">
             <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="climate_off_icon_defrost" filename="climateoff_defrost.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>00AA00</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="climate_on_icon_red_defrost" filename="climateon_defrost.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="true">
+            <color>FF0000</color>
             <color>000000</color>
         </palette>
     </bitmap>

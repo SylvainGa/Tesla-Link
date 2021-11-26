@@ -77,4 +77,21 @@
     <string id="label_close_vent">Close windows ?</string>
     <string id="label_vent">Vent</string>
     <string id="label_frunktrunkport">Select</string>
+    <string id="menu_set_charging_amps">Set charging amps</string>
+    <string id="amps_chooser_title">Set Amps to</string>
+    <string id="menu_set_seat_heat">Seat heat</string>
+	<string id="temp_choose_seat">Which seat?</string>
+	<string id="temp_choose_heat">What level?</string>
+	<string id="seat_driver">Driver</string>
+	<string id="seat_passenger">Passenger</string>
+	<string id="seat_rear_left">Rear Left</string>
+	<string id="seat_rear_center">Rear middle</string>
+	<string id="seat_rear_right">Rear Right</string>
+	<string id="seat_front">Front</string>
+	<string id="seat_rear">Rear</string>
+	<string id="menu_label_defrost">Defrost toggle</string>
+	<string id="label_defrost_on">Defrost On</string>
+	<string id="label_defrost_off">Defrost Off</string>
+	<string id="label_defrost">Defrost</string>
+	<string id="menu_label_vent">Vent</string>
 </strings>

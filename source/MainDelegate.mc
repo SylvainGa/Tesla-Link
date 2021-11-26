@@ -22,6 +22,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _set_climate_on;
     var _set_climate_off;
     var _set_climate_set;
+    var _set_climate_defrost;
+    var _set_charging_amps_set;
     var _get_vehicle_data;
     var _honk_horn;
     var _open_port;
@@ -32,7 +34,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _lock;
     var _settings;
     var _vent;
-	
+    var _set_seat_heat;
+	var _noTimer;	
     var _data;
 
     var _code_verifier;
@@ -59,6 +62,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         _set_climate_on = false;
         _set_climate_off = false;
+        _set_climate_defrost = false;
         _set_climate_set = false;
 		
         _get_vehicle_data = true;
@@ -70,14 +74,18 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _lock = false;
 		_bypass_confirmation = false;
 		_vent = false;
+		_set_seat_heat = false;
 
-        stateMachine();
+		_noTimer = true; stateMachine(); _noTimer = false;
+
+	    var myTimer = new Timer.Timer();
+	    myTimer.start(method(:timerRefresh), 2000, true);
     }
 
     function bearerForAccessOnReceive(responseCode, data) {
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
         }
         else {
             _resetToken();
@@ -233,10 +241,22 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _tesla.climateOff(_vehicle_id, method(:onClimateDone));
         }
 
+        if (_set_climate_defrost) {
+            _set_climate_defrost = false;
+            _handler.invoke(Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on));
+            _tesla.climateDefrost(_vehicle_id, method(:onClimateDone), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+        }
+
         if (_set_climate_set) {
             _set_climate_set = false;
             var temperature = Application.getApp().getProperty("driver_temp");
             _tesla.climateSet(_vehicle_id, method(:onClimateDone), temperature);
+        }
+
+        if (_set_charging_amps_set) {
+            _set_charging_amps_set = false;
+            var charging_amps = Application.getApp().getProperty("charging_amps");
+            _tesla.setChargingAmps(_vehicle_id, method(:onChargingAmpsDone), charging_amps);
         }
 
         if (_honk_horn) {
@@ -303,6 +323,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
             }
         }
+
+		if (_set_seat_heat) {
+			_set_seat_heat = false;
+			var seat_chosen = Application.getApp().getProperty("seat_chosen");
+			var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
+
+            _handler.invoke(Ui.loadResource(seat_chosen));
+
+	        if (seat_chosen == Rez.Strings.seat_driver) {
+	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 0, seat_heat_chosen);
+	        } else if (seat_chosen == Rez.Strings.seat_passenger) {
+	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 1, seat_heat_chosen);
+	        } else if (seat_chosen == Rez.Strings.seat_rear_left) {
+	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 2, seat_heat_chosen);
+	        } else if (seat_chosen == Rez.Strings.seat_rear_center) {
+	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 4, seat_heat_chosen);
+	        } else if (seat_chosen == Rez.Strings.seat_rear_right) {
+	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 5, seat_heat_chosen);
+			}
+		}
     }
 
     function openVentConfirmed() {
@@ -324,7 +364,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
     function trunkConfirmed() {
         _handler.invoke(Ui.loadResource(Rez.Strings.label_trunk));
-        _tesla.openTrunk(_vehicle_id, method(:onClimateDone), "rear");
+        _tesla.openTrunk(_vehicle_id, method(:genericHandler), "rear");
     }
 
     function honkHornConfirmed() {
@@ -333,13 +373,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function timerRefresh() {
-        _get_vehicle_data = true;
-        stateMachine();
+    	if (!_noTimer && _data._vehicle_data != null) {
+	        _get_vehicle_data = true;
+	        stateMachine();
+	    }
     }
 
     function delayedWake() {
         _need_wake = true;
-        stateMachine();
+        _noTimer = true; stateMachine(); _noTimer = false;
     }
 
     function onSelect() {
@@ -352,12 +394,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function doSelect() {
-        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on")) {
-            _set_climate_off = true;
-        } else {
+        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
             _set_climate_on = true;
+        } else {
+            _set_climate_off = true;
         }
-        stateMachine();
+        _noTimer = true; stateMachine(); _noTimer = false;
     }
 
     function onNextPage() {
@@ -375,7 +417,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         } else {
             _unlock = true;
         }
-        stateMachine();
+        _noTimer = true; stateMachine(); _noTimer = false;
     }
 
     function onPreviousPage() {
@@ -400,7 +442,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		else {
 			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
-        stateMachine();
+        _noTimer = true; stateMachine(); _noTimer = false;
     }
 
     function onBack() {
@@ -421,7 +463,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return;
         }
 
+    	_noTimer = true;
         Ui.pushView(new Rez.Menus.OptionMenu(), new OptionMenuDelegate(self), Ui.SLIDE_UP);
+        _noTimer = false; 
     }
 
     function onTap(click) {
@@ -454,15 +498,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
     function onReceiveAuth(responseCode, data) {
         if (responseCode == 200) {
             _auth_done = true;
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
         } else {
             _resetToken();
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});
@@ -477,7 +525,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             if (vehicles.size() > 0) {
                 _vehicle_id = vehicles[0].get("id");
                 Application.getApp().setProperty("vehicle", _vehicle_id);
-                stateMachine();
+                _noTimer = true; stateMachine(); _noTimer = false;
             } else {
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_no_vehicles));
             }
@@ -488,13 +536,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
             if (responseCode == 408) {
-                stateMachine();
+                _noTimer = true; stateMachine(); _noTimer = false;
             }
 
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});
@@ -523,10 +575,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 }
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
+				var errorStr = "";
+	            if (data) {
+	            	errorStr = data.get("error");
+	            }
 	            var alert = new Alert({
 					:timeout => 4000,
 					:font => Graphics.FONT_TINY,
-					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 					:fgcolor => Graphics.COLOR_RED,
 					:bgcolor => Graphics.COLOR_WHITE
 				});
@@ -540,7 +596,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (responseCode == 200) {
             _wake_done = true;
             _get_vehicle_data = true;
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
@@ -554,10 +610,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _sleep_timer.start(method(:delayedWake), 500, false);
             }
 
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});
@@ -570,7 +630,35 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (responseCode == 200) {
             _get_vehicle_data = true;
             _handler.invoke(null);
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
+        } else {
+            if (responseCode == 401) {
+                // Unauthorized
+                _resetToken();
+            }
+ 
+            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+            
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
+            var alert = new Alert({
+				:timeout => 4000,
+				:font => Graphics.FONT_TINY,
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
+				:fgcolor => Graphics.COLOR_RED,
+				:bgcolor => Graphics.COLOR_WHITE
+			});
+			alert.pushView(Ui.SLIDE_IMMEDIATE);
+        }
+    }
+
+    function onChargingAmpsDone(responseCode, data) {
+        if (responseCode == 200) {
+            _get_vehicle_data = true;
+            _handler.invoke(null);
+            _noTimer = true; stateMachine(); _noTimer = false;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
@@ -578,10 +666,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
             
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});
@@ -594,7 +686,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (responseCode == 200) {
             _get_vehicle_data = true;
             _handler.invoke(null);
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
@@ -602,10 +694,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
             
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});
@@ -617,7 +713,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     function genericHandler(responseCode, data) {
         if (responseCode == 200) {
             _handler.invoke(null);
-            stateMachine();
+            _noTimer = true; stateMachine(); _noTimer = false;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
@@ -625,10 +721,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
+			var errorStr = "";
+            if (data) {
+            	errorStr = data.get("error");
+            }
             var alert = new Alert({
 				:timeout => 4000,
 				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + data.get("error"),
+				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
 				:bgcolor => Graphics.COLOR_WHITE
 			});

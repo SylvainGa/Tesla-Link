@@ -43,8 +43,11 @@ class QuickTesla extends App.AppBase {
         }
         else
         {
-            var view = new NoGlanceView();
-            return [ view, new NoGlanceDelegate(data) ];
+// WHY? Worked well on my Venu without having this extra touch screen touch
+//            var view = new NoGlanceView();
+//            return [ view, new NoGlanceDelegate(data) ];
+            var view = new MainView(data);
+            return [ view, new MainDelegate(data, view.method(:onReceive)) ];
         }        
     }
 

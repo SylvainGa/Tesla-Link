@@ -46,8 +46,8 @@
     <string id="label_getting_vehicles">Liste vehicules</string>
     <string id="label_honk">Klaxon</string>
     <string id="label_open_port">Port ouvert</string>
-    <string id="label_hvac_on">Clim Sur</string>
-    <string id="label_hvac_off">Clim Éteint</string>
+    <string id="label_hvac_on">Clim activée</string>
+    <string id="label_hvac_off">Clim Éteinte</string>
     <string id="label_lock_doors">Vér. portes</string>
     <string id="label_locked">Fermée</string>
     <string id="label_login_on_phone">Connexion sur tél.</string>
@@ -77,4 +77,21 @@
 	<string id="label_close_vent">Fermer fenêtre ?</string>
     <string id="label_vent">Ventilé</string>
     <string id="label_frunktrunkport">Choisir</string>
+    <string id="menu_set_charging_amps">Ajuster Ampérage</string>
+    <string id="temp_chooser_title">Ampérage à?</string>
+    <string id="menu_set_seat_heat">Chaleur siège</string>
+	<string id="temp_choose_seat">Quel siège?</string>
+	<string id="temp_choose_heat">Quelle chaleur?</string>
+	<string id="seat_driver">Conducteur</string>
+	<string id="seat_passenger">Passager</string>
+	<string id="seat_rear_left">Arrière gauche</string>
+	<string id="seat_rear_center">Arrière centre</string>
+	<string id="seat_rear_right">Arrière droite</string>
+	<string id="seat_front">Avant</string>
+	<string id="seat_rear">Arrière</string>
+	<string id="menu_label_defrost">Actionner Dégivrage</string>
+	<string id="label_defrost_on">Dégivrage activé</string>
+	<string id="label_defrost_off">Dégivrage éteint</string>
+	<string id="label_defrost">Dégivrage</string>
+	<string id="menu_label_vent">Ventilé</string>
 </strings>
