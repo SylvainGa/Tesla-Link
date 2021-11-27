@@ -1,5 +1,6 @@
 <strings>
     <string id="AppName">Tesla</string>
+    <string id="AppVersionTitle">Version de l'appli</string>
     <string id="car_chooser_title">Choisir un VIN</string>
 
     <!--  Glance view -->
@@ -95,8 +96,6 @@
 	<string id="label_defrost">Dégivrage</string>
 	<string id="menu_label_vent">Ventilé</string>
 	<string id="menu_option_title">Options</string>
-	<string id="AppName">Crystal</string>
-	<string id="AppVersionTitle">Version de l'appli</string>
 	<string id="number_of_slots">Combien d'emplacement utilisés ?</string>
 	<string id="OptionMenu_1">Emplacement 1</string>
 	<string id="OptionMenu_2">Emplacement 2</string>
