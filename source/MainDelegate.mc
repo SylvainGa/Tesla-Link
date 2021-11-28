@@ -594,7 +594,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -630,7 +630,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -666,7 +666,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            	errorStr = data.get("error");
 	            }
 	            var alert = new Alert({
-					:timeout => 4000,
+					:timeout => 1000,
 					:font => Graphics.FONT_TINY,
 					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 					:fgcolor => Graphics.COLOR_RED,
@@ -701,7 +701,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -730,7 +730,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -757,7 +757,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -785,7 +785,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,
@@ -812,7 +812,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             	errorStr = data.get("error");
             }
             var alert = new Alert({
-				:timeout => 4000,
+				:timeout => 1000,
 				:font => Graphics.FONT_TINY,
 				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
 				:fgcolor => Graphics.COLOR_RED,

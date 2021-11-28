@@ -3,3 +3,5 @@
 bin/
 source/TrunkPicker.removed
 manifest.xml
+.vscode/launch.json
+.vscode/tasks.json
