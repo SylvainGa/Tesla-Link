@@ -210,7 +210,7 @@
     </bitmap>
     <bitmap id="settings_icon" filename="settings.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
-            <color>FFFFFF</color>
+            <color>CCCCCC</color>
             <color>000000</color>
         </palette>
     </bitmap>
