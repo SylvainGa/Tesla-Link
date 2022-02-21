@@ -9,21 +9,21 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 //! Factory that controls which numbers can be picked
-class NumberFactory extends WatchUi.PickerFactory {
-    private var _start as Number;
-    private var _stop as Number;
-    private var _increment as Number;
+class FloatFactory extends WatchUi.PickerFactory {
+    private var _start as Float;
+    private var _stop as Float;
+    private var _increment as Float;
     private var _formatString as String;
     private var _font as FontDefinition;
 
     //! Constructor
-    //! @param start Number to start with
-    //! @param stop Number to end with
+    //! @param start Float to start with
+    //! @param stop Float to end with
     //! @param increment How far apart the numbers should be
     //! @param options Dictionary of options
     //! @option options :font The font to use
-    //! @option options :format The number format to display
-    public function initialize(start as Number, stop as Number, increment as Number, options as {
+    //! @option options :format The Float format to display
+    public function initialize(start as Float, stop as Float, increment as Float, options as {
         :font as FontDefinition,
         :format as String
     }) {
@@ -48,10 +48,10 @@ class NumberFactory extends WatchUi.PickerFactory {
         }
     }
 
-    //! Get the index of a number item
-    //! @param value The number to get the index of
-    //! @return The index of the number
-    public function getIndex(value as Number) as Number {
+    //! Get the index of a Float item
+    //! @param value The Float to get the index of
+    //! @return The index of the Float
+    public function getIndex(value as Float) as Float {
         return (value / _increment) - _start;
     }
 
@@ -59,10 +59,10 @@ class NumberFactory extends WatchUi.PickerFactory {
     //! @param index The item index
     //! @param selected true if the current item is selected, false otherwise
     //! @return Drawable for the item
-    public function getDrawable(index as Number, selected as Boolean) as Drawable? {
+    public function getDrawable(index as Float, selected as Boolean) as Drawable? {
         var value = getValue(index);
         var text = "No item";
-        if (value instanceof Number) {
+        if (value instanceof Float) {
             text = value.format(_formatString);
         }
         return new WatchUi.Text({:text=>text, :color=>Graphics.COLOR_WHITE, :font=>_font,
@@ -72,13 +72,13 @@ class NumberFactory extends WatchUi.PickerFactory {
     //! Get the value of the item at the given index
     //! @param index Index of the item to get the value of
     //! @return Value of the item
-    public function getValue(index as Number) as Object? {
+    public function getValue(index as Float) as Object? {
         return _start + (index * _increment);
     }
 
-    //! Get the number of picker items
-    //! @return Number of items
-    public function getSize() as Number {
+    //! Get the Float of picker items
+    //! @return Float of items
+    public function getSize() as Float {
         return (_stop - _start) / _increment + 1;
     }
 }

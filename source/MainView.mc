@@ -266,7 +266,12 @@ System.println(findDrawableById("frunk_icon_white"));*/
 
                     // Update the text at the bottom of the screen with charge and temperature
                     var status_drawable = View.findDrawableById("status");
-                    status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ / " : "% / ") + inside_temp_local);
+                    var charging_current = _data._vehicle_data.get("charge_state").get("charge_current_request");
+                    if (charging_current == null) {
+                    	charging_current = 0;
+                    }
+                    
+                    status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A/" + inside_temp_local);
                     status_drawable.draw(dc);
 
                     // Update the text in the middle of the screen with departure time (if set)

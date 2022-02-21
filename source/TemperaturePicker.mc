@@ -9,7 +9,6 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-
 //! Picker that allows the user to choose a temperature
 class TemperaturePicker extends WatchUi.Picker {
 	var _temperature;
@@ -17,9 +16,17 @@ class TemperaturePicker extends WatchUi.Picker {
     //! Constructor
     public function initialize(temperature, max_temp, min_temp) {
     	_temperature = temperature;
-    	var startPos = [temperature.toNumber() - min_temp.toNumber()];
+
         var title = new WatchUi.Text({:text=>Rez.Strings.temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
-        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(min_temp.toNumber(), max_temp.toNumber(), 0.5, {})], :defaults=>startPos});
+
+        if (Application.getApp().getProperty("imperial")) {
+ 	    	var startPos = [temperature.toNumber() - min_temp.toNumber()];
+	        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(min_temp.toNumber(), max_temp.toNumber(), 1, {:format=>"%2d"})], :defaults=>startPos});
+        }
+        else {
+ 	    	var startPos = [(temperature.toFloat() - min_temp.toFloat()) / 0.5];
+	        Picker.initialize({:title=>title, :pattern=>[new $.FloatFactory(min_temp.toFloat(), max_temp.toFloat(), 0.5, {:format=>"%2.1f"})], :defaults=>startPos});
+        }
     }
 
     //! Update the view
@@ -53,7 +60,7 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
     //! @return true if handled, false otherwise
     function onAccept (values) {
         _temperature = values[0];
-        
+
         if (Application.getApp().getProperty("imperial")) {
 			_temperature = (_temperature - 32.0) * 5.0 / 9.0;	
         }
