@@ -4,25 +4,28 @@
 	</setting>
 
 	<setting propertyKey="@Properties.NumberOfSlots" title="@Strings.number_of_slots">
-		<settingConfig type="numeric" min="1" max="14" required="true"/>
+		<settingConfig type="numeric" min="1" max="16" required="true"/>
 	</setting>
 
 	<setting propertyKey="@Properties.option_slot1" title="@Strings.OptionMenu_1">
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -30,18 +33,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -49,18 +55,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -68,18 +77,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -87,18 +99,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -106,18 +121,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -125,18 +143,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -144,18 +165,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -163,18 +187,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -182,18 +209,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -201,18 +231,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -220,18 +253,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -239,18 +275,21 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -258,18 +297,65 @@
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
 			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
-			<listEntry value="2">@Strings.menu_set_charging_amps</listEntry>
-			<listEntry value="3">@Strings.menu_set_temp</listEntry>
-			<listEntry value="4">@Strings.menu_label_honk</listEntry>
-			<listEntry value="5">@Strings.menu_label_open_frunk</listEntry>
-			<listEntry value="6">@Strings.menu_label_open_trunk</listEntry>
-			<listEntry value="7">@Strings.menu_label_open_port</listEntry>
-			<listEntry value="8">@Strings.menu_label_vent</listEntry>
-			<listEntry value="9">@Strings.menu_label_toggle_view</listEntry>
-			<listEntry value="10">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="11">@Strings.menu_label_toggle_units</listEntry>
-			<listEntry value="12">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="13">@Strings.menu_label_reset</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.option_slot15" title="@Strings.OptionMenu_15">
+		<settingConfig type="list">
+			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
+			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.option_slot16" title="@Strings.OptionMenu_16">
+		<settingConfig type="list">
+			<listEntry value="0">@Strings.menu_label_defrost</listEntry>
+			<listEntry value="1">@Strings.menu_set_seat_heat</listEntry>
+			<listEntry value="2">@Strings.menu_set_steering_wheel_heat</listEntry>
+			<listEntry value="3">@Strings.menu_set_charging_limit</listEntry>
+			<listEntry value="4">@Strings.menu_set_charging_amps</listEntry>
+			<listEntry value="5">@Strings.menu_start_stop_charging</listEntry>
+			<listEntry value="6">@Strings.menu_set_temp</listEntry>
+			<listEntry value="7">@Strings.menu_adjust_departure</listEntry>
+			<listEntry value="8">@Strings.menu_label_honk</listEntry>
+			<listEntry value="9">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="10">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="11">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="12">@Strings.menu_label_vent</listEntry>
+			<listEntry value="13">@Strings.menu_label_toggle_view</listEntry>
+			<listEntry value="14">@Strings.menu_label_swap_frunk_for_port</listEntry>
+			<listEntry value="15">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="16">@Strings.menu_label_reset</listEntry>
 		</settingConfig>
 	</setting>
 

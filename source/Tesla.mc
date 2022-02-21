@@ -186,12 +186,102 @@ class Tesla {
         );
     }
     
+    function climateSteeringWheel(vehicle, notify, steering_wheel_mode) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/remote_steering_wheel_heater_request";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "on" => !steering_wheel_mode
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+    
+    function setChargingLimit(vehicle, notify, charging_limit) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_charge_limit";
+        Communications.makeWebRequest(
+            url,
+            {
+                "percent" => charging_limit
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
     function setChargingAmps(vehicle, notify, charging_amps) {
         var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_charging_amps";
         Communications.makeWebRequest(
             url,
             {
                 "charging_amps" => charging_amps
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
+    function toggleCharging(vehicle, notify, charging) {
+        var url;
+        
+        if (charging) {
+        	url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/charge_stop";
+        }
+        else {
+        	url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/charge_start";
+        }
+        genericPost(url, notify);
+    }
+
+    function stopDeparture(vehicle, notify) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "enable" => false
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
+    function startDeparture(vehicle, notify, departureTime) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "enable" => true,
+                "departure_time" => departureTime,
+                "preconditioning_enabled" => true,
+                "preconditioning_weekdays_only" => false
             },
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,

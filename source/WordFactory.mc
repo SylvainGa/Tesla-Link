@@ -12,6 +12,24 @@ class WordFactory extends WatchUi.PickerFactory {
         mFont = Graphics.FONT_SMALL;
     }
 
+    public function getIndex(value as String or Symbol) as Number {
+        if (value instanceof String) {
+            for (var i = 0; i < mWords.size(); i++) {
+                if (value.equals(WatchUi.loadResource(mWords[i]))) {
+                    return i;
+                }
+            }
+        } else {
+            for (var i = 0; i < mWords.size(); i++) {
+                if (mWords[i].equals(value)) {
+                    return i;
+                }
+            }
+        }
+
+        return 0;
+    }
+
     function getSize() {
         return mWords.size();
     }

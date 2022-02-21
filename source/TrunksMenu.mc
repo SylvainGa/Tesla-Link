@@ -20,6 +20,7 @@ class TrunksMenuDelegate extends Ui.MenuInputDelegate {
         	_controller._open_port = true;
         } else if (item == :vent) {
         	_controller._vent = true;
+        	_controller._bypass_confirmation = true;
         }
 
         _controller.stateMachine();

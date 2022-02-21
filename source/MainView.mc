@@ -12,8 +12,17 @@ class MainView extends Ui.View {
         View.initialize();
         _data = data;
         _data._ready = false;
+
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
     }
+
+    function onShow() {
+	    Application.getApp().setProperty("refreshTimer", true);
+	}
+	
+    function onHide() {
+	    Application.getApp().setProperty("refreshTimer", false);
+	}
 
     function onLayout(dc) {
         setLayout(Rez.Layouts.ImageLayout(dc));
@@ -21,7 +30,7 @@ class MainView extends Ui.View {
 
     function onReceive(args) {
         _display = args;
-        WatchUi.requestUpdate();
+        Ui.requestUpdate();
     }
 
     function onUpdate(dc) {
@@ -65,6 +74,9 @@ class MainView extends Ui.View {
             var use_image_layout = Application.getApp().getProperty("image_view") == null ? System.getDeviceSettings().isTouchScreen : Application.getApp().getProperty("image_view");
             Application.getApp().setProperty("image_view", use_image_layout);
 
+			// Read temperature unit from the watch settings
+			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+
             // Swap frunk for port?
             // New value : Frunk = 0, Trunk = 1. Port = 2
             var swap_frunk_for_port = Application.getApp().getProperty("swap_frunk_for_port");
@@ -78,7 +90,102 @@ class MainView extends Ui.View {
                 View.onUpdate(dc);
             
                 // Draw the initial icons (in white) in case we don't have vehicle data
-                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : swap_frunk_for_port == 2 ?  Ui.loadResource(Rez.Drawables.charge_icon) : Ui.loadResource(Rez.Drawables.frunktrunkport_icon_white));
+                //dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : swap_frunk_for_port == 2 ?  Ui.loadResource(Rez.Drawables.charge_icon) : Ui.loadResource(Rez.Drawables.frunktrunkport_icon_white));
+                if (swap_frunk_for_port != 3) {
+	                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : Ui.loadResource(Rez.Drawables.charge_icon));
+	            }
+	            else {
+/*	            	var icon_string = "frunk0trunk0port0_icon_white";
+	            	var icon_array = icon_string.toCharArray();
+	            	 
+					if (_data._vehicle_data.get("vehicle_state").get("ft") == 1) {
+						icon_array[5] = '1';
+					}
+					
+					if (_data._vehicle_data.get("vehicle_state").get("rt") == 1) {
+						icon_array[11] = '1';
+					}
+
+					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
+						icon_array[16] = '1';
+					}
+					
+					icon_string = StringUtil.charArrayToString(icon_array);
+					var icon_id = findDrawableById(icon_string);
+					
+	                dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk_icon_white));
+System.println("String : " + icon_string + " ID : " + icon_id);
+
+System.println(findDrawableById("frunk_icon_white"));*/
+					var which_bitmap = 0;
+					
+					if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
+						which_bitmap = 1;
+					}
+
+					if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
+						which_bitmap += 2;
+					}
+
+					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
+						which_bitmap += 4;
+					}
+
+					if (Application.getApp().getProperty("venting")) {
+						which_bitmap += 8;
+					}
+
+					switch (which_bitmap) {
+						case 0:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port0vent0_icon_white));
+							break;
+						case 1:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port0vent0_icon_white));
+							break;
+						case 2:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port0vent0_icon_white));
+							break;
+						case 3:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port0vent0_icon_white));
+							break;
+						case 4:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port1vent0_icon_white));
+							break;
+						case 5:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port1vent0_icon_white));
+							break;
+						case 6:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port1vent0_icon_white));
+							break;
+						case 7:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port1vent0_icon_white));
+							break;
+						case 8:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port0vent1_icon_white));
+							break;
+						case 9:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port0vent1_icon_white));
+							break;
+						case 10:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port0vent1_icon_white));
+							break;
+						case 11:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port0vent1_icon_white));
+							break;
+						case 12:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port1vent1_icon_white));
+							break;
+						case 13:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port1vent1_icon_white));
+							break;
+						case 14:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port1vent1_icon_white));
+							break;
+						case 15:
+							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port1vent1_icon_white));
+							break;
+					}
+	            }
                 dc.drawBitmap(image_x_right,image_y_top,Ui.loadResource(Rez.Drawables.climate_on_icon_white));
                 dc.drawBitmap(image_x_left,image_y_bottom,Ui.loadResource(Rez.Drawables.locked_icon_white));
                 dc.drawBitmap(image_x_right,image_y_bottom,Ui.loadResource(is_touchscreen? Rez.Drawables.settings_icon : Rez.Drawables.back_icon));
@@ -127,9 +234,13 @@ class MainView extends Ui.View {
 				var latitude = _data._vehicle_data.get("drive_state").get("latitude");
 				var longitude = _data._vehicle_data.get("drive_state").get("longitude");
 			    var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
-				
+			    var door_open = _data._vehicle_data.get("vehicle_state").get("df").toNumber() + _data._vehicle_data.get("vehicle_state").get("dr").toNumber() + _data._vehicle_data.get("vehicle_state").get("pf").toNumber() + _data._vehicle_data.get("vehicle_state").get("pr").toNumber();
+
+                var departure_time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
+
 	            Application.getApp().setProperty("driver_temp", driver_temp);
 	            Application.getApp().setProperty("venting", venting);
+	            Application.getApp().setProperty("door_open", door_open);
 	            Application.getApp().setProperty("latitude", latitude);
 	            Application.getApp().setProperty("longitude", longitude);
                 
@@ -151,20 +262,49 @@ class MainView extends Ui.View {
                 if (use_image_layout)
                 {
                     // We're using image layout, so update the lock state indicator
-                    dc.drawBitmap(image_x_left.toNumber(),image_y_bottom,(_data._vehicle_data.get("vehicle_state").get("locked") ? Ui.loadResource(Rez.Drawables.locked_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
+                    dc.drawBitmap(image_x_left.toNumber(),image_y_bottom,(_data._vehicle_data.get("vehicle_state").get("locked") ? Ui.loadResource(Rez.Drawables.locked_icon) : door_open ? Ui.loadResource(Rez.Drawables.door_open_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
 
                     // Update the text at the bottom of the screen with charge and temperature
                     var status_drawable = View.findDrawableById("status");
                     status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ / " : "% / ") + inside_temp_local);
                     status_drawable.draw(dc);
 
+                    // Update the text in the middle of the screen with departure time (if set)
+                    if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+	                    var departure_drawable = View.findDrawableById("departure");
+	                    var hours = (departure_time / 60).toLong();
+	                    var minutes = (((departure_time / 60.0) - hours) * 60).toLong();
+	                    var timeStr;
+	                    if (System.getDeviceSettings().is24Hour) {
+		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.departure) + "$1$h$2$", [hours.format("%2d"), minutes.format("%02d")]);
+		                }
+		                else {
+		                	var ampm = "am";
+		                	var hours12 = hours;
+
+		                	if (hours == 0) {
+		                		hours12 = 12;
+		                	}
+		                	else if (hours > 12) {
+		                		ampm = "pm";
+		                		hours12 -= 12;
+		                	}
+		                	
+		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.departure) + "$1$:$2$$3$", [hours12.format("%2d"), minutes.format("%02d"), ampm]);
+		                }
+	                    departure_drawable.setText(timeStr.toString());
+	                    departure_drawable.draw(dc);
+					}
+
                     // Update the climate state indicator, note we have blue or red icons depending on heating or cooling
                     var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
                     var climate_defrost = _data._vehicle_data.get("climate_state").get("defrost_mode");
+                    var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
+
                     if (climate_state == false)
                     {
-                    	if (climate_defrost == 2) {
-	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon_defrost));
+                    	if (climate_batterie_preheat) {
+	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon_preheat));
 	                    } else {
 	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon));
 	                    }
@@ -177,6 +317,8 @@ class MainView extends Ui.View {
                     {
                     	if (climate_defrost == 2) {
 	                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_red_defrost));
+	                    } else if (climate_batterie_preheat) {
+	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_preheat));
 	                    } else {
 	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_red));
 	                    }

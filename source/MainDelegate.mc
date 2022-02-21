@@ -24,6 +24,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _set_climate_set;
     var _set_climate_defrost;
     var _set_charging_amps_set;
+    var _set_charging_limit_set;
+    var _toggle_charging_set;
     var _get_vehicle_data;
     var _honk_horn;
     var _open_port;
@@ -35,10 +37,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _settings;
     var _vent;
     var _set_seat_heat;
-	var _noTimer;	
+    var _set_steering_wheel_heat;
+    var _noTimer;	
     var _data;
-
+	var refreshTimer;
     var _code_verifier;
+    var _adjust_departure;
 
     function initialize(data, handler) {
         BehaviorDelegate.initialize();
@@ -64,6 +68,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _set_climate_off = false;
         _set_climate_defrost = false;
         _set_climate_set = false;
+		_toggle_charging_set = false;
 		
         _get_vehicle_data = true;
         _honk_horn = false;
@@ -75,13 +80,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_bypass_confirmation = false;
 		_vent = false;
 		_set_seat_heat = false;
+        _set_steering_wheel_heat = false;
+        _adjust_departure = false;
 
 		_noTimer = true; stateMachine(); _noTimer = false;
 
-	    var myTimer = new Timer.Timer();
-	    myTimer.start(method(:timerRefresh), 2000, true);
+	    refreshTimer = new Timer.Timer();
+	    refreshTimer.start(method(:timerRefresh), 2000, true);
     }
 
+    function onShow() {
+	    refreshTimer.start(method(:timerRefresh), 2000, true);
+	}
+	
+    function onHide() {
+	    refreshTimer.stop();
+	}
+	
     function bearerForAccessOnReceive(responseCode, data) {
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
@@ -232,31 +247,42 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (_set_climate_on) {
             _set_climate_on = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_hvac_on));
-            _tesla.climateOn(_vehicle_id, method(:onClimateDone));
+            _tesla.climateOn(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_off) {
             _set_climate_off = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_hvac_off));
-            _tesla.climateOff(_vehicle_id, method(:onClimateDone));
+            _tesla.climateOff(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_defrost) {
             _set_climate_defrost = false;
             _handler.invoke(Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on));
-            _tesla.climateDefrost(_vehicle_id, method(:onClimateDone), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+            _tesla.climateDefrost(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
         }
 
         if (_set_climate_set) {
             _set_climate_set = false;
             var temperature = Application.getApp().getProperty("driver_temp");
-            _tesla.climateSet(_vehicle_id, method(:onClimateDone), temperature);
+            _tesla.climateSet(_vehicle_id, method(:genericHandler), temperature);
+        }
+
+        if (_toggle_charging_set) {
+            _toggle_charging_set = false;
+            _tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
+        }
+
+        if (_set_charging_limit_set) {
+            _set_charging_limit_set = false;
+            var charging_limit = Application.getApp().getProperty("charging_limit");
+            _tesla.setChargingLimit(_vehicle_id, method(:genericHandler), charging_limit);
         }
 
         if (_set_charging_amps_set) {
             _set_charging_amps_set = false;
             var charging_amps = Application.getApp().getProperty("charging_amps");
-            _tesla.setChargingAmps(_vehicle_id, method(:onChargingAmpsDone), charging_amps);
+            _tesla.setChargingAmps(_vehicle_id, method(:genericHandler), charging_amps);
         }
 
         if (_honk_horn) {
@@ -275,18 +301,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (_unlock) {
             _unlock = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_unlock_doors));
-            _tesla.doorUnlock(_vehicle_id, method(:onLockDone));
+            _tesla.doorUnlock(_vehicle_id, method(:genericHandler));
         }
 
         if (_lock) {
             _lock = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_lock_doors));
-            _tesla.doorLock(_vehicle_id, method(:onLockDone));
+            _tesla.doorLock(_vehicle_id, method(:genericHandler));
         }
 
         if (_open_frunk) {
             _open_frunk = false;
             if (_bypass_confirmation) {
+            	_bypass_confirmation = false;
 				frunkConfirmed();
 			}
 			else {
@@ -299,6 +326,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (_open_trunk) {
             _open_trunk = false;
             if (_bypass_confirmation) {
+            	_bypass_confirmation = false;
 				trunkConfirmed();
 			}
 			else {
@@ -313,14 +341,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
             var venting = Application.getApp().getProperty("venting");
 
             if (venting == 0) {
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
-	            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed));
-	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+	            if (_bypass_confirmation) {
+	            	_bypass_confirmation = false;
+	            	openVentConfirmed();
+	            } else {
+		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
+		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed));
+		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+		        }
             }
             else {
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
-	            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed));
-	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+	            if (_bypass_confirmation) {
+	            	_bypass_confirmation = false;
+	            	closeVentConfirmed();
+	            } else {
+		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
+		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed));
+		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+	            }
             }
         }
 
@@ -332,38 +370,61 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _handler.invoke(Ui.loadResource(seat_chosen));
 
 	        if (seat_chosen == Rez.Strings.seat_driver) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 0, seat_heat_chosen);
+	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
 	        } else if (seat_chosen == Rez.Strings.seat_passenger) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 1, seat_heat_chosen);
+	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 1, seat_heat_chosen);
 	        } else if (seat_chosen == Rez.Strings.seat_rear_left) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 2, seat_heat_chosen);
+	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 2, seat_heat_chosen);
 	        } else if (seat_chosen == Rez.Strings.seat_rear_center) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 4, seat_heat_chosen);
+	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 4, seat_heat_chosen);
 	        } else if (seat_chosen == Rez.Strings.seat_rear_right) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:onClimateDone), 5, seat_heat_chosen);
+	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 5, seat_heat_chosen);
 			}
 		}
+
+        if (_set_steering_wheel_heat) {
+            _set_steering_wheel_heat = false;
+	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on));
+	        }
+	        else {
+	            _handler.invoke(Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on));
+	            _tesla.climateSteeringWheel(_vehicle_id, method(:onClimateDone), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+	        }
+        }
+        
+        if (_adjust_departure) {
+            _adjust_departure = false;
+			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_stop_departure));
+	            _tesla.stopDeparture(_vehicle_id, method(:genericHandler));
+	        }
+	        else {
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_start_departure));
+	            _tesla.startDeparture(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("departure_time"));
+	        }
+        }
     }
 
     function openVentConfirmed() {
-		_handler.invoke(Ui.loadResource(Rez.Strings.label_vent));
+		_handler.invoke(Ui.loadResource(Rez.Strings.label_vent_opening));
         Application.getApp().setProperty("venting", 4);
         _tesla.vent(_vehicle_id, method(:genericHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function closeVentConfirmed() {
-	    _handler.invoke(Ui.loadResource(Rez.Strings.label_vent));
+	    _handler.invoke(Ui.loadResource(Rez.Strings.label_vent_closing));
         Application.getApp().setProperty("venting", 0);
         _tesla.vent(_vehicle_id, method(:genericHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function frunkConfirmed() {
-        _handler.invoke(Ui.loadResource(Rez.Strings.label_frunk));
+        _handler.invoke(Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened));
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "front");
     }
 
     function trunkConfirmed() {
-        _handler.invoke(Ui.loadResource(Rez.Strings.label_trunk));
+        _handler.invoke(Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing));
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "rear");
     }
 
@@ -373,9 +434,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function timerRefresh() {
-    	if (!_noTimer && _data._vehicle_data != null) {
-	        _get_vehicle_data = true;
-	        stateMachine();
+		if (Application.getApp().getProperty("refreshTimer")) {
+	    	if (!_noTimer && _data._vehicle_data != null) {
+		        _get_vehicle_data = true;
+		        stateMachine();
+		    }
+		}
+	    else {
 	    }
     }
 
@@ -471,51 +536,98 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_index < 0) {
 			_index = 0;
 		}
-		else if (_index > 13) {
-			_index = 13;
+		else if (_index > 16) {
+			_index = 16;
 		}
-		
+
 		switch (_index) {
 			case 0:
-				menu.addItem(Rez.Strings.menu_label_defrost, :defrost);
+		        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("defrost_mode") == 2) {
+					menu.addItem(Rez.Strings.menu_label_defrost_off, :defrost);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_defrost_on, :defrost);
+				}
 				break;
 			case 1:
 				menu.addItem(Rez.Strings.menu_set_seat_heat, :set_seat_heat);
 				break;
 			case 2:
-				menu.addItem(Rez.Strings.menu_set_charging_amps, :set_charging_amps);
+		        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true) {
+					menu.addItem(Rez.Strings.menu_set_steering_wheel_heat_off, :set_steering_wheel_heat);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_set_steering_wheel_heat_on, :set_steering_wheel_heat);
+				}
 				break;
 			case 3:
-				menu.addItem(Rez.Strings.menu_set_temp, :set_temperature);
+				menu.addItem(Rez.Strings.menu_set_charging_limit, :set_charging_limit);
 				break;
 			case 4:
-				menu.addItem(Rez.Strings.menu_label_honk, :honk);
+				menu.addItem(Rez.Strings.menu_set_charging_amps, :set_charging_amps);
 				break;
 			case 5:
-				menu.addItem(Rez.Strings.menu_label_open_frunk, :open_frunk);
+		        if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
+					menu.addItem(Rez.Strings.menu_stop_charging, :toggle_charge);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_start_charging, :toggle_charge);
+				}
 				break;
 			case 6:
-				menu.addItem(Rez.Strings.menu_label_open_trunk, :open_trunk);
+				menu.addItem(Rez.Strings.menu_set_temp, :set_temperature);
 				break;
 			case 7:
-				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
+				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+					menu.addItem(Rez.Strings.menu_label_stop_departure, :adjust_departure);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_start_departure, :adjust_departure);
+				}
 				break;
 			case 8:
-				menu.addItem(Rez.Strings.menu_label_vent, :vent);
+				menu.addItem(Rez.Strings.menu_label_honk, :honk);
 				break;
 			case 9:
-				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
+		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("ft") == 0) {
+					menu.addItem(Rez.Strings.menu_label_open_frunk_open, :open_frunk);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_open_frunk_opened, :open_frunk);
+				}
 				break;
 			case 10:
-				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
+		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("rt") == 0) {
+					menu.addItem(Rez.Strings.menu_label_open_trunk_open, :open_trunk);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_open_trunk_close, :open_trunk);
+				}
 				break;
 			case 11:
-				menu.addItem(Rez.Strings.menu_label_toggle_units, :toggle_units);
+				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
 				break;
 			case 12:
-				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
+				if (Application.getApp().getProperty("venting") == 0) {
+					menu.addItem(Rez.Strings.menu_label_vent_open, :vent);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_vent_close, :vent);
+				}
 				break;
 			case 13:
+				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
+				break;
+			case 14:
+				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
+				break;
+/*			case 15:
+				menu.addItem(Rez.Strings.menu_label_toggle_units, :toggle_units);
+				break; */
+			case 15:
+				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
+				break;
+			case 16:
 				menu.addItem(Rez.Strings.menu_label_reset, :reset);
 				break;
 		}
@@ -530,7 +642,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
 		if (_slot_count == null) {
-			_slot_count = 14;
+			_slot_count = 17;
 		} else if (!(_slot_count instanceof Number)) {
 			_slot_count = _slot_count.toNumber();
 		}
@@ -538,8 +650,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_slot_count < 1) {
 			_slot_count = 1;
 		}
-		else if (_slot_count > 14) {
-			_slot_count = 14;
+		else if (_slot_count > 16) { // Maximum of 16 entries in a menu
+			_slot_count = 16;
 		}
 		
 		var thisMenu = new WatchUi.Menu();
@@ -589,7 +701,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _resetToken();
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-			var errorStr = "";
+/*			var errorStr = "";
             if (data) {
             	errorStr = data.get("error");
             }
@@ -602,7 +714,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			});
 			
 			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
+*/        }
     }
 
     function onReceiveVehicles(responseCode, data) {
@@ -625,7 +737,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _noTimer = true; stateMachine(); _noTimer = false;
             }
 
-			var errorStr = "";
+/*			var errorStr = "";
             if (data) {
             	errorStr = data.get("error");
             }
@@ -638,7 +750,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			});
 			
 			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
+*/        }
     }
 
     function onReceiveVehicleData(responseCode, data) {
@@ -661,7 +773,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 }
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-				var errorStr = "";
+/*				var errorStr = "";
 	            if (data) {
 	            	errorStr = data.get("error");
 	            }
@@ -674,7 +786,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				});
 				
 				alert.pushView(Ui.SLIDE_IMMEDIATE);
-            }
+*/            }
         }
     }
 
@@ -696,7 +808,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 _sleep_timer.start(method(:delayedWake), 500, false);
             }
 
-			var errorStr = "";
+/*			var errorStr = "";
             if (data) {
             	errorStr = data.get("error");
             }
@@ -709,10 +821,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			});
 			
 			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
+*/        }
     }
 
-    function onClimateDone(responseCode, data) {
+/*    function onClimateDone(responseCode, data) {
         if (responseCode == 200) {
             _get_vehicle_data = true;
             _handler.invoke(null);
@@ -739,65 +851,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			alert.pushView(Ui.SLIDE_IMMEDIATE);
         }
     }
-
-    function onChargingAmpsDone(responseCode, data) {
-        if (responseCode == 200) {
-            _get_vehicle_data = true;
-            _handler.invoke(null);
-            _noTimer = true; stateMachine(); _noTimer = false;
-        } else {
-            if (responseCode == 401) {
-                // Unauthorized
-                _resetToken();
-            }
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-            
-			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
-    }
-
-    function onLockDone(responseCode, data) {
-        if (responseCode == 200) {
-            _get_vehicle_data = true;
-            _handler.invoke(null);
-            _noTimer = true; stateMachine(); _noTimer = false;
-        } else {
-            if (responseCode == 401) {
-                // Unauthorized
-                _resetToken();
-            }
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-            
-			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
-    }
-
+*/
     function genericHandler(responseCode, data) {
         if (responseCode == 200) {
+            _get_vehicle_data = true;
             _handler.invoke(null);
             _noTimer = true; stateMachine(); _noTimer = false;
         } else {
@@ -807,7 +864,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             }
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 
-			var errorStr = "";
+/*			var errorStr = "";
             if (data) {
             	errorStr = data.get("error");
             }
@@ -820,7 +877,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			});
 			
 			alert.pushView(Ui.SLIDE_IMMEDIATE);
-        }
+*/        }
     }
 
     function _saveToken(token) {

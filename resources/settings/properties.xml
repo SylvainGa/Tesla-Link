@@ -2,7 +2,7 @@
 
 	<property id="AppVersion" type="string">6.1.0</property>
 	<property id="token" type="string"></property>
-	<property id="NumberOfSlots" type="number">14</property>
+	<property id="NumberOfSlots" type="number">16</property>
 	<property id="option_slot1" type="number">0</property>
 	<property id="option_slot2" type="number">1</property>
 	<property id="option_slot3" type="number">2</property>
@@ -17,4 +17,6 @@
 	<property id="option_slot12" type="number">11</property>
 	<property id="option_slot13" type="number">12</property>
 	<property id="option_slot14" type="number">13</property>
+	<property id="option_slot15" type="number">14</property>
+	<property id="option_slot16" type="number">15</property>
 </properties>

@@ -26,12 +26,6 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :open_trunk) {
             _controller._open_trunk = true;
             _controller.stateMachine();
-        } else if (item == :toggle_units) {
-            if (units) {
-                Application.getApp().setProperty("imperial", false);
-            } else {
-                Application.getApp().setProperty("imperial", true);
-            }
         } else if (item == :toggle_view) {
             var view = Application.getApp().getProperty("image_view");
             if (view) {
@@ -78,6 +72,10 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
             
             Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :set_charging_limit) {
+        	var charging_limit = _controller._data._vehicle_data.get("charge_state").get("charge_limit_soc");
+            
+            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_seat_heat) {
 	        var heat = 0;
             Ui.pushView(new SeatHeatPicker(heat), new SeatHeatPickerDelegate(_controller), Ui.SLIDE_UP);
@@ -102,9 +100,23 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :defrost) {
             _controller._set_climate_defrost = true;
             _controller.stateMachine();
+        } else if (item == :set_steering_wheel_heat) {
+            _controller._set_steering_wheel_heat = true;
+            _controller.stateMachine();
         } else if (item == :vent) {
             _controller._vent = true;
             _controller.stateMachine();
+        } else if (item == :toggle_charge) {
+            _controller._toggle_charging_set = true;
+            _controller.stateMachine();
+        } else if (item == :adjust_departure) {
+			if (_controller._data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+	            _controller._adjust_departure = true;
+	            _controller.stateMachine();
+            }
+            else {
+				Ui.pushView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), WatchUi.SLIDE_IMMEDIATE);
+            }
         }
     }
 
