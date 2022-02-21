@@ -271,7 +271,7 @@ System.println(findDrawableById("frunk_icon_white"));*/
                     	charging_current = 0;
                     }
                     
-                    status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A/" + inside_temp_local);
+                    status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A " + inside_temp_local);
                     status_drawable.draw(dc);
 
                     // Update the text in the middle of the screen with departure time (if set)
