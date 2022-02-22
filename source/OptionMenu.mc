@@ -117,6 +117,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             else {
 				Ui.pushView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), WatchUi.SLIDE_IMMEDIATE);
             }
+        } else if (item == :toggle_sentry) {
+            _controller._sentry_mode = true;
+            _controller.stateMachine();
         }
     }
 

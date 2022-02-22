@@ -67,8 +67,8 @@
     <string id="label_no_vehicles">No vehicles</string>
 
 	<!--  SG Addition. Needs to be moved to their corresponding section -->
-    <string id="menu_adjust_departure">Adjust departure time</string>
-    <string id="menu_set_temp">Set temperature</string>
+    <string id="menu_label_adjust_departure">Adjust departure time</string>
+    <string id="menu_label_set_temp">Set temperature</string>
     <string id="temp_chooser_title">Set Temperature at</string>
     <string id="label_honk_horn">Hunk horn?</string>
     <string id="label_trunk">Trunk</string>
@@ -87,17 +87,17 @@
     <string id="label_vent_opening">Venting</string>
     <string id="label_vent_closing">Closing vents</string>
     <string id="label_frunktrunkport">Select</string>
-    <string id="menu_set_charging_amps">Set charging amps</string>
-    <string id="menu_set_charging_limit">Set charging limit</string>
-    <string id="menu_start_charging">Start charging</string>
-    <string id="menu_stop_charging">Stop charging</string>
-    <string id="menu_start_stop_charging">Start/stop charging</string>
+    <string id="menu_label_set_charging_amps">Set charging amps</string>
+    <string id="menu_label_set_charging_limit">Set charging limit</string>
+    <string id="menu_label_start_charging">Start charging</string>
+    <string id="menu_label_stop_charging">Stop charging</string>
+    <string id="menu_label_start_stop_charging">Start/stop charging</string>
     <string id="amps_chooser_title">Set Amps to</string>
     <string id="charginglimit_chooser_title">Set limit to</string>
-    <string id="menu_set_seat_heat">Seat heat</string>
-    <string id="menu_set_steering_wheel_heat">Steering wheel heat</string>
-    <string id="menu_set_steering_wheel_on">Activate Steering wheel heat</string>
-    <string id="menu_set_steering_wheel_off">Deactivate Steering wheel heat</string>
+    <string id="menu_label_set_seat_heat">Seat heat</string>
+    <string id="menu_label_set_steering_wheel_heat">Steering wheel heat</string>
+    <string id="menu_label_set_steering_wheel_on">Activate Steering wheel heat</string>
+    <string id="menu_label_set_steering_wheel_off">Deactivate Steering wheel heat</string>
 	<string id="temp_choose_seat">Which seat?</string>
 	<string id="temp_choose_heat">What level?</string>
 	<string id="seat_driver">Driver</string>
@@ -146,5 +146,9 @@
     <string id="timeSeparator">:</string>
     <string id="morning">AM</string>
     <string id="afternoon">PM</string>
-
+    <string id="menu_label_sentry">Sentry Toggle</string>
+    <string id="menu_label_sentry_on">Act. Sentry</string>
+    <string id="menu_label_sentry_off">Dis. Sentry</string>
+    <string id="label_sentry_toggle_on">Sentry on</string>
+    <string id="label_sentry_toggle_off">Sentry off</string>
 </strings>

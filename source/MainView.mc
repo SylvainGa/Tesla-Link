@@ -96,28 +96,6 @@ class MainView extends Ui.View {
 	                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : Ui.loadResource(Rez.Drawables.charge_icon));
 	            }
 	            else {
-/*	            	var icon_string = "frunk0trunk0port0_icon_white";
-	            	var icon_array = icon_string.toCharArray();
-	            	 
-					if (_data._vehicle_data.get("vehicle_state").get("ft") == 1) {
-						icon_array[5] = '1';
-					}
-					
-					if (_data._vehicle_data.get("vehicle_state").get("rt") == 1) {
-						icon_array[11] = '1';
-					}
-
-					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
-						icon_array[16] = '1';
-					}
-					
-					icon_string = StringUtil.charArrayToString(icon_array);
-					var icon_id = findDrawableById(icon_string);
-					
-	                dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk_icon_white));
-System.println("String : " + icon_string + " ID : " + icon_id);
-
-System.println(findDrawableById("frunk_icon_white"));*/
 					var which_bitmap = 0;
 					
 					if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
@@ -334,8 +312,6 @@ System.println(findDrawableById("frunk_icon_white"));*/
                     	var bitmap = Ui.loadResource(Rez.Drawables.sentry_icon) as BitmapResource;
                     	var bitmap_width = bitmap.getWidth();
                     	var bitmap_height = bitmap.getHeight();
-System.println("width : " + bitmap_width);
-System.println("height : " + bitmap_height);
                         dc.drawBitmap(center_x - bitmap_width / 2 - 3, sentry_y + bitmap_height / 2, bitmap);
                     }
                 }

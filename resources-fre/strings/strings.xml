@@ -67,8 +67,8 @@
     <string id="label_no_vehicles">Pas de véhicule</string>
 
 	<!--  SG Addition. Needs to be moved to their corresponding section -->
-    <string id="menu_adjust_departure">Ajuster départ planifié</string>
-    <string id="menu_set_temp">Température à</string>
+    <string id="menu_label_adjust_departure">Ajuster départ planifié</string>
+    <string id="menu_label_set_temp">Température à</string>
     <string id="temp_chooser_title">Température à?</string>
     <string id="label_honk_horn">Klaxonner?</string>
     <string id="label_trunk">Valise</string>
@@ -87,17 +87,17 @@
     <string id="label_vent_opening">Ouverture fenêtres</string>
     <string id="label_vent_closing">Fermeture fenêtres</string>
     <string id="label_frunktrunkport">Choisir</string>
-    <string id="menu_set_charging_amps">Ajuster Ampérage</string>
-    <string id="menu_set_charging_limit">Ajuster la limite de charge</string>
-    <string id="menu_start_charging">Démarrer la charge</string>
-    <string id="menu_stop_charging">Arrêter la charge</string>
-    <string id="menu_start_stop_charging">Démarrer/arrêter la charge</string>
+    <string id="menu_label_set_charging_amps">Ajuster Ampérage</string>
+    <string id="menu_label_set_charging_limit">Ajuster la limite de charge</string>
+    <string id="menu_label_start_charging">Démarrer la charge</string>
+    <string id="menu_label_stop_charging">Arrêter la charge</string>
+    <string id="menu_label_start_stop_charging">Démarrer/arrêter la charge</string>
     <string id="amps_chooser_title">Ampérage à?</string>
     <string id="charginglimit_chooser_title">Limit à</string>
-    <string id="menu_set_seat_heat">Chaleur siège</string>
-    <string id="menu_set_steering_wheel_heat">Volant chauffant</string>
-    <string id="menu_set_steering_wheel_heat_on">Activer Volant chauffant</string>
-    <string id="menu_set_steering_wheel_heat_off">Désactiver Volant chauffant</string>
+    <string id="menu_label_set_seat_heat">Chaleur siège</string>
+    <string id="menu_label_set_steering_wheel_heat">Volant chauffant</string>
+    <string id="menu_label_set_steering_wheel_heat_on">Activer Volant chauffant</string>
+    <string id="menu_label_set_steering_wheel_heat_off">Désactiver Volant chauffant</string>
 	<string id="temp_choose_seat">Quel siège?</string>
 	<string id="temp_choose_heat">Quelle chaleur?</string>
 	<string id="seat_driver">Conducteur</string>
@@ -146,4 +146,9 @@
     <string id="timeSeparator">:</string>
     <string id="morning">AM</string>
     <string id="afternoon">PM</string>
+    <string id="menu_label_sentry">Mode Sentinelle</string>
+    <string id="menu_label_sentry_on">Act. Sentinelle</string>
+    <string id="menu_label_sentry_off">Dés. Sentinelle</string>
+    <string id="label_sentry_on">Sentinelle allumé</string>
+    <string id="label_sentry_off">Sentinelle éteint</string>
 </strings>

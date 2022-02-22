@@ -293,4 +293,23 @@ class Tesla {
             notify
         );
     }
+
+    function SentryMode(vehicle, notify, value) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_sentry_mode";
+
+        Communications.makeWebRequest(
+            url,
+            {
+                "on" => value
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
 }

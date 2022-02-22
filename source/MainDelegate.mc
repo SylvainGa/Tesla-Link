@@ -43,6 +43,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var refreshTimer;
     var _code_verifier;
     var _adjust_departure;
+    var _sentry_mode;
 
     function initialize(data, handler) {
         BehaviorDelegate.initialize();
@@ -82,6 +83,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_set_seat_heat = false;
         _set_steering_wheel_heat = false;
         _adjust_departure = false;
+        _sentry_mode = false;
 
 		_noTimer = true; stateMachine(); _noTimer = false;
 
@@ -404,6 +406,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            _tesla.startDeparture(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("departure_time"));
 	        }
         }
+
+        if (_sentry_mode) {
+            _sentry_mode = false;
+            if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_sentry_off));
+	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), false);
+            } else {
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_sentry_on));
+	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), true);
+            }
+        }
     }
 
     function openVentConfirmed() {
@@ -550,32 +563,32 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				break;
 			case 1:
-				menu.addItem(Rez.Strings.menu_set_seat_heat, :set_seat_heat);
+				menu.addItem(Rez.Strings.menu_label_set_seat_heat, :set_seat_heat);
 				break;
 			case 2:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true) {
-					menu.addItem(Rez.Strings.menu_set_steering_wheel_heat_off, :set_steering_wheel_heat);
+					menu.addItem(Rez.Strings.menu_label_set_steering_wheel_heat_off, :set_steering_wheel_heat);
 				}
 				else {
-					menu.addItem(Rez.Strings.menu_set_steering_wheel_heat_on, :set_steering_wheel_heat);
+					menu.addItem(Rez.Strings.menu_label_set_steering_wheel_heat_on, :set_steering_wheel_heat);
 				}
 				break;
 			case 3:
-				menu.addItem(Rez.Strings.menu_set_charging_limit, :set_charging_limit);
+				menu.addItem(Rez.Strings.menu_label_set_charging_limit, :set_charging_limit);
 				break;
 			case 4:
-				menu.addItem(Rez.Strings.menu_set_charging_amps, :set_charging_amps);
+				menu.addItem(Rez.Strings.menu_label_set_charging_amps, :set_charging_amps);
 				break;
 			case 5:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
-					menu.addItem(Rez.Strings.menu_stop_charging, :toggle_charge);
+					menu.addItem(Rez.Strings.menu_label_stop_charging, :toggle_charge);
 				}
 				else {
-					menu.addItem(Rez.Strings.menu_start_charging, :toggle_charge);
+					menu.addItem(Rez.Strings.menu_label_start_charging, :toggle_charge);
 				}
 				break;
 			case 6:
-				menu.addItem(Rez.Strings.menu_set_temp, :set_temperature);
+				menu.addItem(Rez.Strings.menu_label_set_temp, :set_temperature);
 				break;
 			case 7:
 				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
@@ -586,9 +599,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				break;
 			case 8:
-				menu.addItem(Rez.Strings.menu_label_honk, :honk);
+				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
+					menu.addItem(Rez.Strings.menu_label_sentry_off, :toggle_sentry);
+				}
+				else {
+					menu.addItem(Rez.Strings.menu_label_sentry_on, :toggle_sentry);
+				}
 				break;
 			case 9:
+				menu.addItem(Rez.Strings.menu_label_honk, :honk);
+				break;
+			case 10:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(Rez.Strings.menu_label_open_frunk_open, :open_frunk);
 				}
@@ -596,7 +617,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(Rez.Strings.menu_label_open_frunk_opened, :open_frunk);
 				}
 				break;
-			case 10:
+			case 11:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("rt") == 0) {
 					menu.addItem(Rez.Strings.menu_label_open_trunk_open, :open_trunk);
 				}
@@ -604,10 +625,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(Rez.Strings.menu_label_open_trunk_close, :open_trunk);
 				}
 				break;
-			case 11:
+			case 12:
 				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
 				break;
-			case 12:
+			case 13:
 				if (Application.getApp().getProperty("venting") == 0) {
 					menu.addItem(Rez.Strings.menu_label_vent_open, :vent);
 				}
@@ -615,19 +636,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(Rez.Strings.menu_label_vent_close, :vent);
 				}
 				break;
-			case 13:
+			case 14:
 				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
 				break;
-			case 14:
+			case 15:
 				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
 				break;
-/*			case 15:
+/*			case 16:
 				menu.addItem(Rez.Strings.menu_label_toggle_units, :toggle_units);
 				break; */
-			case 15:
+			case 16:
 				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
 				break;
-			case 16:
+			case 17:
 				menu.addItem(Rez.Strings.menu_label_reset, :reset);
 				break;
 		}
