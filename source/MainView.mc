@@ -44,6 +44,7 @@ class MainView extends Ui.View {
         var image_y_bottom = (height/7*4-height/21).toNumber();
         var center_x = dc.getWidth()/2;
         var center_y = dc.getHeight()/2;
+        var sentry_y = image_y_top - height/21;
         
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
@@ -327,6 +328,15 @@ System.println(findDrawableById("frunk_icon_white"));*/
 	                    } else {
 	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_red));
 	                    }
+                    }
+                    
+                    if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
+                    	var bitmap = Ui.loadResource(Rez.Drawables.sentry_icon) as BitmapResource;
+                    	var bitmap_width = bitmap.getWidth();
+                    	var bitmap_height = bitmap.getHeight();
+System.println("width : " + bitmap_width);
+System.println("height : " + bitmap_height);
+                        dc.drawBitmap(center_x - bitmap_width / 2 - 3, sentry_y + bitmap_height / 2, bitmap);
                     }
                 }
                 else

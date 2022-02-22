@@ -226,4 +226,10 @@
             <color>000000</color>
         </palette>
     </bitmap>
+    <bitmap id="sentry_icon" filename="sentry.png" dithering="none" scaleX="10%" scaleY="8%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>CCCCCC</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
 </drawables>
