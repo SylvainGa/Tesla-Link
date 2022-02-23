@@ -151,5 +151,6 @@
     <string id="label_sentry_toggle_on">Sentry on</string>
     <string id="label_sentry_toggle_off">Sentry off</string>
     <string id="enhancedTouch">Enhanced touch experience?</string>
-    <string id="screenBottom">For screen bottom</string>
+    <string id="screenBottomLeft">For screen bottom left</string>
+    <string id="screenBottomRight">For screen bottom right</string>
 </strings>

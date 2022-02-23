@@ -7,7 +7,15 @@
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
-	<setting propertyKey="@Properties.screenBottom" title="@Strings.screenBottom">
+	<setting propertyKey="@Properties.screenBottomLeft" title="@Strings.screenBottomLeft">
+		<settingConfig type="list">
+			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
+			<listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
+			<listEntry value="2">@Strings.menu_label_set_temp</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.screenBottomRight" title="@Strings.screenBottomRight">
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
 			<listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>

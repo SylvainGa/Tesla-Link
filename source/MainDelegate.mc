@@ -694,7 +694,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
         var x = coords[0];
         var y = coords[1];
 		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
-System.println("enhancedTouch : " + enhancedTouch);
 
 		// Tap on vehicle name
 		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
@@ -717,8 +716,7 @@ System.println("enhancedTouch : " + enhancedTouch);
 		} 
 		// Tap on bottom line on screen
 		else if (enhancedTouch && y > _settings.screenHeight - _settings.screenHeight / 6 && _tesla != null) {
-		var screenBottom = Application.getApp().getProperty("screenBottom");
-System.println("screenBottom : " + screenBottom);
+			var screenBottom = Application.getApp().getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
 			switch (screenBottom) {
 				case 0:
 		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
@@ -748,7 +746,7 @@ System.println("screenBottom : " + screenBottom);
 		            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
 		            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
 		            }
-		
+
 		            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
 					break;
             }
