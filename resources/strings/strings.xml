@@ -31,7 +31,6 @@
     <string id="menu_label_open_frunk">Open Frunk</string>
     <string id="menu_label_open_frunk_open">Open Frunk</string>
     <string id="menu_label_open_frunk_opened">Frunk opened</string>
-    <string id="menu_label_toggle_units">Toggle °C/°F</string>
     <string id="menu_label_toggle_view">Toggle View</string>
     <string id="menu_label_swap_frunk_for_port">Alternate Trunk/Frunk/Port</string>
     <string id="menu_label_select_car">Select Vehicle</string>
@@ -151,4 +150,6 @@
     <string id="menu_label_sentry_off">Dis. Sentry</string>
     <string id="label_sentry_toggle_on">Sentry on</string>
     <string id="label_sentry_toggle_off">Sentry off</string>
+    <string id="enhancedTouch">Enhanced touch experience?</string>
+    <string id="screenBottom">For screen bottom</string>
 </strings>

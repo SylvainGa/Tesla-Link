@@ -31,7 +31,6 @@
     <string id="menu_label_open_frunk">Öppna Frunk</string>
     <string id="menu_label_open_frunk_open">Open Frunk</string>
     <string id="menu_label_open_frunk_opened">Frunk opened</string>
-    <string id="menu_label_toggle_units">Växla °C/°F</string>
     <string id="menu_label_toggle_view">Växla vy</string>
     <string id="menu_label_swap_frunk_for_port">Byt Frunk/Laddlucka</string>
     <string id="menu_label_select_car">Välj Fordon</string>

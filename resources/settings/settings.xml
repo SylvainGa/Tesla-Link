@@ -3,6 +3,18 @@
 		<settingConfig type="alphaNumeric" readonly="true"/>
 	</setting>
 
+	<setting propertyKey="@Properties.enhancedTouch" title="@Strings.enhancedTouch">
+		<settingConfig type="boolean" required="true"/>
+	</setting>
+
+	<setting propertyKey="@Properties.screenBottom" title="@Strings.screenBottom">
+		<settingConfig type="list">
+			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
+			<listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
+			<listEntry value="2">@Strings.menu_label_set_temp</listEntry>
+		</settingConfig>
+	</setting>
+
 	<setting propertyKey="@Properties.NumberOfSlots" title="@Strings.number_of_slots">
 		<settingConfig type="numeric" min="1" max="16" required="true"/>
 	</setting>

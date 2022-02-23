@@ -642,9 +642,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case 15:
 				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
 				break;
-/*			case 16:
-				menu.addItem(Rez.Strings.menu_label_toggle_units, :toggle_units);
-				break; */
 			case 16:
 				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
 				break;
@@ -696,8 +693,67 @@ class MainDelegate extends Ui.BehaviorDelegate {
         var coords = click.getCoordinates();
         var x = coords[0];
         var y = coords[1];
+		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
+System.println("enhancedTouch : " + enhancedTouch);
 
-        if (x < _settings.screenWidth/2) {
+		// Tap on vehicle name
+		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
+			_tesla.getVehicleId(method(:selectVehicle));
+		}
+		// Tap on the space used by the 'Eye'
+		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
+            _sentry_mode = true;
+            stateMachine();
+		}
+		// Tap on the middle text line where Departure is written
+		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
+			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+	            _adjust_departure = true;
+	            stateMachine();
+            }
+            else {
+				Ui.pushView(new DepartureTimePicker(_data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(self), WatchUi.SLIDE_IMMEDIATE);
+            }
+		} 
+		// Tap on bottom line on screen
+		else if (enhancedTouch && y > _settings.screenHeight - _settings.screenHeight / 6 && _tesla != null) {
+		var screenBottom = Application.getApp().getProperty("screenBottom");
+System.println("screenBottom : " + screenBottom);
+			switch (screenBottom) {
+				case 0:
+		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
+		            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(self), Ui.SLIDE_UP);
+		            break;
+		        case 1:
+		        	var max_amps = _data._vehicle_data.get("charge_state").get("charge_current_request_max");
+		            var charging_amps = _data._vehicle_data.get("charge_state").get("charge_current_request");
+		            if (charging_amps == null) {
+		            	if (max_amps == null) {
+		            		charging_amps = 32;
+		            	}
+		            	else {
+		            		charging_amps = max_amps;
+		            	}
+		            }
+		            
+		            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(self), Ui.SLIDE_UP);
+		            break;
+		        case 2:
+		            var driver_temp = Application.getApp().getProperty("driver_temp");
+		            var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
+		            var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
+		            
+		            if (Application.getApp().getProperty("imperial")) {
+		            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
+		            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
+		            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
+		            }
+		
+		            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
+					break;
+            }
+		}
+		else if (x < _settings.screenWidth/2) {
             if (y < _settings.screenHeight/2) {
                 doPreviousPage();
             } else {
@@ -713,6 +769,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         return true;
     }
+
+    function selectVehicle(responseCode, data) {
+        if (responseCode == 200) {
+            var vehicles = data.get("response");
+            var vins = new [vehicles.size()];
+            for (var i = 0; i < vehicles.size(); i++) {
+                vins[i] = vehicles[i].get("display_name");
+            }
+            Ui.pushView(new CarPicker(vins), new CarPickerDelegate(self), Ui.SLIDE_UP);
+        } else {
+            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+        }
+    }
+
 
     function onReceiveAuth(responseCode, data) {
         if (responseCode == 200) {

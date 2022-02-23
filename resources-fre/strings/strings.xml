@@ -31,7 +31,6 @@
     <string id="menu_label_open_frunk">Ouvrir Frunk</string>
     <string id="menu_label_open_frunk_open">Ouvrir Frunk</string>
     <string id="menu_label_open_frunk_opened">Frunk ouvert</string>
-    <string id="menu_label_toggle_units">Temp. °C/°F</string>
     <string id="menu_label_toggle_view">Change de vue</string>
     <string id="menu_label_swap_frunk_for_port">Valise arrière/Avant/Port</string>
     <string id="menu_label_select_car">Sélectionnez le véhicule</string>
@@ -151,4 +150,6 @@
     <string id="menu_label_sentry_off">Dés. Sentinelle</string>
     <string id="label_sentry_on">Sentinelle allumé</string>
     <string id="label_sentry_off">Sentinelle éteint</string>
+    <string id="enhancedTouch">Touche améliorée?</string>
+    <string id="screenBottom">Au bas de l'écran</string>
 </strings>
