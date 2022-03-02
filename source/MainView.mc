@@ -97,77 +97,44 @@ class MainView extends Ui.View {
 	            }
 	            else {
 					var which_bitmap = 0;
-					
+					var iconList = [
+						Rez.Drawables.frunk0trunk0port0vent0_icon_white,
+						Rez.Drawables.frunk1trunk0port0vent0_icon_white,
+						Rez.Drawables.frunk0trunk1port0vent0_icon_white,
+						Rez.Drawables.frunk1trunk1port0vent0_icon_white,
+						Rez.Drawables.frunk0trunk0port1vent0_icon_white,
+						Rez.Drawables.frunk1trunk0port1vent0_icon_white,
+						Rez.Drawables.frunk0trunk1port1vent0_icon_white,
+						Rez.Drawables.frunk1trunk1port1vent0_icon_white,
+						Rez.Drawables.frunk0trunk0port0vent1_icon_white,
+						Rez.Drawables.frunk1trunk0port0vent1_icon_white,
+						Rez.Drawables.frunk0trunk1port0vent1_icon_white,
+						Rez.Drawables.frunk1trunk1port0vent1_icon_white,
+						Rez.Drawables.frunk0trunk0port1vent1_icon_white,
+						Rez.Drawables.frunk1trunk0port1vent1_icon_white,
+						Rez.Drawables.frunk0trunk1port1vent1_icon_white,
+						Rez.Drawables.frunk1trunk1port1vent1_icon_white
+					];
+
 					if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
 						which_bitmap = 1;
 					}
-
 					if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
 						which_bitmap += 2;
 					}
-
 					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
 						which_bitmap += 4;
 					}
-
 					if (Application.getApp().getProperty("venting")) {
 						which_bitmap += 8;
 					}
 
-					switch (which_bitmap) {
-						case 0:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port0vent0_icon_white));
-							break;
-						case 1:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port0vent0_icon_white));
-							break;
-						case 2:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port0vent0_icon_white));
-							break;
-						case 3:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port0vent0_icon_white));
-							break;
-						case 4:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port1vent0_icon_white));
-							break;
-						case 5:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port1vent0_icon_white));
-							break;
-						case 6:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port1vent0_icon_white));
-							break;
-						case 7:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port1vent0_icon_white));
-							break;
-						case 8:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port0vent1_icon_white));
-							break;
-						case 9:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port0vent1_icon_white));
-							break;
-						case 10:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port0vent1_icon_white));
-							break;
-						case 11:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port0vent1_icon_white));
-							break;
-						case 12:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk0port1vent1_icon_white));
-							break;
-						case 13:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk0port1vent1_icon_white));
-							break;
-						case 14:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk0trunk1port1vent1_icon_white));
-							break;
-						case 15:
-							dc.drawBitmap(image_x_left,image_y_top,Ui.loadResource(Rez.Drawables.frunk1trunk1port1vent1_icon_white));
-							break;
-					}
+					dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(iconList[which_bitmap]));
 	            }
-                dc.drawBitmap(image_x_right,image_y_top,Ui.loadResource(Rez.Drawables.climate_on_icon_white));
-                dc.drawBitmap(image_x_left,image_y_bottom,Ui.loadResource(Rez.Drawables.locked_icon_white));
-                dc.drawBitmap(image_x_right,image_y_bottom,Ui.loadResource(is_touchscreen? Rez.Drawables.settings_icon : Rez.Drawables.back_icon));
+	            
+                dc.drawBitmap(image_x_right, image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_white));
+                dc.drawBitmap(image_x_left, image_y_bottom, Ui.loadResource(Rez.Drawables.locked_icon_white));
+                dc.drawBitmap(image_x_right, image_y_bottom, Ui.loadResource(is_touchscreen? Rez.Drawables.settings_icon : Rez.Drawables.back_icon));
             }
             else
             {
