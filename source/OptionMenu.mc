@@ -120,10 +120,17 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :toggle_sentry) {
             _controller._sentry_mode = true;
             _controller.stateMachine();
+        } else if (item == :wake) {
+            _controller._need_wake = true;
+            _controller.stateMachine();
+        } else if (item == :refresh) {
+            var refreshTime = Application.getApp().getProperty("refreshTime");
+            Ui.pushView(new RefreshPicker(refreshTime), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         }
     }
 
     function onReceiveVehicles(responseCode, data) {
+logMessage("OptionMenu:onReceiveVehicles " + responseCode.toString());
         if (responseCode == 200) {
             var vehicles = data.get("response");
             var vins = new [vehicles.size()];
@@ -134,5 +141,15 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else {
             _controller._handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
         }
+    }
+
+    (:debug)
+    function logMessage(message) {
+        System.println(message);
+    }
+
+    (:release)
+    function logMessage(message) {
+        
     }
 }

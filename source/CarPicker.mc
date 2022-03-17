@@ -34,6 +34,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onReceiveVehicles(responseCode, data) {
+logMessage("CarPicker:onReceiveVehicles " + responseCode.toString());
         if (responseCode == 200) {
             var vehicles = data.get("response");
             for (var i = 0; i < vehicles.size(); i++) {
@@ -45,5 +46,15 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         } else {
             _controller._handler.invoke(WatchUi.loadResource(Rez.Strings.label_error) + responseCode.toString());
         }
+    }
+
+    (:debug)
+    function logMessage(message) {
+        System.println(message);
+    }
+
+    (:release)
+    function logMessage(message) {
+        
     }
 }

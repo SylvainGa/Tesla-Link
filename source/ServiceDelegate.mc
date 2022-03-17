@@ -24,12 +24,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         if (_token != null && _vehicle_id != null)
         {
+//System.println("onTemporalEvent");
             _tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
         }
     }
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting (we don't want to lose it)
+logMessage("ServiceDelegate:onReceiveVehicleData " + responseCode.toString());
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
@@ -50,5 +52,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
         } else {
             Background.exit(data);
         }
+    }
+
+    (:debug)
+    function logMessage(message) {
+        System.println(message);
+    }
+
+    (:release)
+    function logMessage(message) {
+        
     }
 }

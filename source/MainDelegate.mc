@@ -1,5 +1,6 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Timer;
+using Toybox.Time;
 using Toybox.System;
 using Toybox.Communications as Communications;
 using Toybox.Cryptography;
@@ -38,15 +39,18 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _vent;
     var _set_seat_heat;
     var _set_steering_wheel_heat;
-    var _noTimer;	
+    var _disableRefreshTimer; // When this is true, the refreshTimer will not call stateMachine since we are already inside stateMachine from a direct call elsewhere
     var _data;
 	var refreshTimer;
     var _code_verifier;
     var _adjust_departure;
     var _sentry_mode;
-
+	var _408_count;
+	var _set_refresh_time;
+	
     function initialize(data, handler) {
         BehaviorDelegate.initialize();
+logMessage("MainDelegate:initialize");
         _settings = System.getDeviceSettings();
         _data = data;
         _token = Settings.getToken();
@@ -62,7 +66,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _need_auth = true;
             _auth_done = false;
         }
-        _need_wake = false;
+
+        _need_wake = true;
         _wake_done = true;
 
         _set_climate_on = false;
@@ -71,7 +76,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _set_climate_set = false;
 		_toggle_charging_set = false;
 		
-        _get_vehicle_data = true;
+        _get_vehicle_data = 1;
         _honk_horn = false;
         _open_port = false;
         _open_frunk = false;
@@ -84,25 +89,31 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _set_steering_wheel_heat = false;
         _adjust_departure = false;
         _sentry_mode = false;
-
-		_noTimer = true; stateMachine(); _noTimer = false;
+		_408_count = 0;
+		_set_refresh_time = false;
+			
+		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 
 	    refreshTimer = new Timer.Timer();
-	    refreshTimer.start(method(:timerRefresh), 2000, true);
+logMessage("MainDelegate:Starting initial refresh timer" + " _get_vehicle_data " + _get_vehicle_data);
+	    refreshTimer.start(method(:timerRefresh), 4000, true);
     }
 
     function onShow() {
-	    refreshTimer.start(method(:timerRefresh), 2000, true);
+logMessage("MainDelegate:Starting refresh timer" + " _get_vehicle_data " + _get_vehicle_data);
+	    refreshTimer.start(method(:timerRefresh), 4000, true);
 	}
 	
     function onHide() {
+logMessage("MainDelegate:Stopping refresh timer" + " _get_vehicle_data " + _get_vehicle_data);
 	    refreshTimer.stop();
 	}
 	
     function bearerForAccessOnReceive(responseCode, data) {
+logMessage("MainDelegate:bearerForAccessOnReceive " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
-            _noTimer = true; stateMachine(); _noTimer = false;
+            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
         }
         else {
             _resetToken();
@@ -111,6 +122,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function codeForBearerOnReceive(responseCode, data) {
+logMessage("MainDelegate:codeForBearerOnReceive " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             var bearerForAccessUrl = "https://owner-api.teslamotors.com/oauth/token";
             var bearerForAccessParams = {
@@ -137,6 +149,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onOAuthMessage(message) {
+logMessage("MainDelegate:onOAuthMessage" + " _get_vehicle_data " + _get_vehicle_data);
         var code = message.data[$.OAUTH_CODE];
         var error = message.data[$.OAUTH_ERROR];
         if (message.data != null) {
@@ -165,7 +178,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function stateMachine() {
+logMessage("MainDelegate:stateMachine with _get_vehicle_data at " + _get_vehicle_data);
         if (_need_auth) {
+logMessage("MainDelegate:_need_auth");
 
             _need_auth = false;
 
@@ -212,24 +227,29 @@ class MainDelegate extends Ui.BehaviorDelegate {
                     "responseError" => $.OAUTH_ERROR
                 }
             );
+logMessage("MainDelegate:Made makeOAuthRequest");
             return;
         }
 
         if (!_auth_done) {
             return;
         }
+//logMessage("MainDelegate:_auth_done true");
 
         if (_tesla == null) {
+logMessage("MainDelegate:Need _tesla");
             _tesla = new Tesla(_token);
         }
 
         if (_vehicle_id == null) {
+logMessage("MainDelegate:Need vehicle_id");
             _handler.invoke(Ui.loadResource(Rez.Strings.label_getting_vehicles));
             _tesla.getVehicleId(method(:onReceiveVehicles));
             return;
         }
 
-        if (_need_wake) {
+        if (_need_wake || _408_count > 5) { // Asked to wake up or got five 408 errors (timeout) without a single 200
+logMessage("MainDelegate:Need wake");
             _need_wake = false;
             _wake_done = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_waking_vehicle));
@@ -241,10 +261,22 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return;
         }
 
-        if (_get_vehicle_data) {
-            _get_vehicle_data = false;
+		var _gotBackgroundData = Application.getApp().getProperty("gotBackgroundData");
+		if (_gotBackgroundData == true) {
+			Application.getApp().setProperty("gotBackgroundData", false);
+	        if (_get_vehicle_data == 2) { // If we were waiting for data that was read by the background process, request it again
+	            _get_vehicle_data = 1;
+			}        
+		}
+
+        if (_get_vehicle_data == 1) {
+logMessage("MainDelegate:*** Requesting vehicle data ***");
+            _get_vehicle_data = 2;
             _tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
-        }
+		}
+		else {
+			Ui.requestUpdate(); // We're not getting any data but still refresh the view
+		}
 
         if (_set_climate_on) {
             _set_climate_on = false;
@@ -417,6 +449,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), true);
             }
         }
+
+		if (_set_refresh_time) {
+            _set_refresh_time = false;
+            var refreshTime = Application.getApp().getProperty("refreshTime");
+            if (refreshTime != null) {
+			    refreshTimer.stop();
+			    refreshTimer.start(method(:timerRefresh), refreshTime.toNumber() * 1000, true);
+            }
+		}
     }
 
     function openVentConfirmed() {
@@ -448,18 +489,45 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
     function timerRefresh() {
 		if (Application.getApp().getProperty("refreshTimer")) {
-	    	if (!_noTimer && _data._vehicle_data != null) {
-		        _get_vehicle_data = true;
+	    	if (!_disableRefreshTimer) {
+        		var _spinner = Application.getApp().getProperty("spinner");
+				if (_spinner.equals("+")) {
+					Application.getApp().setProperty("spinner", "-");
+				} else {
+					Application.getApp().setProperty("spinner", "+");
+				}
+
+				if (_data._vehicle_data != null) {
+					if (_get_vehicle_data == 0) {
+logMessage("MainDelegate:timerRefresh calling stateMachine asking for vehicle data");
+				        _get_vehicle_data = 1;
+					}
+					else {
+						Application.getApp().setProperty("spinner", "?");
+logMessage("MainDelegate:timerRefresh calling stateMachine with _get_vehicle_data at " + _get_vehicle_data);
+					}
+				}
+				else {
+logMessage("MainDelegate:timerRefresh calling stateMachine with _data._vehicle_data as null");
+				}
+					
 		        stateMachine();
+			}
+		    else {
+logMessage("MainDelegate:timerRefresh with _disableRefreshTimer true");
 		    }
 		}
 	    else {
+logMessage("MainDelegate:timerRefresh App property is false");
 	    }
     }
 
-    function delayedWake() {
-        _need_wake = true;
-        _noTimer = true; stateMachine(); _noTimer = false;
+    function delayedRetry() {
+logMessage("MainDelegate:delayedRetry called" + " _get_vehicle_data " + _get_vehicle_data);
+//        _need_wake = true;
+        var _oldDisable = _disableRefreshTimer; 
+		_get_vehicle_data = 1;
+		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = _oldDisable;
     }
 
     function onSelect() {
@@ -477,7 +545,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         } else {
             _set_climate_off = true;
         }
-        _noTimer = true; stateMachine(); _noTimer = false;
+        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
     }
 
     function onNextPage() {
@@ -495,7 +563,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         } else {
             _unlock = true;
         }
-        _noTimer = true; stateMachine(); _noTimer = false;
+        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
     }
 
     function onPreviousPage() {
@@ -520,7 +588,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		else {
 			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
-        _noTimer = true; stateMachine(); _noTimer = false;
+        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
     }
 
     function onBack() {
@@ -549,8 +617,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_index < 0) {
 			_index = 0;
 		}
-		else if (_index > 16) {
-			_index = 16;
+		else if (_index > 19) {
+			_index = 19;
 		}
 
 		switch (_index) {
@@ -648,6 +716,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case 17:
 				menu.addItem(Rez.Strings.menu_label_reset, :reset);
 				break;
+			case 18:
+				menu.addItem(Rez.Strings.menu_label_wake, :wake);
+				break;
+			case 19:
+				menu.addItem(Rez.Strings.menu_label_refresh, :refresh);
+				break;
 		}
 	}
 	
@@ -656,7 +730,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return;
         }
 
-    	_noTimer = true;
+    	_disableRefreshTimer = true;
 
 		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
 		if (_slot_count == null) {
@@ -681,7 +755,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		
 		WatchUi.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
 //        Ui.pushView(new Rez.Menus.OptionMenu(), new OptionMenuDelegate(self), Ui.SLIDE_UP);
-        _noTimer = false; 
+        _disableRefreshTimer = false; 
     }
 
     function onTap(click) {
@@ -769,6 +843,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function selectVehicle(responseCode, data) {
+logMessage("MainDelegate:selectVehicle " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             var vins = new [vehicles.size()];
@@ -783,36 +858,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 
     function onReceiveAuth(responseCode, data) {
+logMessage("MainDelegate:onReceiveAuth " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             _auth_done = true;
-            _noTimer = true; stateMachine(); _noTimer = false;
+            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
         } else {
             _resetToken();
             _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-
-/*			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-*/        }
+        }
     }
 
     function onReceiveVehicles(responseCode, data) {
+logMessage("MainDelegate:onReceiveVehicles " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             if (vehicles.size() > 0) {
                 _vehicle_id = vehicles[0].get("id");
                 Application.getApp().setProperty("vehicle", _vehicle_id);
-                _noTimer = true; stateMachine(); _noTimer = false;
+                _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
             } else {
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_no_vehicles));
             }
@@ -820,153 +883,90 @@ class MainDelegate extends Ui.BehaviorDelegate {
             if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
-            }
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-            if (responseCode == 408) {
-                _noTimer = true; stateMachine(); _noTimer = false;
-            }
-
-/*			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-*/        }
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
+                return;
+			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+	        } else if (responseCode == 408) {
+				_408_count += 1;
+	        }
+            _sleep_timer.start(method(:delayedRetry), 500, false);
+        }
     }
 
     function onReceiveVehicleData(responseCode, data) {
+logMessage("MainDelegate:onReceiveVehicleData " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+		        _get_vehicle_data = 0; // All is well, we got our data
+				_408_count = 0; // Reset the count of timeouts since we got our data
                 _handler.invoke(null);
             } else {
-                _wake_done = false;
-                _sleep_timer.start(method(:delayedWake), 500, false);
+logMessage("MainDelegate:onReceiveVehicleData missing some data");
+                _sleep_timer.start(method(:delayedRetry), 500, false);
             }
-        } else if (responseCode != -101) {
-            if (responseCode == 408 || responseCode == -5) {
-                _wake_done = false;
-                _sleep_timer.start(method(:delayedWake), 500, false);
-            } else {
-                if (responseCode == 401) {
-                    // Unauthorized
-                    _resetToken();
-                }
-                _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-
-/*				var errorStr = "";
-	            if (data) {
-	            	errorStr = data.get("error");
-	            }
-	            var alert = new Alert({
-					:timeout => 1000,
-					:font => Graphics.FONT_TINY,
-					:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-					:fgcolor => Graphics.COLOR_RED,
-					:bgcolor => Graphics.COLOR_WHITE
-				});
-				
-				alert.pushView(Ui.SLIDE_IMMEDIATE);
-*/            }
-        }
+        } else {
+			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+	            Application.getApp().setProperty("vehicle", null);
+			} else if (responseCode == 401) {
+			    // Unauthorized
+			    _resetToken();
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
+                return;
+			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+	        } else if (responseCode == 408) {
+				_408_count += 1;
+	        }
+            _sleep_timer.start(method(:delayedRetry), 500, false);
+	    }
     }
 
     function onReceiveAwake(responseCode, data) {
+logMessage("MainDelegate:onReceiveAwake " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
             _wake_done = true;
-            _get_vehicle_data = true;
-            _noTimer = true; stateMachine(); _noTimer = false;
+			_handler.invoke(Ui.loadResource(Rez.Strings.label_requesting_data));
+            _get_vehicle_data = 1;
+            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+			_408_count = 0;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
-            }
-            if (responseCode != -101) {
-                _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-            }
-            if (responseCode == 408) {
-                _wake_done = false;
-                _sleep_timer.start(method(:delayedWake), 500, false);
-            }
-
-/*			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-*/        }
-    }
-
-/*    function onClimateDone(responseCode, data) {
-        if (responseCode == 200) {
-            _get_vehicle_data = true;
-            _handler.invoke(null);
-            _noTimer = true; stateMachine(); _noTimer = false;
-        } else {
-            if (responseCode == 401) {
-                // Unauthorized
-                _resetToken();
-            }
- 
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-            
-			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
+                return;
+			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+	        } else if (responseCode == 408) {
+				_408_count += 1;
+	        }
+            _sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
-*/
+
     function genericHandler(responseCode, data) {
+logMessage("MainDelegate:genericHandler " + responseCode.toString() + " _get_vehicle_data " + _get_vehicle_data);
         if (responseCode == 200) {
-            _get_vehicle_data = true;
+            if (_get_vehicle_data == 0) {
+	            _get_vehicle_data = 1;
+			}
             _handler.invoke(null);
-            _noTimer = true; stateMachine(); _noTimer = false;
+            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
         } else {
             if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
-            }
-            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-
-/*			var errorStr = "";
-            if (data) {
-            	errorStr = data.get("error");
-            }
-            var alert = new Alert({
-				:timeout => 1000,
-				:font => Graphics.FONT_TINY,
-				:text => Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + " " + errorStr,
-				:fgcolor => Graphics.COLOR_RED,
-				:bgcolor => Graphics.COLOR_WHITE
-			});
-			
-			alert.pushView(Ui.SLIDE_IMMEDIATE);
-*/        }
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
+                return;
+			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+	        } else if (responseCode == 408) {
+				_408_count += 1;
+	        }
+            _sleep_timer.start(method(:delayedRetry), 500, false);
+        }
     }
 
     function _saveToken(token) {
@@ -979,5 +979,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _token = null;
         _auth_done = false;
         Settings.setToken(null);
+    }
+
+    (:debug)
+    function logMessage(message) {
+        System.println(message);
+    }
+
+    (:release)
+    function logMessage(message) {
+        
     }
 }

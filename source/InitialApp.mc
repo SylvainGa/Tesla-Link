@@ -8,6 +8,7 @@ using Toybox.WatchUi as Ui;
 class QuickTesla extends App.AppBase {
 
     function initialize() {
+logMessage("\n\n\n\n\n***************************************************");
         AppBase.initialize();
     }
 
@@ -18,6 +19,7 @@ class QuickTesla extends App.AppBase {
     // This fires when the background service returns
     function onBackgroundData(data) {
         Application.getApp().setProperty("status", data["status"]);
+		Application.getApp().setProperty("gotBackgroundData", true);
         Ui.requestUpdate();
     }  
 

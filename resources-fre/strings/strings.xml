@@ -153,4 +153,8 @@
     <string id="enhancedTouch">Touche améliorée?</string>
     <string id="screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="screenBottomRight">Au bas de l'écran à droite</string>
+    <string id="menu_label_wake">Forcer un réveil</string>
+    <string id="menu_label_refresh">temps de rafraichissement</string>
+    <string id="refresh_chooser_title">En secondes</string>
+    <string id="label_unauthorized">Non autorisé</string>
 </strings>

@@ -14,6 +14,9 @@ class MainView extends Ui.View {
         _data._ready = false;
 
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
+
+		Application.getApp().setProperty("spinner", "-");
+		Application.getApp().setProperty("gotBackgroundData", false);
     }
 
     function onShow() {
@@ -29,6 +32,7 @@ class MainView extends Ui.View {
     }
 
     function onReceive(args) {
+logMessage("Received " + args);
         _display = args;
         Ui.requestUpdate();
     }
@@ -189,6 +193,9 @@ class MainView extends Ui.View {
 	            Application.getApp().setProperty("door_open", door_open);
 	            Application.getApp().setProperty("latitude", latitude);
 	            Application.getApp().setProperty("longitude", longitude);
+	            if (Application.getApp().getProperty("refreshTime") == null) {
+	            	Application.getApp().setProperty("refreshTime", 4);
+	            }
                 
                 // Draw the charge status
                 dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
@@ -245,6 +252,13 @@ class MainView extends Ui.View {
 		                }
 	                    departure_drawable.setText(timeStr.toString());
 	                    departure_drawable.draw(dc);
+					}
+
+	        		var _spinner = Application.getApp().getProperty("spinner");
+					if (_spinner.equals("+") || _spinner.equals("-") || _spinner.equals("?")) {
+	                    var spinner_drawable = View.findDrawableById("spinner");
+	                    spinner_drawable.setText(_spinner.toString());
+	                    spinner_drawable.draw(dc);
 					}
 
                     // Update the climate state indicator, note we have blue or red icons depending on heating or cooling
@@ -316,5 +330,15 @@ class MainView extends Ui.View {
                 }               
             }
         }
+    }
+
+    (:debug)
+    function logMessage(message) {
+        System.println(message);
+    }
+
+    (:release)
+    function logMessage(message) {
+        
     }
 }
