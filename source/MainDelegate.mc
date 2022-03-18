@@ -883,6 +883,8 @@ logMessage("MainDelegate:onReceiveVehicles " + responseCode.toString() + " _get_
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();
+                _need_auth = true;
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 logMessage("MainDelegate:onReceiveVehicles clearing vehicle id");
 			} else if (responseCode == 401) {
                 // Unauthorized
@@ -914,6 +916,8 @@ logMessage("MainDelegate:onReceiveVehicleData missing some data");
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();
+                _need_auth = true;
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 logMessage("MainDelegate:onReceiveVehicleData clesaring vehicle id");
 			} else if (responseCode == 401) {
 			    // Unauthorized
@@ -944,6 +948,8 @@ logMessage("MainDelegate:onReceiveAwake " + responseCode.toString() + " _get_veh
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();
+                _need_auth = true;
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 logMessage("MainDelegate:onReceiveAwake clearing vehicle id");
 			} else if (responseCode == 401) {
                 // Unauthorized
@@ -971,6 +977,8 @@ logMessage("MainDelegate:genericHandler " + responseCode.toString() + " _get_veh
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();
+                _need_auth = true;
+	            _handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 logMessage("MainDelegate:genericHandler clearing vehicle id");
 			} else if (responseCode == 401) {
                 // Unauthorized
