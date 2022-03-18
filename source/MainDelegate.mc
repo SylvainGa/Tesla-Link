@@ -880,7 +880,11 @@ logMessage("MainDelegate:onReceiveVehicles " + responseCode.toString() + " _get_
                 _handler.invoke(Ui.loadResource(Rez.Strings.label_no_vehicles));
             }
         } else {
-            if (responseCode == 401) {
+			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+	            Application.getApp().setProperty("vehicle", null);
+                _resetToken();
+logMessage("MainDelegate:onReceiveVehicles clearing vehicle id");
+			} else if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
 	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
@@ -909,6 +913,8 @@ logMessage("MainDelegate:onReceiveVehicleData missing some data");
         } else {
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
+                _resetToken();
+logMessage("MainDelegate:onReceiveVehicleData clesaring vehicle id");
 			} else if (responseCode == 401) {
 			    // Unauthorized
 			    _resetToken();
@@ -932,7 +938,14 @@ logMessage("MainDelegate:onReceiveAwake " + responseCode.toString() + " _get_veh
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 			_408_count = 0;
         } else {
-            if (responseCode == 401) {
+            _need_wake = true;
+            _wake_done = false;
+            
+			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+	            Application.getApp().setProperty("vehicle", null);
+                _resetToken();
+logMessage("MainDelegate:onReceiveAwake clearing vehicle id");
+			} else if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
 	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
@@ -955,7 +968,11 @@ logMessage("MainDelegate:genericHandler " + responseCode.toString() + " _get_veh
             _handler.invoke(null);
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
         } else {
-            if (responseCode == 401) {
+			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+	            Application.getApp().setProperty("vehicle", null);
+                _resetToken();
+logMessage("MainDelegate:genericHandler clearing vehicle id");
+			} else if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
 	            _handler.invoke(Ui.loadResource(Rez.Strings.label_unauthorized));
