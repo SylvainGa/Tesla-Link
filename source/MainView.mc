@@ -6,13 +6,15 @@ using Toybox.Time;
 class MainView extends Ui.View {
     hidden var _display;
     var _data;
-
+	var layoutNumber;
+	
     // Initial load - show the 'requesting data' string, make sure we don't process touches
     function initialize(data) {
         View.initialize();
         _data = data;
         _data._ready = false;
-
+		layoutNumber = 0;
+		
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
 
 		Application.getApp().setProperty("spinner", "-");
@@ -28,11 +30,25 @@ class MainView extends Ui.View {
 	}
 
     function onLayout(dc) {
-        setLayout(Rez.Layouts.ImageLayout(dc));
+    	if (layoutNumber == 0) {
+	        setLayout(Rez.Layouts.ImageLayout(dc));
+	    } else if (layoutNumber == 0) {
+	        setLayout(Rez.Layouts.ChargingLayout(dc));
+	    }
+    }
+
+    function IncLayout() {
+    	layoutNumber++;
+logMessage("We're at layer " + layoutNumber);
+    }
+
+    function DecLayout() {
+    	layoutNumber--;
+logMessage("We're at layer " + layoutNumber);
     }
 
     function onReceive(args) {
-logMessage("Received " + args);
+//logMessage("Received " + args);
         _display = args;
         Ui.requestUpdate();
     }
@@ -53,9 +69,11 @@ logMessage("Received " + args);
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
         if (Rez.Fonts has :montserrat) {
+//logMessage("I have that font");
             font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
         } else {
-            font_montserrat=Graphics.FONT_SMALL;
+//logMessage("Using font FONT_TINY");
+            font_montserrat=Graphics.FONT_TINY;
         }
 
         // Next background update in 5 mins!

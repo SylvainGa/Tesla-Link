@@ -95,8 +95,8 @@
     <string id="charginglimit_chooser_title">Set limit to</string>
     <string id="menu_label_set_seat_heat">Seat heat</string>
     <string id="menu_label_set_steering_wheel_heat">Steering wheel heat</string>
-    <string id="menu_label_set_steering_wheel_on">Activate Steering wheel heat</string>
-    <string id="menu_label_set_steering_wheel_off">Deactivate Steering wheel heat</string>
+    <string id="menu_label_set_steering_wheel_heat_on">Activate Steering wheel heat</string>
+    <string id="menu_label_set_steering_wheel_heat_off">Deactivate Steering wheel heat</string>
 	<string id="temp_choose_seat">Which seat?</string>
 	<string id="temp_choose_heat">What level?</string>
 	<string id="seat_driver">Driver</string>
@@ -148,8 +148,8 @@
     <string id="menu_label_sentry">Sentry Toggle</string>
     <string id="menu_label_sentry_on">Act. Sentry</string>
     <string id="menu_label_sentry_off">Dis. Sentry</string>
-    <string id="label_sentry_toggle_on">Sentry on</string>
-    <string id="label_sentry_toggle_off">Sentry off</string>
+    <string id="label_sentry_on">Sentry on</string>
+    <string id="label_sentry_off">Sentry off</string>
     <string id="enhancedTouch">Enhanced touch experience?</string>
     <string id="screenBottomLeft">For screen bottom left</string>
     <string id="screenBottomRight">For screen bottom right</string>
