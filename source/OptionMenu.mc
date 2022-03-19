@@ -130,7 +130,6 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
     }
 
     function onReceiveVehicles(responseCode, data) {
-logMessage("OptionMenu:onReceiveVehicles " + responseCode.toString());
         if (responseCode == 200) {
             var vehicles = data.get("response");
             var vins = new [vehicles.size()];

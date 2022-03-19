@@ -44,7 +44,6 @@ class MainView extends Ui.View {
 	    	_layoutNumber++;
 	    	_layoutChanged = true;
 	  	}
-logMessage("We're at layer " + _layoutNumber);
     }
 
     function DecLayout() {
@@ -52,17 +51,14 @@ logMessage("We're at layer " + _layoutNumber);
 	    	_layoutNumber--;
 	    	_layoutChanged = true;
 	    }
-logMessage("We're at layer " + _layoutNumber);
     }
 
     function ResetToLayout0() {
     	_layoutNumber = 0;
     	_layoutChanged = true;
-logMessage("We're at layer " + _layoutNumber);
     }
 
     function onReceive(args) {
-//logMessage("Received " + args);
         _display = args;
         Ui.requestUpdate();
     }
@@ -79,7 +75,6 @@ logMessage("We're at layer " + _layoutNumber);
 	}
 
     function onUpdateLayout1(dc) {
-logMessage("Layout1");
         var width = dc.getWidth();
         var height = dc.getHeight();
         var extra = (width/7+width/28) * ((width.toFloat()/height.toFloat())-1);
@@ -94,10 +89,8 @@ logMessage("Layout1");
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
         if (Rez.Fonts has :montserrat) {
-//logMessage("I have that font");
             font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
         } else {
-//logMessage("Using font FONT_TINY");
             font_montserrat=Graphics.FONT_TINY;
         }
 
@@ -146,12 +139,10 @@ logMessage("Layout1");
 
             var milesAdded = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
             milesAdded *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-logMessage(_data._vehicle_data.get("charge_state").get("charge_miles_added_rated"));
             Line3.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Range added " + milesAdded.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 
             var estimatedBatteryRange = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
             estimatedBatteryRange *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-logMessage(_data._vehicle_data.get("charge_state").get("est_battery_range"));
             Line4.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Estimated Range " + estimatedBatteryRange.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 
             var minutesToFullCharge = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
@@ -187,7 +178,6 @@ logMessage(_data._vehicle_data.get("charge_state").get("est_battery_range"));
 	}
 
     function onUpdateLayout0(dc) {
-logMessage("Layout0");
         // Set up all our variables for drawing things in the right place!
         var width = dc.getWidth();
         var height = dc.getHeight();
@@ -203,10 +193,8 @@ logMessage("Layout0");
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
         if (Rez.Fonts has :montserrat) {
-//logMessage("I have that font");
             font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
         } else {
-//logMessage("Using font FONT_TINY");
             font_montserrat=Graphics.FONT_TINY;
         }
 

@@ -8,7 +8,6 @@ using Toybox.WatchUi as Ui;
 class QuickTesla extends App.AppBase {
 
     function initialize() {
-logMessage("\n\n\n\n\n***************************************************");
         AppBase.initialize();
     }
 
@@ -51,16 +50,6 @@ logMessage("\n\n\n\n\n***************************************************");
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
         }        
-    }
-
-    (:debug)
-    function logMessage(message) {
-        System.println(message);
-    }
-
-    (:release)
-    function logMessage(message) {
-        
     }
 }
 

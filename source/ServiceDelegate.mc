@@ -31,7 +31,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting (we don't want to lose it)
-logMessage("ServiceDelegate:onReceiveVehicleData " + responseCode.toString());
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};

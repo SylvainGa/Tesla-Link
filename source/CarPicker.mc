@@ -34,7 +34,6 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onReceiveVehicles(responseCode, data) {
-logMessage("CarPicker:onReceiveVehicles " + responseCode.toString());
         if (responseCode == 200) {
             var vehicles = data.get("response");
             for (var i = 0; i < vehicles.size(); i++) {
