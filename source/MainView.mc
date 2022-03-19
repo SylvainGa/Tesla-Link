@@ -477,14 +477,4 @@ logMessage("Layout0");
             }
         }
     }
-
-    (:debug)
-    function logMessage(message) {
-        System.println(message);
-    }
-
-    (:release)
-    function logMessage(message) {
-        
-    }
 }

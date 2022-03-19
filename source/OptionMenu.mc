@@ -142,14 +142,4 @@ logMessage("OptionMenu:onReceiveVehicles " + responseCode.toString());
             _controller._handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
         }
     }
-
-    (:debug)
-    function logMessage(message) {
-        System.println(message);
-    }
-
-    (:release)
-    function logMessage(message) {
-        
-    }
 }

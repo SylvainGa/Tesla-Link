@@ -53,14 +53,4 @@ logMessage("ServiceDelegate:onReceiveVehicleData " + responseCode.toString());
             Background.exit(data);
         }
     }
-
-    (:debug)
-    function logMessage(message) {
-        System.println(message);
-    }
-
-    (:release)
-    function logMessage(message) {
-        
-    }
 }
