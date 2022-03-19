@@ -115,5 +115,5 @@ var errorsStr = {
 	"504" => "Gateway_Timeout",
 	"505" => "HTTP_Version_Not_Supported",
 	"511" => "Network_Authentication_Required",
-	"540" => "Veicle_Server_Error"
+	"540" => "Vehicle_Server_Error"
 };

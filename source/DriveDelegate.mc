@@ -6,8 +6,8 @@ using Toybox.Communications as Communications;
 using Toybox.Cryptography;
 using Toybox.Graphics;
 
-class ClimateDelegate extends Ui.BehaviorDelegate {
-	var _view as ClimateView;
+class DriveDelegate extends Ui.BehaviorDelegate {
+	var _view as DriveView;
     var _handler;
     var _token;
     var _tesla;
@@ -18,7 +18,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
     var _data;
 	var refreshTimer;
 	
-    function initialize(view as ClimateView, data, tesla, handler) {
+    function initialize(view as DriveView, data, tesla, handler) {
         BehaviorDelegate.initialize();
     	_view = view;
 
@@ -54,7 +54,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
     }
 
     function timerRefresh() {
-logMessage("ClimateDelegate:timerRefresh");
+logMessage("DriveDelegate:timerRefresh");
     	if (!_disableRefreshTimer) {
 			if (_data._vehicle_data != null) {
 				if (_get_vehicle_data == 0) {
@@ -71,7 +71,7 @@ logMessage("ClimateDelegate:timerRefresh");
 	    	if (swipeEvent.getDirection() == 3) {
 			    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
 				Ui.popView(Ui.SLIDE_IMMEDIATE);
-				_handler.invoke(3); // Tell MainDelegate to show next subview
+				_handler.invoke(4); // Tell MainDelegate to show next subview
 		        return true;
 		    }
 		    else if (swipeEvent.getDirection() == 2) { // Up we go!
@@ -80,35 +80,37 @@ logMessage("ClimateDelegate:timerRefresh");
 					_view._viewOffset = 0;
 		    	}
 		    }	
-		    else if (swipeEvent.getDirection() == 0) { // Down we go!
+		    else if (swipeEvent.getDirection() == 0) { // Down we go! (only one screen here)
 		    	_view._viewOffset += 4;
-		    	if (_view._viewOffset > 12) {
-					_view._viewOffset = 12;
+		    	if (_view._viewOffset > 0) {
+					_view._viewOffset = 0;
 		    	}
 		    }	
 		}	    
 	    _view.requestUpdate();
         return true;
 	}
+	
     function onBack() {
 	    refreshTimer.stop();
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
-		_handler.invoke(1);
+		_handler.invoke(2);
         return true;
     }
 
     function onTap(click) {
 	    refreshTimer.stop();
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
-		_handler.invoke(1);
+		_handler.invoke(2);
         return true;
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("ClimateDelegate:onReceiveVehicleData responseCode is " + responseCode);
+logMessage("DriveDelegate:onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+logMessage("DriveDeletegate:Drive state: " + _data._vehicle_data.get("drive_state"));
 		        _get_vehicle_data = 0; // All is well, we got our data
                 _handler.invoke(null);
             }

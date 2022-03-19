@@ -80,7 +80,7 @@ logMessage("ChargeDelegate:timerRefresh");
 					_view._viewOffset = 0;
 		    	}
 		    }	
-		    else if (swipeEvent.getDirection() == 0) { // Up we go!
+		    else if (swipeEvent.getDirection() == 0) { // Down we go!
 		    	_view._viewOffset += 4;
 		    	if (_view._viewOffset > 4) {
 					_view._viewOffset = 4;
@@ -92,7 +92,6 @@ logMessage("ChargeDelegate:timerRefresh");
 	}
 	
     function onBack() {
-logMessage("ChargeDelegate:onBack called");
 	    refreshTimer.stop();
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
@@ -100,7 +99,6 @@ logMessage("ChargeDelegate:onBack called");
     }
 
     function onTap(click) {
-logMessage("ChargeDelegate:onTap called");
 	    refreshTimer.stop();
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
@@ -112,10 +110,6 @@ logMessage("ChargeDelegate:onReceiveVehicleData responseCode is " + responseCode
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-//logMessage("ChargeDeletegate:Charge state: " + _data._vehicle_data.get("charge_state"));
-//logMessage("Vehicle state: " + _data._vehicle_data.get("vehicle_state"));
-//logMessage("Climate state: " + _data._vehicle_data.get("climate_state"));
-//logMessage("Drive state: " + _data._vehicle_data.get("drive_state"));
 		        _get_vehicle_data = 0; // All is well, we got our data
                 _handler.invoke(null);
             }
