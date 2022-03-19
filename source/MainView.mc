@@ -6,15 +6,17 @@ using Toybox.Time;
 class MainView extends Ui.View {
     hidden var _display;
     var _data;
-	var layoutNumber;
-	
+	var _layoutNumber;
+	var _layoutChanged;
+		
     // Initial load - show the 'requesting data' string, make sure we don't process touches
     function initialize(data) {
         View.initialize();
         _data = data;
         _data._ready = false;
-		layoutNumber = 0;
-		
+		_layoutNumber = 0;
+    	_layoutChanged = false;
+			
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
 
 		Application.getApp().setProperty("spinner", "-");
@@ -30,21 +32,27 @@ class MainView extends Ui.View {
 	}
 
     function onLayout(dc) {
-    	if (layoutNumber == 0) {
+    	if (_layoutNumber == 0) {
 	        setLayout(Rez.Layouts.ImageLayout(dc));
-	    } else if (layoutNumber == 0) {
+	    } else if (_layoutNumber == 1) {
 	        setLayout(Rez.Layouts.ChargingLayout(dc));
 	    }
     }
 
     function IncLayout() {
-    	layoutNumber++;
-logMessage("We're at layer " + layoutNumber);
+    	if (_layoutNumber <= 1) {
+	    	_layoutNumber++;
+	    	_layoutChanged = true;
+	  	}
+logMessage("We're at layer " + _layoutNumber);
     }
 
     function DecLayout() {
-    	layoutNumber--;
-logMessage("We're at layer " + layoutNumber);
+    	if (_layoutNumber >= 0) {
+	    	_layoutNumber--;
+	    	_layoutChanged = true;
+	    }
+logMessage("We're at layer " + _layoutNumber);
     }
 
     function onReceive(args) {
@@ -54,6 +62,126 @@ logMessage("We're at layer " + layoutNumber);
     }
 
     function onUpdate(dc) {
+  		if (_layoutChanged) {
+	    	_layoutChanged = false;
+  		}
+    	if (_layoutNumber == 0) {
+    		onUpdateLayout0(dc);
+	    } else if (_layoutNumber == 1) {
+    		onUpdateLayout1(dc);
+	    }
+	}
+
+    function onUpdateLayout1(dc) {
+logMessage("Layout1");
+        var width = dc.getWidth();
+        var height = dc.getHeight();
+        var extra = (width/7+width/28) * ((width.toFloat()/height.toFloat())-1);
+        var image_x_left = (width/7+width/28+extra).toNumber();
+        var image_y_top = (height/7+height/21).toNumber();
+        var image_x_right = (width/7*4-width/28+extra).toNumber();
+        var image_y_bottom = (height/7*4-height/21).toNumber();
+        var center_x = dc.getWidth()/2;
+        var center_y = dc.getHeight()/2;
+        var sentry_y = image_y_top - height/21;
+        
+        // Load our custom font if it's there, generally only for high res, high mem devices
+        var font_montserrat;
+        if (Rez.Fonts has :montserrat) {
+//logMessage("I have that font");
+            font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
+        } else {
+//logMessage("Using font FONT_TINY");
+            font_montserrat=Graphics.FONT_TINY;
+        }
+
+        // Next background update in 5 mins!
+        Background.registerForTemporalEvent(new Time.Duration(60*5));
+
+        // Redraw the layout and wipe the canvas              
+        if (_display != null) 
+        {
+            // We're showing a message, so set 'ready' false to prevent touches
+            _data._ready = false;
+
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.clear();
+            dc.drawText(center_x, center_y, font_montserrat, _display, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        } else {           
+            // Showing the main layouts, so we can process touches now
+            _data._ready = true;
+
+            // We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
+            var is_touchscreen = System.getDeviceSettings().isTouchScreen;
+
+			// Read temperature unit from the watch settings
+			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+
+            // We're loading the image layout
+            setLayout(Rez.Layouts.ChargingLayout(dc));
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.clear();
+            View.onUpdate(dc);
+            
+            var Line1 = View.findDrawableById("Line1");
+            var Line2 = View.findDrawableById("Line2");
+            var Line3 = View.findDrawableById("Line3");
+            var Line4 = View.findDrawableById("Line4");
+            var Line5 = View.findDrawableById("Line5");
+            var Line6 = View.findDrawableById("Line6");
+            var Line7 = View.findDrawableById("Line7");
+            var Line8 = View.findDrawableById("Line8");
+            
+            var chargeLimit = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
+            Line1.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge limit " + chargeLimit.toString() + "%");
+
+            var batteryLevel = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
+            Line2.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Level " + batteryLevel.toString() + "%");
+
+            var milesAdded = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
+            milesAdded *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+logMessage(_data._vehicle_data.get("charge_state").get("charge_miles_added_rated"));
+            Line3.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Range added " + milesAdded.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+
+            var estimatedBatteryRange = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
+            estimatedBatteryRange *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+logMessage(_data._vehicle_data.get("charge_state").get("est_battery_range"));
+            Line4.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Estimated Range " + estimatedBatteryRange.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+
+            var minutesToFullCharge = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
+            var hours = minutesToFullCharge / 60;
+            var minutes = minutesToFullCharge - hours * 60;
+            var timeStr;
+			if (System.getDeviceSettings().is24Hour) {
+				timeStr = Lang.format(/*Ui.loadResource(Rez.Strings.departure)*/"Time left $1$h$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+			}
+			else {
+				timeStr = Lang.format(/*Ui.loadResource(Rez.Strings.departure)*/"Time left $1$:$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+			}
+            Line5.setText(timeStr);
+
+            var chargerVoltage = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
+            Line6.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger voltage " + chargerVoltage.toString() + "V");
+
+            var chargerActualCurrent = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
+            Line7.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger current " + chargerActualCurrent.toString() + "A");
+
+            var batteryHeaterOn = _data._vehicle_data.get("climate_state").get("battery_heater");
+            Line8.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Heater " + (batteryHeaterOn ? "On" : "Off"));
+
+            Line1.draw(dc);
+            Line2.draw(dc);
+            Line3.draw(dc);
+            Line4.draw(dc);
+            Line5.draw(dc);
+            Line6.draw(dc);
+            Line7.draw(dc);
+            Line8.draw(dc);
+        }
+	}
+
+    function onUpdateLayout0(dc) {
+logMessage("Layout0");
         // Set up all our variables for drawing things in the right place!
         var width = dc.getWidth();
         var height = dc.getHeight();
