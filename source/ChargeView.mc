@@ -6,12 +6,14 @@ using Toybox.Time;
 class ChargeView extends Ui.View {
     hidden var _display;
     var _data;
+    var _viewOffset;
 		
     // Initial load - show the 'requesting data' string, make sure we don't process touches
     function initialize(data) {
         View.initialize();
         _data = data;
         _data._ready = false;
+        _viewOffset = 0;
     }
 
     function onLayout(dc) {
@@ -71,83 +73,92 @@ class ChargeView extends Ui.View {
             dc.clear();
             View.onUpdate(dc);
             
-            var Title = View.findDrawableById("Title");
-            var Line1Text = View.findDrawableById("Line1Text");
-            var Line2Text = View.findDrawableById("Line2Text");
-            var Line3Text = View.findDrawableById("Line3Text");
-            var Line4Text = View.findDrawableById("Line4Text");
-            var Line5Text = View.findDrawableById("Line5Text");
-            var Line6Text = View.findDrawableById("Line6Text");
-            var Line7Text = View.findDrawableById("Line7Text");
-            var Line8Text = View.findDrawableById("Line8Text");
-            var Line1Value = View.findDrawableById("Line1Value");
-            var Line2Value = View.findDrawableById("Line2Value");
-            var Line3Value = View.findDrawableById("Line3Value");
-            var Line4Value = View.findDrawableById("Line4Value");
-            var Line5Value = View.findDrawableById("Line5Value");
-            var Line6Value = View.findDrawableById("Line6Value");
-            var Line7Value = View.findDrawableById("Line7Value");
-            var Line8Value = View.findDrawableById("Line8Value");
+            var title = View.findDrawableById("Title");
+            var line1Text = View.findDrawableById("Line1Text");
+            var line2Text = View.findDrawableById("Line2Text");
+            var line3Text = View.findDrawableById("Line3Text");
+            var line4Text = View.findDrawableById("Line4Text");
+            var line5Text = View.findDrawableById("Line5Text");
+            var line6Text = View.findDrawableById("Line6Text");
+            var line7Text = View.findDrawableById("Line7Text");
+            var line8Text = View.findDrawableById("Line8Text");
+            var line1Value = View.findDrawableById("Line1Value");
+            var line2Value = View.findDrawableById("Line2Value");
+            var line3Value = View.findDrawableById("Line3Value");
+            var line4Value = View.findDrawableById("Line4Value");
+            var line5Value = View.findDrawableById("Line5Value");
+            var line6Value = View.findDrawableById("Line6Value");
+            var line7Value = View.findDrawableById("Line7Value");
+            var line8Value = View.findDrawableById("Line8Value");
 
-            var chargeLimit = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
-            Line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge limit");
-            Line1Value.setText(chargeLimit.toString() + "%");
+logMessage("_viewOffset is " + _viewOffset);
+			if (_viewOffset == 0) {
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data");
 
-            var batteryLevel = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
-            Line2Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Level");
-            Line2Value.setText(batteryLevel.toString() + "%");
-
-            var milesAdded = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
-            milesAdded *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-            Line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Range added");
-            Line3Value.setText(milesAdded.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
-
-            var estimatedBatteryRange = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
-            estimatedBatteryRange *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-            Line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Estimated Range");
-            Line4Value.setText(estimatedBatteryRange.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
-
-            var minutesToFullCharge = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
-            var hours = minutesToFullCharge / 60;
-            var minutes = minutesToFullCharge - hours * 60;
-            var timeStr;
-			if (System.getDeviceSettings().is24Hour) {
-				timeStr = Lang.format("$1$h$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+	            var line3Data = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
+	            line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge limit");
+	            line3Value.setText(line3Data.toString() + "%");
+	
+	            var line4Data = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
+	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Level");
+	            line4Value.setText(line4Data.toString() + "%");
+	
+	            var line5Data = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
+	            line5Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Range added");
+	            line5Value.setText(line5Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	
+	            var line6Data = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
+	            line6Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Estimated Range");
+	            line6Value.setText(line6Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	
 			}
-			else {
-				timeStr = Lang.format("$1$:$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+			else if (_viewOffset == 4) {
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data");
+
+	            var line3Data = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
+	            var hours = line3Data / 60;
+	            var minutes = line3Data - hours * 60;
+	            var timeStr;
+				if (System.getDeviceSettings().is24Hour) {
+					timeStr = Lang.format("$1$h$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+				}
+				else {
+					timeStr = Lang.format("$1$:$2$ ", [hours.format("%d"), minutes.format("%02d")]);
+				}
+	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Time left");
+	            line3Value.setText(timeStr);
+
+	            var line4Data = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
+	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger voltage");
+	            line4Value.setText(line4Data.toString() + "V");
+	
+	            var line5Data = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
+	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger current");
+	            line5Value.setText(line5Data.toString() + "A");
+	
+	            var line6Data = _data._vehicle_data.get("climate_state").get("battery_heater");
+	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Heater");
+	            line6Value.setText((line6Data ? "On" : "Off"));
 			}
-            Line5Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Time left");
-            Line5Value.setText(timeStr);
-
-            var chargerVoltage = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
-            Line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger voltage");
-            Line6Value.setText(chargerVoltage.toString() + "V");
-
-            var chargerActualCurrent = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
-            Line7Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger current");
-            Line7Value.setText(chargerActualCurrent.toString() + "A");
-
-            var batteryHeaterOn = _data._vehicle_data.get("climate_state").get("battery_heater");
-            Line8Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Heater");
-            Line8Value.setText((batteryHeaterOn ? "On" : "Off"));
-
-            Line1Text.draw(dc);
-            Line1Value.draw(dc);
-            Line2Text.draw(dc);
-            Line2Value.draw(dc);
-            Line3Text.draw(dc);
-            Line3Value.draw(dc);
-            Line4Text.draw(dc);
-            Line4Value.draw(dc);
-            Line5Text.draw(dc);
-            Line5Value.draw(dc);
-            Line6Text.draw(dc);
-            Line6Value.draw(dc);
-            Line7Text.draw(dc);
-            Line7Value.draw(dc);
-            Line8Text.draw(dc);
-            Line8Value.draw(dc);
+			
+            line1Text.draw(dc);
+            line1Value.draw(dc);
+            line2Text.draw(dc);
+            line2Value.draw(dc);
+            line3Text.draw(dc);
+            line3Value.draw(dc);
+            line4Text.draw(dc);
+            line4Value.draw(dc);
+            line5Text.draw(dc);
+            line5Value.draw(dc);
+            line6Text.draw(dc);
+            line6Value.draw(dc);
+            line7Text.draw(dc);
+            line7Value.draw(dc);
+            line8Text.draw(dc);
+            line8Value.draw(dc);
         }
 	}
 }

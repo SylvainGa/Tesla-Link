@@ -20,6 +20,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _auth_done;
     var _need_wake;
     var _wake_done;
+    var _waiting_for_vehicle_data;
 
     var _set_climate_on;
     var _set_climate_off;
@@ -72,7 +73,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         _need_wake = true;
         _wake_done = true;
-
+		_waiting_for_vehicle_data = true;
+		
         _set_climate_on = false;
         _set_climate_off = false;
         _set_climate_defrost = false;
@@ -105,23 +107,33 @@ logMessage("MainDelegate: Starting timer");
 
     function onReceive(args) {
 logMessage("MainDelegate:onReceive args is " + args);
-		if (args == true) { // The sub page ended and sent us a _handler.invoke(true) call, that's our cue to restart our timer
+		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, that's our cue to restart our timer and display our main view
+			_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+
 	        var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
 		    refreshTimer.start(method(:timerRefresh), refreshTimeInterval * 1000, true);
 		}
-	}
-
-    function onSwipe(swipeEvent) {
-    	if (swipeEvent.getDirection() == 3) {
-		    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
-		    _sleep_timer.stop();
-
+		else if (args == 1) { // Swiped left on subview 1, show subview 2
             var view = new ChargeView(_view._data);
             var delegate = new ChargeDelegate(view, _view._data, _tesla, method(:onReceive));
             Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
-	    }
-	    
+		}
+		else if (args == 2) { // Swiped left on subview 1, show subview 2
+            var view = new ClimateView(_view._data);
+            var delegate = new ClimateDelegate(view, _view._data, _tesla, method(:onReceive));
+            Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
+		}
 	    _view.requestUpdate();
+	}
+
+    function onSwipe(swipeEvent) {
+    	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
+	    	if (swipeEvent.getDirection() == 3) {
+			    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other submenus
+			    _sleep_timer.stop();
+		    }
+			onReceive(1); // Show the first submenu
+		}
         return true;
 	}
 	
@@ -259,6 +271,7 @@ logMessage("MainDelegate:onReceive args is " + args);
             _need_wake = false;
             _wake_done = false;
             _handler.invoke(Ui.loadResource(Rez.Strings.label_waking_vehicle));
+logMessage("MainDelegate:stateMachine asking to wake vehicle");
             _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
@@ -494,7 +507,7 @@ logMessage("MainDelegate:onReceive args is " + args);
 
     function timerRefresh() {
 		if (Application.getApp().getProperty("refreshTimer")) {
-logMessage("Timer running");
+logMessage("MainDelegate:timerRefresh");
 	    	if (!_disableRefreshTimer) {
         		var _spinner = Application.getApp().getProperty("spinner");
 				if (_spinner.equals("+")) {
@@ -890,6 +903,7 @@ logMessage("MainDelegate:onBack called");
     }
 
     function onReceiveVehicleData(responseCode, data) {
+logMessage("MainDelegate:onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
@@ -897,6 +911,7 @@ logMessage("MainDelegate:onBack called");
 //logMessage("Vehicle state: " + _data._vehicle_data.get("vehicle_state"));
 //logMessage("Climate state: " + _data._vehicle_data.get("climate_state"));
 //logMessage("Drive state: " + _data._vehicle_data.get("drive_state"));
+				_waiting_for_vehicle_data = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
                 _handler.invoke(null);
@@ -925,15 +940,18 @@ logMessage("MainDelegate:onBack called");
 
     function onReceiveAwake(responseCode, data) {
         if (responseCode == 200) {
+			if (!_waiting_for_vehicle_data) {
+				_handler.invoke(Ui.loadResource(Rez.Strings.label_requesting_data));
+			}
             _wake_done = true;
-			_handler.invoke(Ui.loadResource(Rez.Strings.label_requesting_data));
             _get_vehicle_data = 1;
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 			_408_count = 0;
         } else {
             _need_wake = true;
             _wake_done = false;
-            
+			_waiting_for_vehicle_data = true;
+			            
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();
