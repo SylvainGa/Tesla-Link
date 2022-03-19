@@ -93,10 +93,10 @@ class DriveView extends Ui.View {
 
 logMessage("_viewOffset is " + _viewOffset);
 			if (_viewOffset == 0) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Drive data (1/1)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_drive_data_1_1));
 
 	            var line3Data = _data._vehicle_data.get("drive_state").get("shift_state");
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Shift state");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_shift_state));
 	            if (line3Data != null) {
 		            line3Value.setText(line3Data.toString());
 				}
@@ -105,7 +105,7 @@ logMessage("_viewOffset is " + _viewOffset);
 				}
 				
 	            var line4Data = _data._vehicle_data.get("drive_state").get("speed");
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Speed");
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_speed));
 				if (line4Data == null) {
 					line4Data = 0;
 				}
@@ -113,16 +113,17 @@ logMessage("_viewOffset is " + _viewOffset);
 	            line4Value.setText(line4Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? " miles" : " km"));
 
 	            var line5Data = _data._vehicle_data.get("drive_state").get("heading").toFloat();
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Heading");
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_heading));
 	            if (line5Data != null) {
 					var val = (line5Data.toFloat() / 22.5) + .5;
-					var arr = ["N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+					var arr = toArray(Ui.loadResource(Rez.Strings.subview_label_compass),",");
+
 					line5Data = arr[(val.toNumber() % 16)];
 		            line5Value.setText(line5Data.toString());
 				}
 					
 	            var line6Data = _data._vehicle_data.get("drive_state").get("power").toFloat();
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Power");
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_power));
 	            if (line6Data != null) {
 		            line6Value.setText(line6Data.toString());
 		        }
@@ -145,5 +146,28 @@ logMessage("_viewOffset is " + _viewOffset);
             line8Text.draw(dc);
             line8Value.draw(dc);
         }
+	}
+
+	function toArray(string, splitter) {
+		var array = new [16]; //Use maximum expected length
+		var index = 0;
+		var location;
+
+		do {
+			location = string.find(splitter);
+			if (location != null) {
+				array[index] = string.substring(0, location);
+				string = string.substring(location + 1, string.length());
+				index++;
+			}
+		} while (location != null);
+
+		array[index] = string;
+		
+		var result = new [index];
+		for (var i = 0; i < index; i++) {
+			result = array;
+		}
+		return result;
 	}
 }

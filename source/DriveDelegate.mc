@@ -94,7 +94,7 @@ logMessage("DriveDelegate:timerRefresh");
     function onBack() {
 	    refreshTimer.stop();
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
-		_handler.invoke(2);
+		_handler.invoke(0);
         return true;
     }
 

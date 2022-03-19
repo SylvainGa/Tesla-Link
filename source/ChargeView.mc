@@ -93,29 +93,29 @@ class ChargeView extends Ui.View {
 
 logMessage("_viewOffset is " + _viewOffset);
 			if (_viewOffset == 0) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data (1/2)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_1_2));
 
 	            var line3Data = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge limit");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_limit_soc));
 	            line3Value.setText(line3Data.toString() + "%");
 	
 	            var line4Data = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Level");
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_battery_level));
 	            line4Value.setText(line4Data.toString() + "%");
 	
 	            var line5Data = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
 	            line5Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Range added");
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
 	            line5Value.setText(line5Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 	
 	            var line6Data = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
 	            line6Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Estimated Range");
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
 	            line6Value.setText(line6Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 	
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data (2/2)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_2_2));
 
 	            var line3Data = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
 	            var hours = line3Data / 60;
@@ -127,20 +127,20 @@ logMessage("_viewOffset is " + _viewOffset);
 				else {
 					timeStr = Lang.format("$1$:$2$ ", [hours.format("%d"), minutes.format("%02d")]);
 				}
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Time left");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_minutes_to_full_charge));
 	            line3Value.setText(timeStr);
 
 	            var line4Data = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger voltage");
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_charger_voltage));
 	            line4Value.setText(line4Data.toString() + "V");
 	
 	            var line5Data = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charger current");
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_charger_actual_current));
 	            line5Value.setText(line5Data.toString() + "A");
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("battery_heater");
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Battery Heater");
-	            line6Value.setText((line6Data ? "On" : "Off"));
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_battery_heater));
+	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			
             line1Text.draw(dc);

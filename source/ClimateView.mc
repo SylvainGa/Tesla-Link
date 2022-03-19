@@ -93,7 +93,7 @@ class ClimateView extends Ui.View {
 
 logMessage("_viewOffset is " + _viewOffset);
 			if (_viewOffset == 0) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (1/4)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_1_4));
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
 	            var line3Unit = "°F";
@@ -101,7 +101,7 @@ logMessage("_viewOffset is " + _viewOffset);
 					line3Data = (line3Data - 32.0) * 5.0 / 9.0;	
 					line3Unit = "°C";
 		        }
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Driver temperature");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_driver_temp_setting));
 	            line3Value.setText(line3Data.toString() + line3Unit);
 
 	            var line4Data = _data._vehicle_data.get("climate_state").get("passenger_temp_setting").toNumber();
@@ -110,7 +110,7 @@ logMessage("_viewOffset is " + _viewOffset);
 					line4Data = (line4Data - 32.0) * 5.0 / 9.0;	
 					line4Unit = "°C";
 		        }
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Passenger temperature");
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_passenger_temp_setting));
 	            line4Value.setText(line4Data.toString() + line4Unit);
 	
 	            var line5Data = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
@@ -119,7 +119,7 @@ logMessage("_viewOffset is " + _viewOffset);
 					line5Data = (line5Data - 32.0) * 5.0 / 9.0;	
 					line5Unit = "°C";
 		        }
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Inside temperature");
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_inside_temp));
 	            line5Value.setText(line5Data.toString() + line5Unit);
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("outside_temp").toNumber();
@@ -128,67 +128,67 @@ logMessage("_viewOffset is " + _viewOffset);
 					line6Data = (line6Data - 32.0) * 5.0 / 9.0;	
 					line6Unit = "°C";
 		        }
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Outside temperature");
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_outside_temp));
 	            line6Value.setText(line6Data.toString() + line6Unit);
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (2/4)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_2_4));
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("is_climate_on");
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Climate state");
-	            line3Value.setText((line3Data ? "On" : "Off"));
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_climate_on));
+	            line3Value.setText((line3Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 
 	            var line4Data = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Front defrost");
-	            line4Value.setText((line4Data ? "On" : "Off"));
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_front_defroster_on));
+	            line4Value.setText((line4Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
 	            var line5Data = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Rear defrost");
-	            line5Value.setText((line5Data ? "On" : "Off"));
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_rear_defroster_on));
+	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("side_mirror_heaters");
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Mirrors heater");
-	            line6Value.setText((line6Data ? "On" : "Off"));
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_side_mirror_heaters));
+	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 8) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (3/4)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_3_4));
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("seat_heater_left").toNumber();
 				var driverAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_left") ? " (A)" : "");
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Driver seat");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_left));
 	            line3Value.setText(line3Data.toString() + driverAutoSeat);
 
 	            var line4Data = _data._vehicle_data.get("climate_state").get("seat_heater_right").toNumber();
 				var passengerAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_right") ? " (A)" : "");
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Passenger seat");
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_right));
 	            line4Value.setText(line4Data.toString() + passengerAutoSeat);
 	
 	            var line5Data = _data._vehicle_data.get("climate_state").get("steering_wheel_heater");
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Steering heater");
-	            line5Value.setText((line5Data ? "On" : "Off"));
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_steering_wheel_heater));
+	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("wiper_blade_heater");
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Wiper heater");
-	            line6Value.setText((line6Data ? "On" : "Off"));
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_wiper_blade_heater));
+	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 12) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (4/4)");
+	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_4_4));
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("climate_keeper_mode");
-	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Climate keeper");
+	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_keeper_mode));
 	            line3Value.setText(line3Data.toString());
 
 	            var line4Data = _data._vehicle_data.get("climate_state").get("allow_cabin_overheat_protection");
-	            line4Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Overheat protection");
-	            line4Value.setText((line4Data ? "On" : "Off"));
+	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_allow_cabin_overheat_protection));
+	            line4Value.setText((line4Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
 	            var line5Data = _data._vehicle_data.get("climate_state").get("supports_fan_only_cabin_overheat_protection");
-	            line5Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"No A/C protection");
-	            line5Value.setText((line5Data ? "On" : "Off"));
+	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_supports_fan_only_cabin_overheat_protection));
+	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("cabin_overheat_protection_actively_cooling");
-	            line6Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Overheat cooling");
-	            line6Value.setText((line6Data ? "On" : "Off"));
+	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_cabin_overheat_protection_actively_cooling));
+	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 
             line1Text.draw(dc);
