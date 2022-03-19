@@ -93,7 +93,7 @@ class ClimateView extends Ui.View {
 
 logMessage("_viewOffset is " + _viewOffset);
 			if (_viewOffset == 0) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (1/4)");
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
 	            var line3Unit = "°F";
@@ -132,7 +132,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	            line6Value.setText(line6Data.toString() + line6Unit);
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (2/4)");
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("is_climate_on");
 	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Climate state");
@@ -151,7 +151,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	            line6Value.setText((line6Data ? "On" : "Off"));
 			}
 			else if (_viewOffset == 8) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (3/4)");
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("seat_heater_left").toNumber();
 				var driverAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_left") ? " (A)" : "");
@@ -172,7 +172,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	            line6Value.setText((line6Data ? "On" : "Off"));
 			}
 			else if (_viewOffset == 12) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Climate data (4/4)");
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("climate_keeper_mode");
 	            line3Text.setText(/*Ui.loadResource(Rez.Strings.departure)*/"Climate keeper");

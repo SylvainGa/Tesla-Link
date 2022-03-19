@@ -93,7 +93,7 @@ class ChargeView extends Ui.View {
 
 logMessage("_viewOffset is " + _viewOffset);
 			if (_viewOffset == 0) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data (1/2)");
 
 	            var line3Data = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
 	            line3Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge limit");
@@ -115,7 +115,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data");
+	            line1Text.setText(/*Ui.loadResource(Rez.Strings.label_cabin)*/"Charge data (2/2)");
 
 	            var line3Data = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
 	            var hours = line3Data / 60;

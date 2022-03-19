@@ -1,5 +1,5 @@
 <layout id="ClimateLayout">
-    <label id="Line1Text" x="65%" y="28" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_RIGHT" />
+    <label id="Line1Text" x="center" y="28" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
     <label id="Line2Text" x="65%" y="72" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_RIGHT" />
     <label id="Line3Text" x="65%" y="116" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_RIGHT" />
     <label id="Line4Text" x="65%" y="160" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_RIGHT" />
