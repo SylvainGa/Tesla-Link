@@ -55,7 +55,7 @@ class RefreshPickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         _refreshTime = values[0];
 
-        Application.getApp().setProperty("refreshTime", _refreshTime);
+        Application.getApp().setProperty("refreshTimeInterval", _refreshTime);
         _controller._set_refresh_time = true;
         _controller.stateMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);

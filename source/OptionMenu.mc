@@ -124,8 +124,8 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             _controller._need_wake = true;
             _controller.stateMachine();
         } else if (item == :refresh) {
-            var refreshTime = Application.getApp().getProperty("refreshTime");
-            Ui.pushView(new RefreshPicker(refreshTime), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
+            var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+            Ui.pushView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         }
     }
 

@@ -4,7 +4,7 @@ using Toybox.Time;
 using Toybox.System;
 using Toybox.Communications as Communications;
 using Toybox.Cryptography;
-using  Toybox.Graphics;
+using Toybox.Graphics;
 
 const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
@@ -97,28 +97,32 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			
 		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 
+logMessage("MainDelegate: Starting timer");
 	    refreshTimer = new Timer.Timer();
-	    refreshTimer.start(method(:timerRefresh), 4000, true);
+        var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+	    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
     }
+
+    function onReceive(args) {
+logMessage("MainDelegate:onReceive args is " + args);
+		if (args == true) { // The sub page ended and sent us a _handler.invoke(true) call, that's our cue to restart our timer
+	        var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+		    refreshTimer.start(method(:timerRefresh), refreshTimeInterval * 1000, true);
+		}
+	}
 
     function onSwipe(swipeEvent) {
     	if (swipeEvent.getDirection() == 3) {
-    		_view.IncLayout();
-	    }
-    	else if (swipeEvent.getDirection() == 1) {
-    		_view.DecLayout();
+		    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
+		    _sleep_timer.stop();
+
+            var view = new ChargeView(_view._data);
+            var delegate = new ChargeDelegate(view, _view._data, _tesla, method(:onReceive));
+            Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 	    }
 	    
 	    _view.requestUpdate();
         return true;
-	}
-	
-    function onShow() {
-	    refreshTimer.start(method(:timerRefresh), 4000, true);
-	}
-	
-    function onHide() {
-	    refreshTimer.stop();
 	}
 	
     function bearerForAccessOnReceive(responseCode, data) {
@@ -453,10 +457,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (_set_refresh_time) {
             _set_refresh_time = false;
-            var refreshTime = Application.getApp().getProperty("refreshTime");
-            if (refreshTime != null) {
+            var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+            if (refreshTimeInterval != null) {
 			    refreshTimer.stop();
-			    refreshTimer.start(method(:timerRefresh), refreshTime.toNumber() * 1000, true);
+			    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
             }
 		}
     }
@@ -490,6 +494,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
     function timerRefresh() {
 		if (Application.getApp().getProperty("refreshTimer")) {
+logMessage("Timer running");
 	    	if (!_disableRefreshTimer) {
         		var _spinner = Application.getApp().getProperty("spinner");
 				if (_spinner.equals("+")) {
@@ -523,13 +528,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return false;
         }
 
-		if (_view._layoutNumber == 0) {
-	        doSelectLayout0();
-	    }
+        doSelect();
         return true;
     }
 
-    function doSelectLayout0() {
+    function doSelect() {
         if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
             _set_climate_on = true;
         } else {
@@ -543,21 +546,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return false;
         }
 
-		if (_view._layoutNumber == 0) {
-	        doNextPageLayout0();
-	    }
+        doNextPage();
         return true;
     }
 
-    function doNextPageLayout0() {
-		if (_view._layoutNumber == 0) {
-	        if (_data._vehicle_data != null && !_data._vehicle_data.get("vehicle_state").get("locked")) {
-	            _lock = true;
-	        } else {
-	            _unlock = true;
-	        }
-	        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
-	    }
+    function doNextPage() {
+        if (_data._vehicle_data != null && !_data._vehicle_data.get("vehicle_state").get("locked")) {
+            _lock = true;
+        } else {
+            _unlock = true;
+        }
+        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
     }
 
     function onPreviousPage() {
@@ -565,13 +564,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return false;
         }
 
-		if (_view._layoutNumber == 0) {
-	        doPreviousPageLayout0();
-	    }
+        doPreviousPage();
         return true;
     }
 
-    function doPreviousPageLayout0() {
+    function doPreviousPage() {
     	if (Application.getApp().getProperty("swap_frunk_for_port") == 0) {
    			_open_frunk = true;
         }
@@ -588,11 +585,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onBack() {
-		if (_view._layoutNumber > 0) {
-			_view.ResetToLayout0();
-		    _view.requestUpdate();
-		    return true;
-		}
+logMessage("MainDelegate:onBack called");
+	    refreshTimer.stop();
+	    _sleep_timer.stop();
         return false;
     }
 
@@ -601,9 +596,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return false;
         }
 
-		if (_view._layoutNumber == 0) {
-	        doMenuLayout0();
-	    }
+        doMenu();
         return true;
     }
 
@@ -728,7 +721,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 	
-    function doMenuLayout0() {
+    function doMenu() {
         if (!_auth_done) {
             return;
         }
@@ -767,88 +760,80 @@ class MainDelegate extends Ui.BehaviorDelegate {
             return true;
         }
         
-		if (_view._layoutNumber == 0) {
-	        var coords = click.getCoordinates();
-	        var x = coords[0];
-	        var y = coords[1];
-			var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
-	
-			// Tap on vehicle name
-			if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
-				_tesla.getVehicleId(method(:selectVehicle));
-			}
-			// Tap on the space used by the 'Eye'
-			else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
-	            _sentry_mode = true;
+        var coords = click.getCoordinates();
+        var x = coords[0];
+        var y = coords[1];
+		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
+
+		// Tap on vehicle name
+		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
+			_tesla.getVehicleId(method(:selectVehicle));
+		}
+		// Tap on the space used by the 'Eye'
+		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
+            _sentry_mode = true;
+            stateMachine();
+		}
+		// Tap on the middle text line where Departure is written
+		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
+			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+	            _adjust_departure = true;
 	            stateMachine();
-			}
-			// Tap on the middle text line where Departure is written
-			else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
-				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-		            _adjust_departure = true;
-		            stateMachine();
-	            }
-	            else {
-					Ui.pushView(new DepartureTimePicker(_data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(self), WatchUi.SLIDE_IMMEDIATE);
-	            }
-			} 
-			// Tap on bottom line on screen
-			else if (enhancedTouch && y > _settings.screenHeight - _settings.screenHeight / 6 && _tesla != null) {
-				var screenBottom = Application.getApp().getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
-				switch (screenBottom) {
-					case 0:
-			        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
-			            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(self), Ui.SLIDE_UP);
-			            break;
-			        case 1:
-			        	var max_amps = _data._vehicle_data.get("charge_state").get("charge_current_request_max");
-			            var charging_amps = _data._vehicle_data.get("charge_state").get("charge_current_request");
-			            if (charging_amps == null) {
-			            	if (max_amps == null) {
-			            		charging_amps = 32;
-			            	}
-			            	else {
-			            		charging_amps = max_amps;
-			            	}
-			            }
-			            
-			            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(self), Ui.SLIDE_UP);
-			            break;
-			        case 2:
-			            var driver_temp = Application.getApp().getProperty("driver_temp");
-			            var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
-			            var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
-			            
-			            if (Application.getApp().getProperty("imperial")) {
-			            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
-			            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
-			            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
-			            }
-	
-			            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
-						break;
-	            }
-			}
-			else if (x < _settings.screenWidth/2) {
-	            if (y < _settings.screenHeight/2) {
-	                doPreviousPageLayout0();
-	            } else {
-	                doNextPageLayout0();
-	            }
-	        } else {
-	            if (y < _settings.screenHeight/2) {
-	                doSelectLayout0();
-	            } else {
-	                doMenuLayout0();
-	            }
-	        }
+            }
+            else {
+				Ui.pushView(new DepartureTimePicker(_data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(self), WatchUi.SLIDE_IMMEDIATE);
+            }
+		} 
+		// Tap on bottom line on screen
+		else if (enhancedTouch && y > _settings.screenHeight - _settings.screenHeight / 6 && _tesla != null) {
+			var screenBottom = Application.getApp().getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
+			switch (screenBottom) {
+				case 0:
+		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
+		            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(self), Ui.SLIDE_UP);
+		            break;
+		        case 1:
+		        	var max_amps = _data._vehicle_data.get("charge_state").get("charge_current_request_max");
+		            var charging_amps = _data._vehicle_data.get("charge_state").get("charge_current_request");
+		            if (charging_amps == null) {
+		            	if (max_amps == null) {
+		            		charging_amps = 32;
+		            	}
+		            	else {
+		            		charging_amps = max_amps;
+		            	}
+		            }
+		            
+		            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(self), Ui.SLIDE_UP);
+		            break;
+		        case 2:
+		            var driver_temp = Application.getApp().getProperty("driver_temp");
+		            var max_temp = _data._vehicle_data.get("climate_state").get("max_avail_temp");
+		            var min_temp = _data._vehicle_data.get("climate_state").get("min_avail_temp");
+		            
+		            if (Application.getApp().getProperty("imperial")) {
+		            	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
+		            	max_temp = max_temp * 9.0 / 5.0 + 32.0;
+		            	min_temp = min_temp * 9.0 / 5.0 + 32.0;
+		            }
+
+		            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(self), Ui.SLIDE_UP);
+					break;
+            }
 		}
-		else if (_view._layoutNumber == 1) {
-			_view.ResetToLayout0();
-		    _view.requestUpdate();
-		    return true;
-		}
-        return true;
+		else if (x < _settings.screenWidth/2) {
+            if (y < _settings.screenHeight/2) {
+                doPreviousPage();
+            } else {
+                doNextPage();
+            }
+        } else {
+            if (y < _settings.screenHeight/2) {
+                doSelect();
+            } else {
+                doMenu();
+            }
+        }
     }
 
     function selectVehicle(responseCode, data) {
@@ -908,6 +893,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+//logMessage("Charge state: " + _data._vehicle_data.get("charge_state"));
+//logMessage("Vehicle state: " + _data._vehicle_data.get("vehicle_state"));
+//logMessage("Climate state: " + _data._vehicle_data.get("climate_state"));
+//logMessage("Drive state: " + _data._vehicle_data.get("drive_state"));
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
                 _handler.invoke(null);
