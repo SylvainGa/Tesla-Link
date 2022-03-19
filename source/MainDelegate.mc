@@ -616,6 +616,11 @@ logMessage("Swipe " + swipeEvent.getDirection().toString());
     }
 
     function onBack() {
+		if (_view._layoutNumber > 0) {
+			_view.ResetToLayout0();
+		    _view.requestUpdate();
+		    return true;
+		}
         return false;
     }
 

@@ -55,6 +55,12 @@ logMessage("We're at layer " + _layoutNumber);
 logMessage("We're at layer " + _layoutNumber);
     }
 
+    function ResetToLayout0() {
+    	_layoutNumber = 0;
+    	_layoutChanged = true;
+logMessage("We're at layer " + _layoutNumber);
+    }
+
     function onReceive(args) {
 //logMessage("Received " + args);
         _display = args;
