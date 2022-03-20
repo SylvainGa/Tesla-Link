@@ -2,4 +2,5 @@
     <label id="name" x="center" y="30" font="@Fonts.montserrat" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
     <label id="status" x="center" y="343" font="@Fonts.montserrat" justification="Gfx.TEXT_JUSTIFY_CENTER" />
     <label id="departure" x="center" y="171" font="Graphics.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="spinner" x="center" y="66%" font="Graphics.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_CENTER" />
 </layout>

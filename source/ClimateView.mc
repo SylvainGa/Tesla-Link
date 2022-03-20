@@ -17,7 +17,7 @@ class ClimateView extends Ui.View {
     }
 
     function onLayout(dc) {
-        setLayout(Rez.Layouts.ChargingLayout(dc));
+        setLayout(Rez.Layouts.DataScreenLayout(dc));
     }
 
     function onReceive(args) {
@@ -68,7 +68,7 @@ class ClimateView extends Ui.View {
 			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
 
             // We're loading the image layout
-            setLayout(Rez.Layouts.ChargingLayout(dc));
+            setLayout(Rez.Layouts.DataScreenLayout(dc));
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();
             View.onUpdate(dc);
