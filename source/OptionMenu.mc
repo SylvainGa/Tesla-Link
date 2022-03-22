@@ -138,7 +138,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
             Ui.pushView(new CarPicker(vins), new CarPickerDelegate(_controller), Ui.SLIDE_UP);
         } else {
-            _controller._handler.invoke(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
+            _controller._handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
     }
 }

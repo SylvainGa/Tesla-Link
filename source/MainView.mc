@@ -5,13 +5,20 @@ using Toybox.Time;
 
 class MainView extends Ui.View {
     hidden var _display;
+    hidden var _displayType;
     var _data;
-		
+	var _errorTimer;
+	var _bufferedText;
+	var _firstShowing;
+					
     // Initial load - show the 'requesting data' string, make sure we don't process touches
     function initialize(data) {
         View.initialize();
         _data = data;
         _data._ready = false;
+		_errorTimer = 0;
+		_bufferedText = null;
+		_firstShowing = true;
 			
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
 
@@ -35,7 +42,10 @@ class MainView extends Ui.View {
     }
 
     function onReceive(args) {
-        _display = args;
+        _displayType = args[0];
+        _display = args[1];
+//logMessage("args[0] " + args[0]);
+//logMessage("args[1] " + args[1]);
         Ui.requestUpdate();
     }
 
@@ -64,17 +74,35 @@ class MainView extends Ui.View {
         Background.registerForTemporalEvent(new Time.Duration(60*5));
 
         // Redraw the layout and wipe the canvas              
-        if (_display != null) 
-        {
+        if (_display != null || (_errorTimer > 0 && !_firstShowing)) {
             // We're showing a message, so set 'ready' false to prevent touches
             _data._ready = false;
 
+			if (_displayType == 0 && _display != null) { // We're displaying an error, time it so it stays up 2 seconds
+logMessage("Priority Message " + _display);
+				_errorTimer = System.getTimer() + 2000;
+				_bufferedText = _display;
+			} else if (_errorTimer == 0) {
+logMessage("Show this Message " + _display);
+				_errorTimer = System.getTimer() + 1000;
+				_bufferedText = _display;
+			}
+			_displayType = -1;
+
+			if (System.getTimer() > _errorTimer) { // Time's up
+				_errorTimer = 0;
+			}
+			_display = _bufferedText;
+logMessage("Showing Message " + _display);
+			
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();
             dc.drawText(center_x, center_y, font_montserrat, _display, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         } else {           
             // Showing the main layouts, so we can process touches now
             _data._ready = true;
+            _firstShowing = false;
+            _errorTimer = 0;
 
             // We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
             var is_touchscreen = System.getDeviceSettings().isTouchScreen;

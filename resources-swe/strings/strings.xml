@@ -194,4 +194,5 @@
     <string id="subview_label_climate_data_4_4">Climate data (4/4)</string>
     <string id="subview_label_drive_data_1_1">Drive data (1/1)</string>
     <string id="subview_label_parked">Parked</string>
+    <string id="label_no_phone_internet">Phone not connected\nto the internet</string>
 </strings>

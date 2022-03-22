@@ -43,7 +43,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                 }
             }
         } else {
-            _controller._handler.invoke(WatchUi.loadResource(Rez.Strings.label_error) + responseCode.toString());
+            _controller._handler.invoke([0, WatchUi.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
     }
 }
