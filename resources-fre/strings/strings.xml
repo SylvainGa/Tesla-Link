@@ -195,4 +195,9 @@
     <string id="subview_label_drive_data_1_1">Conduite (1/1)</string>
     <string id="subview_label_parked">Stationné</string>
     <string id="label_no_phone_internet">Mobile non raccordé\nà l'Internet</string>
+	<string id="seat_auto">Auto</string>
+	<string id="seat_off">Éteint</string>
+	<string id="seat_low">Bas</string>
+	<string id="seat_medium">Moyen</string>
+	<string id="seat_high">Haut</string>
 </strings>

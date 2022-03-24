@@ -4,10 +4,30 @@ using Toybox.Graphics;
 class SeatHeatPicker extends WatchUi.Picker {
 	var _heat;
 	
-    public function initialize (heat) {
-		_heat = [heat - 0];
+    public function initialize (seat) {
+		
         var title = new WatchUi.Text({:text=>Rez.Strings.temp_choose_heat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
-        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(0, 3, 1, {})], :defaults=>_heat});
+
+//        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(0, 3, 1, {})], :defaults=>_heat});
+		var frontSeat = false;
+		if (seat == Rez.Strings.seat_driver || seat == Rez.Strings.seat_passenger || seat == Rez.Strings.seat_front) {
+			frontSeat = true;
+		}
+
+        var seatHeat = new [frontSeat ? 5 : 4];
+
+        seatHeat[0] = Rez.Strings.seat_off;
+        seatHeat[1] = Rez.Strings.seat_low;
+        seatHeat[2] = Rez.Strings.seat_medium;
+        seatHeat[3] = Rez.Strings.seat_high;
+		if (frontSeat) {
+	        seatHeat[4] = Rez.Strings.seat_auto;
+	    }
+    
+        var factory = new WordFactory(seatHeat);
+        
+//        Picker.initialize({:title=>title, :pattern=>[factory], :defaults=>_heat});
+        Picker.initialize({:title=>title, :pattern=>[factory]});
     }
 
     public function onUpdate(dc) {

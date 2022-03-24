@@ -195,4 +195,9 @@
     <string id="subview_label_drive_data_1_1">Drive data (1/1)</string>
     <string id="subview_label_parked">Parked</string>
     <string id="label_no_phone_internet">Phone not connected\nto the internet</string>
+	<string id="seat_auto">Auto</string>
+	<string id="seat_off">Off</string>
+	<string id="seat_low">Low</string>
+	<string id="seat_medium">Medium</string>
+	<string id="seat_high">High</string>
 </strings>

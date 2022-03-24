@@ -167,14 +167,28 @@ class Tesla {
     }
     
     function climateSeatHeat(vehicle, notify, seat_chosen, heat_chosen) {
-        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/remote_seat_heater_request";
-
-        Communications.makeWebRequest(
-            url,
+		var url;
+		var options;
+		
+		if (heat_chosen >= 0) {
+	        url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/remote_seat_heater_request";
+	        options = 
             {
                 "heater" => seat_chosen,
                 "level" => heat_chosen
-            },
+            };
+		} else {
+	        url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/remote_auto_seat_climate_request";
+	        options = 
+            {
+                "auto_seat_position" => seat_chosen + 1,
+                "auto_climate_on" => true
+            };
+		}
+logMessage("Calling url " + url + " options at " + options);
+        Communications.makeWebRequest(
+            url,
+            options,
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {

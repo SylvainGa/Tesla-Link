@@ -446,6 +446,33 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			var seat_chosen = Application.getApp().getProperty("seat_chosen");
 			var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
 
+			switch (seat_heat_chosen) {
+				case Rez.Strings.seat_auto:
+					seat_heat_chosen = -1;
+					break;
+
+				case Rez.Strings.seat_off:
+					seat_heat_chosen = 0;
+					break;
+
+				case Rez.Strings.seat_low:
+					seat_heat_chosen = 1;
+					break;
+
+				case Rez.Strings.seat_medium:
+					seat_heat_chosen = 2;
+					break;
+
+				case Rez.Strings.seat_high:
+					seat_heat_chosen = 3;
+					break;
+					
+				default:
+					seat_heat_chosen = 0;
+					break;
+			}
+logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
+
             _handler.invoke([1, Ui.loadResource(seat_chosen)]);
 
 	        if (seat_chosen == Rez.Strings.seat_driver) {
@@ -931,7 +958,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 logMessage("MainDelegate:onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
-//logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
+logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 				_waiting_for_vehicle_data = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
@@ -995,6 +1022,7 @@ logMessage("MainDelegate:onReceiveVehicleData responseCode is " + responseCode);
     }
 
     function genericHandler(responseCode, data) {
+logMessage(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
         if (responseCode == 200) {
             if (_get_vehicle_data == 0) {
 	            _get_vehicle_data = 1;

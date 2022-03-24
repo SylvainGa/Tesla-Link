@@ -31,6 +31,9 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         _selected = values[0];
 		Application.getApp().setProperty("seat_chosen", _selected);
+
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+
+        WatchUi.pushView(new SeatHeatPicker(_selected), new SeatHeatPickerDelegate(_controller), WatchUi.SLIDE_UP);
     }
 }

@@ -77,9 +77,6 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             
             Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_seat_heat) {
-	        var heat = 0;
-            Ui.pushView(new SeatHeatPicker(heat), new SeatHeatPickerDelegate(_controller), Ui.SLIDE_UP);
-
 			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
 	        var seats = new [rear_seats_avail != null ? 7 : 3];
 
