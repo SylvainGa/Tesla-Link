@@ -2,6 +2,7 @@ using Toybox.Application as App;
 using Toybox.Background;
 using Toybox.System;
 using Toybox.Time;
+using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
 
 (:background)
@@ -55,14 +56,14 @@ class QuickTesla extends App.AppBase {
 
 (:debug)
 function logMessage(message) {
-    System.println(message);
+	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+	System.println(dateStr + " : " + message);
 }
 
 (:release)
-function logMessage(message) {
-    
+function logMessage(output) {
 }
-
 var errorsStr = {
 	"0" => "UNKNOWN_ERROR",
 	"-1" => "BLE_ERROR",

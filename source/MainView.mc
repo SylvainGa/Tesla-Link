@@ -5,7 +5,7 @@ using Toybox.Time;
 
 class MainView extends Ui.View {
     hidden var _display;
-    hidden var _displayType;
+    hidden var _displayType = 1;
     var _data;
 	var _errorTimer;
 	var _bufferedText;
@@ -16,11 +16,13 @@ class MainView extends Ui.View {
         View.initialize();
         _data = data;
         _data._ready = false;
-		_errorTimer = 0;
+		_errorTimer = System.getTimer() + 2000;
 		_bufferedText = null;
 		_firstShowing = true;
 			
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
+        _bufferedText = _display;
+logMessage("MainView:initialize with _display at " + _display);
 
 		Application.getApp().setProperty("spinner", "-");
 		Application.getApp().setProperty("gotBackgroundData", false);
@@ -44,8 +46,8 @@ class MainView extends Ui.View {
     function onReceive(args) {
         _displayType = args[0];
         _display = args[1];
-//logMessage("args[0] " + args[0]);
-//logMessage("args[1] " + args[1]);
+logMessage("args[0] " + args[0]);
+logMessage("args[1] " + args[1]);
         Ui.requestUpdate();
     }
 
