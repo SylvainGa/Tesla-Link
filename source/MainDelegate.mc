@@ -405,19 +405,19 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 
         if (_set_climate_on) {
             _set_climate_on = false;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
+            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_on)]);
             _tesla.climateOn(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_off) {
             _set_climate_off = false;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
+            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_off)]);
             _tesla.climateOff(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_defrost) {
             _set_climate_defrost = false;
-            _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
+            _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
             _tesla.climateDefrost(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
         }
 
@@ -453,19 +453,19 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 
         if (_open_port) {
             _open_port = false;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_open_port)]);
+            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_open_port)]);
             _tesla.openPort(_vehicle_id, method(:genericHandler));
         }
 
         if (_unlock) {
             _unlock = false;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
+            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
             _tesla.doorUnlock(_vehicle_id, method(:genericHandler));
         }
 
         if (_lock) {
             _lock = false;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
+            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_lock_doors)]);
             _tesla.doorLock(_vehicle_id, method(:genericHandler));
         }
 
@@ -553,7 +553,7 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 			}
 logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
 
-            _handler.invoke([1, Ui.loadResource(seat_chosen)]);
+            _handler.invoke([2, Ui.loadResource(seat_chosen)]);
 
 	        if (seat_chosen == Rez.Strings.seat_driver) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
@@ -571,10 +571,10 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_set_steering_wheel_heat) {
             _set_steering_wheel_heat = false;
 	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
 	        }
 	        else {
-	            _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
+	            _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
 	            _tesla.climateSteeringWheel(_vehicle_id, method(:onClimateDone), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
 	        }
         }
@@ -582,11 +582,11 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_adjust_departure) {
             _adjust_departure = false;
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_stop_departure)]);
 	            _tesla.stopDeparture(_vehicle_id, method(:genericHandler));
 	        }
 	        else {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_start_departure)]);
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_start_departure)]);
 	            _tesla.startDeparture(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("departure_time"));
 	        }
         }
@@ -594,10 +594,10 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_sentry_mode) {
             _sentry_mode = false;
             if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_sentry_off)]);
 	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), false);
             } else {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_sentry_on)]);
 	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), true);
             }
         }
@@ -613,29 +613,29 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
     }
 
     function openVentConfirmed() {
-		_handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
-        Application.getApp().setProperty("venting", 4);
+		_handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_opening)]);
+//        Application.getApp().setProperty("venting", 4); Let onUpdate deal with that
         _tesla.vent(_vehicle_id, method(:genericHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function closeVentConfirmed() {
-	    _handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
-        Application.getApp().setProperty("venting", 0);
+	    _handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_closing)]);
+//        Application.getApp().setProperty("venting", 0); Let onUpdate deal with that
         _tesla.vent(_vehicle_id, method(:genericHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function frunkConfirmed() {
-        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
+        _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "front");
     }
 
     function trunkConfirmed() {
-        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
+        _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "rear");
     }
 
     function honkHornConfirmed() {
-        _handler.invoke([1, Ui.loadResource(Rez.Strings.label_honk)]);
+        _handler.invoke([2, Ui.loadResource(Rez.Strings.label_honk)]);
         _tesla.honkHorn(_vehicle_id, method(:genericHandler));
     }
 
@@ -660,6 +660,9 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 				}
 					
 		        stateMachine();
+			}
+			else {
+logMessage("MainDelegate:timerRefresh skipped ");
 			}
 		}
     }
@@ -1012,7 +1015,7 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
                 Application.getApp().setProperty("vehicle", _vehicle_id);
                 _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
             } else {
-                _handler.invoke([1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
+                _handler.invoke([0, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
             }
         } else {
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
@@ -1043,7 +1046,9 @@ logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
 				_waiting_for_vehicle_data = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
-                _handler.invoke([1, null]);
+                _handler.invoke([0, null]);
+				Ui.requestUpdate(); // We got data! Now show it!
+
             } else {
                 _sleep_timer.start(method(:delayedRetry), 500, false);
             }
@@ -1102,14 +1107,17 @@ logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
     }
 
     function genericHandler(responseCode, data) {
-logMessage(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
         if (responseCode == 200) {
             if (_get_vehicle_data == 0) {
 	            _get_vehicle_data = 1;
 			}
-            _handler.invoke([0, null]);
-            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+            _handler.invoke([2, null]);
+            
+// Give it some time then query the state again, otherwise it doesn't have enough time to record the change
+//            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+            _sleep_timer.start(method(:delayedRetry), 500, false); 
         } else {
+logMessage(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 	            Application.getApp().setProperty("vehicle", null);
                 _resetToken();

@@ -78,13 +78,18 @@ logMessage("MainView:initialize with _display at " + _display);
             // We're showing a message, so set 'ready' false to prevent touches
             _data._ready = false;
 
-			if (_displayType == 0 && _display != null) { // We're displaying an error, time it so it stays up 2 seconds
+			if (_displayType == 0 && _display != null) { // We're displaying an error, time it so it stays up (at least) 2 seconds
 logMessage("Priority Message " + _display);
 				_errorTimer = System.getTimer() + 2000;
 				_bufferedText = _display;
 			} else if (_errorTimer == 0) {
 logMessage("Show this Message " + _display);
-				_errorTimer = System.getTimer() + 1000;
+				if (_displayType == 1) {
+					_errorTimer = System.getTimer() + 1000;
+				} else {
+					_errorTimer = 0; // Confirmation message disappears as soon as the next message show up
+				}
+
 				_bufferedText = _display;
 			}
 			_displayType = -1;
