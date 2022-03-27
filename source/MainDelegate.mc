@@ -352,6 +352,7 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 	                    "responseError" => $.OAUTH_ERROR
 	                }
 	            );
+			}
             return;
         }
 
