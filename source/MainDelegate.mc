@@ -5,6 +5,7 @@ using Toybox.System;
 using Toybox.Communications as Communications;
 using Toybox.Cryptography;
 using Toybox.Graphics;
+using Toybox.Time.Gregorian;
 
 const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
@@ -64,13 +65,40 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _handler = handler;
         _tesla = null;
 		
-        if (_token != null && _token.length() != 0) {
+		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
+		if (createdAt == null) {
+			createdAt = 0;
+		}
+		else {
+			createdAt = createdAt.toNumber();
+		}
+		var expireIn = Application.getApp().getProperty("TokenExpiresIn");
+		if (expireIn == null) {
+			expireIn = 0;
+		}
+		else {
+			expireIn = expireIn.toNumber();
+		}
+		
+		var timeNow = Time.now().value();
+		var interval = 5 * 60 * 60;
+		var answer = (timeNow + interval < createdAt + expireIn);
+		
+        if (_token != null && _token.length() != 0 && answer == true ) {
             _need_auth = false;
             _auth_done = true;
+			var expireAt = new Time.Moment(createdAt + expireIn);
+			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
+
         } else {
+logMessage("initialize:No token, will need to get one through a refresh token or authentication");
             _need_auth = true;
             _auth_done = false;
         }
+_need_auth = true;
+_auth_done = false;
 
         _need_wake = true;
         _wake_done = true;
@@ -142,7 +170,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
         return true;
 	}
-	
+
+// STEP 4 no longer required. Bearer access token given by step 3	
     function bearerForAccessOnReceive(responseCode, data) {
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
@@ -166,6 +195,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 "client_id" => "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384",
                 "client_secret" => "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
             };
+logMessage("codeForBearerOnReceive data is " + data);
 
             var bearerForAccessOptions = {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
@@ -212,7 +242,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             };
 
-            Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:codeForBearerOnReceive));
+// Since step 4 is no longer required, we'll process the token we just received
+//            Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:codeForBearerOnReceive));
+            Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
         } else {
         	if (error == 404) {
 	            Application.getApp().setProperty("vehicle", null);
@@ -224,55 +256,102 @@ class MainDelegate extends Ui.BehaviorDelegate {
         }
     }
 
+    function onReceiveToken(responseCode, data) {
+logMessage("onReceiveToken responseCode is " + responseCode);
+logMessage("onReceiveToken data  is " + data);
+        if (responseCode == 200) {
+            _auth_done = true;
+
+			var accessToken = data["access_token"];
+			var refreshToken = data["refresh_token"];
+			var expires_in = data["expires_in"];
+			var created_at = Time.now().value();
+			_saveToken(accessToken);
+			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
+				Settings.setRefreshToken(refreshToken, expires_in, created_at);
+			}
+        } else {
+			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
+            _need_auth = true;
+            _auth_done = false;
+			System.setRefreshToken(null);
+	    }
+    }
+
+    function GetAccessToken(token, notify) {
+        var url = "https://auth.tesla.com/oauth2/v3/token";
+        Communications.makeWebRequest(
+            url,
+            {
+				"grant_type" => "refresh_token",
+				"client_id" => "ownerapi",
+				"refresh_token" => token,
+				"scope" => "openid email offline_access"
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
+
     function stateMachine() {
 //logMessage("Running stateMachine " + _need_auth + " " + _tesla + " " + _auth_done);
         if (_need_auth) {
             _need_auth = false;
 
-            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
-                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-                :toRepresentation => StringUtil.REPRESENTATION_STRING_HEX,
-            });
-
-            var code_verifier_bytes = StringUtil.convertEncodedString(_code_verifier, {
-                :fromRepresentation => StringUtil.REPRESENTATION_STRING_PLAIN_TEXT,
-                :toRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-            });
-            
-            var hmac = new Cryptography.HashBasedMessageAuthenticationCode({
-                :algorithm => Cryptography.HASH_SHA256,
-                :key => code_verifier_bytes
-            });
-
-            var code_challenge = StringUtil.convertEncodedString(hmac.digest(), {
-                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-                :toRepresentation => StringUtil.REPRESENTATION_STRING_BASE64,
-            });
-
-            var params = {
-                "client_id" => "ownerapi",
-                "code_challenge" => code_challenge,
-                "code_challenge_method" => "S256",
-                "redirect_uri" => "https://auth.tesla.com/void/callback",
-                "response_type" => "code",
-                "scope" => "openid email offline_access",
-                "state" => "123"                
-            };
-            
-            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
-
-            Communications.registerForOAuthMessages(method(:onOAuthMessage));
-            Communications.makeOAuthRequest(
-                "https://auth.tesla.com/oauth2/v3/authorize",
-                params,
-                "https://auth.tesla.com/void/callback",
-                Communications.OAUTH_RESULT_TYPE_URL,
-                {
-                    "code" => $.OAUTH_CODE,
-                    "responseError" => $.OAUTH_ERROR
-                }
-            );
-
+			// Do we have a refresh token? If so, try to use it instead of login in
+			var _refreshToken = Settings.getRefreshToken();
+			if (_refreshToken != null && _refreshToken.length() != 0) {
+logMessage("stateMachine: Asking for access token through refresh token " + _refreshToken);
+				 GetAccessToken(_refreshToken, method(:onReceiveToken));
+			}
+			else {
+logMessage("stateMachine: Asking for access token through user credentials ");
+	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
+	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
+	                :toRepresentation => StringUtil.REPRESENTATION_STRING_HEX,
+	            });
+	
+	            var code_verifier_bytes = StringUtil.convertEncodedString(_code_verifier, {
+	                :fromRepresentation => StringUtil.REPRESENTATION_STRING_PLAIN_TEXT,
+	                :toRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
+	            });
+	            
+	            var hmac = new Cryptography.HashBasedMessageAuthenticationCode({
+	                :algorithm => Cryptography.HASH_SHA256,
+	                :key => code_verifier_bytes
+	            });
+	
+	            var code_challenge = StringUtil.convertEncodedString(hmac.digest(), {
+	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
+	                :toRepresentation => StringUtil.REPRESENTATION_STRING_BASE64,
+	            });
+	
+	            var params = {
+	                "client_id" => "ownerapi",
+	                "code_challenge" => code_challenge,
+	                "code_challenge_method" => "S256",
+	                "redirect_uri" => "https://auth.tesla.com/void/callback",
+	                "response_type" => "code",
+	                "scope" => "openid email offline_access",
+	                "state" => "123"                
+	            };
+	            
+	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+	
+	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
+	            Communications.makeOAuthRequest(
+	                "https://auth.tesla.com/oauth2/v3/authorize",
+	                params,
+	                "https://auth.tesla.com/void/callback",
+	                Communications.OAUTH_RESULT_TYPE_URL,
+	                {
+	                    "code" => $.OAUTH_CODE,
+	                    "responseError" => $.OAUTH_ERROR
+	                }
+	            );
             return;
         }
 

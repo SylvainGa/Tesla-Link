@@ -1,6 +1,6 @@
 <properties>
 	<property id="AppVersion" type="string">6.1.0</property>
-	<property id="token" type="string"></property>
+	<property id="refreshToken" type="string"></property>
 	<property id="enhancedTouch" type="boolean">false</property>
 	<property id="screenBottomLeft" type="number">0</property>
 	<property id="screenBottomRight" type="number">1</property>

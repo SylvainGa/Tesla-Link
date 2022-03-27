@@ -35,7 +35,7 @@
     <string id="menu_label_swap_frunk_for_port">Byt Frunk/Laddlucka</string>
     <string id="menu_label_select_car">Välj Fordon</string>
 
-    <string id="setting_token_label">API Token</string>
+    <string id="setting_token_label">API REFRESH Token (frivillig) </string>
     <string id="setting_token_prompt">Skriv in ditt Teslakontos token</string>
 
     <!--  Second view -->

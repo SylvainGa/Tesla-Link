@@ -35,7 +35,7 @@
     <string id="menu_label_swap_frunk_for_port">Valise arrière/Avant/Port</string>
     <string id="menu_label_select_car">Sélectionnez le véhicule</string>
 
-    <string id="setting_token_label">Jeton d'API</string>
+    <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>
     <string id="setting_token_prompt">Entrez votre jeton de compte Tesla</string>
 
 	<!--  Second view -->

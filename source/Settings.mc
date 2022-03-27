@@ -5,17 +5,30 @@ using Toybox.System as System;
 (:background)
 module Settings {
 
-    //! Store auth token
+    //! Store access token
     function setToken(token) {
-        Application.getApp().setProperty(TOKEN, token);
+        Application.getApp().setProperty("token", token);
+    }
+
+    //! Get access token
+    function getToken() {
+        var value = Application.getApp().getProperty("token");
+        return value;
+    }
+
+    //! Store refresh token
+    function setRefreshToken(token, expires_in, created_at) {
+        Application.getApp().setProperty(REFRESH_TOKEN, token);
+        Application.getApp().setProperty("TokenExpiresIn", expires_in);
+        Application.getApp().setProperty("TokenCreatedAt", created_at);
     }
 
     //! Get auth token
-    function getToken() {
-        var value = Application.getApp().getProperty(TOKEN);
+    function getRefreshToken() {
+        var value = Application.getApp().getProperty(REFRESH_TOKEN);
         return value;
     }
 
     // Settings name, see resources/settings/settings.xml
-    const TOKEN = "token";
+    const REFRESH_TOKEN = "refreshToken";
 }

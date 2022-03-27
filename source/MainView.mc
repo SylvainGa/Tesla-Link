@@ -46,8 +46,6 @@ logMessage("MainView:initialize with _display at " + _display);
     function onReceive(args) {
         _displayType = args[0];
         _display = args[1];
-logMessage("args[0] " + args[0]);
-logMessage("args[1] " + args[1]);
         Ui.requestUpdate();
     }
 
