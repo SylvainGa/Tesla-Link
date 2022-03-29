@@ -51,7 +51,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _sentry_mode;
 	var _408_count;
 	var _set_refresh_time;
-	
+	var _firstTime = true;
+		
     function initialize(view as MainView, data, handler) {
         BehaviorDelegate.initialize();
     	_view = view;
@@ -97,10 +98,8 @@ logMessage("initialize:No token, will need to get one through a refresh token or
             _need_auth = true;
             _auth_done = false;
         }
-_need_auth = true;
-_auth_done = false;
 
-        _need_wake = true;
+        _need_wake = false; // Assume we're awake and if we get a 408, then wake up
         _wake_done = true;
 		_waiting_for_vehicle_data = true;
 		_wakeTime = System.getTimer();
@@ -129,7 +128,7 @@ _auth_done = false;
 			
 		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 
-//logMessage("MainDelegate: Starting timer");
+//logMessage(" Starting timer");
 	    refreshTimer = new Timer.Timer();
         var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
 	    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
@@ -258,7 +257,7 @@ logMessage("codeForBearerOnReceive data is " + data);
 
     function onReceiveToken(responseCode, data) {
 logMessage("onReceiveToken responseCode is " + responseCode);
-logMessage("onReceiveToken data  is " + data);
+logMessage("onReceiveToken data is " + data.toString().substring(0,60));
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -372,13 +371,23 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 
 		if (_waiting_for_vehicle_data) {
             var timeAsking = System.getTimer() - _wakeTime;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
+            if (_firstTime) {
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
+	        } else {
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n(" + timeAsking / 1000 + "s)"]);
+	        }
         }
 
         if (_need_wake || _408_count > 10) { // Asked to wake up or got ten 408 errors (timeout) without a single 200
             _need_wake = false;
             _wake_done = false;
-//logMessage("MainDelegate:stateMachine asking to wake vehicle");
+			_waiting_for_vehicle_data = true;
+logMessage("stateMachine:Asking to wake vehicle");
+            if (_firstTime) {
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
+	        } else {
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data)]);
+	        }
             _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
@@ -405,19 +414,19 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 
         if (_set_climate_on) {
             _set_climate_on = false;
-            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_on)]);
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
             _tesla.climateOn(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_off) {
             _set_climate_off = false;
-            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_off)]);
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
             _tesla.climateOff(_vehicle_id, method(:genericHandler));
         }
 
         if (_set_climate_defrost) {
             _set_climate_defrost = false;
-            _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
+            _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
             _tesla.climateDefrost(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
         }
 
@@ -453,19 +462,19 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 
         if (_open_port) {
             _open_port = false;
-            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_open_port)]);
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_open_port)]);
             _tesla.openPort(_vehicle_id, method(:genericHandler));
         }
 
         if (_unlock) {
             _unlock = false;
-            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
             _tesla.doorUnlock(_vehicle_id, method(:genericHandler));
         }
 
         if (_lock) {
             _lock = false;
-            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_lock_doors)]);
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
             _tesla.doorLock(_vehicle_id, method(:genericHandler));
         }
 
@@ -553,7 +562,7 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 			}
 logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
 
-            _handler.invoke([2, Ui.loadResource(seat_chosen)]);
+            _handler.invoke([1, Ui.loadResource(seat_chosen)]);
 
 	        if (seat_chosen == Rez.Strings.seat_driver) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
@@ -571,10 +580,10 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_set_steering_wheel_heat) {
             _set_steering_wheel_heat = false;
 	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
-	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
 	        }
 	        else {
-	            _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
+	            _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
 	            _tesla.climateSteeringWheel(_vehicle_id, method(:onClimateDone), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
 	        }
         }
@@ -582,11 +591,11 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_adjust_departure) {
             _adjust_departure = false;
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_stop_departure)]);
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
 	            _tesla.stopDeparture(_vehicle_id, method(:genericHandler));
 	        }
 	        else {
-	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_start_departure)]);
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_start_departure)]);
 	            _tesla.startDeparture(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("departure_time"));
 	        }
         }
@@ -594,10 +603,10 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         if (_sentry_mode) {
             _sentry_mode = false;
             if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
-	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_sentry_off)]);
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
 	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), false);
             } else {
-	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_sentry_on)]);
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
 	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), true);
             }
         }
@@ -613,35 +622,35 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
     }
 
     function openVentConfirmed() {
-		_handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_opening)]);
+		_handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 //        Application.getApp().setProperty("venting", 4); Let onUpdate deal with that
         _tesla.vent(_vehicle_id, method(:genericHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function closeVentConfirmed() {
-	    _handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_closing)]);
+	    _handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 //        Application.getApp().setProperty("venting", 0); Let onUpdate deal with that
         _tesla.vent(_vehicle_id, method(:genericHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function frunkConfirmed() {
-        _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
+        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "front");
     }
 
     function trunkConfirmed() {
-        _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
+        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
         _tesla.openTrunk(_vehicle_id, method(:genericHandler), "rear");
     }
 
     function honkHornConfirmed() {
-        _handler.invoke([2, Ui.loadResource(Rez.Strings.label_honk)]);
+        _handler.invoke([1, Ui.loadResource(Rez.Strings.label_honk)]);
         _tesla.honkHorn(_vehicle_id, method(:genericHandler));
     }
 
     function timerRefresh() {
 		if (Application.getApp().getProperty("refreshTimer")) {
-//logMessage("MainDelegate:timerRefresh");
+//logMessage("timerRefresh");
 	    	if (!_disableRefreshTimer) {
         		var _spinner = Application.getApp().getProperty("spinner");
 				if (_spinner.equals("+")) {
@@ -662,7 +671,7 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 		        stateMachine();
 			}
 			else {
-logMessage("MainDelegate:timerRefresh skipped ");
+logMessage("timerRefresh skipped ");
 			}
 		}
     }
@@ -998,6 +1007,7 @@ logMessage("MainDelegate:timerRefresh skipped ");
     }
 
     function onReceiveAuth(responseCode, data) {
+logMessage("onReceiveAuth:responseCode is " + responseCode);
         if (responseCode == 200) {
             _auth_done = true;
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
@@ -1008,6 +1018,7 @@ logMessage("MainDelegate:timerRefresh skipped ");
     }
 
     function onReceiveVehicles(responseCode, data) {
+logMessage("onReceiveVehicles:responseCode is " + responseCode);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             if (vehicles.size() > 0) {
@@ -1018,32 +1029,27 @@ logMessage("MainDelegate:timerRefresh skipped ");
                 _handler.invoke([0, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
             }
         } else {
-			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-	            Application.getApp().setProperty("vehicle", null);
-                _resetToken();
-                _need_auth = true;
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			} else if (responseCode == 401) {
+			if (responseCode == 401) {
                 // Unauthorized
                 _resetToken();
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
                 return;
-			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
+			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-	        } else if (responseCode == 408) {
-				_408_count += 1;
 	        }
+
             _sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("MainDelegate:onReceiveVehicleData responseCode is " + responseCode);
+logMessage("onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
-logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
+//logMessage("onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 				_waiting_for_vehicle_data = false;
+				_firstTime = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
                 _handler.invoke([0, null]);
@@ -1053,87 +1059,79 @@ logMessage("MainDelegate:onReceiveVehicleData received " + _data._vehicle_data);
                 _sleep_timer.start(method(:delayedRetry), 500, false);
             }
         } else {
-			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-	            Application.getApp().setProperty("vehicle", null);
-                _resetToken();
-                _need_auth = true;
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			} else if (responseCode == 401) {
-			    // Unauthorized
-			    _resetToken();
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-                return;
-			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-	        } else if (responseCode == 408) {
-				_408_count += 1;
-	        }
+			_waiting_for_vehicle_data = true;
+			if (responseCode == 408) { // We got a 408, so we're still asleep
+	        	if (_408_count == 0) { // First 408 recieved
+					_wakeTime = System.getTimer();
+	        		_408_count++;
+logMessage("onReceiveVehicleData: First 408 received, ask to wake up");
+		            _need_wake = true;
+		            _wake_done = false;
+	            }
+			} else {
+				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+		            Application.getApp().setProperty("vehicle", null);
+	                _resetToken();
+	                _need_auth = true;
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+				} else if (responseCode == 401) {
+	                // Unauthorized
+	                _resetToken();
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+	                return;
+				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		        }
+			}
             _sleep_timer.start(method(:delayedRetry), 500, false);
 	    }
     }
 
     function onReceiveAwake(responseCode, data) {
+logMessage("onReceiveAwake:responseCode is " + responseCode);
         if (responseCode == 200) {
-			if (!_waiting_for_vehicle_data) {
-				_handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data)]);
-			}
             _wake_done = true;
             _get_vehicle_data = 1;
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
-			_408_count = 0;
-        } else {
-            _need_wake = true;
-            _wake_done = false;
-			_waiting_for_vehicle_data = true;
-			_wakeTime = System.getTimer();
-
-			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-	            Application.getApp().setProperty("vehicle", null);
-                _resetToken();
-                _need_auth = true;
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			} else if (responseCode == 401) {
-                // Unauthorized
-                _resetToken();
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-                return;
-			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-	        } else if (responseCode == 408) {
-				_408_count += 1;
+       } else {
+			if (responseCode == 408) { // We got a 408, so we're still asleep
+	        	if (_408_count == 0) { // First 408 recieved
+					_wakeTime = System.getTimer();
+	        		_408_count++;
+logMessage("onReceiveAwake: First 408 received, ask to wake up");
+		            _need_wake = true;
+		            _wake_done = false;
+	            }
+			} else {
+				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+		            Application.getApp().setProperty("vehicle", null);
+	                _resetToken();
+	                _need_auth = true;
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+				} else if (responseCode == 401) { // Unauthorized
+	                _resetToken();
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+	                return;
+				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		        }
 	        }
             _sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
 
     function genericHandler(responseCode, data) {
+logMessage("genericHandler:responseCode is " + responseCode);
         if (responseCode == 200) {
             if (_get_vehicle_data == 0) {
 	            _get_vehicle_data = 1;
 			}
-            _handler.invoke([2, null]);
+            _handler.invoke([1, null]);
+			_408_count = 0;
             
 // Give it some time then query the state again, otherwise it doesn't have enough time to record the change
 //            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
             _sleep_timer.start(method(:delayedRetry), 500, false); 
-        } else {
-logMessage(Ui.loadResource(Rez.Strings.label_error) + responseCode.toString());
-			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-	            Application.getApp().setProperty("vehicle", null);
-                _resetToken();
-                _need_auth = true;
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			} else if (responseCode == 401) {
-                // Unauthorized
-                _resetToken();
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-                return;
-			} else if (responseCode != 408 && responseCode != -5  && responseCode != -101) { // These are silent errors
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-	        } else if (responseCode == 408) {
-				_408_count += 1;
-	        }
-            _sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
 

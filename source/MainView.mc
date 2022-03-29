@@ -6,10 +6,10 @@ using Toybox.Time;
 class MainView extends Ui.View {
     hidden var _display;
     hidden var _displayType = 1;
+	hidden var _previousDisplayType = 1;
     var _data;
 	var _errorTimer;
 	var _bufferedText;
-	var _firstShowing;
 					
     // Initial load - show the 'requesting data' string, make sure we don't process touches
     function initialize(data) {
@@ -18,7 +18,6 @@ class MainView extends Ui.View {
         _data._ready = false;
 		_errorTimer = System.getTimer() + 2000;
 		_bufferedText = null;
-		_firstShowing = true;
 			
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
         _bufferedText = _display;
@@ -73,8 +72,8 @@ logMessage("MainView:initialize with _display at " + _display);
         // Next background update in 5 mins!
         Background.registerForTemporalEvent(new Time.Duration(60*5));
 
-        // Redraw the layout and wipe the canvas              
-        if (_display != null || (_errorTimer > 0 && !_firstShowing)) {
+        // Redraw the layout and wipe the canvas
+        if (_display != null || (_errorTimer > 0 && _previousDisplayType != 1)) {
             // We're showing a message, so set 'ready' false to prevent touches
             _data._ready = false;
 
@@ -82,6 +81,7 @@ logMessage("MainView:initialize with _display at " + _display);
 logMessage("Priority Message " + _display);
 				_errorTimer = System.getTimer() + 2000;
 				_bufferedText = _display;
+				_previousDisplayType = _displayType;
 			} else if (_errorTimer == 0) {
 logMessage("Show this Message " + _display);
 				if (_displayType == 1) {
@@ -91,6 +91,7 @@ logMessage("Show this Message " + _display);
 				}
 
 				_bufferedText = _display;
+				_previousDisplayType = _displayType;
 			}
 			_displayType = -1;
 
@@ -106,7 +107,6 @@ logMessage("Showing Message " + _display);
         } else {           
             // Showing the main layouts, so we can process touches now
             _data._ready = true;
-            _firstShowing = false;
             _errorTimer = 0;
 
             // We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
