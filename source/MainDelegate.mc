@@ -82,7 +82,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		
 		var timeNow = Time.now().value();
-		var interval = 5 * 60 * 60;
+		var interval = 5 * 60;
 		var answer = (timeNow + interval < createdAt + expireIn);
 		
         if (_token != null && _token.length() != 0 && answer == true ) {
@@ -101,7 +101,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 
         _need_wake = false; // Assume we're awake and if we get a 408, then wake up
         _wake_done = true;
-		_waiting_for_vehicle_data = true;
+		_waiting_for_vehicle_data = 2;
 		_wakeTime = System.getTimer();
 		
         _set_climate_on = false;
@@ -369,7 +369,8 @@ logMessage("stateMachine: Asking for access token through user credentials ");
             return;
         }
 
-		if (_waiting_for_vehicle_data) {
+		if (_waiting_for_vehicle_data > 1) { // Skip the message on the first erorr. If it repeats, display
+logMessage("stateMachine:_waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
             var timeAsking = System.getTimer() - _wakeTime;
             if (_firstTime) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
@@ -381,14 +382,15 @@ logMessage("stateMachine: Asking for access token through user credentials ");
         if (_need_wake || _408_count > 10) { // Asked to wake up or got ten 408 errors (timeout) without a single 200
             _need_wake = false;
             _wake_done = false;
-			_waiting_for_vehicle_data = true;
-logMessage("stateMachine:Asking to wake vehicle");
+
+logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
             if (_firstTime) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
-	        } else {
+	        } else if (_waiting_for_vehicle_data > 1) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data)]);
 	        }
-            _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+
+			_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
 
@@ -1048,7 +1050,7 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
             _data._vehicle_data = data.get("response");
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-				_waiting_for_vehicle_data = false;
+				_waiting_for_vehicle_data = 0;
 				_firstTime = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
@@ -1059,7 +1061,7 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
                 _sleep_timer.start(method(:delayedRetry), 500, false);
             }
         } else {
-			_waiting_for_vehicle_data = true;
+			_waiting_for_vehicle_data++;
 			if (responseCode == 408) { // We got a 408, so we're still asleep
 	        	if (_408_count == 0) { // First 408 recieved
 					_wakeTime = System.getTimer();
