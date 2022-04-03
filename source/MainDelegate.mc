@@ -257,7 +257,7 @@ logMessage("codeForBearerOnReceive data is " + data);
 
     function onReceiveToken(responseCode, data) {
 logMessage("onReceiveToken responseCode is " + responseCode);
-logMessage("onReceiveToken data is " + data.toString().substring(0,60));
+if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60)); }
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -273,7 +273,7 @@ logMessage("onReceiveToken data is " + data.toString().substring(0,60));
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
             _need_auth = true;
             _auth_done = false;
-			System.setRefreshToken(null);
+			Settings.setRefreshToken(null, 0, 0);
 	    }
     }
 

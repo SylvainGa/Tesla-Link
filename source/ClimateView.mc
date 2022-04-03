@@ -96,37 +96,37 @@ logMessage("_viewOffset is " + _viewOffset);
 	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_1_4));
 
 	            var line3Data = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
-	            var line3Unit = "°F";
+	            var line3Unit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line3Data = (line3Data - 32.0) * 5.0 / 9.0;	
-					line3Unit = "°C";
+					line3Data = (line3Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					line3Unit = "°F";
 		        }
 	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_driver_temp_setting));
 	            line3Value.setText(line3Data.toString() + line3Unit);
 
 	            var line4Data = _data._vehicle_data.get("climate_state").get("passenger_temp_setting").toNumber();
-	            var line4Unit = "°F";
+	            var line4Unit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line4Data = (line4Data - 32.0) * 5.0 / 9.0;	
-					line4Unit = "°C";
+					line4Data = (line4Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					line4Unit = "°F";
 		        }
 	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_passenger_temp_setting));
 	            line4Value.setText(line4Data.toString() + line4Unit);
 	
 	            var line5Data = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
-	            var line5Unit = "°F";
+	            var line5Unit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line5Data = (line5Data - 32.0) * 5.0 / 9.0;	
-					line5Unit = "°C";
+					line5Data = (line5Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					line5Unit = "°F";
 		        }
 	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_inside_temp));
 	            line5Value.setText(line5Data.toString() + line5Unit);
 	
 	            var line6Data = _data._vehicle_data.get("climate_state").get("outside_temp").toNumber();
-	            var line6Unit = "°F";
+	            var line6Unit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line6Data = (line6Data - 32.0) * 5.0 / 9.0;	
-					line6Unit = "°C";
+					line6Data = (line6Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					line6Unit = "°F";
 		        }
 	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_outside_temp));
 	            line6Value.setText(line6Data.toString() + line6Unit);
