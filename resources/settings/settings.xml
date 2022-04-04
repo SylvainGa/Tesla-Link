@@ -45,10 +45,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -70,10 +71,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -95,10 +97,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -120,10 +123,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -145,10 +149,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -170,10 +175,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -195,10 +201,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -220,10 +227,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -245,10 +253,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -270,10 +279,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -295,10 +305,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -320,10 +331,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -345,10 +357,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -370,10 +383,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -395,10 +409,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -420,10 +435,11 @@
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
 			<listEntry value="14">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="15">@Strings.menu_label_swap_frunk_for_port</listEntry>
-			<listEntry value="16">@Strings.menu_label_select_car</listEntry>
-			<listEntry value="17">@Strings.menu_label_reset</listEntry>
-			<listEntry value="18">@Strings.menu_label_wake</listEntry>
-			<listEntry value="19">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="16">@Strings.menu_label_datascreen</listEntry>
+			<listEntry value="17">@Strings.menu_label_select_car</listEntry>
+			<listEntry value="18">@Strings.menu_label_reset</listEntry>
+			<listEntry value="19">@Strings.menu_label_wake</listEntry>
+			<listEntry value="20">@Strings.menu_label_refresh</listEntry>
 		</settingConfig>
 	</setting>
 

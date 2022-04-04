@@ -54,7 +54,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
     }
 
     function timerRefresh() {
-logMessage("DriveDelegate:timerRefresh");
+//logMessage("DriveDelegate:timerRefresh");
     	if (!_disableRefreshTimer) {
 			if (_data._vehicle_data != null) {
 				if (_get_vehicle_data == 0) {
@@ -66,28 +66,37 @@ logMessage("DriveDelegate:timerRefresh");
 		}
     }
 
-    function onSwipe(swipeEvent) {
-    	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
-	    	if (swipeEvent.getDirection() == 3) {
-			    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
-				Ui.popView(Ui.SLIDE_IMMEDIATE);
-				_handler.invoke(4); // Tell MainDelegate to show next subview
-		        return true;
-		    }
-		    else if (swipeEvent.getDirection() == 2) { // Up we go!
-		    	_view._viewOffset -= 4;
-		    	if (_view._viewOffset < 0) {
-					_view._viewOffset = 0;
-		    	}
-		    }	
-		    else if (swipeEvent.getDirection() == 0) { // Down we go! (only one screen here)
-		    	_view._viewOffset += 4;
-		    	if (_view._viewOffset > 0) {
-					_view._viewOffset = 0;
-		    	}
-		    }	
-		}	    
+    function onPreviousPage() {
+    	_view._viewOffset -= 4;
+    	if (_view._viewOffset < 0) {
+			_view._viewOffset = 0;
+    	}
 	    _view.requestUpdate();
+        return true;
+    }
+
+    function onNextPage() {
+    	_view._viewOffset += 4;
+    	if (_view._viewOffset > 0) { // One page but coded to accept more if required
+			_view._viewOffset = 0;
+    	}
+	    _view.requestUpdate();
+        return true;
+    }
+
+	function onMenu() {
+	    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
+		Ui.popView(Ui.SLIDE_IMMEDIATE);
+		_handler.invoke(4); // Tell MainDelegate to show next subview
+
+	    _view.requestUpdate();
+        return true;
+	}
+	
+    function onSwipe(swipeEvent) {
+    	if (swipeEvent.getDirection() == 3) {
+	    	onMenu();
+    	}
         return true;
 	}
 	

@@ -52,7 +52,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _408_count;
 	var _set_refresh_time;
 	var _firstTime = true;
-		
+	var _view_datascreen;
+			
     function initialize(view as MainView, data, handler) {
         BehaviorDelegate.initialize();
     	_view = view;
@@ -125,6 +126,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
         _sentry_mode = false;
 		_408_count = 0;
 		_set_refresh_time = false;
+		_view_datascreen = false;
 			
 		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
 
@@ -621,6 +623,15 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 			    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
             }
 		}
+		
+		if (_view_datascreen) {
+			_view_datascreen = false;
+			
+		    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other submenus
+		    _sleep_timer.stop();
+
+			onReceive(1); // Show the first submenu
+		}
     }
 
     function openVentConfirmed() {
@@ -669,7 +680,7 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 						Application.getApp().setProperty("spinner", "?");
 					}
 				}
-					
+//logMessage("timerRefresh:stateMachine");
 		        stateMachine();
 			}
 			else {
@@ -773,8 +784,8 @@ logMessage("timerRefresh skipped ");
 		if (_index < 0) {
 			_index = 0;
 		}
-		else if (_index > 19) {
-			_index = 19;
+		else if (_index > 20) {
+			_index = 20;
 		}
 
 		switch (_index) {
@@ -867,15 +878,18 @@ logMessage("timerRefresh skipped ");
 				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
 				break;
 			case 16:
-				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
+				menu.addItem(Rez.Strings.menu_label_datascreen, :data_screen);
 				break;
 			case 17:
-				menu.addItem(Rez.Strings.menu_label_reset, :reset);
+				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
 				break;
 			case 18:
-				menu.addItem(Rez.Strings.menu_label_wake, :wake);
+				menu.addItem(Rez.Strings.menu_label_reset, :reset);
 				break;
 			case 19:
+				menu.addItem(Rez.Strings.menu_label_wake, :wake);
+				break;
+			case 20:
 				menu.addItem(Rez.Strings.menu_label_refresh, :refresh);
 				break;
 		}
@@ -1045,7 +1059,7 @@ logMessage("onReceiveVehicles:responseCode is " + responseCode);
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("onReceiveVehicleData responseCode is " + responseCode);
+//logMessage("onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);

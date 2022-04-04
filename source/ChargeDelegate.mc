@@ -54,7 +54,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
     }
 
     function timerRefresh() {
-logMessage("ChargeDelegate:timerRefresh");
+//logMessage("ChargeDelegate:timerRefresh");
     	if (!_disableRefreshTimer) {
 			if (_data._vehicle_data != null) {
 				if (_get_vehicle_data == 0) {
@@ -66,28 +66,37 @@ logMessage("ChargeDelegate:timerRefresh");
 		}
     }
 
-    function onSwipe(swipeEvent) {
-    	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
-	    	if (swipeEvent.getDirection() == 3) {
-			    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
-				Ui.popView(Ui.SLIDE_IMMEDIATE);
-				_handler.invoke(2); // Tell MainDelegate to show next subview
-		        return true;
-		    }
-		    else if (swipeEvent.getDirection() == 2) { // Up we go!
-		    	_view._viewOffset -= 4;
-		    	if (_view._viewOffset < 0) {
-					_view._viewOffset = 0;
-		    	}
-		    }	
-		    else if (swipeEvent.getDirection() == 0) { // Down we go!
-		    	_view._viewOffset += 4;
-		    	if (_view._viewOffset > 4) {
-					_view._viewOffset = 4;
-		    	}
-		    }	
-		}	    
+    function onPreviousPage() {
+    	_view._viewOffset -= 4;
+    	if (_view._viewOffset < 0) {
+			_view._viewOffset = 0;
+    	}
 	    _view.requestUpdate();
+        return true;
+    }
+
+    function onNextPage() {
+    	_view._viewOffset += 4;
+    	if (_view._viewOffset > 4) {
+			_view._viewOffset = 4;
+    	}
+	    _view.requestUpdate();
+        return true;
+    }
+
+	function onMenu() {
+	    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other pages
+		Ui.popView(Ui.SLIDE_IMMEDIATE);
+		_handler.invoke(2); // Tell MainDelegate to show next subview
+
+	    _view.requestUpdate();
+        return true;
+	}
+	
+    function onSwipe(swipeEvent) {
+    	if (swipeEvent.getDirection() == 3) {
+	    	onMenu();
+    	}
         return true;
 	}
 	
@@ -106,7 +115,7 @@ logMessage("ChargeDelegate:timerRefresh");
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("ChargeDelegate:onReceiveVehicleData responseCode is " + responseCode);
+//logMessage("ChargeDelegate:onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {

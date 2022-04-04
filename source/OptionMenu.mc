@@ -123,6 +123,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
             Ui.pushView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :data_screen) {
+            _controller._view_datascreen = true;
+            _controller.stateMachine();
         }
     }
 
