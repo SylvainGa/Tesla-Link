@@ -696,10 +696,10 @@ logMessage("timerRefresh skipped ");
     }
 
     function onSelect() {
-        if (_settings.isTouchScreen) {
+/*        if (_settings.isTouchScreen) {
             return false;
         }
-
+*/
         doSelect();
         return true;
     }
@@ -714,10 +714,10 @@ logMessage("timerRefresh skipped ");
     }
 
     function onNextPage() {
-        if (_settings.isTouchScreen) {
+/*        if (_settings.isTouchScreen) {
             return false;
         }
-
+*/
         doNextPage();
         return true;
     }
@@ -732,10 +732,10 @@ logMessage("timerRefresh skipped ");
     }
 
     function onPreviousPage() {
-        if (_settings.isTouchScreen) {
+/*        if (_settings.isTouchScreen) {
             return false;
         }
-
+*/
         doPreviousPage();
         return true;
     }
@@ -763,10 +763,10 @@ logMessage("timerRefresh skipped ");
     }
 
     function onMenu() {
-        if (_settings.isTouchScreen) {
+/*        if (_settings.isTouchScreen) {
             return false;
         }
-
+*/
         doMenu();
         return true;
     }
@@ -1059,7 +1059,7 @@ logMessage("onReceiveVehicles:responseCode is " + responseCode);
     }
 
     function onReceiveVehicleData(responseCode, data) {
-//logMessage("onReceiveVehicleData responseCode is " + responseCode);
+logMessage("onReceiveVehicleData responseCode is " + responseCode);
         if (responseCode == 200) {
             _data._vehicle_data = data.get("response");
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
