@@ -35,7 +35,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
         } else if (item == :swap_frunk_for_port) {
             var swap = Application.getApp().getProperty("swap_frunk_for_port");
-            if (swap == 0) {
+            if (swap == 0 || swap == null) {
                 Application.getApp().setProperty("swap_frunk_for_port", 1);
 			}
 			else if (swap == 1) {

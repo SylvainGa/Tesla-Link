@@ -132,7 +132,7 @@ logMessage("Showing Message " + _display);
                 // Draw the initial icons (in white) in case we don't have vehicle data
                 //dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : swap_frunk_for_port == 2 ?  Ui.loadResource(Rez.Drawables.charge_icon) : Ui.loadResource(Rez.Drawables.frunktrunkport_icon_white));
                 if (swap_frunk_for_port != 3) {
-	                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : Ui.loadResource(Rez.Drawables.charge_icon));
+	                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 || swap_frunk_for_port == null ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : Ui.loadResource(Rez.Drawables.charge_icon));
 	            }
 	            else {
 					var which_bitmap = 0;
