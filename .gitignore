@@ -6,3 +6,4 @@ manifest.xml
 .vscode/launch.json
 .vscode/tasks.json
 *.bak
+.DS_Store

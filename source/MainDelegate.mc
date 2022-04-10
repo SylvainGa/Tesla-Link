@@ -217,9 +217,9 @@ logMessage("codeForBearerOnReceive data is " + data);
 			}
 			else {
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-	        }
-            _resetToken();
-        }
+	      }
+        _resetToken();
+      } 
     }
 
     function onOAuthMessage(message) {
