@@ -22,7 +22,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _need_wake;
     var _wake_done;
     var _waiting_for_vehicle_data;
-	var _wakeTime = 0;
+	var _wakeTime;
 
     var _set_climate_on;
     var _set_climate_off;
@@ -51,7 +51,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _sentry_mode;
 	var _408_count;
 	var _set_refresh_time;
-	var _firstTime = true;
 	var _view_datascreen;
 			
     function initialize(view as MainView, data, handler) {
@@ -371,32 +370,26 @@ logMessage("stateMachine: Asking for access token through user credentials ");
             return;
         }
 
-		if (_waiting_for_vehicle_data > 1) { // Skip the message on the first erorr. If it repeats, display
-logMessage("stateMachine:_waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
+logMessage("stateMachine:_get_vehicle_data=" + _get_vehicle_data + " _waiting_for_vehicle_data=" + _waiting_for_vehicle_data + " _408_count=" + _408_count);
+		if (_waiting_for_vehicle_data > 1 || _408_count > 0) { // Skip the message on the first error (unless it's a wake command). If it repeats, display
             var timeAsking = System.getTimer() - _wakeTime;
-            if (_firstTime) {
+            if (_408_count > 0) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
 	        } else {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n(" + timeAsking / 1000 + "s)"]);
 	        }
         }
 
-        if (_need_wake || _408_count > 10) { // Asked to wake up or got ten 408 errors (timeout) without a single 200
-            _need_wake = false;
+        if (_need_wake) { // Asked to wake up
+            _need_wake = false; // Do it only once. On a first 408 received, we'll wake again 
             _wake_done = false;
 
-logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
-            if (_firstTime) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
-	        } else if (_waiting_for_vehicle_data > 1) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data)]);
-	        }
-
+logMessage("stateMachine:Asking to wake vehicle, _get_vehicle_data=" + _get_vehicle_data + " waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
 			_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
 
-        if (!_wake_done) {
+        if (!_wake_done) { // If wake_done is true, we got our 200 in the onReceiveAwake, now it's time to ask for data, otherwise get out and check again
             return;
         }
 
@@ -404,12 +397,14 @@ logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _w
 		if (_gotBackgroundData == true) {
 			Application.getApp().setProperty("gotBackgroundData", false);
 	        if (_get_vehicle_data == 2) { // If we were waiting for data that was read by the background process, request it again
+logMessage("StateMachine:BackgroundData stole our data, requesting again");
 	            _get_vehicle_data = 1;
 			}        
 		}
 
         if (_get_vehicle_data == 1) {
             _get_vehicle_data = 2;
+logMessage("StateMachine: Requesting data for vehicle " + _vehicle_id);
             _tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 		}
 		else {
@@ -1007,6 +1002,8 @@ logMessage("timerRefresh skipped ");
                 doMenu();
             }
         }
+
+		return true;
     }
 
     function selectVehicle(responseCode, data) {
@@ -1035,6 +1032,7 @@ logMessage("onReceiveAuth:responseCode is " + responseCode);
 
     function onReceiveVehicles(responseCode, data) {
 logMessage("onReceiveVehicles:responseCode is " + responseCode);
+//logMessage("onReceiveVehicles:data is " + data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             if (vehicles.size() > 0) {
@@ -1065,7 +1063,6 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 				_waiting_for_vehicle_data = 0;
-				_firstTime = false;
 		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
                 _handler.invoke([0, null]);
@@ -1079,11 +1076,11 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
 			if (responseCode == 408) { // We got a 408, so we're still asleep
 	        	if (_408_count == 0) { // First 408 recieved
 					_wakeTime = System.getTimer();
-	        		_408_count++;
 logMessage("onReceiveVehicleData: First 408 received, ask to wake up");
 		            _need_wake = true;
 		            _wake_done = false;
 	            }
+        		_408_count++;
 			} else {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 		            Application.getApp().setProperty("vehicle", null);
@@ -1091,7 +1088,8 @@ logMessage("onReceiveVehicleData: First 408 received, ask to wake up");
 	                _need_auth = true;
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 				} else if (responseCode == 401) {
-	                // Unauthorized
+	                // Unauthorized, retry
+	                _need_auth = true;
 	                _resetToken();
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
 	                return;
@@ -1110,28 +1108,22 @@ logMessage("onReceiveAwake:responseCode is " + responseCode);
             _get_vehicle_data = 1;
             _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
        } else {
-			if (responseCode == 408) { // We got a 408, so we're still asleep
-	        	if (_408_count == 0) { // First 408 recieved
-					_wakeTime = System.getTimer();
-	        		_408_count++;
-logMessage("onReceiveAwake: First 408 received, ask to wake up");
-		            _need_wake = true;
-		            _wake_done = false;
-	            }
-			} else {
-				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-		            Application.getApp().setProperty("vehicle", null);
-	                _resetToken();
-	                _need_auth = true;
-		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-				} else if (responseCode == 401) { // Unauthorized
-	                _resetToken();
-		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-	                return;
-				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-		        }
-	        }
+		   // We were unable to wake, try again
+			_need_wake = true;
+			_wake_done = false;
+			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+				Application.getApp().setProperty("vehicle", null);
+				_resetToken();
+				_need_auth = true;
+				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			} else if (responseCode == 401) { // Unauthorized, retry
+				_resetToken();
+				_need_auth = true;
+				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				return;
+			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			}
             _sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
