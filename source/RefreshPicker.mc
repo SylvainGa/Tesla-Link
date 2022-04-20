@@ -19,8 +19,8 @@ class RefreshPicker extends WatchUi.Picker {
 
         var title = new WatchUi.Text({:text=>Rez.Strings.refresh_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
-		var startPos = [_refreshTime.toNumber() - 1];
-		Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(1, 10, 1, {:format=>"%2d"})], :defaults=>startPos});
+		var startPos = [_refreshTime.toNumber() / 500 - 1];
+		Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(500, 9000, 500, {:format=>"%4d"})], :defaults=>startPos});
     }
 
     //! Update the view

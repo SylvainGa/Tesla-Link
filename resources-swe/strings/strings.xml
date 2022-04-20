@@ -156,7 +156,7 @@
     <string id="menu_label_wake">Force Wake</string>
     <string id="menu_label_refresh">Set refresh time</string>
     <string id="menu_label_datascreen">View data screen</string>
-    <string id="refresh_chooser_title">In seconds</string>
+    <string id="refresh_chooser_title">In msec</string>
     <string id="label_unauthorized">Unauthorized</string>
     <string id="subview_label_charge_limit_soc">Charge limit</string>
     <string id="subview_label_battery_level">Battery Level</string>

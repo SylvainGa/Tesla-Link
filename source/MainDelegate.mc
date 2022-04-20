@@ -23,7 +23,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _wake_done;
     var _waiting_for_vehicle_data;
 	var _wakeTime;
-
+	var _firstTime;
     var _set_climate_on;
     var _set_climate_off;
     var _set_climate_set;
@@ -31,7 +31,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _set_charging_amps_set;
     var _set_charging_limit_set;
     var _toggle_charging_set;
-    var _get_vehicle_data;
     var _honk_horn;
     var _open_port;
     var _open_frunk;
@@ -43,16 +42,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _vent;
     var _set_seat_heat;
     var _set_steering_wheel_heat;
-    var _disableRefreshTimer; // When this is true, the refreshTimer will not call stateMachine since we are already inside stateMachine from a direct call elsewhere
     var _data;
-	var refreshTimer;
     var _code_verifier;
     var _adjust_departure;
     var _sentry_mode;
 	var _408_count;
 	var _set_refresh_time;
 	var _view_datascreen;
-			
+	var _refreshTimeInterval;
+
     function initialize(view as MainView, data, handler) {
         BehaviorDelegate.initialize();
     	_view = view;
@@ -103,14 +101,13 @@ logMessage("initialize:No token, will need to get one through a refresh token or
         _wake_done = true;
 		_waiting_for_vehicle_data = 2;
 		_wakeTime = System.getTimer();
-		
+		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the the first 408 generate a wake commmand
         _set_climate_on = false;
         _set_climate_off = false;
         _set_climate_defrost = false;
         _set_climate_set = false;
 		_toggle_charging_set = false;
 		
-        _get_vehicle_data = 1;
         _honk_horn = false;
         _open_port = false;
         _open_frunk = false;
@@ -126,35 +123,34 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 		_408_count = 0;
 		_set_refresh_time = false;
 		_view_datascreen = false;
-			
-		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+		if (_refreshTimeInterval == null) {
+			_refreshTimeInterval = 1000;
+		}
 
-//logMessage(" Starting timer");
-	    refreshTimer = new Timer.Timer();
-        var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-	    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
+logMessage("StateMachine: Initialize");
+		stateMachine();
     }
 
     function onReceive(args) {
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, that's our cue to restart our timer and display our main view
-			_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("StateMachine: onReceive");
+			stateMachine();
 
-	        var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-		    refreshTimer.start(method(:timerRefresh), refreshTimeInterval * 1000, true);
 		}
 		else if (args == 1) { // Swiped left on subview 1, show subview 2
             var view = new ChargeView(_view._data);
-            var delegate = new ChargeDelegate(view, _view._data, _tesla, method(:onReceive));
+            var delegate = new ChargeDelegate(view, method(:onReceive));
             Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 2) { // Swiped left on subview 2, show subview 3
             var view = new ClimateView(_view._data);
-            var delegate = new ClimateDelegate(view, _view._data, _tesla, method(:onReceive));
+            var delegate = new ClimateDelegate(view, method(:onReceive));
             Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 3) { // Swiped left on subview 3, show subview 4 (but none so go back to main screen)
             var view = new DriveView(_view._data);
-            var delegate = new DriveDelegate(view, _view._data, _tesla, method(:onReceive));
+            var delegate = new DriveDelegate(view, method(:onReceive));
             Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 	    _view.requestUpdate();
@@ -163,27 +159,27 @@ logMessage("initialize:No token, will need to get one through a refresh token or
     function onSwipe(swipeEvent) {
     	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
 	    	if (swipeEvent.getDirection() == 3) {
-			    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other submenus
-			    _sleep_timer.stop();
+				onReceive(1); // Show the first submenu
 		    }
-			onReceive(1); // Show the first submenu
 		}
         return true;
 	}
 
 // STEP 4 no longer required. Bearer access token given by step 3	
     function bearerForAccessOnReceive(responseCode, data) {
+logMessage("bearerForAccessOnReceive " + responseCode);
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
-            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("StateMachine: bearerForAccessOnReceive");
+            stateMachine();
         }
         else {
         	if (responseCode == 401) {
 	            _need_auth = true;
         	}
             _resetToken();
-//logMessage("bearerForAccessOnReceive " + responseCode);
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
+			_sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
 
@@ -218,6 +214,7 @@ logMessage("codeForBearerOnReceive data is " + data);
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
 	      }
         _resetToken();
+		_sleep_timer.start(method(:delayedRetry), 500, false);
       } 
     }
 
@@ -246,19 +243,21 @@ logMessage("codeForBearerOnReceive data is " + data);
 //            Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:codeForBearerOnReceive));
             Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
         } else {
+            _need_auth = true;
+            _auth_done = false;
         	if (error == 404) {
 	            Application.getApp().setProperty("vehicle", null);
-	            _need_auth = true;
 	        }
 //logMessage("onOAuthMessage " + responseCode);
             _resetToken();
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
+			_sleep_timer.start(method(:delayedRetry), 500, false);
         }
     }
 
     function onReceiveToken(responseCode, data) {
 logMessage("onReceiveToken responseCode is " + responseCode);
-if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60)); }
+if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60) + "..."); }
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -276,6 +275,7 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
             _auth_done = false;
 			Settings.setRefreshToken(null, 0, 0);
 	    }
+		_sleep_timer.start(method(:delayedRetry), 500, false);
     }
 
     function GetAccessToken(token, notify) {
@@ -298,6 +298,13 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
 
     function stateMachine() {
 //logMessage("Running stateMachine " + _need_auth + " " + _tesla + " " + _auth_done);
+		var _spinner = Application.getApp().getProperty("spinner");
+		if (_spinner.equals("+")) {
+			Application.getApp().setProperty("spinner", "-");
+		} else {
+			Application.getApp().setProperty("spinner", "+");
+		}
+
         if (_need_auth) {
             _need_auth = false;
 
@@ -370,21 +377,21 @@ logMessage("stateMachine: Asking for access token through user credentials ");
             return;
         }
 
-logMessage("stateMachine:_get_vehicle_data=" + _get_vehicle_data + " _waiting_for_vehicle_data=" + _waiting_for_vehicle_data + " _408_count=" + _408_count);
-		if (_waiting_for_vehicle_data > 1 || _408_count > 0) { // Skip the message on the first error (unless it's a wake command). If it repeats, display
+logMessage("stateMachine: _waiting_for_vehicle_data=" + _waiting_for_vehicle_data + " _408_count=" + _408_count);
+		if (_waiting_for_vehicle_data > 1) { // Skip the message on the first error. If it repeats, display
             var timeAsking = System.getTimer() - _wakeTime;
-            if (_408_count > 0) {
-	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
+            if (_408_count > 0 && _firstTime) {
+	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
 	        } else {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n(" + timeAsking / 1000 + "s)"]);
 	        }
         }
 
         if (_need_wake) { // Asked to wake up
-            _need_wake = false; // Do it only once. On a first 408 received, we'll wake again 
+            _need_wake = false; // Do it only once
             _wake_done = false;
 
-logMessage("stateMachine:Asking to wake vehicle, _get_vehicle_data=" + _get_vehicle_data + " waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
+logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
 			_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
@@ -393,23 +400,8 @@ logMessage("stateMachine:Asking to wake vehicle, _get_vehicle_data=" + _get_vehi
             return;
         }
 
-		var _gotBackgroundData = Application.getApp().getProperty("gotBackgroundData");
-		if (_gotBackgroundData == true) {
-			Application.getApp().setProperty("gotBackgroundData", false);
-	        if (_get_vehicle_data == 2) { // If we were waiting for data that was read by the background process, request it again
-logMessage("StateMachine:BackgroundData stole our data, requesting again");
-	            _get_vehicle_data = 1;
-			}        
-		}
-
-        if (_get_vehicle_data == 1) {
-            _get_vehicle_data = 2;
 logMessage("StateMachine: Requesting data for vehicle " + _vehicle_id);
-            _tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
-		}
-		else {
-			Ui.requestUpdate(); // We're not getting any data but still refresh the view
-		}
+		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 
         if (_set_climate_on) {
             _set_climate_on = false;
@@ -612,19 +604,15 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 
 		if (_set_refresh_time) {
             _set_refresh_time = false;
-            var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-            if (refreshTimeInterval != null) {
-			    refreshTimer.stop();
-			    refreshTimer.start(method(:timerRefresh), refreshTimeInterval.toNumber() * 1000, true);
+            _refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+            if (_refreshTimeInterval == null) {
+				_refreshTimeInterval = 1000;
             }
+logMessage("refreshTimer at " + _refreshTimeInterval);
 		}
 		
 		if (_view_datascreen) {
 			_view_datascreen = false;
-			
-		    refreshTimer.stop(); // Stop our timers so we don't grab received events from our other submenus
-		    _sleep_timer.stop();
-
 			onReceive(1); // Show the first submenu
 		}
     }
@@ -656,45 +644,16 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         _tesla.honkHorn(_vehicle_id, method(:genericHandler));
     }
 
-    function timerRefresh() {
-		if (Application.getApp().getProperty("refreshTimer")) {
-//logMessage("timerRefresh");
-	    	if (!_disableRefreshTimer) {
-        		var _spinner = Application.getApp().getProperty("spinner");
-				if (_spinner.equals("+")) {
-					Application.getApp().setProperty("spinner", "-");
-				} else {
-					Application.getApp().setProperty("spinner", "+");
-				}
-
-				if (_data._vehicle_data != null) {
-					if (_get_vehicle_data == 0) {
-				        _get_vehicle_data = 1;
-					}
-					else {
-						Application.getApp().setProperty("spinner", "?");
-					}
-				}
-//logMessage("timerRefresh:stateMachine");
-		        stateMachine();
-			}
-			else {
-logMessage("timerRefresh skipped ");
-			}
-		}
-    }
-
     function delayedRetry() {
-        var _oldDisable = _disableRefreshTimer; 
-		_get_vehicle_data = 1;
-		_disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = _oldDisable;
+logMessage("MainDelegate: delayedRetry");
+		stateMachine();
     }
 
     function onSelect() {
-/*        if (_settings.isTouchScreen) {
+        if (_settings.isTouchScreen) {
             return false;
         }
-*/
+
         doSelect();
         return true;
     }
@@ -705,14 +664,15 @@ logMessage("timerRefresh skipped ");
         } else {
             _set_climate_off = true;
         }
-        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("stateMachine: doSelect");
+        stateMachine();
     }
 
     function onNextPage() {
-/*        if (_settings.isTouchScreen) {
+        if (_settings.isTouchScreen) {
             return false;
         }
-*/
+
         doNextPage();
         return true;
     }
@@ -723,14 +683,15 @@ logMessage("timerRefresh skipped ");
         } else {
             _unlock = true;
         }
-        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("stateMachine: doNextPage");
+        stateMachine();
     }
 
     function onPreviousPage() {
-/*        if (_settings.isTouchScreen) {
+        if (_settings.isTouchScreen) {
             return false;
         }
-*/
+
         doPreviousPage();
         return true;
     }
@@ -748,20 +709,19 @@ logMessage("timerRefresh skipped ");
 		else {
 			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
-        _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("stateMachine: doPreviousPage");
+        stateMachine();
     }
 
     function onBack() {
-	    refreshTimer.stop();
-	    _sleep_timer.stop();
         return false;
     }
 
     function onMenu() {
-/*        if (_settings.isTouchScreen) {
+        if (_settings.isTouchScreen) {
             return false;
         }
-*/
+
         doMenu();
         return true;
     }
@@ -895,8 +855,6 @@ logMessage("timerRefresh skipped ");
             return;
         }
 
-    	_disableRefreshTimer = true;
-
 		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
 		if (_slot_count == null) {
 			_slot_count = 17;
@@ -919,7 +877,6 @@ logMessage("timerRefresh skipped ");
 		}
 		
 		Ui.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
-        _disableRefreshTimer = false; 
     }
 
     function onTap(click) {
@@ -940,12 +897,14 @@ logMessage("timerRefresh skipped ");
 		// Tap on the space used by the 'Eye'
 		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
             _sentry_mode = true;
+logMessage("stateMachine: onTap");
             stateMachine();
 		}
 		// Tap on the middle text line where Departure is written
 		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 	            _adjust_departure = true;
+logMessage("stateMachine: onTap");
 	            stateMachine();
             }
             else {
@@ -1019,17 +978,6 @@ logMessage("timerRefresh skipped ");
         }
     }
 
-    function onReceiveAuth(responseCode, data) {
-logMessage("onReceiveAuth:responseCode is " + responseCode);
-        if (responseCode == 200) {
-            _auth_done = true;
-            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
-        } else {
-            _resetToken();
-            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-        }
-    }
-
     function onReceiveVehicles(responseCode, data) {
 logMessage("onReceiveVehicles:responseCode is " + responseCode);
 //logMessage("onReceiveVehicles:data is " + data);
@@ -1038,7 +986,9 @@ logMessage("onReceiveVehicles:responseCode is " + responseCode);
             if (vehicles.size() > 0) {
                 _vehicle_id = vehicles[0].get("id");
                 Application.getApp().setProperty("vehicle", _vehicle_id);
-                _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("stateMachine: onReceiveVehicles");
+                stateMachine();
+				return;
             } else {
                 _handler.invoke([0, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
             }
@@ -1063,20 +1013,19 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 				_waiting_for_vehicle_data = 0;
-		        _get_vehicle_data = 0; // All is well, we got our data
 				_408_count = 0; // Reset the count of timeouts since we got our data
+				_firstTime = false;
                 _handler.invoke([0, null]);
 				Ui.requestUpdate(); // We got data! Now show it!
-
-            } else {
-                _sleep_timer.start(method(:delayedRetry), 500, false);
+                _sleep_timer.start(method(:delayedRetry), _refreshTimeInterval, false);
+				return;
             }
         } else {
 			_waiting_for_vehicle_data++;
 			if (responseCode == 408) { // We got a 408, so we're still asleep
-	        	if (_408_count == 0) { // First 408 recieved
+	        	if ((_408_count == 0 && _firstTime) || (_408_count == 1 && !_firstTime)) { // First or second 408 recieved will generate a wake. First one on start and we'll let pass a 408 if we're already running
 					_wakeTime = System.getTimer();
-logMessage("onReceiveVehicleData: First 408 received, ask to wake up");
+logMessage("onReceiveVehicleData: Got 408, need to wake up the car");
 		            _need_wake = true;
 		            _wake_done = false;
 	            }
@@ -1097,16 +1046,17 @@ logMessage("onReceiveVehicleData: First 408 received, ask to wake up");
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		        }
 			}
-            _sleep_timer.start(method(:delayedRetry), 500, false);
 	    }
+        _sleep_timer.start(method(:delayedRetry), 500, false);
     }
 
     function onReceiveAwake(responseCode, data) {
 logMessage("onReceiveAwake:responseCode is " + responseCode);
         if (responseCode == 200) {
             _wake_done = true;
-            _get_vehicle_data = 1;
-            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
+logMessage("stateMachine: onReceiveWake");
+            stateMachine();
+			return;
        } else {
 		   // We were unable to wake, try again
 			_need_wake = true;
@@ -1124,23 +1074,19 @@ logMessage("onReceiveAwake:responseCode is " + responseCode);
 			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			}
-            _sleep_timer.start(method(:delayedRetry), 500, false);
         }
+        _sleep_timer.start(method(:delayedRetry), 500, false);
     }
 
     function genericHandler(responseCode, data) {
 logMessage("genericHandler:responseCode is " + responseCode);
         if (responseCode == 200) {
-            if (_get_vehicle_data == 0) {
-	            _get_vehicle_data = 1;
-			}
             _handler.invoke([1, null]);
 			_408_count = 0;
-            
-// Give it some time then query the state again, otherwise it doesn't have enough time to record the change
-//            _disableRefreshTimer = true; stateMachine(); _disableRefreshTimer = false;
-            _sleep_timer.start(method(:delayedRetry), 500, false); 
-        }
+            stateMachine();
+		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		}
     }
 
     function _saveToken(token) {

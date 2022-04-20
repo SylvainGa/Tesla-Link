@@ -45,9 +45,6 @@ class ClimateView extends Ui.View {
             font_montserrat=Graphics.FONT_TINY;
         }
 
-        // Next background update in 5 mins!
-        Background.registerForTemporalEvent(new Time.Duration(60*5));
-
         // Redraw the layout and wipe the canvas              
         if (_display != null) 
         {

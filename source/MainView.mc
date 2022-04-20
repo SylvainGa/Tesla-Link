@@ -24,7 +24,6 @@ class MainView extends Ui.View {
 logMessage("MainView:initialize with _display at " + _display);
 
 		Application.getApp().setProperty("spinner", "-");
-		Application.getApp().setProperty("gotBackgroundData", false);
         if (Application.getApp().getProperty("refreshTimeInterval") == null) {
         	Application.getApp().setProperty("refreshTimeInterval", 4);
         }

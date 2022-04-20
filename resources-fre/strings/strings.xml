@@ -156,7 +156,7 @@
     <string id="menu_label_wake">Forcer un réveil</string>
     <string id="menu_label_refresh">temps de rafraichissement</string>
     <string id="menu_label_datascreen">Voir écran de données</string>
-    <string id="refresh_chooser_title">En secondes</string>
+    <string id="refresh_chooser_title">En milisec</string>
     <string id="label_unauthorized">Non autorisé</string>
     <string id="subview_label_charge_limit_soc">Charge limite</string>
     <string id="subview_label_battery_level">Niveau pile</string>
