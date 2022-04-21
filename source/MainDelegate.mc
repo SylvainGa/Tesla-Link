@@ -17,11 +17,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _tesla;
     var _sleep_timer;
     var _vehicle_id;
+	var _vehicle_state;
     var _need_auth;
     var _auth_done;
     var _need_wake;
     var _wake_done;
-    var _waiting_for_vehicle_data;
 	var _wakeTime;
 	var _firstTime;
     var _set_climate_on;
@@ -61,6 +61,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _token = Settings.getToken();
 
         _vehicle_id = Application.getApp().getProperty("vehicle");
+		_vehicle_state = "online"; // Assume we're online
         _sleep_timer = new Timer.Timer();
         _handler = handler;
         _tesla = null;
@@ -98,9 +99,8 @@ logMessage("initialize:No token, will need to get one through a refresh token or
             _auth_done = false;
         }
 
-        _need_wake = false; // Assume we're awake and if we get a 408, then wake up
+        _need_wake = false; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
         _wake_done = true;
-		_waiting_for_vehicle_data = 2;
 		_wakeTime = System.getTimer();
 		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the the first 408 generate a wake commmand
         _set_climate_on = false;
@@ -129,13 +129,13 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 			_refreshTimeInterval = 1000;
 		}
 
-logMessage("StateMachine: Initialize");
+//logMessage("StateMachine: Initialize");
 		stateMachine();
     }
 
     function onReceive(args) {
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, that's our cue to restart our timer and display our main view
-logMessage("StateMachine: onReceive");
+//logMessage("StateMachine: onReceive");
 			stateMachine();
 
 		}
@@ -171,7 +171,7 @@ logMessage("StateMachine: onReceive");
 logMessage("bearerForAccessOnReceive " + responseCode);
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
-logMessage("StateMachine: bearerForAccessOnReceive");
+//logMessage("StateMachine: bearerForAccessOnReceive");
             stateMachine();
         }
         else {
@@ -372,16 +372,20 @@ logMessage("stateMachine: Asking for access token through user credentials ");
             _tesla = new Tesla(_token);
         }
 
-        if (_vehicle_id == null) {
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
+        if (_vehicle_id == null || _vehicle_id == -1) { // -1 means we're from a 408 response, use this call to see if we're awake
+			if (_vehicle_id == null) {
+	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
+			} else {
+logMessage("StateMachine: Asking to test if we're awake");
+			}
             _tesla.getVehicleId(method(:onReceiveVehicles));
             return;
         }
 
-logMessage("stateMachine: _waiting_for_vehicle_data=" + _waiting_for_vehicle_data + " _408_count=" + _408_count);
-		if (_waiting_for_vehicle_data > 1) { // Skip the message on the first error. If it repeats, display
+logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = " + _408_count + " _need_wake = " + _need_wake);
+		if (_vehicle_state.equals("online") == false) { // Only matters if we're not online, otherwise be silent
             var timeAsking = System.getTimer() - _wakeTime;
-            if (_408_count > 0 && _firstTime) {
+            if (_firstTime) {
 	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_waking_vehicle) + "\n(" + timeAsking / 1000 + "s)"]);
 	        } else {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n(" + timeAsking / 1000 + "s)"]);
@@ -985,9 +989,16 @@ logMessage("onReceiveVehicles:responseCode is " + responseCode);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             if (vehicles.size() > 0) {
+				_vehicle_state = vehicles[0].get("state");
                 _vehicle_id = vehicles[0].get("id");
                 Application.getApp().setProperty("vehicle", _vehicle_id);
-logMessage("stateMachine: onReceiveVehicles");
+logMessage("onReceiveVehicles: Vehicle state is '" + _vehicle_state + "'");
+				if (_vehicle_state.equals("online") == false) { // We're not awake, next iteration of StateMachine will call the wake function
+					_need_wake = true;
+					_wake_done = false;
+				}
+
+//logMessage("stateMachine: onReceiveVehicles");
                 stateMachine();
 				return;
             } else {
@@ -1013,9 +1024,9 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
             _data._vehicle_data = data.get("response");
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
             if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-				_waiting_for_vehicle_data = 0;
 				_408_count = 0; // Reset the count of timeouts since we got our data
 				_firstTime = false;
+				_vehicle_state = "online"; // We got data so we got to be online
                 _handler.invoke([0, null]);
 				Ui.requestUpdate(); // We got data! Now show it!
 				var timeDelta = System.getTimer() - _lastDataRun;
@@ -1031,13 +1042,13 @@ logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec
 				return;
             }
         } else {
-			_waiting_for_vehicle_data++;
-			if (responseCode == 408) { // We got a 408, so we're still asleep
-	        	if ((_408_count == 0 && _firstTime) || (_408_count == 1 && !_firstTime)) { // First or second 408 recieved will generate a wake. First one on start and we'll let pass a 408 if we're already running
-					_wakeTime = System.getTimer();
-logMessage("onReceiveVehicleData: Got 408, need to wake up the car");
-		            _need_wake = true;
-		            _wake_done = false;
+			if (responseCode == 408) { // We got a timeout, check if we're still awake
+	        	if ((_408_count == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
+					if (_408_count < 2) { // Only when we first started to get the errors do we keep the start time
+						_wakeTime = System.getTimer();
+					}
+logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");
+		            _vehicle_id = -1;
 	            }
         		_408_count++;
 			} else {
@@ -1064,7 +1075,7 @@ logMessage("onReceiveVehicleData: Got 408, need to wake up the car");
 logMessage("onReceiveAwake:responseCode is " + responseCode);
         if (responseCode == 200) {
             _wake_done = true;
-logMessage("stateMachine: onReceiveWake");
+//logMessage("stateMachine: onReceiveWake");
             stateMachine();
 			return;
        } else {
