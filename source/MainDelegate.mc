@@ -50,6 +50,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _set_refresh_time;
 	var _view_datascreen;
 	var _refreshTimeInterval;
+    var _lastDataRun;
 
     function initialize(view as MainView, data, handler) {
         BehaviorDelegate.initialize();
@@ -391,7 +392,7 @@ logMessage("stateMachine: _waiting_for_vehicle_data=" + _waiting_for_vehicle_dat
             _need_wake = false; // Do it only once
             _wake_done = false;
 
-logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _waiting_for_vehicle_data);
+logMessage("stateMachine:Asking to wake vehicle");
 			_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
             return;
         }
@@ -400,7 +401,8 @@ logMessage("stateMachine:Asking to wake vehicle, waiting_for_vehicle_data=" + _w
             return;
         }
 
-logMessage("StateMachine: Requesting data for vehicle " + _vehicle_id);
+logMessage("StateMachine: Requesting data");
+    	_lastDataRun = System.getTimer();
 		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 
         if (_set_climate_on) {
@@ -645,7 +647,6 @@ logMessage("refreshTimer at " + _refreshTimeInterval);
     }
 
     function delayedRetry() {
-logMessage("MainDelegate: delayedRetry");
 		stateMachine();
     }
 
@@ -1017,7 +1018,16 @@ logMessage("onReceiveVehicleData responseCode is " + responseCode);
 				_firstTime = false;
                 _handler.invoke([0, null]);
 				Ui.requestUpdate(); // We got data! Now show it!
-                _sleep_timer.start(method(:delayedRetry), _refreshTimeInterval, false);
+				var timeDelta = System.getTimer() - _lastDataRun;
+logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
+				timeDelta = _refreshTimeInterval - timeDelta;
+				if (timeDelta < 0) {
+logMessage("onReceiveVehicleData: Running StateMachine NOW");
+					stateMachine(); // We're too late already, run it now!
+				} else {
+logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec");
+                	_sleep_timer.start(method(:delayedRetry), timeDelta, false);
+				}
 				return;
             }
         } else {
