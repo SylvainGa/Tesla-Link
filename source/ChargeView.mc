@@ -71,52 +71,44 @@ class ChargeView extends Ui.View {
             View.onUpdate(dc);
             
             var title = View.findDrawableById("Title");
-            var line1Text = View.findDrawableById("Line1Text");
-            var line2Text = View.findDrawableById("Line2Text");
-            var line3Text = View.findDrawableById("Line3Text");
-            var line4Text = View.findDrawableById("Line4Text");
-            var line5Text = View.findDrawableById("Line5Text");
-            var line6Text = View.findDrawableById("Line6Text");
-            var line7Text = View.findDrawableById("Line7Text");
-            var line8Text = View.findDrawableById("Line8Text");
-            var line1Value = View.findDrawableById("Line1Value");
-            var line2Value = View.findDrawableById("Line2Value");
-            var line3Value = View.findDrawableById("Line3Value");
-            var line4Value = View.findDrawableById("Line4Value");
-            var line5Value = View.findDrawableById("Line5Value");
-            var line6Value = View.findDrawableById("Line6Value");
-            var line7Value = View.findDrawableById("Line7Value");
-            var line8Value = View.findDrawableById("Line8Value");
+		    var lineText = new [8];
+		    var lineValue = new [8];
+            
+            for (var i = 1; i <= 8; i++) {
+                lineText[i - 1]  = View.findDrawableById("Line" + i + "Text");
+                lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
+            }
 
 logMessage("_viewOffset is " + _viewOffset);
+            var lineData; 
 			if (_viewOffset == 0) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_1_2));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_1_2));
 
-	            var line3Data = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_limit_soc));
-	            line3Value.setText(line3Data.toString() + "%");
+	            lineData = _data._vehicle_data.get("charge_state").get("charge_limit_soc").toNumber();
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_charge_limit_soc));
+	            lineValue[2].setText(lineData.toString() + "%");
 	
-	            var line4Data = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_battery_level));
-	            line4Value.setText(line4Data.toString() + "%");
+	            lineData = _data._vehicle_data.get("charge_state").get("battery_level").toNumber();
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_battery_level));
+	            lineValue[3].setText(lineData.toString() + "%");
 	
-	            var line5Data = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
-	            line5Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
-	            line5Value.setText(line5Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	            lineData = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
+	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
+	            lineValue[4].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 	
-	            var line6Data = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
-	            line6Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
-	            line6Value.setText(line6Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	            lineData = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
+	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
+	            lineValue[5].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 	
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_2_2));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_2_2));
 
-	            var line3Data = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
-	            var hours = line3Data / 60;
-	            var minutes = line3Data - hours * 60;
+	            lineData = _data._vehicle_data.get("charge_state").get("minutes_to_full_charge").toNumber();
+	            var hours = lineData / 60;
+	            var minutes = lineData - hours * 60;
 	            var timeStr;
 				if (System.getDeviceSettings().is24Hour) {
 					timeStr = Lang.format("$1$h$2$ ", [hours.format("%d"), minutes.format("%02d")]);
@@ -124,38 +116,26 @@ logMessage("_viewOffset is " + _viewOffset);
 				else {
 					timeStr = Lang.format("$1$:$2$ ", [hours.format("%d"), minutes.format("%02d")]);
 				}
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_minutes_to_full_charge));
-	            line3Value.setText(timeStr);
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_minutes_to_full_charge));
+	            lineValue[2].setText(timeStr);
 
-	            var line4Data = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_charger_voltage));
-	            line4Value.setText(line4Data.toString() + "V");
+	            lineData = _data._vehicle_data.get("charge_state").get("charger_voltage").toNumber();
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_charger_voltage));
+	            lineValue[3].setText(lineData.toString() + "V");
 	
-	            var line5Data = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_charger_actual_current));
-	            line5Value.setText(line5Data.toString() + "A");
+	            lineData = _data._vehicle_data.get("charge_state").get("charger_actual_current").toNumber();
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charger_actual_current));
+	            lineValue[4].setText(lineData.toString() + "A");
 	
-	            var line6Data = _data._vehicle_data.get("climate_state").get("battery_heater");
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_battery_heater));
-	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("battery_heater");
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_battery_heater));
+	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			
-            line1Text.draw(dc);
-            line1Value.draw(dc);
-            line2Text.draw(dc);
-            line2Value.draw(dc);
-            line3Text.draw(dc);
-            line3Value.draw(dc);
-            line4Text.draw(dc);
-            line4Value.draw(dc);
-            line5Text.draw(dc);
-            line5Value.draw(dc);
-            line6Text.draw(dc);
-            line6Value.draw(dc);
-            line7Text.draw(dc);
-            line7Value.draw(dc);
-            line8Text.draw(dc);
-            line8Value.draw(dc);
+            for (var i = 0; i < 8; i++) {
+                lineText[i].draw(dc);
+                lineValue[i].draw(dc);
+            }
         }
 	}
 }

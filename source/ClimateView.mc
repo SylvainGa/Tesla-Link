@@ -71,139 +71,120 @@ class ClimateView extends Ui.View {
             View.onUpdate(dc);
             
             var title = View.findDrawableById("Title");
-            var line1Text = View.findDrawableById("Line1Text");
-            var line2Text = View.findDrawableById("Line2Text");
-            var line3Text = View.findDrawableById("Line3Text");
-            var line4Text = View.findDrawableById("Line4Text");
-            var line5Text = View.findDrawableById("Line5Text");
-            var line6Text = View.findDrawableById("Line6Text");
-            var line7Text = View.findDrawableById("Line7Text");
-            var line8Text = View.findDrawableById("Line8Text");
-            var line1Value = View.findDrawableById("Line1Value");
-            var line2Value = View.findDrawableById("Line2Value");
-            var line3Value = View.findDrawableById("Line3Value");
-            var line4Value = View.findDrawableById("Line4Value");
-            var line5Value = View.findDrawableById("Line5Value");
-            var line6Value = View.findDrawableById("Line6Value");
-            var line7Value = View.findDrawableById("Line7Value");
-            var line8Value = View.findDrawableById("Line8Value");
+		    var lineText = new [8];
+		    var lineValue = new [8];
+            
+            for (var i = 1; i <= 8; i++) {
+                lineText[i - 1]  = View.findDrawableById("Line" + i + "Text");
+                lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
+            }
 
 logMessage("_viewOffset is " + _viewOffset);
+            var lineData; 
+            var lineUnit; 
 			if (_viewOffset == 0) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_1_4));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_1_4));
 
-	            var line3Data = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
-	            var line3Unit = "°C";
+	            lineData = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
+	            lineUnit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line3Data = (line3Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
-					line3Unit = "°F";
+					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					lineUnit = "°F";
 		        }
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_driver_temp_setting));
-	            line3Value.setText(line3Data.toString() + line3Unit);
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_driver_temp_setting));
+	            lineValue[2].setText(lineData.toString() + lineUnit);
 
-	            var line4Data = _data._vehicle_data.get("climate_state").get("passenger_temp_setting").toNumber();
-	            var line4Unit = "°C";
+	            lineData = _data._vehicle_data.get("climate_state").get("passenger_temp_setting").toNumber();
+	            lineUnit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line4Data = (line4Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
-					line4Unit = "°F";
+					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					lineUnit = "°F";
 		        }
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_passenger_temp_setting));
-	            line4Value.setText(line4Data.toString() + line4Unit);
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_passenger_temp_setting));
+	            lineValue[3].setText(lineData.toString() + lineUnit);
 	
-	            var line5Data = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
-	            var line5Unit = "°C";
+	            lineData = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
+	            lineUnit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line5Data = (line5Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
-					line5Unit = "°F";
+					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					lineUnit = "°F";
 		        }
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_inside_temp));
-	            line5Value.setText(line5Data.toString() + line5Unit);
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_inside_temp));
+	            lineValue[4].setText(lineData.toString() + lineUnit);
 	
-	            var line6Data = _data._vehicle_data.get("climate_state").get("outside_temp").toNumber();
-	            var line6Unit = "°C";
+	            lineData = _data._vehicle_data.get("climate_state").get("outside_temp").toNumber();
+	            lineUnit = "°C";
 		        if (Application.getApp().getProperty("imperial")) {
-					line6Data = (line6Data * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
-					line6Unit = "°F";
+					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
+					lineUnit = "°F";
 		        }
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_outside_temp));
-	            line6Value.setText(line6Data.toString() + line6Unit);
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_outside_temp));
+	            lineValue[5].setText(lineData.toString() + lineUnit);
 			}
 			else if (_viewOffset == 4) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_2_4));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_2_4));
 
-	            var line3Data = _data._vehicle_data.get("climate_state").get("is_climate_on");
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_climate_on));
-	            line3Value.setText((line3Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("is_climate_on");
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_is_climate_on));
+	            lineValue[2].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 
-	            var line4Data = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_front_defroster_on));
-	            line4Value.setText((line4Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_is_front_defroster_on));
+	            lineValue[3].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            var line5Data = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_is_rear_defroster_on));
-	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_is_rear_defroster_on));
+	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            var line6Data = _data._vehicle_data.get("climate_state").get("side_mirror_heaters");
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_side_mirror_heaters));
-	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("side_mirror_heaters");
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_side_mirror_heaters));
+	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 8) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_3_4));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_3_4));
 
-	            var line3Data = _data._vehicle_data.get("climate_state").get("seat_heater_left").toNumber();
+	            lineData = _data._vehicle_data.get("climate_state").get("seat_heater_left").toNumber();
 				var driverAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_left") ? " (A)" : "");
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_left));
-	            line3Value.setText(line3Data.toString() + driverAutoSeat);
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_left));
+	            lineValue[2].setText(lineData.toString() + driverAutoSeat);
 
-	            var line4Data = _data._vehicle_data.get("climate_state").get("seat_heater_right").toNumber();
+	            lineData = _data._vehicle_data.get("climate_state").get("seat_heater_right").toNumber();
 				var passengerAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_right") ? " (A)" : "");
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_right));
-	            line4Value.setText(line4Data.toString() + passengerAutoSeat);
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_right));
+	            lineValue[3].setText(lineData.toString() + passengerAutoSeat);
 	
-	            var line5Data = _data._vehicle_data.get("climate_state").get("steering_wheel_heater");
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_steering_wheel_heater));
-	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("steering_wheel_heater");
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_steering_wheel_heater));
+	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            var line6Data = _data._vehicle_data.get("climate_state").get("wiper_blade_heater");
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_wiper_blade_heater));
-	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("wiper_blade_heater");
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_wiper_blade_heater));
+	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 12) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_4_4));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_4_4));
 
-	            var line3Data = _data._vehicle_data.get("climate_state").get("climate_keeper_mode");
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_climate_keeper_mode));
-	            line3Value.setText(line3Data.toString());
+	            lineData = _data._vehicle_data.get("climate_state").get("climate_keeper_mode");
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_climate_keeper_mode));
+	            lineValue[2].setText(lineData.toString());
 
-	            var line4Data = _data._vehicle_data.get("climate_state").get("allow_cabin_overheat_protection");
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_allow_cabin_overheat_protection));
-	            line4Value.setText((line4Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("allow_cabin_overheat_protection");
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_allow_cabin_overheat_protection));
+	            lineValue[3].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            var line5Data = _data._vehicle_data.get("climate_state").get("supports_fan_only_cabin_overheat_protection");
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_supports_fan_only_cabin_overheat_protection));
-	            line5Value.setText((line5Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("supports_fan_only_cabin_overheat_protection");
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_supports_fan_only_cabin_overheat_protection));
+	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            var line6Data = _data._vehicle_data.get("climate_state").get("cabin_overheat_protection_actively_cooling");
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_cabin_overheat_protection_actively_cooling));
-	            line6Value.setText((line6Data ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
+	            lineData = _data._vehicle_data.get("climate_state").get("cabin_overheat_protection_actively_cooling");
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_cabin_overheat_protection_actively_cooling));
+	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 
-            line1Text.draw(dc);
-            line1Value.draw(dc);
-            line2Text.draw(dc);
-            line2Value.draw(dc);
-            line3Text.draw(dc);
-            line3Value.draw(dc);
-            line4Text.draw(dc);
-            line4Value.draw(dc);
-            line5Text.draw(dc);
-            line5Value.draw(dc);
-            line6Text.draw(dc);
-            line6Value.draw(dc);
-            line7Text.draw(dc);
-            line7Value.draw(dc);
-            line8Text.draw(dc);
-            line8Value.draw(dc);
+            for (var i = 0; i < 8; i++) {
+                lineText[i].draw(dc);
+                lineValue[i].draw(dc);
+            }
         }
 	}
 }

@@ -71,77 +71,57 @@ class DriveView extends Ui.View {
             View.onUpdate(dc);
             
             var title = View.findDrawableById("Title");
-            var line1Text = View.findDrawableById("Line1Text");
-            var line2Text = View.findDrawableById("Line2Text");
-            var line3Text = View.findDrawableById("Line3Text");
-            var line4Text = View.findDrawableById("Line4Text");
-            var line5Text = View.findDrawableById("Line5Text");
-            var line6Text = View.findDrawableById("Line6Text");
-            var line7Text = View.findDrawableById("Line7Text");
-            var line8Text = View.findDrawableById("Line8Text");
-            var line1Value = View.findDrawableById("Line1Value");
-            var line2Value = View.findDrawableById("Line2Value");
-            var line3Value = View.findDrawableById("Line3Value");
-            var line4Value = View.findDrawableById("Line4Value");
-            var line5Value = View.findDrawableById("Line5Value");
-            var line6Value = View.findDrawableById("Line6Value");
-            var line7Value = View.findDrawableById("Line7Value");
-            var line8Value = View.findDrawableById("Line8Value");
+		    var lineText = new [8];
+		    var lineValue = new [8];
+            
+            for (var i = 1; i <= 8; i++) {
+                lineText[i - 1]  = View.findDrawableById("Line" + i + "Text");
+                lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
+            }
 
 logMessage("_viewOffset is " + _viewOffset);
+            var lineData; 
 			if (_viewOffset == 0) {
-	            line1Text.setText(Ui.loadResource(Rez.Strings.subview_label_drive_data_1_1));
+	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_drive_data_1_1));
 
-	            var line3Data = _data._vehicle_data.get("drive_state").get("shift_state");
-	            line3Text.setText(Ui.loadResource(Rez.Strings.subview_label_shift_state));
-	            if (line3Data != null) {
-		            line3Value.setText(line3Data.toString());
+	            lineData = _data._vehicle_data.get("drive_state").get("shift_state");
+	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_shift_state));
+	            if (lineData != null) {
+		            lineValue[2].setText(lineData.toString());
 				}
 				else {
-					line3Value.setText("Parked");
+					lineValue[2].setText("Parked");
 				}
 				
-	            var line4Data = _data._vehicle_data.get("drive_state").get("speed");
-	            line4Text.setText(Ui.loadResource(Rez.Strings.subview_label_speed));
-				if (line4Data == null) {
-					line4Data = 0;
+	            lineData = _data._vehicle_data.get("drive_state").get("speed");
+	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_speed));
+				if (lineData == null) {
+					lineData = 0;
 				}
-	            line4Data *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            line4Value.setText(line4Data.toNumber().toString() + (Application.getApp().getProperty("imperial") ? " miles" : " km"));
+	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            lineValue[3].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? " miles" : " km"));
 
-	            var line5Data = _data._vehicle_data.get("drive_state").get("heading").toFloat();
-	            line5Text.setText(Ui.loadResource(Rez.Strings.subview_label_heading));
-	            if (line5Data != null) {
-					var val = (line5Data.toFloat() / 22.5) + .5;
+	            lineData = _data._vehicle_data.get("drive_state").get("heading").toFloat();
+	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_heading));
+	            if (lineData != null) {
+					var val = (lineData.toFloat() / 22.5) + .5;
 					var arr = toArray(Ui.loadResource(Rez.Strings.subview_label_compass),",");
 
-					line5Data = arr[(val.toNumber() % 16)];
-		            line5Value.setText(line5Data.toString());
+					lineData = arr[(val.toNumber() % 16)];
+		            lineValue[4].setText(lineData.toString());
 				}
 					
-	            var line6Data = _data._vehicle_data.get("drive_state").get("power").toFloat();
-	            line6Text.setText(Ui.loadResource(Rez.Strings.subview_label_power));
-	            if (line6Data != null) {
-		            line6Value.setText(line6Data.toString());
+	            lineData = _data._vehicle_data.get("drive_state").get("power").toFloat();
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_power));
+	            if (lineData != null) {
+		            lineValue[5].setText(lineData.toString());
 		        }
 			}
 			
-            line1Text.draw(dc);
-            line1Value.draw(dc);
-            line2Text.draw(dc);
-            line2Value.draw(dc);
-            line3Text.draw(dc);
-            line3Value.draw(dc);
-            line4Text.draw(dc);
-            line4Value.draw(dc);
-            line5Text.draw(dc);
-            line5Value.draw(dc);
-            line6Text.draw(dc);
-            line6Value.draw(dc);
-            line7Text.draw(dc);
-            line7Value.draw(dc);
-            line8Text.draw(dc);
-            line8Value.draw(dc);
+            for (var i = 0; i < 8; i++) {
+                lineText[i].draw(dc);
+                lineValue[i].draw(dc);
+            }
         }
 	}
 
