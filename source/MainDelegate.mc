@@ -612,12 +612,12 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 logMessage("StateMachine: Preconditionning off - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-	            _tesla.stopDeparture(_vehicle_id, method(:chargeStateHandler));
+	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), false);
 	        }
 	        else {
 logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-	            _tesla.startDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"));
+	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), true);
 	        }
         }
 

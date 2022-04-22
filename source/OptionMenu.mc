@@ -119,6 +119,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             _controller.stateMachine();
         } else if (item == :wake) {
             _controller._need_wake = true;
+            _controller._wake_done = false;
             _controller.stateMachine();
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");

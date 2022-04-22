@@ -285,35 +285,19 @@ logMessage("Calling url " + url + " options at " + options);
         genericPost(url, notify);
     }
 
-    function stopDeparture(vehicle, notify) {
+    function setDeparture(vehicle, notify, departureTime, enable) {
         var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
 
         Communications.makeWebRequest(
             url,
             {
-                "enable" => false
-            },
-            {
-                :method => Communications.HTTP_REQUEST_METHOD_POST,
-                :headers => {
-                    "Authorization" => _token
-                },
-                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
-            },
-            notify
-        );
-    }
-
-    function startDeparture(vehicle, notify, departureTime) {
-        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
-
-        Communications.makeWebRequest(
-            url,
-            {
-                "enable" => true,
+                "enable" => enable,
                 "departure_time" => departureTime,
-                "preconditioning_enabled" => true,
-                "preconditioning_weekdays_only" => false
+                "preconditioning_enabled" => enable,
+                "preconditioning_weekdays_only" => false,
+                "off_peak_charging_enabled" => false,
+                "off_peak_charging_weekdays_only" => false,
+               "end_off_peak_time" => 360
             },
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
