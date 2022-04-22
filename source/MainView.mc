@@ -77,12 +77,12 @@ logMessage("MainView:initialize with _display at " + _display);
             _data._ready = false;
 
 			if (_displayType == 0 && _display != null) { // We're displaying an error, time it so it stays up (at least) 2 seconds
-logMessage("Priority Message " + _display);
+//logMessage("Priority Message " + _display);
 				_errorTimer = System.getTimer() + 2000;
 				_bufferedText = _display;
 				_previousDisplayType = _displayType;
 			} else if (_errorTimer == 0) {
-logMessage("Show this Message " + _display);
+//logMessage("Show this Message " + _display);
 				if (_displayType == 1) {
 					_errorTimer = System.getTimer() + 1000;
 				} else {
@@ -134,6 +134,8 @@ logMessage("Showing Message " + _display);
 	                dc.drawBitmap(image_x_left,image_y_top,swap_frunk_for_port == 0 || swap_frunk_for_port == null ?  Ui.loadResource(Rez.Drawables.frunk_icon_white) : swap_frunk_for_port == 1 ?  Ui.loadResource(Rez.Drawables.trunk_icon_white) : Ui.loadResource(Rez.Drawables.charge_icon));
 	            }
 	            else {
+                    var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
+
 					var which_bitmap = 0;
 					var iconList = [
 						Rez.Drawables.frunk0trunk0port0vent0_icon_white,
@@ -163,7 +165,7 @@ logMessage("Showing Message " + _display);
 					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
 						which_bitmap += 4;
 					}
-					if (Application.getApp().getProperty("venting")) {
+					if (venting) {
 						which_bitmap += 8;
 					}
 
@@ -217,7 +219,7 @@ logMessage("Showing Message " + _display);
                 var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
 				var latitude = _data._vehicle_data.get("drive_state").get("latitude");
 				var longitude = _data._vehicle_data.get("drive_state").get("longitude");
-			    var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
+                var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 			    var door_open = _data._vehicle_data.get("vehicle_state").get("df").toNumber() + _data._vehicle_data.get("vehicle_state").get("dr").toNumber() + _data._vehicle_data.get("vehicle_state").get("pf").toNumber() + _data._vehicle_data.get("vehicle_state").get("pr").toNumber();
 
                 var departure_time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
@@ -296,6 +298,8 @@ logMessage("Showing Message " + _display);
                     var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
                     var climate_defrost = _data._vehicle_data.get("climate_state").get("defrost_mode");
                     var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
+
+logMessage("venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
 
                     if (climate_state == false)
                     {

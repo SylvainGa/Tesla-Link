@@ -54,6 +54,24 @@ class Tesla {
         genericGet(url, notify);
     }
 
+    (:background)
+    function getVehicleState(vehicle, notify) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/data_request/vehicle_state";
+        genericGet(url, notify);
+    }
+
+    (:background)
+    function getClimateState(vehicle, notify) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/data_request/climate_state";
+        genericGet(url, notify);
+    }
+
+    (:background)
+    function getChargeState(vehicle, notify) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/data_request/charge_state";
+        genericGet(url, notify);
+    }
+
     function wakeVehicle(vehicle, notify) {
         var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/wake_up";
         genericPost(url, notify);

@@ -16,6 +16,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _token;
     var _tesla;
     var _sleep_timer;
+	var _handler_timer; // So it doesn't interfere with the timer used in onReceiveVehicleData
     var _vehicle_id;
 	var _vehicle_state;
     var _need_auth;
@@ -51,6 +52,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _view_datascreen;
 	var _refreshTimeInterval;
     var _lastDataRun;
+	var _skipGetVehicleData;
+	var _waitingForVehicleData;
+	var _lastTimeStamp;
 
     function initialize(view as MainView, data, handler) {
         BehaviorDelegate.initialize();
@@ -63,6 +67,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _vehicle_id = Application.getApp().getProperty("vehicle");
 		_vehicle_state = "online"; // Assume we're online
         _sleep_timer = new Timer.Timer();
+        _handler_timer = new Timer.Timer();
         _handler = handler;
         _tesla = null;
 		
@@ -129,6 +134,10 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 			_refreshTimeInterval = 1000;
 		}
 
+		_skipGetVehicleData = false;
+		_waitingForVehicleData = false;
+		_lastTimeStamp = 0;
+
 //logMessage("StateMachine: Initialize");
 		stateMachine();
     }
@@ -180,7 +189,7 @@ logMessage("bearerForAccessOnReceive " + responseCode);
         	}
             _resetToken();
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-			_sleep_timer.start(method(:delayedRetry), 500, false);
+			_sleep_timer.start(method(:stateMachine), 500, false);
         }
     }
 
@@ -215,7 +224,7 @@ logMessage("codeForBearerOnReceive data is " + data);
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
 	      }
         _resetToken();
-		_sleep_timer.start(method(:delayedRetry), 500, false);
+		_sleep_timer.start(method(:stateMachine), 500, false);
       } 
     }
 
@@ -252,7 +261,7 @@ logMessage("codeForBearerOnReceive data is " + data);
 //logMessage("onOAuthMessage " + responseCode);
             _resetToken();
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-			_sleep_timer.start(method(:delayedRetry), 500, false);
+			_sleep_timer.start(method(:stateMachine), 500, false);
         }
     }
 
@@ -276,7 +285,7 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
             _auth_done = false;
 			Settings.setRefreshToken(null, 0, 0);
 	    }
-		_sleep_timer.start(method(:delayedRetry), 500, false);
+		_sleep_timer.start(method(:stateMachine), 500, false);
     }
 
     function GetAccessToken(token, notify) {
@@ -305,6 +314,12 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
 		} else {
 			Application.getApp().setProperty("spinner", "+");
 		}
+
+		if (_skipGetVehicleData) {
+logMessage("StateMachine: Skipping stateMachine");
+			return;
+		}
+
 
         if (_need_auth) {
             _need_auth = false;
@@ -405,26 +420,27 @@ logMessage("stateMachine:Asking to wake vehicle");
             return;
         }
 
-logMessage("StateMachine: Requesting data");
-    	_lastDataRun = System.getTimer();
-		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
-
         if (_set_climate_on) {
+logMessage("StateMachine: Climate On - calling climateStateHandler");
             _set_climate_on = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
-            _tesla.climateOn(_vehicle_id, method(:genericHandler));
+            _tesla.climateOn(_vehicle_id, method(:climateStateHandler));
         }
 
         if (_set_climate_off) {
+logMessage("StateMachine: Climate Off - calling climateStateHandler");
             _set_climate_off = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
-            _tesla.climateOff(_vehicle_id, method(:genericHandler));
+            _tesla.climateOff(_vehicle_id, method(:climateStateHandler));
         }
 
         if (_set_climate_defrost) {
             _set_climate_defrost = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
-            _tesla.climateDefrost(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+            _tesla.climateDefrost(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
         }
 
         if (_set_climate_set) {
@@ -459,20 +475,25 @@ logMessage("StateMachine: Requesting data");
 
         if (_open_port) {
             _open_port = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_open_port)]);
-            _tesla.openPort(_vehicle_id, method(:genericHandler));
+            _tesla.openPort(_vehicle_id, method(:chargeStateHandler));
         }
 
         if (_unlock) {
+logMessage("StateMachine: Unlock - calling vehicleStateHandler");
             _unlock = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
-            _tesla.doorUnlock(_vehicle_id, method(:genericHandler));
+            _tesla.doorUnlock(_vehicle_id, method(:vehicleStateHandler));
         }
 
         if (_lock) {
+logMessage("StateMachine: Lock - calling vehicleStateHandler");
             _lock = false;
+			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
-            _tesla.doorLock(_vehicle_id, method(:genericHandler));
+            _tesla.doorLock(_vehicle_id, method(:vehicleStateHandler));
         }
 
         if (_open_frunk) {
@@ -587,24 +608,28 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
         
         if (_adjust_departure) {
             _adjust_departure = false;
+			_skipGetVehicleData = true;
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+logMessage("StateMachine: Preconditionning off - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-	            _tesla.stopDeparture(_vehicle_id, method(:genericHandler));
+	            _tesla.stopDeparture(_vehicle_id, method(:chargeStateHandler));
 	        }
 	        else {
+logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-	            _tesla.startDeparture(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("departure_time"));
+	            _tesla.startDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"));
 	        }
         }
 
         if (_sentry_mode) {
             _sentry_mode = false;
+			_skipGetVehicleData = true;
             if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
-	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), false);
+	            _tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), false);
             } else {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
-	            _tesla.SentryMode(_vehicle_id, method(:genericHandler), true);
+	            _tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), true);
             }
         }
 
@@ -621,37 +646,52 @@ logMessage("refreshTimer at " + _refreshTimeInterval);
 			_view_datascreen = false;
 			onReceive(1); // Show the first submenu
 		}
+
+		if (!_skipGetVehicleData) {
+			if (!_waitingForVehicleData) {
+logMessage("StateMachine: Requesting data");
+				_lastDataRun = System.getTimer();
+				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
+				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
+			} else {
+logMessage("StateMachine: Already waiting for data, skipping");
+			}
+		} else {
+logMessage("StateMachine: Skipping requesting data");
+		}
     }
 
     function openVentConfirmed() {
 		_handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 //        Application.getApp().setProperty("venting", 4); Let onUpdate deal with that
-        _tesla.vent(_vehicle_id, method(:genericHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+logMessage("StateMachine: Open vent - calling vehicleStateHandler");
+		_skipGetVehicleData = true;
+        _tesla.vent(_vehicle_id, method(:vehicleStateHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function closeVentConfirmed() {
 	    _handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 //        Application.getApp().setProperty("venting", 0); Let onUpdate deal with that
-        _tesla.vent(_vehicle_id, method(:genericHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+logMessage("StateMachine: Close vent - calling vehicleStateHandler");
+		_skipGetVehicleData = true;
+        _tesla.vent(_vehicle_id, method(:vehicleStateHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
 
     function frunkConfirmed() {
         _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
-        _tesla.openTrunk(_vehicle_id, method(:genericHandler), "front");
+		_skipGetVehicleData = true;
+        _tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
     }
 
     function trunkConfirmed() {
         _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
-        _tesla.openTrunk(_vehicle_id, method(:genericHandler), "rear");
+		_skipGetVehicleData = true;
+        _tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "rear");
     }
 
     function honkHornConfirmed() {
         _handler.invoke([1, Ui.loadResource(Rez.Strings.label_honk)]);
         _tesla.honkHorn(_vehicle_id, method(:genericHandler));
-    }
-
-    function delayedRetry() {
-		stateMachine();
     }
 
     function onSelect() {
@@ -1014,33 +1054,51 @@ logMessage("onReceiveVehicles: Vehicle state is '" + _vehicle_state + "'");
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 	        }
 
-            _sleep_timer.start(method(:delayedRetry), 500, false);
+            _sleep_timer.start(method(:stateMachine), 500, false);
         }
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("onReceiveVehicleData responseCode is " + responseCode);
+logMessage("onReceiveVehicleData: responseCode is " + responseCode);
+		_waitingForVehicleData = false;
+		
+		if (_skipGetVehicleData) {
+logMessage("onReceiveVehicleData: Asked to skip");
+			return;
+		}
+
         if (responseCode == 200) {
-            _data._vehicle_data = data.get("response");
+			_vehicle_state = "online"; // We got data so we got to be online
+
+			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
+			var response = data.get("response");
+			if (response != null && response.hasKey("charge_state") && response.get("charge_state").hasKey("timestamp") && response.get("charge_state").get("timestamp") > _lastTimeStamp) {
+				_data._vehicle_data = response;
+				_lastTimeStamp = response.get("charge_state").get("timestamp");
 //logMessage("onReceiveVehicleData received " + _data._vehicle_data);
-            if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-				_408_count = 0; // Reset the count of timeouts since we got our data
-				_firstTime = false;
-				_vehicle_state = "online"; // We got data so we got to be online
-                _handler.invoke([0, null]);
-				Ui.requestUpdate(); // We got data! Now show it!
-				var timeDelta = System.getTimer() - _lastDataRun;
+				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+					_408_count = 0; // Reset the count of timeouts since we got our data
+					_firstTime = false;
+					_handler.invoke([0, null]);
+					Ui.requestUpdate(); // We got data! Now show it!
+					var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
-				timeDelta = _refreshTimeInterval - timeDelta;
-				if (timeDelta < 0) {
-logMessage("onReceiveVehicleData: Running StateMachine NOW");
-					stateMachine(); // We're too late already, run it now!
-				} else {
+					timeDelta = _refreshTimeInterval - timeDelta;
+					if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
 logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec");
-                	_sleep_timer.start(method(:delayedRetry), timeDelta, false);
+	                	_sleep_timer.start(method(:stateMachine), timeDelta, false);
+						return;
+					} else {
+logMessage("onReceiveVehicleData: Running StateMachine in at least 500 msec");
+					}
+				} else {
+logMessage("onReceiveVehicleData: Received incomplete data, ignoring");
 				}
-				return;
-            }
+			} else {
+logMessage("onReceiveVehicleData: Received an out or order data or missing timestamp, ignoring");
+			}
+			_sleep_timer.start(method(:stateMachine), 500, false);
+			return;
         } else {
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
 	        	if ((_408_count == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
@@ -1068,7 +1126,7 @@ logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?"
 		        }
 			}
 	    }
-        _sleep_timer.start(method(:delayedRetry), 500, false);
+        _sleep_timer.start(method(:stateMachine), 500, false);
     }
 
     function onReceiveAwake(responseCode, data) {
@@ -1096,18 +1154,136 @@ logMessage("onReceiveAwake:responseCode is " + responseCode);
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			}
         }
-        _sleep_timer.start(method(:delayedRetry), 500, false);
+        _sleep_timer.start(method(:stateMachine), 500, false);
+    }
+
+   function onReceiveVehicleState(responseCode, data) {
+logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
+        if (responseCode == 200) {
+			var response = data.get("response");
+			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
+				_lastTimeStamp = response.get("timestamp");
+				_data._vehicle_data.get("vehicle_state").put("sentry_mode", response.get("sentry_mode"));
+				_data._vehicle_data.get("vehicle_state").put("locked", response.get("locked"));
+				_data._vehicle_data.get("vehicle_state").put("fd_window", response.get("fd_window"));
+				_data._vehicle_data.get("vehicle_state").put("fp_window", response.get("fp_window"));
+				_data._vehicle_data.get("vehicle_state").put("rd_window", response.get("rd_window"));
+				_data._vehicle_data.get("vehicle_state").put("rp_window", response.get("rp_window"));
+				_data._vehicle_data.get("vehicle_state").put("df", response.get("df"));
+				_data._vehicle_data.get("vehicle_state").put("pf", response.get("pf"));
+				_data._vehicle_data.get("vehicle_state").put("dr", response.get("dr"));
+				_data._vehicle_data.get("vehicle_state").put("pr", response.get("pr"));
+				_data._vehicle_data.get("vehicle_state").put("ft", response.get("ft"));
+				_data._vehicle_data.get("vehicle_state").put("rt", response.get("rt"));
+			} else {
+logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
+			}
+        } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
+
+        _handler.invoke([1, null]);
+		Ui.requestUpdate();
+		_skipGetVehicleData = false;
+        stateMachine();
+    }
+
+   function onReceiveClimateState(responseCode, data) {
+logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
+        if (responseCode == 200) {
+			var response = data.get("response");
+			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
+				_lastTimeStamp = response.get("timestamp");
+				_data._vehicle_data.get("climate_state").put("is_climate_on", response.get("is_climate_on"));
+				_data._vehicle_data.get("climate_state").put("defrost_mode", response.get("defrost_mode"));
+				_data._vehicle_data.get("climate_state").put("battery_heater", response.get("battery_heater"));
+			} else {
+logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
+			}
+        } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
+
+        _handler.invoke([1, null]);
+		Ui.requestUpdate();
+		_skipGetVehicleData = false;
+        stateMachine();
+    }
+
+   function onReceiveChargeState(responseCode, data) {
+logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
+        if (responseCode == 200) {
+			var response = data.get("response");
+			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
+				_lastTimeStamp = response.get("timestamp");
+				_data._vehicle_data.get("charge_state").put("preconditioning_enabled", response.get("preconditioning_enabled"));
+				_data._vehicle_data.get("charge_state").put("scheduled_departure_time_minutes", response.get("scheduled_departure_time_minutes"));
+				_data._vehicle_data.get("charge_state").put("charge_port_door_open", response.get("charge_port_door_open"));
+			} else {
+logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
+			}
+        } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
+
+        _handler.invoke([1, null]);
+		Ui.requestUpdate();
+		_skipGetVehicleData = false;
+        stateMachine();
+    }
+
+    function getVehicleState() {
+logMessage("getVehicleState: Calling onReceiveVehicleState");
+		_tesla.getVehicleState(_vehicle_id, method(:onReceiveVehicleState));
+	}
+
+    function vehicleStateHandler(responseCode, data) {
+logMessage("vehicleStateHandler: responseCode is " + responseCode + " Calling getVehicleState");
+        if (responseCode == 200) {
+	        _handler_timer.start(method(:getVehicleState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
+		} else {  // Our call failed, say the error and back to the main code
+			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_skipGetVehicleData = false;
+			_handler_timer.start(method(:stateMachine), 500, false);
+		}
+    }
+
+    function getClimateState() {
+logMessage("getClimateState: Calling onReceiveClimateState");
+		_tesla.getClimateState(_vehicle_id, method(:onReceiveClimateState));
+	}
+
+    function climateStateHandler(responseCode, data) {
+logMessage("climateStateHandler: responseCode is " + responseCode + " Calling getClimateState");
+        if (responseCode == 200) {
+	        _handler_timer.start(method(:getClimateState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
+			return;
+		} else { // Our call failed, say the error and back to the main code
+			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_skipGetVehicleData = false;
+			_handler_timer.start(method(:stateMachine), 500, false);
+		}
+    }
+
+    function getChargeState() {
+logMessage("getChargeState: Calling onReceiveChargeState");
+		_tesla.getChargeState(_vehicle_id, method(:onReceiveChargeState));
+	}
+
+    function chargeStateHandler(responseCode, data) {
+logMessage("chargeStateHandler: responseCode is " + responseCode + " Calling getChargeState");
+        if (responseCode == 200) {
+	        _handler_timer.start(method(:getChargeState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
+			return;
+		} else { // Our call failed, say the error and back to the main code
+			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_skipGetVehicleData = false;
+			_handler_timer.start(method(:stateMachine), 500, false);
+		}
     }
 
     function genericHandler(responseCode, data) {
-logMessage("genericHandler:responseCode is " + responseCode);
+logMessage("genericHandler: responseCode is " + responseCode);
         if (responseCode == 200) {
             _handler.invoke([1, null]);
-			_408_count = 0;
-            stateMachine();
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
+        _handler_timer.start(method(:stateMachine), 500, false);
     }
 
     function _saveToken(token) {
