@@ -177,7 +177,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 
 // STEP 4 no longer required. Bearer access token given by step 3	
     function bearerForAccessOnReceive(responseCode, data) {
-logMessage("bearerForAccessOnReceive " + responseCode);
+//logMessage("bearerForAccessOnReceive " + responseCode);
         if (responseCode == 200) {
             _saveToken(data["access_token"]);
 //logMessage("StateMachine: bearerForAccessOnReceive");
@@ -201,7 +201,7 @@ logMessage("bearerForAccessOnReceive " + responseCode);
                 "client_id" => "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384",
                 "client_secret" => "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
             };
-logMessage("codeForBearerOnReceive data is " + data);
+//logMessage("codeForBearerOnReceive data is " + data);
 
             var bearerForAccessOptions = {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
@@ -256,7 +256,7 @@ logMessage("codeForBearerOnReceive data is " + data);
             _need_auth = true;
             _auth_done = false;
         	if (error == 404) {
-	            Application.getApp().setProperty("vehicle", null);
+				_vehicle_id = null;
 	        }
 //logMessage("onOAuthMessage " + responseCode);
             _resetToken();
@@ -421,7 +421,7 @@ logMessage("stateMachine:Asking to wake vehicle");
         }
 
         if (_set_climate_on) {
-logMessage("StateMachine: Climate On - calling climateStateHandler");
+//logMessage("StateMachine: Climate On - calling climateStateHandler");
             _set_climate_on = false;
 			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
@@ -429,7 +429,7 @@ logMessage("StateMachine: Climate On - calling climateStateHandler");
         }
 
         if (_set_climate_off) {
-logMessage("StateMachine: Climate Off - calling climateStateHandler");
+//logMessage("StateMachine: Climate Off - calling climateStateHandler");
             _set_climate_off = false;
 			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
@@ -481,7 +481,7 @@ logMessage("StateMachine: Climate Off - calling climateStateHandler");
         }
 
         if (_unlock) {
-logMessage("StateMachine: Unlock - calling vehicleStateHandler");
+//logMessage("StateMachine: Unlock - calling vehicleStateHandler");
             _unlock = false;
 			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
@@ -489,7 +489,7 @@ logMessage("StateMachine: Unlock - calling vehicleStateHandler");
         }
 
         if (_lock) {
-logMessage("StateMachine: Lock - calling vehicleStateHandler");
+//logMessage("StateMachine: Lock - calling vehicleStateHandler");
             _lock = false;
 			_skipGetVehicleData = true;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
@@ -578,7 +578,7 @@ logMessage("StateMachine: Lock - calling vehicleStateHandler");
 					seat_heat_chosen = 0;
 					break;
 			}
-logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
+//logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
 
             _handler.invoke([1, Ui.loadResource(seat_chosen)]);
 
@@ -610,12 +610,12 @@ logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_c
             _adjust_departure = false;
 			_skipGetVehicleData = true;
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-logMessage("StateMachine: Preconditionning off - calling chargeStateHandler");
+//logMessage("StateMachine: Preconditionning off - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
 	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), false);
 	        }
 	        else {
-logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
+//logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_start_departure)]);
 	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), true);
 	        }
@@ -639,7 +639,7 @@ logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
             if (_refreshTimeInterval == null) {
 				_refreshTimeInterval = 1000;
             }
-logMessage("refreshTimer at " + _refreshTimeInterval);
+//logMessage("refreshTimer at " + _refreshTimeInterval);
 		}
 		
 		if (_view_datascreen) {
@@ -664,7 +664,7 @@ logMessage("StateMachine: Skipping requesting data");
     function openVentConfirmed() {
 		_handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 //        Application.getApp().setProperty("venting", 4); Let onUpdate deal with that
-logMessage("StateMachine: Open vent - calling vehicleStateHandler");
+//logMessage("StateMachine: Open vent - calling vehicleStateHandler");
 		_skipGetVehicleData = true;
         _tesla.vent(_vehicle_id, method(:vehicleStateHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
@@ -672,7 +672,7 @@ logMessage("StateMachine: Open vent - calling vehicleStateHandler");
     function closeVentConfirmed() {
 	    _handler.invoke([1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 //        Application.getApp().setProperty("venting", 0); Let onUpdate deal with that
-logMessage("StateMachine: Close vent - calling vehicleStateHandler");
+//logMessage("StateMachine: Close vent - calling vehicleStateHandler");
 		_skipGetVehicleData = true;
         _tesla.vent(_vehicle_id, method(:vehicleStateHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
     }
@@ -942,7 +942,7 @@ logMessage("stateMachine: doPreviousPage");
 		// Tap on the space used by the 'Eye'
 		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
             _sentry_mode = true;
-logMessage("stateMachine: onTap");
+//logMessage("stateMachine: onTap");
             stateMachine();
 		}
 		// Tap on the middle text line where Departure is written
@@ -1029,10 +1029,24 @@ logMessage("onReceiveVehicles:responseCode is " + responseCode);
         if (responseCode == 200) {
             var vehicles = data.get("response");
             if (vehicles.size() > 0) {
-				_vehicle_state = vehicles[0].get("state");
-                _vehicle_id = vehicles[0].get("id");
+				// Need to retrieve the right vehicle, not just the first one!
+				var vehicle_index = 0;
+				var vehicle_name = Application.getApp().getProperty("vehicle_name");
+				if (vehicle_name != null) {
+					while (vehicle_index < vehicles.size()) {
+						if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
+							break;
+						}
+					}
+					if (vehicle_index == vehicles.size()) {
+						vehicle_index = 0;
+					}
+				}
+				_vehicle_state = vehicles[vehicle_index].get("state");
+                _vehicle_id = vehicles[vehicle_index].get("id");
                 Application.getApp().setProperty("vehicle", _vehicle_id);
-logMessage("onReceiveVehicles: Vehicle state is '" + _vehicle_state + "'");
+                Application.getApp().setProperty("vehicle_name", vehicles[vehicle_index].get("display_name"));
+logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
 				if (_vehicle_state.equals("online") == false) { // We're not awake, next iteration of StateMachine will call the wake function
 					_need_wake = true;
 					_wake_done = false;
@@ -1089,7 +1103,7 @@ logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec
 	                	_sleep_timer.start(method(:stateMachine), timeDelta, false);
 						return;
 					} else {
-logMessage("onReceiveVehicleData: Running StateMachine in at least 500 msec");
+logMessage("onReceiveVehicleData: Running StateMachine in no less than 500 msec");
 					}
 				} else {
 logMessage("onReceiveVehicleData: Received incomplete data, ignoring");
@@ -1111,9 +1125,7 @@ logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?"
         		_408_count++;
 			} else {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-		            Application.getApp().setProperty("vehicle", null);
-	                _resetToken();
-	                _need_auth = true;
+					_vehicle_id = null;
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 				} else if (responseCode == 401) {
 	                // Unauthorized, retry
@@ -1141,9 +1153,7 @@ logMessage("onReceiveAwake:responseCode is " + responseCode);
 			_need_wake = true;
 			_wake_done = false;
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-				Application.getApp().setProperty("vehicle", null);
-				_resetToken();
-				_need_auth = true;
+				_vehicle_id = null;
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			} else if (responseCode == 401) { // Unauthorized, retry
 				_resetToken();

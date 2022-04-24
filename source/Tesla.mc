@@ -203,7 +203,6 @@ class Tesla {
                 "auto_climate_on" => true
             };
 		}
-logMessage("Calling url " + url + " options at " + options);
         Communications.makeWebRequest(
             url,
             options,
@@ -297,7 +296,7 @@ logMessage("Calling url " + url + " options at " + options);
                 "preconditioning_weekdays_only" => false,
                 "off_peak_charging_enabled" => false,
                 "off_peak_charging_weekdays_only" => false,
-               "end_off_peak_time" => 360
+                "end_off_peak_time" => 360
             },
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,

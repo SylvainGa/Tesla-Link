@@ -21,7 +21,7 @@ class MainView extends Ui.View {
 			
         _display = Ui.loadResource(Rez.Strings.label_requesting_data);
         _bufferedText = _display;
-logMessage("MainView:initialize with _display at " + _display);
+//logMessage("MainView:initialize with _display at " + _display);
 
 		Application.getApp().setProperty("spinner", "-");
         if (Application.getApp().getProperty("refreshTimeInterval") == null) {
