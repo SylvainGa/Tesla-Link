@@ -408,11 +408,16 @@ logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = 
         }
 
         if (_need_wake) { // Asked to wake up
-            _need_wake = false; // Do it only once
-            _wake_done = false;
-
+			if (_firstTime) { // As if we should wake the vehicle
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake));
+	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
+	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
+			} else {
+				_need_wake = false; // Do it only once
+				_wake_done = false;
 logMessage("stateMachine:Asking to wake vehicle");
-			_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+			}
             return;
         }
 
@@ -469,7 +474,7 @@ logMessage("stateMachine:Asking to wake vehicle");
         if (_honk_horn) {
             _honk_horn = false;
             var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
-            var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed));
+            var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), null);
             Ui.pushView(view, delegate, Ui.SLIDE_UP);
         }
 
@@ -504,7 +509,7 @@ logMessage("stateMachine:Asking to wake vehicle");
 			}
 			else {
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
-	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed));
+	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), null);
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	        }
         }
@@ -517,7 +522,7 @@ logMessage("stateMachine:Asking to wake vehicle");
 			}
 			else {
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_trunk));
-	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed));
+	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), null);
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	        }
         }
@@ -532,7 +537,7 @@ logMessage("stateMachine:Asking to wake vehicle");
 	            	openVentConfirmed();
 	            } else {
 		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed));
+		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), null);
 		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 		        }
             }
@@ -542,7 +547,7 @@ logMessage("stateMachine:Asking to wake vehicle");
 	            	closeVentConfirmed();
 	            } else {
 		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed));
+		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), null);
 		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	            }
             }
@@ -659,6 +664,17 @@ logMessage("StateMachine: Already waiting for data, skipping");
 		} else {
 logMessage("StateMachine: Skipping requesting data");
 		}
+    }
+
+    function wakeConfirmed() {
+		_need_wake = false;
+		_wake_done = false;
+		_wakeTime = System.getTimer();
+		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+    }
+
+    function wakeCanceled() {
+		Ui.popView(SLIDE_IMMEDIATE);
     }
 
     function openVentConfirmed() {
