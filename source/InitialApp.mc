@@ -6,7 +6,7 @@ using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
 
 (:background)
-class QuickTesla extends App.AppBase {
+class TeslaLink extends App.AppBase {
 
     function initialize() {
         AppBase.initialize();
