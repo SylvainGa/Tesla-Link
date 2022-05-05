@@ -7,6 +7,10 @@
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
+	<setting propertyKey="@Properties.HansshowFrunk" title="@Strings.HansshowFrunk">
+		<settingConfig type="boolean" required="true"/>
+	</setting>
+
 	<setting propertyKey="@Properties.screenBottomLeft" title="@Strings.screenBottomLeft">
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>

@@ -694,9 +694,21 @@ logMessage("StateMachine: Skipping requesting data");
     }
 
     function frunkConfirmed() {
-        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_opened)]);
-		_skipGetVehicleData = true;
-        _tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
+		var hansshowFrunk = Application.getApp().getProperty("HansshowFrunk");
+		if (hansshowFrunk) {
+	        _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
+			_skipGetVehicleData = true;
+			_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
+		} else {
+			if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
+				_handler.invoke([1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
+				_skipGetVehicleData = true;
+				_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
+			} else {
+				_handler.invoke([1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
+	            _sleep_timer.start(method(:stateMachine), 500, false);
+			}
+		}
     }
 
     function trunkConfirmed() {

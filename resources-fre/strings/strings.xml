@@ -45,6 +45,7 @@
     <string id="label_error">Erreur: </string>
     <string id="label_frunk">Frunk</string>
     <string id="label_frunk_opening">Ouveture du frunk</string>
+    <string id="label_frunk_closing">Fermeture du frunk</string>
     <string id="label_frunk_opened">Frunk déjà ouvert</string>
     <string id="label_port">Port</string>
     <string id="label_getting_vehicles">Liste vehicules</string>
@@ -202,4 +203,5 @@
 	<string id="seat_medium">Moyen</string>
 	<string id="seat_high">Haut</string>
     <string id="label_should_we_wake">On réveil?</string>
+    <string id="HansshowFrunk">Possède un Hansshow frunk?</string>
 </strings>
