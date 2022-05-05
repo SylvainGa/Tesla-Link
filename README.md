@@ -1,18 +1,21 @@
-# Quick Tesla Widget
+# Tesla-Link Widget
 
-Quick Tesla Widget is a Garmin ConnectIQ widget for Tesla vehicle control.
+Tesla Link Widget is a Garmin ConnectIQ widget for Tesla vehicle control.
+
+Based on the work of srwalter and paulobrien and posted with their blessing. Link to their github is at the end of this file.
+My work includes enhancing the touch display interface, increased the reliability of the communication, added many features to the Option menu, added the selection/order of the Option menu and added data screens.
 
 <p align="center">
-  <img src="https://github.com/paulobrien/garmin-tesla/blob/develop/blob/venu2.png?raw=true" />
+  <img src="https://github.com/SylvainGa/Tesla-Link/blob/develop/blob/venu2.png?raw=true" />
 </p>
 
 ## Installation
 
-Install the widget from the [Connect IQ Store](https://apps.garmin.com/en-US/apps/f5f8b74f-f04a-4ad9-9575-231a33640475).
+Install the widget from the [Connect IQ Store](https://apps.garmin.com/en-US/apps/3ca805c7-b4e6-469e-a3fc-7a5c707fca54).
 
 ## Description
 
-Quick Tesla Widget allows you to quickly see and control your Tesla vehicle.
+Tesla Link Widget allows you to quickly see and control your Tesla vehicle.
 
 It is designed to load very fast and work reliably.
 
@@ -25,9 +28,9 @@ Features include:
 - touch and button based controls to suit your device
 - battery status in glance view with background service on supported devices
 
-Please raise an issue if anything doesn't work correctly, or if you use an unsupported Garmin device, via the [Github issues page](https://github.com/srwalter/garmin-tesla/issues).
+Please raise an issue if anything doesn't work correctly, or if you use an unsupported Garmin device, via the [Github issues page](https://github.com/SylvainGa/Tesla-Link/issues).
 
-If you like the widget, please consider [leaving a positive review](https://apps.garmin.com/en-US/apps/f5f8b74f-f04a-4ad9-9575-231a33640475).
+If you like the widget, please consider [leaving a positive review](https://apps.garmin.com/en-US/apps/3ca805c7-b4e6-469e-a3fc-7a5c707fca54).
 
 ## Donations
 

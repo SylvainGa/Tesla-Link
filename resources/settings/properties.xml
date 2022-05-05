@@ -1,5 +1,5 @@
 <properties>
-	<property id="AppVersion" type="string">6.1.0</property>
+	<property id="AppVersion" type="string">7.0.0</property>
 	<property id="refreshToken" type="string"></property>
 	<property id="enhancedTouch" type="boolean">false</property>
 	<property id="HansshowFrunk" type="boolean">false</property>
