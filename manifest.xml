@@ -4,6 +4,8 @@
     <iq:application entry="TeslaLink" id="45e8c365d140409c8663527e4235b260" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.2.0" name="@Strings.AppName" type="widget">
         <iq:products>
             <iq:product id="d2air"/>
+            <iq:product id="d2airx10"/>
+            <iq:product id="d2mach1"/>
             <iq:product id="descentmk2"/>
             <iq:product id="descentmk2s"/>
             <iq:product id="epix2"/>
@@ -35,6 +37,7 @@
             <iq:product id="marqgolfer"/>
             <iq:product id="venu"/>
             <iq:product id="venu2"/>
+            <iq:product id="venu2plus"/>
             <iq:product id="venu2s"/>
             <iq:product id="venud"/>
             <iq:product id="venusqm"/>
