@@ -231,6 +231,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
     }
 
     function onOAuthMessage(message) {
+logMessage("onOAuthMessage message: " + message);
         var code = message.data[$.OAUTH_CODE];
         var error = message.data[$.OAUTH_ERROR];
         if (message.data != null) {
