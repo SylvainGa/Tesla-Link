@@ -127,6 +127,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :data_screen) {
             _controller._view_datascreen = true;
             _controller.stateMachine();
+        } else if (item == :homelink) {
+            _controller._homelink = true;
+            _controller.stateMachine();
         }
     }
 

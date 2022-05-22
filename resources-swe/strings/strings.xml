@@ -151,12 +151,14 @@
     <string id="menu_label_sentry_off">Dis. Sentry</string>
     <string id="label_sentry_on">Sentry on</string>
     <string id="label_sentry_off">Sentry off</string>
+    <string id="label_homelink">Homelink</string>
     <string id="enhancedTouch">Enhanced touch experience?</string>
     <string id="screenBottomLeft">For screen bottom left</string>
     <string id="screenBottomRight">For screen bottom right</string>
     <string id="menu_label_wake">Force Wake</string>
     <string id="menu_label_refresh">Set refresh time</string>
     <string id="menu_label_datascreen">View data screen</string>
+    <string id="menu_label_homelink">Homelink</string>
     <string id="refresh_chooser_title">In msec</string>
     <string id="label_unauthorized">Unauthorized</string>
     <string id="subview_label_charge_limit_soc">Charge limit</string>

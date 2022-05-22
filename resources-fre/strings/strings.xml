@@ -151,12 +151,14 @@
     <string id="menu_label_sentry_off">Dés. Sentinelle</string>
     <string id="label_sentry_on">Sentinelle allumé</string>
     <string id="label_sentry_off">Sentinelle éteint</string>
+    <string id="label_homelink">Homelink</string>
     <string id="enhancedTouch">Touche améliorée?</string>
     <string id="screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="screenBottomRight">Au bas de l'écran à droite</string>
     <string id="menu_label_wake">Forcer un réveil</string>
     <string id="menu_label_refresh">temps de rafraichissement</string>
     <string id="menu_label_datascreen">Voir écran de données</string>
+    <string id="menu_label_homelink">Homelink</string>
     <string id="refresh_chooser_title">En milisec</string>
     <string id="label_unauthorized">Non autorisé</string>
     <string id="subview_label_charge_limit_soc">Charge limite</string>

@@ -327,4 +327,23 @@ class Tesla {
             notify
         );
     }
+
+    function homelink(vehicle, notify, lat, lon) {
+        var url = "https://owner-api.teslamotors.com/api/1/vehicles/" + vehicle.toString() + "/command/trigger_homelink";
+        Communications.makeWebRequest(
+            url,
+            {
+                "lat" => lat,
+                "lon" => lon
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
+    }
 }

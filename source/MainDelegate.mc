@@ -47,6 +47,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _code_verifier;
     var _adjust_departure;
     var _sentry_mode;
+	var _homelink;
 	var _408_count;
 	var _set_refresh_time;
 	var _view_datascreen;
@@ -126,12 +127,13 @@ logMessage("initialize:No token, will need to get one through a refresh token or
         _set_steering_wheel_heat = false;
         _adjust_departure = false;
         _sentry_mode = false;
+		_homelink = false;
 		_408_count = 0;
 		_set_refresh_time = false;
 		_view_datascreen = false;
 		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
 		if (_refreshTimeInterval == null) {
-			_refreshTimeInterval = 1000;
+			_refreshTimeInterval = 4000;
 		}
 
 		_skipGetVehicleData = false;
@@ -397,7 +399,7 @@ logMessage("StateMachine: Asking to test if we're awake");
             return;
         }
 
-logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = " + _408_count + " _need_wake = " + _need_wake);
+// 2022-05-21 logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = " + _408_count + " _need_wake = " + _need_wake);
 		if (_vehicle_state.equals("online") == false) { // Only matters if we're not online, otherwise be silent
             var timeAsking = System.getTimer() - _wakeTime;
             if (_firstTime) {
@@ -638,6 +640,13 @@ logMessage("stateMachine:Asking to wake vehicle");
             }
         }
 
+        if (_homelink) {
+logMessage("StateMachine: Homelink - calling vehicleStateHandler");
+            _homelink = false;
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_homelink)]);
+	        _tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+        }
+
 		if (_set_refresh_time) {
             _set_refresh_time = false;
             _refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
@@ -654,7 +663,7 @@ logMessage("stateMachine:Asking to wake vehicle");
 
 		if (!_skipGetVehicleData) {
 			if (!_waitingForVehicleData) {
-logMessage("StateMachine: Requesting data");
+// 2022-05-21 logMessage("StateMachine: Requesting data");
 				_lastDataRun = System.getTimer();
 				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
 				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
@@ -812,8 +821,8 @@ logMessage("stateMachine: doPreviousPage");
 		if (_index < 0) {
 			_index = 0;
 		}
-		else if (_index > 20) {
-			_index = 20;
+		else if (_index > 21) {
+			_index = 21;
 		}
 
 		switch (_index) {
@@ -900,24 +909,27 @@ logMessage("stateMachine: doPreviousPage");
 				}
 				break;
 			case 14:
-				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
+				menu.addItem(Rez.Strings.menu_label_homelink, :homelink);
 				break;
 			case 15:
-				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
+				menu.addItem(Rez.Strings.menu_label_toggle_view, :toggle_view);
 				break;
 			case 16:
-				menu.addItem(Rez.Strings.menu_label_datascreen, :data_screen);
+				menu.addItem(Rez.Strings.menu_label_swap_frunk_for_port, :swap_frunk_for_port);
 				break;
 			case 17:
-				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
+				menu.addItem(Rez.Strings.menu_label_datascreen, :data_screen);
 				break;
 			case 18:
-				menu.addItem(Rez.Strings.menu_label_reset, :reset);
+				menu.addItem(Rez.Strings.menu_label_select_car, :select_car);
 				break;
 			case 19:
-				menu.addItem(Rez.Strings.menu_label_wake, :wake);
+				menu.addItem(Rez.Strings.menu_label_reset, :reset);
 				break;
 			case 20:
+				menu.addItem(Rez.Strings.menu_label_wake, :wake);
+				break;
+			case 21:
 				menu.addItem(Rez.Strings.menu_label_refresh, :refresh);
 				break;
 		}
@@ -930,7 +942,7 @@ logMessage("stateMachine: doPreviousPage");
 
 		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
 		if (_slot_count == null) {
-			_slot_count = 17;
+			_slot_count = 16;
 		} else if (!(_slot_count instanceof Number)) {
 			_slot_count = _slot_count.toNumber();
 		}
@@ -1101,7 +1113,7 @@ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display
     }
 
     function onReceiveVehicleData(responseCode, data) {
-logMessage("onReceiveVehicleData: responseCode is " + responseCode);
+// 2022-05-21 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
 		_waitingForVehicleData = false;
 		
 		if (_skipGetVehicleData) {
@@ -1124,14 +1136,14 @@ logMessage("onReceiveVehicleData: Asked to skip");
 					_handler.invoke([0, null]);
 					Ui.requestUpdate(); // We got data! Now show it!
 					var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
-logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
+// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
 					timeDelta = _refreshTimeInterval - timeDelta;
 					if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
-logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec");
+// 2022-05-21 logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec");
 	                	_sleep_timer.start(method(:stateMachine), timeDelta, false);
 						return;
 					} else {
-logMessage("onReceiveVehicleData: Running StateMachine in no less than 500 msec");
+// 2022-05-21 logMessage("onReceiveVehicleData: Running StateMachine in no less than 500 msec");
 					}
 				} else {
 logMessage("onReceiveVehicleData: Received incomplete data, ignoring");
