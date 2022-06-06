@@ -119,7 +119,7 @@
 	<string id="menu_label_vent">Vent</string>
 	<string id="menu_label_vent_open">Start venting</string>
 	<string id="menu_label_vent_close">Stop venting</string>
-	<string id="menu_option_title">Options</string>
+	<string id="menu_option_title">Menu</string>
 	<string id="number_of_slots">How many filled slots?</string>
 	<string id="departure">Departure: </string>
 	<string id="menu_label_start_departure">Act. departure</string>

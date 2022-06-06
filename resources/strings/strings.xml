@@ -119,7 +119,7 @@
 	<string id="menu_label_vent">Vent</string>
 	<string id="menu_label_vent_open">Start venting</string>
 	<string id="menu_label_vent_close">Stop venting</string>
-	<string id="menu_option_title">Options</string>
+	<string id="menu_option_title">Menu</string>
 	<string id="number_of_slots">How many filled slots?</string>
 	<string id="departure">Departure: </string>
 	<string id="menu_label_start_departure">Act. departure</string>
@@ -169,10 +169,10 @@
     <string id="subview_label_charger_voltage">Charger voltage</string>
     <string id="subview_label_charger_actual_current">Charger current</string>
     <string id="subview_label_battery_heater">Battery Heater</string>
-    <string id="subview_label_driver_temp_setting">Driver temperature</string>
-    <string id="subview_label_passenger_temp_setting">Passenger temperature</string>
-    <string id="subview_label_inside_temp">Inside temperature</string>
-    <string id="subview_label_outside_temp">Outside temperature</string>
+    <string id="subview_label_driver_temp_setting">Driver temp</string>
+    <string id="subview_label_passenger_temp_setting">Passenger temp</string>
+    <string id="subview_label_inside_temp">Inside temp</string>
+    <string id="subview_label_outside_temp">Outside temp</string>
     <string id="subview_label_is_climate_on">Climate state</string>
     <string id="subview_label_is_front_defroster_on">Front defrost</string>
     <string id="subview_label_is_rear_defroster_on">Rear defrost</string>

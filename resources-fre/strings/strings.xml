@@ -119,7 +119,7 @@
 	<string id="menu_label_vent">Ventilé</string>
 	<string id="menu_label_vent_open">Ventiler</string>
 	<string id="menu_label_vent_close">Fermer fenêtres</string>
-	<string id="menu_option_title">Options</string>
+	<string id="menu_option_title">Menu</string>
 	<string id="number_of_slots">Combien d'emplacement utilisés ?</string>
 	<string id="departure">Départ : </string>
 	<string id="menu_label_start_departure">Act. départ</string>

@@ -97,7 +97,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
 	            lineValue[4].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
 	
-	            lineData = _data._vehicle_data.get("charge_state").get("est_battery_range").toFloat();
+	            lineData = _data._vehicle_data.get("charge_state").get("battery_range").toFloat();
 	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
 	            lineValue[5].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
