@@ -11,7 +11,7 @@ class NoGlanceDelegate extends Ui.BehaviorDelegate {
 
     function onSelect() {
         var view = new MainView(tesla_data);
-        Ui.pushView(view, new MainDelegate(tesla_data, view.method(:onReceive)), Ui.SLIDE_UP);
+        Ui.pushView(view, new MainDelegate(view, tesla_data, view.method(:onReceive)), Ui.SLIDE_UP);
         return true;
     }
 

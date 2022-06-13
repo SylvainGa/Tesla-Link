@@ -42,13 +42,15 @@ class TeslaLink extends App.AppBase {
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
         }
-        else
+        else if (System.getDeviceSettings().isTouchScreen)
         {
-// WHY? Worked well on my Venu without having this extra touch screen touch
-//            var view = new NoGlanceView();
-//            return [ view, new NoGlanceDelegate(data) ];
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
+		}
+		else
+		{
+            var view = new NoGlanceView();
+            return [ view, new NoGlanceDelegate(data) ];
         }        
     }
 }

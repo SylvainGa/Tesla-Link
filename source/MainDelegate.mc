@@ -169,6 +169,10 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 	}
 
     function onSwipe(swipeEvent) {
+        if (_settings.isTouchScreen) {
+            return false;
+        }
+
     	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
 	    	if (swipeEvent.getDirection() == 3) {
 				onReceive(1); // Show the first submenu
