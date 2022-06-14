@@ -38,7 +38,11 @@ class TeslaLink extends App.AppBase {
         var data = new TeslaData();
 		var useTouch = Application.getApp().getProperty("useTouch");
 		var hasTouch = System.getDeviceSettings().isTouchScreen;
-		if (useTouch == null || useTouch == true && hasTouch == false) {
+		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
+		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
+
+		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
+		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
 			useTouch = hasTouch;
 			Application.getApp().setProperty("useTouch", useTouch);
 		}
