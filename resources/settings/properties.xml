@@ -1,7 +1,8 @@
 <properties>
-	<property id="AppVersion" type="string">7.1.3</property>
+	<property id="AppVersion" type="string">7.2.0</property>
 	<property id="refreshToken" type="string"></property>
-	<property id="serverLocation" type="string">owner-api.teslamotors.com</property>
+	<property id="serverAPILocation" type="string">owner-api.teslamotors.com</property>
+	<property id="serverAUTHLocation" type="string">auth.tesla.com</property>
 	<property id="enhancedTouch" type="boolean">false</property>
 	<property id="useTouch" type="boolean">true</property>
 	<property id="HansshowFrunk" type="boolean">false</property>

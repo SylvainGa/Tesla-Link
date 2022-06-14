@@ -471,7 +471,11 @@
 		<settingConfig type="alphaNumeric" />
 	</setting>
 
-	<setting propertyKey="@Properties.serverLocation" title="@Strings.settings_server_location_label" prompt="@Strings.settings_server_location_prompt">
+	<setting propertyKey="@Properties.serverAPILocation" title="@Strings.settings_api_server_location_label" prompt="@Strings.settings_server_location_prompt">
+		<settingConfig type="alphaNumeric" />
+	</setting>
+
+	<setting propertyKey="@Properties.serverAUTHLocation" title="@Strings.settings_auth_server_location_label" prompt="@Strings.settings_server_location_prompt">
 		<settingConfig type="alphaNumeric" />
 	</setting>
 </settings>

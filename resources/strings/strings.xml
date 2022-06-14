@@ -207,6 +207,7 @@
 	<string id="seat_high">High</string>
     <string id="label_should_we_wake">Should we wake?</string>
     <string id="HansshowFrunk">Has a Hansshow powered frunk?</string>
-    <string id="settings_server_location_label">Location of Tesla's servers?</string>
-    <string id="settings_server_location_prompt">Enter auth.tesla.com for China or owner-api.teslamotors.com for the rest of the world</string>
+    <string id="settings_api_server_location_label">Location of Tesla's API servers?</string>
+    <string id="settings_auth_server_location_label">Location of Tesla's Auth servers?</string>
+    <string id="settings_server_location_prompt">Enter the server domain name</string>
 </strings>
