@@ -153,6 +153,7 @@
     <string id="label_sentry_off">Sentinelle éteint</string>
     <string id="label_homelink">Homelink</string>
     <string id="enhancedTouch">Touche améliorée?</string>
+    <string id="useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile)?</string>
     <string id="screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="screenBottomRight">Au bas de l'écran à droite</string>
     <string id="menu_label_wake">Forcer un réveil</string>
@@ -206,4 +207,6 @@
 	<string id="seat_high">Haut</string>
     <string id="label_should_we_wake">On réveil?</string>
     <string id="HansshowFrunk">Possède un Hansshow frunk?</string>
+    <string id="settings_server_location_label">Location des serveurs Tesla</string>
+    <string id="settings_server_location_prompt">Entrez auth.tesla.com pour la Chine ou owner-api.teslamotors.com pour le reste du monde</string>
 </strings>

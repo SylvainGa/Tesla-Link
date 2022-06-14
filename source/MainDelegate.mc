@@ -169,10 +169,6 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 	}
 
     function onSwipe(swipeEvent) {
-        if (_settings.isTouchScreen) {
-            return false;
-        }
-
     	if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
 	    	if (swipeEvent.getDirection() == 3) {
 				onReceive(1); // Show the first submenu
@@ -201,7 +197,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
 
     function codeForBearerOnReceive(responseCode, data) {
         if (responseCode == 200) {
-            var bearerForAccessUrl = "https://owner-api.teslamotors.com/oauth/token";
+            var bearerForAccessUrl = "https://" + Application.getApp().getProperty("serverLocation") + "/oauth/token";
             var bearerForAccessParams = {
                 "grant_type" => "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "client_id" => "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384",
@@ -239,13 +235,13 @@ logMessage("onOAuthMessage message: " + message);
         var code = message.data[$.OAUTH_CODE];
         var error = message.data[$.OAUTH_ERROR];
         if (message.data != null) {
-            var codeForBearerUrl = "https://auth.tesla.com/oauth2/v3/token";
+            var codeForBearerUrl = "https://" + Application.getApp().getProperty("serverLocation") + "/oauth2/v3/token";
             var codeForBearerParams = {
                 "grant_type" => "authorization_code",
                 "client_id" => "ownerapi",
                 "code" => code,
                 "code_verifier" => _code_verifier,
-                "redirect_uri" => "https://auth.tesla.com/void/callback"
+                "redirect_uri" => "https://" + Application.getApp().getProperty("serverLocation") + "/void/callback"
             };
 
             var codeForBearerOptions = {
@@ -296,7 +292,7 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
     }
 
     function GetAccessToken(token, notify) {
-        var url = "https://auth.tesla.com/oauth2/v3/token";
+        var url = "https://" + Application.getApp().getProperty("serverLocation") + "/oauth2/v3/token";
         Communications.makeWebRequest(
             url,
             {
@@ -363,7 +359,7 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 	                "client_id" => "ownerapi",
 	                "code_challenge" => code_challenge,
 	                "code_challenge_method" => "S256",
-	                "redirect_uri" => "https://auth.tesla.com/void/callback",
+	                "redirect_uri" => "https://" + Application.getApp().getProperty("serverLocation") + "/void/callback",
 	                "response_type" => "code",
 	                "scope" => "openid email offline_access",
 	                "state" => "123"                
@@ -373,9 +369,9 @@ logMessage("stateMachine: Asking for access token through user credentials ");
 	
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
 	            Communications.makeOAuthRequest(
-	                "https://auth.tesla.com/oauth2/v3/authorize",
+	                "https://" + Application.getApp().getProperty("serverLocation") + "/oauth2/v3/authorize",
 	                params,
-	                "https://auth.tesla.com/void/callback",
+	                "https://" + Application.getApp().getProperty("serverLocation") + "/void/callback",
 	                Communications.OAUTH_RESULT_TYPE_URL,
 	                {
 	                    "code" => $.OAUTH_CODE,
@@ -737,7 +733,7 @@ logMessage("StateMachine: Skipping requesting data");
     }
 
     function onSelect() {
-        if (_settings.isTouchScreen) {
+        if (Application.getApp().getProperty("useTouch")) {
             return false;
         }
 
@@ -756,7 +752,7 @@ logMessage("stateMachine: doSelect");
     }
 
     function onNextPage() {
-        if (_settings.isTouchScreen) {
+        if (Application.getApp().getProperty("useTouch")) {
             return false;
         }
 
@@ -775,7 +771,7 @@ logMessage("stateMachine: doNextPage");
     }
 
     function onPreviousPage() {
-        if (_settings.isTouchScreen) {
+        if (Application.getApp().getProperty("useTouch")) {
             return false;
         }
 
@@ -805,7 +801,7 @@ logMessage("stateMachine: doPreviousPage");
     }
 
     function onMenu() {
-        if (_settings.isTouchScreen) {
+        if (Application.getApp().getProperty("useTouch")) {
             return false;
         }
 

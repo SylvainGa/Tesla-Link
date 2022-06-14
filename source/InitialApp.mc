@@ -36,13 +36,19 @@ class TeslaLink extends App.AppBase {
         }
 
         var data = new TeslaData();
+		var useTouch = Application.getApp().getProperty("useTouch");
+		var hasTouch = System.getDeviceSettings().isTouchScreen;
+		if (useTouch == null || useTouch == true && hasTouch == false) {
+			useTouch = hasTouch;
+			Application.getApp().setProperty("useTouch", useTouch);
+		}
         
         if (Application.getApp().getProperty("canGlance"))
         {
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
         }
-        else if (System.getDeviceSettings().isTouchScreen)
+        else if (useTouch)
         {
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];

@@ -7,6 +7,10 @@
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
+	<setting propertyKey="@Properties.useTouch" title="@Strings.useTouch">
+		<settingConfig type="boolean" required="true"/>
+	</setting>
+
 	<setting propertyKey="@Properties.HansshowFrunk" title="@Strings.HansshowFrunk">
 		<settingConfig type="boolean" required="true"/>
 	</setting>
@@ -47,7 +51,7 @@
 			<listEntry value="11">@Strings.menu_label_open_trunk</listEntry>
 			<listEntry value="12">@Strings.menu_label_open_port</listEntry>
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
-			<listEntry value="14">@Strings.menu_label_homelink</listEntry>
+<listEntry value="14">@Strings.menu_label_homelink</listEntry>
 			<listEntry value="15">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="16">@Strings.menu_label_swap_frunk_for_port</listEntry>
 			<listEntry value="17">@Strings.menu_label_datascreen</listEntry>
@@ -464,6 +468,10 @@
 	</setting>
 
 	<setting propertyKey="@Properties.refreshToken" title="@Strings.setting_token_label" prompt="@Strings.setting_token_prompt">
+		<settingConfig type="alphaNumeric" />
+	</setting>
+
+	<setting propertyKey="@Properties.serverLocation" title="@Strings.settings_server_location_label" prompt="@Strings.settings_server_location_prompt">
 		<settingConfig type="alphaNumeric" />
 	</setting>
 </settings>

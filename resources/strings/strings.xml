@@ -153,6 +153,7 @@
     <string id="label_sentry_off">Sentry off</string>
     <string id="label_homelink">Homelink</string>
     <string id="enhancedTouch">Enhanced touch experience?</string>
+    <string id="useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
     <string id="screenBottomLeft">For screen bottom left</string>
     <string id="screenBottomRight">For screen bottom right</string>
     <string id="menu_label_wake">Force Wake</string>
@@ -206,4 +207,6 @@
 	<string id="seat_high">High</string>
     <string id="label_should_we_wake">Should we wake?</string>
     <string id="HansshowFrunk">Has a Hansshow powered frunk?</string>
+    <string id="settings_server_location_label">Location of Tesla's servers?</string>
+    <string id="settings_server_location_prompt">Enter auth.tesla.com for China or owner-api.teslamotors.com for the rest of the world</string>
 </strings>
