@@ -1,0 +1,213 @@
+<strings>
+    <string id="AppName">Tesla Link</string>
+    <string id="AppVersionTitle">App Version</string>
+    <string id="car_chooser_title">Wähle eine VIN aus</string>
+
+    <!--  Glance view -->
+    <string id="wake" scope="glance">Wach </string>
+    <string id="vehicle" scope="glance">Fahrzeug</string>
+    <string id="label_asleep" scope="background">Schläft</string>
+    <string id="label_status_unknown" scope="glance">Status unbekannt</string>
+
+    <!-- No glance view -->
+    <string id="label_touch">Touch Screen</string>
+    <string id="label_press">Drücke Start</string>
+    <string id="label_connect">um zu verbinden</string>
+    
+	<!--  Main layout -->
+    <string id="prompt">Tesla</string>
+    <string id="label_offline1">Telefonverbindung</string>
+    <string id="label_offline2">wird benötigt</string>
+
+	<!--  Tesla layout -->
+    <string id="button_climate_on">Belüftung</string>
+    <string id="button_door">Tür</string>
+    <string id="button_frunk">Frunk</string>
+
+	<!--  Option menu -->
+    <string id="menu_label_reset">Zurücksetzen</string>
+    <string id="menu_label_honk">Hupen</string>
+    <string id="menu_label_open_port">Ladeanschluss öffnen</string>
+    <string id="menu_label_open_frunk">Frunk öffnen</string>
+    <string id="menu_label_open_frunk_open">Frunk öffnen</string>
+    <string id="menu_label_open_frunk_opened">Frunk geöffnet</string>
+    <string id="menu_label_toggle_view">Anzeige ändern</string>
+    <string id="menu_label_swap_frunk_for_port">Alternativer Kofferraum/Frunk/Ladeport</string>
+    <string id="menu_label_select_car">Wähle Farzeug aus</string>
+
+    <string id="setting_token_label">API REFRESH Token (optional) </string>
+    <string id="setting_token_prompt">Gib deinen Tesla Account token ein</string>
+
+	<!--  Second view -->
+    <string id="label_cabin">Innenraum: </string>
+    <string id="label_charge">Ladung: </string>
+    <string id="label_climate">Belüftung: </string>
+    <string id="label_error">Fehler: </string>
+    <string id="label_frunk">Frunk</string>
+    <string id="label_frunk_opening">Frunk öffnet</string>
+    <string id="label_frunk_closing">Frunk schließt</string>
+    <string id="label_frunk_opened">Frunk ist bereits geöffnet</string>
+    <string id="label_port">Ladeanschluss</string>
+    <string id="label_getting_vehicles">Getting vehicles</string>
+    <string id="label_honk">Hupen</string>
+    <string id="label_open_port">Öffne Ladeanschluss</string>
+    <string id="label_hvac_on">Belüftung an</string>
+    <string id="label_hvac_off">Belüftung aus</string>
+    <string id="label_lock_doors">Türen verschließen</string>
+    <string id="label_locked">Verschlossen</string>
+    <string id="label_login_on_phone">Logge dich auf dem Smartphone ein!</string>
+    <string id="label_oauth_error">OAuth Fehler</string>
+    <string id="label_off">AUS</string>
+    <string id="label_on">AN</string>
+    <string id="label_open_frunk">Frunk öffnen?</string>
+    <string id="label_requesting_data">Empfange Daten</string>
+    <string id="label_unlock_doors">Öffne Türen</string>
+    <string id="label_unlocked">Geöffnet</string>
+    <string id="label_waking_vehicle">Wecke Fahrzeug auf</string>
+    <string id="label_no_vehicles">Keine Fahrzeuge</string>
+
+	<!--  SG Addition. Needs to be moved to their corresponding section -->
+    <string id="menu_label_adjust_departure">Passe Abfahrtszeit an</string>
+    <string id="menu_label_set_temp">Ändere Temperatur</string>
+    <string id="temp_chooser_title">Ändere Temperatur auf</string>
+    <string id="label_honk_horn">Hupe betätigen?</string>
+    <string id="label_trunk">Kofferraum</string>
+    <string id="label_trunk_opening">Kofferraum öffnet</string>
+    <string id="label_trunk_closing">Kofferraum schließt</string>
+    <string id="menu_label_open_trunk">Kofferraum öffnen</string>
+    <string id="menu_label_open_trunk_open">Kofferraum öffnen</string>
+    <string id="menu_label_open_trunk_close">Kofferraum schließen</string>
+    <string id="label_open_trunk">Kofferraum öffnen?</string>
+	<string id="frunk">Frunk</string>
+	<string id="trunk">Kofferraum</string>
+	<string id="port">Ladeanschluss</string>
+	<string id="vent">Fensterspalt</string>
+    <string id="label_open_vent">Fensterspalt öffnen?</string>
+    <string id="label_close_vent">Fensterspalt schließen?</string>
+    <string id="label_vent_opening">Fensterspalt geöffnet</string>
+    <string id="label_vent_closing">Fensterspalt geschlossen</string>
+    <string id="label_frunktrunkport">Auswählen</string>
+    <string id="menu_label_set_charging_amps">Ändere Ladestrom</string>
+    <string id="menu_label_set_charging_limit">Ändere Ladegrenze</string>
+    <string id="menu_label_start_charging">Ladung starten</string>
+    <string id="menu_label_stop_charging">Ldung stoppen</string>
+    <string id="menu_label_start_stop_charging">Ladung starten/stoppen</string>
+    <string id="amps_chooser_title">Ändere Ladestrom auf</string>
+    <string id="charginglimit_chooser_title">Ändere Ladegrenze auf</string>
+    <string id="menu_label_set_seat_heat">Sitzheizung</string>
+    <string id="menu_label_set_steering_wheel_heat">Lenkradheizung</string>
+    <string id="menu_label_set_steering_wheel_heat_on">Lenkradheizung einschalten</string>
+    <string id="menu_label_set_steering_wheel_heat_off">Lenkradheizung ausschalten</string>
+	<string id="temp_choose_seat">Für welchen Sitz?</string>
+	<string id="temp_choose_heat">Auf welche Stufe?</string>
+	<string id="seat_driver">Fahrer</string>
+	<string id="seat_passenger">Beifahrer</string>
+	<string id="seat_rear_left">Rückbank Links</string>
+	<string id="seat_rear_center">Rückbank mittig</string>
+	<string id="seat_rear_right">Rückbank rechts</string>
+	<string id="seat_front">Sitze vorne</string>
+	<string id="seat_rear">Sitze Rückbank</string>
+	<string id="label_steering_wheel_on">Lenkradheizung aktiv</string>
+ 	<string id="label_steering_wheel_off">Lankradheizung inaktiv </string>
+ 	<string id="label_steering_wheel_need_climate_on">Lüftung muss eingeschaltet sein</string>
+	<string id="menu_label_defrost">Enteisung</string>
+	<string id="menu_label_defrost_on">Starte Enteisung</string>
+	<string id="menu_label_defrost_off">Stoppe Enteisung</string>
+	<string id="label_defrost_on">Enteisung aktiv</string>
+	<string id="label_defrost_off">Enteisung nicht aktiv</string>
+	<string id="label_defrost">Enteisung</string>
+	<string id="menu_label_vent">Fensterspalt</string>
+	<string id="menu_label_vent_open">Fensterspalt öffnen</string>
+	<string id="menu_label_vent_close">Fensterspalt schließen</string>
+	<string id="menu_option_title">Menü</string>
+	<string id="number_of_slots">Wieviele Funktionen sollen auswählbar sein? (1-16)</string>
+	<string id="departure">Abfahrt: </string>
+	<string id="menu_label_start_departure">Akt. gepl. Abfahrt</string>
+	<string id="menu_label_stop_departure">Deakt. gepl. Abfahrt</string>
+	<string id="label_start_departure">Gepl. Abfahrt aktivivert</string>
+	<string id="label_stop_departure">Gepl. Abfahrt deativiert</string>
+	<string id="OptionMenu_1">Funktion 1</string>
+	<string id="OptionMenu_2">Funktion 2</string>
+	<string id="OptionMenu_3">Funktion 3</string>
+	<string id="OptionMenu_4">Funktion 4</string>
+	<string id="OptionMenu_5">Funktion 5</string>
+	<string id="OptionMenu_6">Funktion 6</string>
+	<string id="OptionMenu_7">Funktion 7</string>
+	<string id="OptionMenu_8">Funktion 8</string>
+	<string id="OptionMenu_9">Funktion 9</string>
+	<string id="OptionMenu_10">Funktion 10</string>
+	<string id="OptionMenu_11">Funktion 11</string>
+	<string id="OptionMenu_12">Funktion 12</string>
+	<string id="OptionMenu_13">Funktion 13</string>
+	<string id="OptionMenu_14">Funktion 14</string>
+	<string id="OptionMenu_15">Funktion 15</string>
+	<string id="OptionMenu_16">Funktion 16</string>
+    <string id="timePickerTitle">Geplant für?</string>
+    <string id="timeSeparator">:</string>
+    <string id="morning">AM</string>
+    <string id="afternoon">PM</string>
+    <string id="menu_label_sentry">Überwachungsmodus</string>
+    <string id="menu_label_sentry_on">Akt. Überwachung</string>
+    <string id="menu_label_sentry_off">Deakt. Überwachung</string>
+    <string id="label_sentry_on">Überwachung AN</string>
+    <string id="label_sentry_off">Überwachung AUS</string>
+    <string id="label_homelink">Homelink</string>
+    <string id="enhancedTouch">Verbesserte Touch-Funktionen?</string>
+    <string id="useTouch">Nutze Touch (für Geräte mit Knöpfen und Touchscreen)?</string>
+    <string id="screenBottomLeft">Für Bildschirmbereich unten links</string>
+    <string id="screenBottomRight">Für Bildschirmbereich unten rechts</string>
+    <string id="menu_label_wake">Erzwinge Aufwachen</string>
+    <string id="menu_label_refresh">Ändere Aktualisierungsintervall</string>
+    <string id="menu_label_datascreen">Zeige detaillierte Datensicht</string>
+    <string id="menu_label_homelink">Homelink</string>
+    <string id="refresh_chooser_title">In msec</string>
+    <string id="label_unauthorized">Nicht berechtigt</string>
+    <string id="subview_label_charge_limit_soc">Ladeobergrenze</string>
+    <string id="subview_label_battery_level">Batterie Ladestand</string>
+    <string id="subview_label_charge_miles_added_rated">Aufgeladene Reichweite</string>
+    <string id="subview_label_est_battery_range">Geschätzte Gesamtreichweite</string>
+    <string id="subview_label_minutes_to_full_charge">Zeit bis Ladelimit</string>
+    <string id="subview_label_charger_voltage">Aktuelle Spannung</string>
+    <string id="subview_label_charger_actual_current">Aktuelle Stromstärke</string>
+    <string id="subview_label_battery_heater">Batterieheizung</string>
+    <string id="subview_label_driver_temp_setting">Temp. Lüftung Fahrer</string>
+    <string id="subview_label_passenger_temp_setting">Temp. Lüftung Beifahrer</string>
+    <string id="subview_label_inside_temp">Innenraumtemp.</string>
+    <string id="subview_label_outside_temp">Außentemp.</string>
+    <string id="subview_label_is_climate_on">Belüftung</string>
+    <string id="subview_label_is_front_defroster_on">Enteisung vorne</string>
+    <string id="subview_label_is_rear_defroster_on">Enteisung hinten</string>
+    <string id="subview_label_side_mirror_heaters">Außenspiegelheiz.</string>
+    <string id="subview_label_seat_heater_left">Fahrersitzheiz.</string>
+    <string id="subview_label_seat_heater_right">Beifahrersitzheiz.</string>
+    <string id="subview_label_steering_wheel_heater">Lenkradheiz.</string>
+    <string id="subview_label_wiper_blade_heater">Scheibenwischerheiz.</string>
+    <string id="subview_label_climate_keeper_mode">???</string>
+    <string id="subview_label_allow_cabin_overheat_protection">Überhitzungsschutz</string>
+    <string id="subview_label_supports_fan_only_cabin_overheat_protection">Kühlen ohne Klima</string>
+    <string id="subview_label_cabin_overheat_protection_actively_cooling">Kühlen mit Klima</string>
+    <string id="subview_label_shift_state">Getriebestatus</string>
+    <string id="subview_label_speed">Geschwindigkeit</string>
+    <string id="subview_label_heading">Richtung</string>
+    <string id="subview_label_power">Leistung</string>
+    <string id="subview_label_compass">N,NNO,NO,ONO,O,OSO,SO,SSO,S,SSW,SW,WSW,W,WNW,NW,NNW</string>
+    <string id="subview_label_charge_data_1_2">Ladeinformation (1/2)</string>
+    <string id="subview_label_charge_data_2_2">Ladeinformation (2/2)</string>
+    <string id="subview_label_climate_data_1_4">Lüftung &amp; Heizung (1/4)</string>
+    <string id="subview_label_climate_data_2_4">Lüftung &amp; Heizung (2/4)</string>
+    <string id="subview_label_climate_data_3_4">Lüftung &amp; Heizung (3/4)</string>
+    <string id="subview_label_climate_data_4_4">Lüftung &amp; Heizung (4/4)</string>
+    <string id="subview_label_drive_data_1_1">Fahrtdaten (1/1)</string>
+    <string id="subview_label_parked">Geparkt</string>
+    <string id="label_no_phone_internet">Telefon ist nicht mit dem\n Internet verbunden</string>
+	<string id="seat_auto">Auto</string>
+	<string id="seat_off">Aus</string>
+	<string id="seat_low">Niedrig</string>
+	<string id="seat_medium">Mittel</string>
+	<string id="seat_high">Hoch</string>
+    <string id="label_should_we_wake">Fahrzeug aufwecken?</string>
+    <string id="HansshowFrunk">Fahrzeug hat elektr. Frunk von Hansshow?</string>
+    <string id="settings_api_server_location_label">Standort des Tesla API servers?</string>
+    <string id="settings_auth_server_location_label">Standort des Tesla Auth servers?</string>
+    <string id="settings_server_location_prompt">Gib den Server domain name ein</string>
+</strings>
