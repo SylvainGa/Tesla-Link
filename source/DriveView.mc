@@ -62,7 +62,7 @@ class DriveView extends Ui.View {
             var is_touchscreen = System.getDeviceSettings().isTouchScreen;
 
 			// Read temperature unit from the watch settings
-			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+			//Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
 
             // We're loading the image layout
             setLayout(Rez.Layouts.DataScreenLayout(dc));
@@ -98,8 +98,8 @@ logMessage("_viewOffset is " + _viewOffset);
 				if (lineData == null) {
 					lineData = 0;
 				}
-	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
-	            lineValue[3].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? " miles" : " km"));
+	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
+	            lineValue[3].setText(lineData.toNumber().toString() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km"));
 
 	            lineData = _data._vehicle_data.get("drive_state").get("heading").toFloat();
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_heading));

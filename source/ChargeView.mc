@@ -62,7 +62,7 @@ class ChargeView extends Ui.View {
             var is_touchscreen = System.getDeviceSettings().isTouchScreen;
 
 			// Read temperature unit from the watch settings
-			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+			//Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
 
             // We're loading the image layout
             setLayout(Rez.Layouts.DataScreenLayout(dc));
@@ -93,14 +93,14 @@ logMessage("_viewOffset is " + _viewOffset);
 	            lineValue[3].setText(lineData.toString() + "%");
 	
 	            lineData = _data._vehicle_data.get("charge_state").get("charge_miles_added_rated").toFloat();
-	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
-	            lineValue[4].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	            lineValue[4].setText(lineData.toNumber().toString() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
 	
 	            lineData = _data._vehicle_data.get("charge_state").get("battery_range").toFloat();
-	            lineData *=  (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
-	            lineValue[5].setText(lineData.toNumber().toString() + (Application.getApp().getProperty("imperial") ? "miles" : "km"));
+	            lineValue[5].setText(lineData.toNumber().toString() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
 	
 			}
 			else if (_viewOffset == 4) {

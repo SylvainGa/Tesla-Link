@@ -1,4 +1,5 @@
 using Toybox.WatchUi as Ui;
+using Toybox.System;
 
 class OptionMenuDelegate extends Ui.MenuInputDelegate {
     var _controller;
@@ -52,7 +53,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             var max_temp = _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
             var min_temp = _controller._data._vehicle_data.get("climate_state").get("min_avail_temp");
             
-            if (Application.getApp().getProperty("imperial")) {
+            if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
             	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
             	max_temp = max_temp * 9.0 / 5.0 + 32.0;
             	min_temp = min_temp * 9.0 / 5.0 + 32.0;

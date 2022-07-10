@@ -114,7 +114,7 @@ logMessage("Showing Message " + _display);
             Application.getApp().setProperty("image_view", use_image_layout);
 
 			// Read temperature unit from the watch settings
-			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+			//Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
 
             // Swap frunk for port?
             // New value : Frunk = 0, Trunk = 1. Port = 2
@@ -214,8 +214,11 @@ logMessage("Showing Message " + _display);
                 var battery_level = _data._vehicle_data.get("charge_state").get("battery_level");
                 var charge_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
                 var charging_state = _data._vehicle_data.get("charge_state").get("charging_state");
-                var inside_temp = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
-                var inside_temp_local = Application.getApp().getProperty("imperial") ? ((inside_temp*9/5) + 32) + "°F" : inside_temp + "°C";
+                var inside_temp = _data._vehicle_data.get("climate_state").get("inside_temp");
+                var inside_temp_local = "???";
+                if (inside_temp != null) {
+                    inside_temp_local = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp.toNumber()*9/5) + 32) + "°F" : inside_temp.toNumber() + "°C";
+                }
                 var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
 				var latitude = _data._vehicle_data.get("drive_state").get("latitude");
 				var longitude = _data._vehicle_data.get("drive_state").get("longitude");

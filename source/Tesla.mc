@@ -32,7 +32,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -101,7 +102,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -141,7 +143,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -162,7 +165,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -182,7 +186,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -216,7 +221,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -236,7 +242,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -255,7 +262,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -274,7 +282,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -312,7 +321,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -332,7 +342,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -352,7 +363,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },

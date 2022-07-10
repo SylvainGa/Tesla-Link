@@ -40,13 +40,27 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (responseCode == 200) {
             var vehicle_data = responseData.get("response");    
             var battery_level = vehicle_data.get("charge_state").get("battery_level");
-            var battery_range = vehicle_data.get("charge_state").get("battery_range") * (Application.getApp().getProperty("imperial") ? 1.0 : 1.6);
+            var battery_range = vehicle_data.get("charge_state").get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
             var charging_state = vehicle_data.get("charge_state").get("charging_state");
 
-            data.put("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + " @ " + System.getClockTime().hour.format("%d")+":"+System.getClockTime().min.format("%02d"));
+            var suffix;
+            try {
+                var clock_time = System.getClockTime();
+                suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+            } catch (e) {
+                suffix = "";
+            }
+            data.put("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + suffix);
             Background.exit(data);
         } else if (responseCode == 408) {
-            data.put("status", Application.loadResource(Rez.Strings.label_asleep) + " @ " + System.getClockTime().hour.format("%d")+":"+System.getClockTime().min.format("%02d"));
+            var suffix;
+            try {
+                var clock_time = System.getClockTime();
+                suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+            } catch (e) {
+                suffix = "";
+            }
+            data.put("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
             Background.exit(data);
         } else {
             Background.exit(data);

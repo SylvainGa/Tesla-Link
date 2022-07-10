@@ -62,7 +62,7 @@ class ClimateView extends Ui.View {
             var is_touchscreen = System.getDeviceSettings().isTouchScreen;
 
 			// Read temperature unit from the watch settings
-			Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
+			//Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
 
             // We're loading the image layout
             setLayout(Rez.Layouts.DataScreenLayout(dc));
@@ -87,7 +87,7 @@ logMessage("_viewOffset is " + _viewOffset);
 
 	            lineData = _data._vehicle_data.get("climate_state").get("driver_temp_setting").toNumber();
 	            lineUnit = "°C";
-		        if (Application.getApp().getProperty("imperial")) {
+		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
 					lineUnit = "°F";
 		        }
@@ -96,7 +96,7 @@ logMessage("_viewOffset is " + _viewOffset);
 
 	            lineData = _data._vehicle_data.get("climate_state").get("passenger_temp_setting").toNumber();
 	            lineUnit = "°C";
-		        if (Application.getApp().getProperty("imperial")) {
+		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
 					lineUnit = "°F";
 		        }
@@ -105,7 +105,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	
 	            lineData = _data._vehicle_data.get("climate_state").get("inside_temp").toNumber();
 	            lineUnit = "°C";
-		        if (Application.getApp().getProperty("imperial")) {
+		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
 					lineUnit = "°F";
 		        }
@@ -114,7 +114,7 @@ logMessage("_viewOffset is " + _viewOffset);
 	
 	            lineData = _data._vehicle_data.get("climate_state").get("outside_temp").toNumber();
 	            lineUnit = "°C";
-		        if (Application.getApp().getProperty("imperial")) {
+		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
 					lineUnit = "°F";
 		        }

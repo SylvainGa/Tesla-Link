@@ -19,7 +19,7 @@ class TemperaturePicker extends WatchUi.Picker {
 
         var title = new WatchUi.Text({:text=>Rez.Strings.temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
-        if (Application.getApp().getProperty("imperial")) {
+        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
  	    	var startPos = [temperature.toNumber() - min_temp.toNumber()];
 	        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(min_temp.toNumber(), max_temp.toNumber(), 1, {:format=>"%2d"})], :defaults=>startPos});
         }
@@ -61,7 +61,7 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         _temperature = values[0];
 
-        if (Application.getApp().getProperty("imperial")) {
+        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 			_temperature = (_temperature - 32.0) * 5.0 / 9.0;	
         }
         
