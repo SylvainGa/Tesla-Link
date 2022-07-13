@@ -27,7 +27,9 @@ class Tesla {
     hidden function genericPost(url, notify) {
         Communications.makeWebRequest(
             url,
-            null,
+            {
+                "dummy" => "dummy"
+            },
             {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
