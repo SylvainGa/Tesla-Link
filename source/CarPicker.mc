@@ -39,6 +39,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
             for (var i = 0; i < vehicles.size(); i++) {
                 if (_selected.equals(vehicles[i].get("display_name"))) {
                     Application.getApp().setProperty("vehicle", vehicles[i].get("id"));
+                    Application.getApp().setProperty("vehicle_name", _selected);
                     WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
                 }
             }
