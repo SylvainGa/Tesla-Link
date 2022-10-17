@@ -12,7 +12,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
     function onMenuItem(item) {
         if (item == :reset) {
             Settings.setToken(null);
+            Settings.setRefreshToken(null, 0, 0);
             Application.getApp().setProperty("vehicle", null);
+			Application.getApp().setProperty("ResetNeeded", true);
         } else if (item == :honk) {
             _controller._honk_horn = true;
             _controller.stateMachine();
@@ -137,11 +139,14 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
     function onReceiveVehicles(responseCode, data) {
         if (responseCode == 200) {
             var vehicles = data.get("response");
-            var vins = new [vehicles.size()];
-            for (var i = 0; i < vehicles.size(); i++) {
-                vins[i] = vehicles[i].get("display_name");
+            var size = vehicles.size();
+            var vinsName = new [size];
+            var vinsId = new [size];
+            for (var i = 0; i < size; i++) {
+                vinsName[i] = vehicles[i].get("display_name");
+                vinsId[i] = vehicles[i].get("id");
             }
-            Ui.pushView(new CarPicker(vins), new CarPickerDelegate(_controller), Ui.SLIDE_UP);
+            Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
         } else {
             _controller._handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }

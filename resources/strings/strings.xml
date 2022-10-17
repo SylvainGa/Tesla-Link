@@ -205,7 +205,7 @@
 	<string id="seat_low">Low</string>
 	<string id="seat_medium">Medium</string>
 	<string id="seat_high">High</string>
-    <string id="label_should_we_wake">Should we wake?</string>
+    <string id="label_should_we_wake">Wake </string>
     <string id="HansshowFrunk">Has a Hansshow powered frunk?</string>
     <string id="settings_api_server_location_label">Location of Tesla's API servers?</string>
     <string id="settings_auth_server_location_label">Location of Tesla's Auth servers?</string>

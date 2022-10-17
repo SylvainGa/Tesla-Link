@@ -205,7 +205,7 @@
 	<string id="seat_low">Niedrig</string>
 	<string id="seat_medium">Mittel</string>
 	<string id="seat_high">Hoch</string>
-    <string id="label_should_we_wake">Fahrzeug aufwecken?</string>
+    <string id="label_should_we_wake">Aufwacken </string>
     <string id="HansshowFrunk">Fahrzeug hat elektr. Frunk von Hansshow?</string>
     <string id="settings_api_server_location_label">Standort des Tesla API servers?</string>
     <string id="settings_auth_server_location_label">Standort des Tesla Auth servers?</string>

@@ -79,7 +79,7 @@ class ClimateView extends Ui.View {
                 lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
             }
 
-logMessage("_viewOffset is " + _viewOffset);
+// 2022-10-10 logMessage("_viewOffset is " + _viewOffset);
             var lineData; 
             var lineUnit; 
 			if (_viewOffset == 0) {

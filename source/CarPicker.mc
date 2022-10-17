@@ -1,10 +1,11 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.System;
 
 class CarPicker extends WatchUi.Picker {
-    function initialize (cars) {
+    function initialize (carsName) {
         var title = new WatchUi.Text({:text=>Rez.Strings.car_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
-        var factory = new WordFactory(cars);
+        var factory = new WordFactory(carsName);
         Picker.initialize({:pattern => [factory], :title => title});
     }
 
@@ -16,10 +17,13 @@ class CarPicker extends WatchUi.Picker {
 }
 
 class CarPickerDelegate extends WatchUi.PickerDelegate {
+    var _carsName;
+    var _carsId;
     var _controller;
-    var _selected;
 
-    function initialize (controller) {
+    function initialize (carsName, carsId, controller) {
+        _carsName = carsName;
+        _carsId = carsId;
         _controller = controller;
         PickerDelegate.initialize();
     }
@@ -29,22 +33,39 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onAccept (values) {
-        _selected = values[0];
-        _controller._tesla.getVehicleId(method(:onReceiveVehicles));
-    }
+        var _selected = values[0];
+//        _controller._tesla.getVehicleId(method(:onReceiveVehicles));
 
-    function onReceiveVehicles(responseCode, data) {
-        if (responseCode == 200) {
-            var vehicles = data.get("response");
-            for (var i = 0; i < vehicles.size(); i++) {
-                if (_selected.equals(vehicles[i].get("display_name"))) {
-                    Application.getApp().setProperty("vehicle", vehicles[i].get("id"));
+        var size = _carsName.size();
+
+// 2022-10-17 logMessage("CarPickerDelegate: Have " + size + " vehicles");
+        var i;
+        for (i = 0; i < size; i++) {
+// 2022-10-17 logMessage("CarPickerDelegate: vehicle " + i + ": '" + _carsName[i] + "'");
+            if (_selected.equals(_carsName[i])) {
+// 2022-10-17 logMessage("CarPickerDelegate: Got a match!");
+                if (Application.getApp().getProperty("vehicle") != _carsId[i]) { // If it's a new car, start fresh
+                    Application.getApp().setProperty("vehicle", _carsId[i]);
                     Application.getApp().setProperty("vehicle_name", _selected);
-                    WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+
+                    // Start fresh as if we just loaded
+                    _controller._firstTime = true;
+                    _controller._408_count = 0;
+                    _controller._check_wake = false;
+                    _controller._need_wake = false;
+                    _controller._wake_done = true;
+                    _controller._wakeTime = System.getTimer();
+            		_controller._vehicle_state = "online";
+                    _controller._vehicle_id = _carsId[i];
                 }
+                break;
             }
-        } else {
-            _controller._handler.invoke([0, WatchUi.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
+        if (i == size) {
+// 2022-10-17 logMessage("CarPickerDelegate: No match?!?");
+        }
+
+        _controller.stateMachine();
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }

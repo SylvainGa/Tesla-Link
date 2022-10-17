@@ -79,7 +79,7 @@ class ChargeView extends Ui.View {
                 lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
             }
 
-logMessage("_viewOffset is " + _viewOffset);
+// 2022-10-10 logMessage("_viewOffset is " + _viewOffset);
             var lineData; 
 			if (_viewOffset == 0) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_1_2));

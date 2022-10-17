@@ -98,12 +98,12 @@ class MainView extends Ui.View {
 				_errorTimer = 0;
 			}
 			_display = _bufferedText;
-logMessage("Showing Message " + _display);
+// 2022-10-10 logMessage("Showing Message " + _display);
 			
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();
             dc.drawText(center_x, center_y, font_montserrat, _display, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        } else {           
+        } else if (_data._vehicle_data != null) {
             // Showing the main layouts, so we can process touches now
             _data._ready = true;
             _errorTimer = 0;
@@ -135,7 +135,6 @@ logMessage("Showing Message " + _display);
 	            }
 	            else {
                     var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
-
 					var which_bitmap = 0;
 					var iconList = [
 						Rez.Drawables.frunk0trunk0port0vent0_icon_white,
@@ -206,7 +205,9 @@ logMessage("Showing Message " + _display);
                 // Retrieve and display the vehicle name
                 var name_drawable = View.findDrawableById("name");
                 var vehicle_name = _data._vehicle_data.get("display_name");
-                Application.getApp().setProperty("vehicle_name", vehicle_name);
+                if (Application.getApp().getProperty("vehicle_name") == null) {
+                    Application.getApp().setProperty("vehicle_name", vehicle_name);
+                }
                 name_drawable.setText(vehicle_name);
                 name_drawable.draw(dc);
 

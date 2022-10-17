@@ -21,6 +21,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _vehicle_state;
     var _need_auth;
     var _auth_done;
+	var _check_wake;
     var _need_wake;
     var _wake_done;
 	var _wakeTime;
@@ -64,14 +65,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _settings = System.getDeviceSettings();
         _data = data;
         _token = Settings.getToken();
-
         _vehicle_id = Application.getApp().getProperty("vehicle");
 		_vehicle_state = "online"; // Assume we're online
         _sleep_timer = new Timer.Timer();
         _handler_timer = new Timer.Timer();
         _handler = handler;
         _tesla = null;
-		
+
 		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
 		if (createdAt == null) {
 			createdAt = 0;
@@ -97,14 +97,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			var expireAt = new Time.Moment(createdAt + expireIn);
 			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
 			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
+// 2022-10-10 logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
 
         } else {
-logMessage("initialize:No token, will need to get one through a refresh token or authentication");
+// 2022-10-10 logMessage("initialize:No token, will need to get one through a refresh token or authentication");
             _need_auth = true;
             _auth_done = false;
         }
 
+		_check_wake = false; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
         _need_wake = false; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
         _wake_done = true;
 		_wakeTime = System.getTimer();
@@ -232,7 +233,7 @@ logMessage("initialize:No token, will need to get one through a refresh token or
     }
 
     function onOAuthMessage(message) {
-logMessage("onOAuthMessage message: " + message);
+// 2022-10-10 logMessage("onOAuthMessage message: " + message);
         var code = message.data[$.OAUTH_CODE];
         var error = message.data[$.OAUTH_ERROR];
         if (message.data != null) {
@@ -271,8 +272,8 @@ logMessage("onOAuthMessage message: " + message);
     }
 
     function onReceiveToken(responseCode, data) {
-logMessage("onReceiveToken responseCode is " + responseCode);
-if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60) + "..."); }
+// 2022-10-10 logMessage("onReceiveToken responseCode is " + responseCode);
+// 2022-10-10 if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60) + "..."); }
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -284,6 +285,7 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				Settings.setRefreshToken(refreshToken, expires_in, created_at);
 			}
+			_handler.invoke([0, null]);
         } else {
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
             _need_auth = true;
@@ -321,10 +323,15 @@ if (data != null) { logMessage("onReceiveToken data is " + data.toString().subst
 		}
 
 		if (_skipGetVehicleData) {
-logMessage("StateMachine: Skipping stateMachine");
+// 2022-10-10 logMessage("StateMachine: Skipping stateMachine");
 			return;
 		}
 
+		var resetNeeded = Application.getApp().getProperty("ResetNeeded");
+		if (resetNeeded != null && resetNeeded == true) {
+			Application.getApp().setProperty("ResetNeeded", false);
+			_need_auth = true;
+		}
 
         if (_need_auth) {
             _need_auth = false;
@@ -332,11 +339,11 @@ logMessage("StateMachine: Skipping stateMachine");
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_refreshToken != null && _refreshToken.length() != 0) {
-logMessage("stateMachine: Asking for access token through refresh token " + _refreshToken);
+// 2022-10-10 logMessage("stateMachine: Asking for access token through refresh token " + _refreshToken);
 				 GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
-logMessage("stateMachine: Asking for access token through user credentials ");
+// 2022-10-10 logMessage("stateMachine: Asking for access token through user credentials ");
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
 	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
 	                :toRepresentation => StringUtil.REPRESENTATION_STRING_HEX,
@@ -392,11 +399,17 @@ logMessage("stateMachine: Asking for access token through user credentials ");
             _tesla = new Tesla(_token);
         }
 
-        if (_vehicle_id == null || _vehicle_id == -1) { // -1 means we're from a 408 response, use this call to see if we're awake
+		if (_vehicle_id == -2) {
+			_tesla.getVehicleId(method(:selectVehicle));
+			_vehicle_id = -1;
+			return;
+		}
+// 2022-10-17 logMessage("stateMachine: vehicle_id = " + _vehicle_id + " vehicle_state = '" + _vehicle_state + "' 408_count = " + _408_count + " check_wake = " + _check_wake + " need_wake = " + _need_wake);
+        if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
 			if (_vehicle_id == null) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			} else {
-logMessage("StateMachine: Asking to test if we're awake");
+// 2022-10-10 logMessage("StateMachine: Asking to test if we're awake");
 			}
             _tesla.getVehicleId(method(:onReceiveVehicles));
             return;
@@ -414,13 +427,13 @@ logMessage("StateMachine: Asking to test if we're awake");
 
         if (_need_wake) { // Asked to wake up
 			if (_firstTime) { // As if we should wake the vehicle
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake));
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Application.getApp().getProperty("vehicle_name") + "?");
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-logMessage("stateMachine:Asking to wake vehicle");
+// 2022-10-17 logMessage("stateMachine:Asking to wake vehicle");
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
             return;
@@ -644,7 +657,7 @@ logMessage("stateMachine:Asking to wake vehicle");
         }
 
         if (_homelink) {
-logMessage("StateMachine: Homelink - calling vehicleStateHandler");
+// 2022-10-10 logMessage("StateMachine: Homelink - calling vehicleStateHandler");
             _homelink = false;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_homelink)]);
 	        _tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
@@ -671,10 +684,10 @@ logMessage("StateMachine: Homelink - calling vehicleStateHandler");
 				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
 				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 			} else {
-logMessage("StateMachine: Already waiting for data, skipping");
+// 2022-10-10 logMessage("StateMachine: Already waiting for data, skipping");
 			}
 		} else {
-logMessage("StateMachine: Skipping requesting data");
+// 2022-10-10 logMessage("StateMachine: Skipping requesting data");
 		}
     }
 
@@ -682,11 +695,13 @@ logMessage("StateMachine: Skipping requesting data");
 		_need_wake = false;
 		_wake_done = false;
 		_wakeTime = System.getTimer();
+// 2022-10-17 logMessage("wakeConfirmed:Asking to wake vehicle");
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
     }
 
     function wakeCanceled() {
-		Ui.popView(SLIDE_IMMEDIATE);
+		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
+		stateMachine();
     }
 
     function openVentConfirmed() {
@@ -749,7 +764,7 @@ logMessage("StateMachine: Skipping requesting data");
         } else {
             _set_climate_off = true;
         }
-logMessage("stateMachine: doSelect");
+// 2022-10-10 logMessage("stateMachine: doSelect");
         stateMachine();
     }
 
@@ -768,7 +783,7 @@ logMessage("stateMachine: doSelect");
         } else {
             _unlock = true;
         }
-logMessage("stateMachine: doNextPage");
+// 2022-10-10 logMessage("stateMachine: doNextPage");
         stateMachine();
     }
 
@@ -794,7 +809,7 @@ logMessage("stateMachine: doNextPage");
 		else {
 			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
-logMessage("stateMachine: doPreviousPage");
+// 2022-10-10 logMessage("stateMachine: doPreviousPage");
         stateMachine();
     }
 
@@ -992,7 +1007,7 @@ logMessage("stateMachine: doPreviousPage");
 		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 	            _adjust_departure = true;
-logMessage("stateMachine: onTap");
+// 2022-10-10 logMessage("stateMachine: onTap");
 	            stateMachine();
             }
             else {
@@ -1056,44 +1071,53 @@ logMessage("stateMachine: onTap");
     function selectVehicle(responseCode, data) {
         if (responseCode == 200) {
             var vehicles = data.get("response");
-            var vins = new [vehicles.size()];
-            for (var i = 0; i < vehicles.size(); i++) {
-                vins[i] = vehicles[i].get("display_name");
+			var size = vehicles.size();
+            var vinsName = new [size];
+            var vinsId = new [size];
+            for (var i = 0; i < size; i++) {
+                vinsName[i] = vehicles[i].get("display_name");
+                vinsId[i] = vehicles[i].get("id");
             }
-            Ui.pushView(new CarPicker(vins), new CarPickerDelegate(self), Ui.SLIDE_UP);
+            Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, self), Ui.SLIDE_UP);
         } else {
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
     }
 
     function onReceiveVehicles(responseCode, data) {
-logMessage("onReceiveVehicles:responseCode is " + responseCode);
+// 2022-10-17 logMessage("onReceiveVehicles:responseCode is " + responseCode);
 //logMessage("onReceiveVehicles:data is " + data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
-            if (vehicles.size() > 0) {
+			var size = vehicles.size();
+            if (size > 0) {
 				// Need to retrieve the right vehicle, not just the first one!
 				var vehicle_index = 0;
 				var vehicle_name = Application.getApp().getProperty("vehicle_name");
 				if (vehicle_name != null) {
-					while (vehicle_index < vehicles.size()) {
+					while (vehicle_index < size) {
 						if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
 							break;
 						}
+						vehicle_index++;
 					}
-					if (vehicle_index == vehicles.size()) {
+
+					if (vehicle_index == size) {
 						vehicle_index = 0;
 					}
 				}
+
 				_vehicle_state = vehicles[vehicle_index].get("state");
-                _vehicle_id = vehicles[vehicle_index].get("id");
-                Application.getApp().setProperty("vehicle", _vehicle_id);
-                Application.getApp().setProperty("vehicle_name", vehicles[vehicle_index].get("display_name"));
-logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
-				if (_vehicle_state.equals("online") == false) { // We're not awake, next iteration of StateMachine will call the wake function
+// 2022-10-17 logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
+				if (_vehicle_state.equals("online") == false && _vehicle_id != null && _vehicle_id > 0) { // We're not awake and we have a vehicle ID, next iteration of StateMachine will call the wake function
 					_need_wake = true;
 					_wake_done = false;
 				}
+				_check_wake = false;
+
+                _vehicle_id = vehicles[vehicle_index].get("id");
+                Application.getApp().setProperty("vehicle", _vehicle_id);
+                Application.getApp().setProperty("vehicle_name", vehicles[vehicle_index].get("display_name"));
 
 //logMessage("stateMachine: onReceiveVehicles");
                 stateMachine();
@@ -1116,11 +1140,11 @@ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display
     }
 
     function onReceiveVehicleData(responseCode, data) {
-// 2022-05-21 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
+// 2022-10-17 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
 		_waitingForVehicleData = false;
 		
 		if (_skipGetVehicleData) {
-logMessage("onReceiveVehicleData: Asked to skip");
+// 2022-10-10 logMessage("onReceiveVehicleData: Asked to skip");
 			return;
 		}
 
@@ -1149,21 +1173,23 @@ logMessage("onReceiveVehicleData: Asked to skip");
 // 2022-05-21 logMessage("onReceiveVehicleData: Running StateMachine in no less than 500 msec");
 					}
 				} else {
-logMessage("onReceiveVehicleData: Received incomplete data, ignoring");
+// 2022-10-10 logMessage("onReceiveVehicleData: Received incomplete data, ignoring");
 				}
 			} else {
-logMessage("onReceiveVehicleData: Received an out or order data or missing timestamp, ignoring");
+// 2022-10-10 logMessage("onReceiveVehicleData: Received an out or order data or missing timestamp, ignoring");
 			}
 			_sleep_timer.start(method(:stateMachine), 500, false);
 			return;
         } else {
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
-	        	if ((_408_count == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
+// 2022-10-17 logMessage("onReceiveVehicleData: Got 408, 408_count = " + _408_count + " firstTime = " + _firstTime);
+	        	if ((_408_count % 20 == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
 					if (_408_count < 2) { // Only when we first started to get the errors do we keep the start time
 						_wakeTime = System.getTimer();
 					}
-logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");
-		            _vehicle_id = -1;
+// 2022-10-10 logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");
+//		            _vehicle_id = -1;
+					_check_wake = true;
 	            }
         		_408_count++;
 			} else {
@@ -1185,7 +1211,7 @@ logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?"
     }
 
     function onReceiveAwake(responseCode, data) {
-logMessage("onReceiveAwake:responseCode is " + responseCode);
+// 2022-10-17 logMessage("onReceiveAwake:responseCode is " + responseCode);
         if (responseCode == 200) {
             _wake_done = true;
 //logMessage("stateMachine: onReceiveWake");
@@ -1211,7 +1237,7 @@ logMessage("onReceiveAwake:responseCode is " + responseCode);
     }
 
    function onReceiveVehicleState(responseCode, data) {
-logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
+// 2022-10-10 logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1229,7 +1255,7 @@ logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling 
 				_data._vehicle_data.get("vehicle_state").put("ft", response.get("ft"));
 				_data._vehicle_data.get("vehicle_state").put("rt", response.get("rt"));
 			} else {
-logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
+// 2022-10-10 logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
 			}
         } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
 
@@ -1240,7 +1266,7 @@ logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignor
     }
 
    function onReceiveClimateState(responseCode, data) {
-logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
+// 2022-10-10 logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1249,7 +1275,7 @@ logMessage("onReceiveClimateState responseCode is " + responseCode + " calling S
 				_data._vehicle_data.get("climate_state").put("defrost_mode", response.get("defrost_mode"));
 				_data._vehicle_data.get("climate_state").put("battery_heater", response.get("battery_heater"));
 			} else {
-logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
+// 2022-10-10 logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
 			}
         } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
 
@@ -1260,7 +1286,7 @@ logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignor
     }
 
    function onReceiveChargeState(responseCode, data) {
-logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
+// 2022-10-10 logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1269,7 +1295,7 @@ logMessage("onReceiveChargeState responseCode is " + responseCode + " calling St
 				_data._vehicle_data.get("charge_state").put("scheduled_departure_time_minutes", response.get("scheduled_departure_time_minutes"));
 				_data._vehicle_data.get("charge_state").put("charge_port_door_open", response.get("charge_port_door_open"));
 			} else {
-logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
+// 2022-10-10 logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
 			}
         } // We silently ignore errors here. We'll get the data using the main stateMachine function anyway, just a bit later
 
@@ -1280,12 +1306,12 @@ logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignori
     }
 
     function getVehicleState() {
-logMessage("getVehicleState: Calling onReceiveVehicleState");
+// 2022-10-10 logMessage("getVehicleState: Calling onReceiveVehicleState");
 		_tesla.getVehicleState(_vehicle_id, method(:onReceiveVehicleState));
 	}
 
     function vehicleStateHandler(responseCode, data) {
-logMessage("vehicleStateHandler: responseCode is " + responseCode + " Calling getVehicleState");
+// 2022-10-10 logMessage("vehicleStateHandler: responseCode is " + responseCode + " Calling getVehicleState");
         if (responseCode == 200) {
 	        _handler_timer.start(method(:getVehicleState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 		} else {  // Our call failed, say the error and back to the main code
@@ -1296,12 +1322,12 @@ logMessage("vehicleStateHandler: responseCode is " + responseCode + " Calling ge
     }
 
     function getClimateState() {
-logMessage("getClimateState: Calling onReceiveClimateState");
+// 2022-10-10 logMessage("getClimateState: Calling onReceiveClimateState");
 		_tesla.getClimateState(_vehicle_id, method(:onReceiveClimateState));
 	}
 
     function climateStateHandler(responseCode, data) {
-logMessage("climateStateHandler: responseCode is " + responseCode + " Calling getClimateState");
+// 2022-10-10 logMessage("climateStateHandler: responseCode is " + responseCode + " Calling getClimateState");
         if (responseCode == 200) {
 	        _handler_timer.start(method(:getClimateState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 			return;
@@ -1313,12 +1339,12 @@ logMessage("climateStateHandler: responseCode is " + responseCode + " Calling ge
     }
 
     function getChargeState() {
-logMessage("getChargeState: Calling onReceiveChargeState");
+// 2022-10-10 logMessage("getChargeState: Calling onReceiveChargeState");
 		_tesla.getChargeState(_vehicle_id, method(:onReceiveChargeState));
 	}
 
     function chargeStateHandler(responseCode, data) {
-logMessage("chargeStateHandler: responseCode is " + responseCode + " Calling getChargeState");
+// 2022-10-10 logMessage("chargeStateHandler: responseCode is " + responseCode + " Calling getChargeState");
         if (responseCode == 200) {
 	        _handler_timer.start(method(:getChargeState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 			return;
@@ -1330,7 +1356,7 @@ logMessage("chargeStateHandler: responseCode is " + responseCode + " Calling get
     }
 
     function genericHandler(responseCode, data) {
-logMessage("genericHandler: responseCode is " + responseCode);
+// 2022-10-10 logMessage("genericHandler: responseCode is " + responseCode);
         if (responseCode == 200) {
             _handler.invoke([1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
