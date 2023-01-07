@@ -2,6 +2,9 @@
 
 Tesla Link Widget is a Garmin ConnectIQ widget for Tesla vehicle control.
 
+**If you enjoy this maintained version of the app, you can support my work with a small donation:**
+https://bit.ly/sylvainga
+
 Based on the work of srwalter and paulobrien and posted with their blessing. Link to their github is at the end of this file.
 My work includes enhancing the touch display interface, increased the reliability of the communication, added many features to the Option menu, added the selection/order of the Option menu and added data screens.
 
