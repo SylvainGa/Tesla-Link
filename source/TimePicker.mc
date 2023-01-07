@@ -22,7 +22,7 @@ class DepartureTimePicker extends WatchUi.Picker {
     public function initialize(time) {
 		_time = time;
 
-        var title = new WatchUi.Text({:text=>$.Rez.Strings.timePickerTitle, :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
+        var title = new WatchUi.Text({:text=>$.Rez.Strings.label_timePickerTitle, :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         var factories;
 
@@ -32,10 +32,10 @@ class DepartureTimePicker extends WatchUi.Picker {
         } else {
             factories = new Array<PickerFactory or Text>[$.FACTORY_COUNT_12_HOUR];
             factories[0] = new $.NumberFactory(1, 12, 1, {});
-            factories[3] = new $.WordFactory([$.Rez.Strings.morning, $.Rez.Strings.afternoon] as Array<Symbol>);
+            factories[3] = new $.WordFactory([$.Rez.Strings.label_morning, $.Rez.Strings.label_afternoon] as Array<Symbol>);
         }
 
-        factories[1] = new WatchUi.Text({:text=>$.Rez.Strings.timeSeparator, :font=>Graphics.FONT_MEDIUM,
+        factories[1] = new WatchUi.Text({:text=>$.Rez.Strings.label_timeSeparator, :font=>Graphics.FONT_MEDIUM,
             :locX=>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_CENTER, :color=>Graphics.COLOR_WHITE});
         factories[2] = new $.NumberFactory(0, 59, 15, {:format=>$.MINUTE_FORMAT});
 

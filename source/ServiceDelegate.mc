@@ -15,6 +15,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         System.ServiceDelegate.initialize();
         
         _token = Settings.getToken();
+//System.println("ServiceDelegate: token = " + _token);
         _tesla = new Tesla(_token);
         _vehicle_id = Application.getApp().getProperty("vehicle");
     }
@@ -22,10 +23,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
 
+//System.println("onTemporalEvent");
         if (_token != null && _vehicle_id != null)
         {
-//System.println("onTemporalEvent");
-            _tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
+//System.println("onTemporalEvent getting data");
+            _tesla.getChargeState(_vehicle_id, method(:onReceiveVehicleData));
         }
     }
 
@@ -35,13 +37,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (data == null) {
             data = {};
 		}
+//System.println("onReceiveVehicleData: responseCode = " + responseCode);
+//System.println("onReceiveVehicleData: responseData = " + responseData);
 
-        // Deal with appropriately - we care about awake (200) or asleep (408)
+        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
         if (responseCode == 200) {
             var vehicle_data = responseData.get("response");    
-            var battery_level = vehicle_data.get("charge_state").get("battery_level");
-            var battery_range = vehicle_data.get("charge_state").get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
-            var charging_state = vehicle_data.get("charge_state").get("charging_state");
+            var battery_level = vehicle_data.get("battery_level");
+            var battery_range = vehicle_data.get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
+            var charging_state = vehicle_data.get("charging_state");
 
             var suffix;
             try {
@@ -51,6 +55,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 suffix = "";
             }
             data.put("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + suffix);
+            Background.exit(data);
+        } else if (responseCode == 401) {
+            data.put("status", Application.loadResource(Rez.Strings.label_launch_widget));
             Background.exit(data);
         } else if (responseCode == 408) {
             var suffix;

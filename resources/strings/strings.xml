@@ -1,13 +1,13 @@
 <strings>
     <string id="AppName">Tesla Link</string>
     <string id="AppVersionTitle">App Version</string>
-    <string id="car_chooser_title">Choose a VIN</string>
 
     <!--  Glance view -->
-    <string id="wake" scope="glance">Wake </string>
     <string id="vehicle" scope="glance">vehicle</string>
     <string id="label_asleep" scope="background">Asleep</string>
     <string id="label_status_unknown" scope="glance">Status unknown</string>
+    <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
+    <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
 
     <!-- No glance view -->
     <string id="label_touch">Touch Screen</string>
@@ -28,104 +28,50 @@
     <string id="menu_label_reset">Reset</string>
     <string id="menu_label_honk">Honk</string>
     <string id="menu_label_open_port">Open Port</string>
+    <string id="menu_label_close_port">Close Port</string>  <!--  NEW -->
+    <string id="menu_label_unlock_port">Unlock Port</string>  <!--  NEW -->
     <string id="menu_label_open_frunk">Open Frunk</string>
-    <string id="menu_label_open_frunk_open">Open Frunk</string>
+    <string id="menu_label_close_frunk">Close Frunk</string>  <!--  NEW -->
     <string id="menu_label_open_frunk_opened">Frunk opened</string>
     <string id="menu_label_toggle_view">Toggle View</string>
     <string id="menu_label_swap_frunk_for_port">Alternate Trunk/Frunk/Port</string>
-    <string id="menu_label_select_car">Select Vehicle</string>
-
-    <string id="setting_token_label">API REFRESH Token (optionnal) </string>
-    <string id="setting_token_prompt">Enter your Tesla Account token</string>
-
-	<!--  Second view -->
-    <string id="label_cabin">Cabin: </string>
-    <string id="label_charge">Charge: </string>
-    <string id="label_climate">Climate: </string>
-    <string id="label_error">Error: </string>
-    <string id="label_frunk">Frunk</string>
-    <string id="label_frunk_opening">Frunk opening</string>
-    <string id="label_frunk_closing">Frunk closing</string>
-    <string id="label_frunk_opened">Frunk already opened</string>
-    <string id="label_port">Port</string>
-    <string id="label_getting_vehicles">Getting vehicles</string>
-    <string id="label_honk">Honking</string>
-    <string id="label_open_port">Open Port</string>
-    <string id="label_hvac_on">Climate On</string>
-    <string id="label_hvac_off">Climate Off</string>
-    <string id="label_lock_doors">Locking Doors</string>
-    <string id="label_locked">Locked</string>
-    <string id="label_login_on_phone">Login on Phone!</string>
-    <string id="label_oauth_error">OAuth error</string>
-    <string id="label_off">Off</string>
-    <string id="label_on">On</string>
-    <string id="label_open_frunk">Open Frunk?</string>
-    <string id="label_requesting_data">Retrieving data</string>
-    <string id="label_unlock_doors">Unlocking Doors</string>
-    <string id="label_unlocked">Unlocked</string>
-    <string id="label_waking_vehicle">Waking vehicle</string>
-    <string id="label_no_vehicles">No vehicles</string>
-
-	<!--  SG Addition. Needs to be moved to their corresponding section -->
-    <string id="menu_label_adjust_departure">Adjust departure time</string>
-    <string id="menu_label_set_temp">Set temperature</string>
-    <string id="temp_chooser_title">Set Temperature at</string>
-    <string id="label_honk_horn">Hunk horn?</string>
-    <string id="label_trunk">Trunk</string>
-    <string id="label_trunk_opening">Trunk opening</string>
-    <string id="label_trunk_closing">Trunk closing</string>
-    <string id="menu_label_open_trunk">Open Trunk</string>
-    <string id="menu_label_open_trunk_open">Open Trunk</string>
-    <string id="menu_label_open_trunk_close">Close Trunk</string>
-    <string id="label_open_trunk">Open Trunk?</string>
-	<string id="frunk">Frunk</string>
-	<string id="trunk">Trunk</string>
-	<string id="port">Port</string>
-	<string id="vent">Vent</string>
-    <string id="label_open_vent">Vent ?</string>
-    <string id="label_close_vent">Close windows ?</string>
-    <string id="label_vent_opening">Venting</string>
-    <string id="label_vent_closing">Closing vents</string>
-    <string id="label_frunktrunkport">Select</string>
-    <string id="menu_label_set_charging_amps">Set charging amps</string>
-    <string id="menu_label_set_charging_limit">Set charging limit</string>
-    <string id="menu_label_start_charging">Start charging</string>
-    <string id="menu_label_stop_charging">Stop charging</string>
-    <string id="menu_label_start_stop_charging">Start/stop charging</string>
-    <string id="amps_chooser_title">Set Amps to</string>
-    <string id="charginglimit_chooser_title">Set limit to</string>
-    <string id="menu_label_set_seat_heat">Seat heat</string>
-    <string id="menu_label_set_steering_wheel_heat">Steering wheel heat</string>
-    <string id="menu_label_set_steering_wheel_heat_on">Activate Steering wheel heat</string>
-    <string id="menu_label_set_steering_wheel_heat_off">Deactivate Steering wheel heat</string>
-	<string id="temp_choose_seat">Which seat?</string>
-	<string id="temp_choose_heat">What level?</string>
-	<string id="seat_driver">Driver</string>
-	<string id="seat_passenger">Passenger</string>
-	<string id="seat_rear_left">Rear Left</string>
-	<string id="seat_rear_center">Rear middle</string>
-	<string id="seat_rear_right">Rear Right</string>
-	<string id="seat_front">Front</string>
-	<string id="seat_rear">Rear</string>
-	<string id="label_steering_wheel_on">Steering wheel activated</string>
- 	<string id="label_steering_wheel_off">Steering wheel deactivated </string>
- 	<string id="label_steering_wheel_need_climate_on">Needs climate ON</string>
-	<string id="menu_label_defrost">Defrost toggle</string>
 	<string id="menu_label_defrost_on">Activate Defrost</string>
 	<string id="menu_label_defrost_off">Deactivate Defrost</string>
-	<string id="label_defrost_on">Defrost On</string>
-	<string id="label_defrost_off">Defrost Off</string>
-	<string id="label_defrost">Defrost</string>
-	<string id="menu_label_vent">Vent</string>
-	<string id="menu_label_vent_open">Start venting</string>
-	<string id="menu_label_vent_close">Stop venting</string>
-	<string id="menu_option_title">Menu</string>
-	<string id="number_of_slots">How many filled slots?</string>
-	<string id="departure">Departure: </string>
+    <string id="menu_label_set_seat_heat">Seat heat</string>
+    <string id="menu_label_set_steering_wheel_heat_on">Activate Steering wheel heat</string>
+    <string id="menu_label_set_steering_wheel_heat_off">Deactivate Steering wheel heat</string>
+    <string id="menu_label_set_charging_limit">Set charging limit</string>
+    <string id="menu_label_set_charging_amps">Set charging amps</string>
+    <string id="menu_label_start_charging">Start charging</string>
+    <string id="menu_label_stop_charging">Stop charging</string>
+    <string id="menu_label_set_temp">Set temperature</string>
 	<string id="menu_label_start_departure">Act. departure</string>
 	<string id="menu_label_stop_departure">Dis. departure</string>
-	<string id="label_start_departure">departure enabled</string>
-	<string id="label_stop_departure">departure disabled</string>
+    <string id="menu_label_sentry_on">Act. Sentry</string>
+    <string id="menu_label_sentry_off">Dis. Sentry</string>
+    <string id="menu_label_open_trunk">Open Trunk</string>
+    <string id="menu_label_close_trunk">Close Trunk</string>
+	<string id="menu_label_open_vent">Start venting</string>
+	<string id="menu_label_close_vent">Stop venting</string>
+    <string id="menu_label_homelink">Homelink</string>
+    <string id="menu_label_datascreen">View data screen</string>
+    <string id="menu_label_select_car">Select Vehicle</string>
+    <string id="menu_label_wake">Force Wake</string>
+    <string id="menu_label_refresh">Set refresh time</string>
+    <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
+
+	<!--  Items in Settings only -->
+    <string id="setting_token_label">API REFRESH Token (optionnal) </string>
+    <string id="setting_token_prompt">Enter your Tesla Account token</string>
+	<string id="setting_number_of_slots">How many filled slots?</string>
+    <string id="setting_enhancedTouch">Enhanced touch experience?</string>
+    <string id="setting_useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
+    <string id="setting_screenBottomLeft">For screen bottom left</string>
+    <string id="setting_screenBottomRight">For screen bottom right</string>
+    <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
+    <string id="setting_api_server_location_label">Location of Tesla's API servers?</string>
+    <string id="setting_auth_server_location_label">Location of Tesla's Auth servers?</string>
+    <string id="setting_server_location_prompt">Enter the server domain name</string>
 	<string id="OptionMenu_1">Slot 1</string>
 	<string id="OptionMenu_2">Slot 2</string>
 	<string id="OptionMenu_3">Slot 3</string>
@@ -142,26 +88,108 @@
 	<string id="OptionMenu_14">Slot 14</string>
 	<string id="OptionMenu_15">Slot 15</string>
 	<string id="OptionMenu_16">Slot 16</string>
-    <string id="timePickerTitle">Scheduled for?</string>
-    <string id="timeSeparator">:</string>
-    <string id="morning">AM</string>
-    <string id="afternoon">PM</string>
+	<string id="menu_label_vent">Vent</string>
+    <string id="menu_label_adjust_departure">Adjust departure time</string>
+    <string id="menu_label_start_stop_charging">Start/stop charging</string>
+    <string id="menu_label_set_steering_wheel_heat">Steering wheel heat</string>
+	<string id="menu_label_defrost">Defrost toggle</string>
     <string id="menu_label_sentry">Sentry Toggle</string>
-    <string id="menu_label_sentry_on">Act. Sentry</string>
-    <string id="menu_label_sentry_off">Dis. Sentry</string>
+
+	<!--  Text view -->
+    <string id="label_cabin">Cabin: </string>
+    <string id="label_charge">Charge: </string>
+    <string id="label_climate">Climate: </string>
+    <string id="label_frunk">Frunk</string>
+    <string id="label_trunk">Trunk</string>
+    <string id="label_port">Port</string>
+    <string id="label_locked">Locked</string>
+    <string id="label_unlocked">Unlocked</string>
+    <string id="label_off">Off</string>
+    <string id="label_on">On</string>
+    <string id="label_frunktrunkport">Select</string>
+	<string id="label_defrost">Defrost</string>
+
+	<!--  Image view -->
+	<string id="label_departure">Departure: </string>
+
+	<!--  Handler text -->
+    <string id="label_error">Error: </string>
+    <string id="label_getting_vehicles">Getting vehicles</string>
+    <string id="label_frunk_opening">Frunk opening</string>
+    <string id="label_frunk_closing">Frunk closing</string>
+    <string id="label_frunk_opened">Frunk already opened</string>
+    <string id="label_trunk_opening">Trunk opening</string>
+    <string id="label_trunk_closing">Trunk closing</string>
+    <string id="label_honk">Honking</string>
+    <string id="label_open_port">Opening port</string>
+    <string id="label_close_port">Closing port</string>  <!--  NEW -->
+    <string id="label_unlock_port">Unlocking port</string>  <!--  NEW -->
+    <string id="label_hvac_on">Climate On</string>
+    <string id="label_hvac_off">Climate Off</string>
+    <string id="label_lock_doors">Locking Doors</string>
+    <string id="label_unlock_doors">Unlocking Doors</string>
+    <string id="label_login_on_phone">Login on Phone!</string>
+    <string id="label_oauth_error">OAuth error</string>
+    <string id="label_requesting_data">Retrieving data</string>
+    <string id="label_waking_vehicle">Waking vehicle</string>
+    <string id="label_no_vehicles">No vehicles</string>
+    <string id="label_vent_opening">Venting</string>
+    <string id="label_vent_closing">Closing vents</string>
+	<string id="label_steering_wheel_on">Steering wheel activated</string>
+ 	<string id="label_steering_wheel_off">Steering wheel deactivated </string>
+ 	<string id="label_steering_wheel_need_climate_on">Needs climate ON</string>
+	<string id="label_defrost_on">Defrost On</string>
+	<string id="label_defrost_off">Defrost Off</string>
+	<string id="label_start_departure">departure enabled</string>
+	<string id="label_stop_departure">departure disabled</string>
     <string id="label_sentry_on">Sentry on</string>
     <string id="label_sentry_off">Sentry off</string>
     <string id="label_homelink">Homelink</string>
-    <string id="enhancedTouch">Enhanced touch experience?</string>
-    <string id="useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
-    <string id="screenBottomLeft">For screen bottom left</string>
-    <string id="screenBottomRight">For screen bottom right</string>
-    <string id="menu_label_wake">Force Wake</string>
-    <string id="menu_label_refresh">Set refresh time</string>
-    <string id="menu_label_datascreen">View data screen</string>
-    <string id="menu_label_homelink">Homelink</string>
-    <string id="refresh_chooser_title">In msec</string>
     <string id="label_unauthorized">Unauthorized</string>
+    <string id="label_no_phone_internet">Phone not connected\nto the internet</string>
+    <string id="label_remote_boombox">Boombox</string>  <!--  NEW -->
+    <string id="label_stop_charging">Stopping charge</string>  <!--  NEW -->
+    <string id="label_start_charging">Starting charge</string>  <!--  NEW -->
+
+	<!--  Popup text -->
+    <string id="label_open_frunk">Open Frunk?</string>
+    <string id="label_open_trunk">Open Trunk?</string>
+    <string id="label_honk_horn">Hunk horn?</string>
+    <string id="label_open_vent">Vent ?</string>
+    <string id="label_close_vent">Close windows ?</string>
+    <string id="label_should_we_wake">Wake </string>
+
+	<!--  Menu text -->
+	<string id="menu_option_title">Menu</string>
+    <string id="label_car_chooser_title">Choose a VIN</string>
+    <string id="label_temp_chooser_title">Set Temperature at</string>
+    <string id="label_amps_chooser_title">Set Amps to</string>
+    <string id="label_charginglimit_chooser_title">Set limit to</string>
+	<string id="frunk">Frunk</string>
+	<string id="trunk">Trunk</string>
+	<string id="port">Port</string>
+	<string id="vent">Vent</string>
+	<string id="label_temp_choose_seat">Which seat?</string>
+	<string id="label_temp_choose_heat">What level?</string>
+	<string id="label_seat_driver">Driver</string>
+	<string id="label_seat_passenger">Passenger</string>
+	<string id="label_seat_rear_left">Rear Left</string>
+	<string id="label_seat_rear_center">Rear middle</string>
+	<string id="label_seat_rear_right">Rear Right</string>
+	<string id="label_seat_front">Front</string>
+	<string id="label_seat_rear">Rear</string>
+	<string id="label_seat_auto">Auto</string>
+	<string id="label_seat_off">Off</string>
+	<string id="label_seat_low">Low</string>
+	<string id="label_seat_medium">Medium</string>
+	<string id="label_seat_high">High</string>
+    <string id="label_timePickerTitle">Scheduled for?</string>
+    <string id="label_timeSeparator">:</string>
+    <string id="label_morning">AM</string>
+    <string id="label_afternoon">PM</string>
+    <string id="label_refresh_chooser_title">In msec</string>
+
+	<!--  Subview text -->
     <string id="subview_label_charge_limit_soc">Charge limit</string>
     <string id="subview_label_battery_level">Battery Level</string>
     <string id="subview_label_charge_miles_added_rated">Range added</string>
@@ -199,15 +227,4 @@
     <string id="subview_label_climate_data_4_4">Climate data (4/4)</string>
     <string id="subview_label_drive_data_1_1">Drive data (1/1)</string>
     <string id="subview_label_parked">Parked</string>
-    <string id="label_no_phone_internet">Phone not connected\nto the internet</string>
-	<string id="seat_auto">Auto</string>
-	<string id="seat_off">Off</string>
-	<string id="seat_low">Low</string>
-	<string id="seat_medium">Medium</string>
-	<string id="seat_high">High</string>
-    <string id="label_should_we_wake">Wake </string>
-    <string id="HansshowFrunk">Has a Hansshow powered frunk?</string>
-    <string id="settings_api_server_location_label">Location of Tesla's API servers?</string>
-    <string id="settings_auth_server_location_label">Location of Tesla's Auth servers?</string>
-    <string id="settings_server_location_prompt">Enter the server domain name</string>
 </strings>

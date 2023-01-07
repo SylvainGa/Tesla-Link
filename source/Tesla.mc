@@ -124,6 +124,11 @@ class Tesla {
         genericPost(url, notify);
     }
 
+    function closePort(vehicle, notify) {
+        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_port_door_close";
+        genericPost(url, notify);
+    }
+
     function doorUnlock(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/door_unlock";
         genericPost(url, notify);
@@ -372,5 +377,10 @@ class Tesla {
             },
             notify
         );
+    }
+
+    function remoteBoombox(vehicle, notify) {
+        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_boombox";
+        genericPost(url, notify);
     }
 }

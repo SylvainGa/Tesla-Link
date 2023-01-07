@@ -271,7 +271,7 @@ class MainView extends Ui.View {
 	                    var minutes = (((departure_time / 60.0) - hours) * 60).toLong();
 	                    var timeStr;
 	                    if (System.getDeviceSettings().is24Hour) {
-		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.departure) + "$1$h$2$", [hours.format("%2d"), minutes.format("%02d")]);
+		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.label_departure) + "$1$h$2$", [hours.format("%2d"), minutes.format("%02d")]);
 		                }
 		                else {
 		                	var ampm = "am";
@@ -285,7 +285,7 @@ class MainView extends Ui.View {
 		                		hours12 -= 12;
 		                	}
 		                	
-		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.departure) + "$1$:$2$$3$", [hours12.format("%2d"), minutes.format("%02d"), ampm]);
+		                    timeStr = Lang.format(Ui.loadResource(Rez.Strings.label_departure) + "$1$:$2$$3$", [hours12.format("%2d"), minutes.format("%02d"), ampm]);
 		                }
 	                    departure_drawable.setText(timeStr.toString());
 	                    departure_drawable.draw(dc);

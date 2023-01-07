@@ -4,7 +4,7 @@ using Toybox.System;
 
 class CarPicker extends WatchUi.Picker {
     function initialize (carsName) {
-        var title = new WatchUi.Text({:text=>Rez.Strings.car_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_car_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         var factory = new WordFactory(carsName);
         Picker.initialize({:pattern => [factory], :title => title});
     }

@@ -3,7 +3,7 @@ using Toybox.Graphics;
 
 class SeatPicker extends WatchUi.Picker {
     function initialize (seats) {
-        var title = new WatchUi.Text({:text=>Rez.Strings.temp_choose_seat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_seat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         var factory = new WordFactory(seats);
         Picker.initialize({:pattern => [factory], :title => title});
     }

@@ -3,19 +3,19 @@
 		<settingConfig type="alphaNumeric" readonly="true"/>
 	</setting>
 
-	<setting propertyKey="@Properties.enhancedTouch" title="@Strings.enhancedTouch">
+	<setting propertyKey="@Properties.enhancedTouch" title="@Strings.setting_enhancedTouch">
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
-	<setting propertyKey="@Properties.useTouch" title="@Strings.useTouch">
+	<setting propertyKey="@Properties.useTouch" title="@Strings.setting_useTouch">
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
-	<setting propertyKey="@Properties.HansshowFrunk" title="@Strings.HansshowFrunk">
+	<setting propertyKey="@Properties.HansshowFrunk" title="@Strings.setting_HansshowFrunk">
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
-	<setting propertyKey="@Properties.screenBottomLeft" title="@Strings.screenBottomLeft">
+	<setting propertyKey="@Properties.screenBottomLeft" title="@Strings.setting_screenBottomLeft">
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
 			<listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
@@ -23,7 +23,7 @@
 		</settingConfig>
 	</setting>
 
-	<setting propertyKey="@Properties.screenBottomRight" title="@Strings.screenBottomRight">
+	<setting propertyKey="@Properties.screenBottomRight" title="@Strings.setting_screenBottomRight">
 		<settingConfig type="list">
 			<listEntry value="0">@Strings.menu_label_set_charging_limit</listEntry>
 			<listEntry value="1">@Strings.menu_label_set_charging_amps</listEntry>
@@ -31,7 +31,7 @@
 		</settingConfig>
 	</setting>
 
-	<setting propertyKey="@Properties.NumberOfSlots" title="@Strings.number_of_slots">
+	<setting propertyKey="@Properties.NumberOfSlots" title="@Strings.setting_number_of_slots">
 		<settingConfig type="numeric" min="1" max="16" required="true"/>
 	</setting>
 
@@ -51,7 +51,7 @@
 			<listEntry value="11">@Strings.menu_label_open_trunk</listEntry>
 			<listEntry value="12">@Strings.menu_label_open_port</listEntry>
 			<listEntry value="13">@Strings.menu_label_vent</listEntry>
-<listEntry value="14">@Strings.menu_label_homelink</listEntry>
+			<listEntry value="14">@Strings.menu_label_homelink</listEntry>
 			<listEntry value="15">@Strings.menu_label_toggle_view</listEntry>
 			<listEntry value="16">@Strings.menu_label_swap_frunk_for_port</listEntry>
 			<listEntry value="17">@Strings.menu_label_datascreen</listEntry>
@@ -59,6 +59,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -86,6 +87,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -113,6 +115,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -140,6 +143,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -167,6 +171,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -194,6 +199,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -221,6 +227,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -248,6 +255,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -275,6 +283,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -302,6 +311,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -329,6 +339,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -356,6 +367,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -383,6 +395,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -410,6 +423,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -437,6 +451,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -464,6 +479,7 @@
 			<listEntry value="19">@Strings.menu_label_reset</listEntry>
 			<listEntry value="20">@Strings.menu_label_wake</listEntry>
 			<listEntry value="21">@Strings.menu_label_refresh</listEntry>
+			<listEntry value="22">@Strings.menu_label_remote_boombox</listEntry>
 		</settingConfig>
 	</setting>
 
@@ -471,11 +487,11 @@
 		<settingConfig type="alphaNumeric" />
 	</setting>
 
-	<setting propertyKey="@Properties.serverAPILocation" title="@Strings.settings_api_server_location_label" prompt="@Strings.settings_server_location_prompt">
+	<setting propertyKey="@Properties.serverAPILocation" title="@Strings.setting_api_server_location_label" prompt="@Strings.setting_server_location_prompt">
 		<settingConfig type="alphaNumeric" />
 	</setting>
 
-	<setting propertyKey="@Properties.serverAUTHLocation" title="@Strings.settings_auth_server_location_label" prompt="@Strings.settings_server_location_prompt">
+	<setting propertyKey="@Properties.serverAUTHLocation" title="@Strings.setting_auth_server_location_label" prompt="@Strings.setting_server_location_prompt">
 		<settingConfig type="alphaNumeric" />
 	</setting>
 </settings>

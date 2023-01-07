@@ -83,17 +83,17 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
 	        var seats = new [rear_seats_avail != null ? 7 : 3];
 
-	        seats[0] = Rez.Strings.seat_driver;
-	        seats[1] = Rez.Strings.seat_passenger;
+	        seats[0] = Rez.Strings.label_seat_driver;
+	        seats[1] = Rez.Strings.label_seat_passenger;
 	        if (rear_seats_avail != null) {
-		        seats[2] = Rez.Strings.seat_rear_left;
-		        seats[3] = Rez.Strings.seat_rear_center;
-		        seats[4] = Rez.Strings.seat_rear_right;
-		        seats[5] = Rez.Strings.seat_front;
-		        seats[6] = Rez.Strings.seat_rear;
+		        seats[2] = Rez.Strings.label_seat_rear_left;
+		        seats[3] = Rez.Strings.label_seat_rear_center;
+		        seats[4] = Rez.Strings.label_seat_rear_right;
+		        seats[5] = Rez.Strings.label_seat_front;
+		        seats[6] = Rez.Strings.label_seat_rear;
 	        }
 	        else {
-		        seats[2] = Rez.Strings.seat_front;
+		        seats[2] = Rez.Strings.label_seat_front;
 	        }
 
 	        Ui.pushView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
@@ -132,6 +132,9 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             _controller.stateMachine();
         } else if (item == :homelink) {
             _controller._homelink = true;
+            _controller.stateMachine();
+        } else if (item == :remote_boombox) {
+            _controller._remote_boombox = true;
             _controller.stateMachine();
         }
     }

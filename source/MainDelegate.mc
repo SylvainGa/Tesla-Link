@@ -35,6 +35,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _toggle_charging_set;
     var _honk_horn;
     var _open_port;
+    var _close_port;
     var _open_frunk;
     var _open_trunk;
     var _bypass_confirmation;
@@ -49,6 +50,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     var _adjust_departure;
     var _sentry_mode;
 	var _homelink;
+	var _remote_boombox;
 	var _408_count;
 	var _set_refresh_time;
 	var _view_datascreen;
@@ -118,6 +120,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		
         _honk_horn = false;
         _open_port = false;
+        _close_port = false;
         _open_frunk = false;
         _open_trunk = false;
         _unlock = false;
@@ -129,6 +132,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         _adjust_departure = false;
         _sentry_mode = false;
 		_homelink = false;
+		_remote_boombox = false;
 		_408_count = 0;
 		_set_refresh_time = false;
 		_view_datascreen = false;
@@ -474,6 +478,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
         if (_toggle_charging_set) {
             _toggle_charging_set = false;
+            _handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
             _tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
         }
 
@@ -499,8 +504,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (_open_port) {
             _open_port = false;
 			_skipGetVehicleData = true;
-            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_open_port)]);
+	    	_handler.invoke([1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
             _tesla.openPort(_vehicle_id, method(:chargeStateHandler));
+        }
+
+        if (_close_port) {
+            _close_port = false;
+			_skipGetVehicleData = true;
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_close_port)]);
+            _tesla.closePort(_vehicle_id, method(:chargeStateHandler));
         }
 
         if (_unlock) {
@@ -577,23 +589,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
 
 			switch (seat_heat_chosen) {
-				case Rez.Strings.seat_auto:
+				case Rez.Strings.label_seat_auto:
 					seat_heat_chosen = -1;
 					break;
 
-				case Rez.Strings.seat_off:
+				case Rez.Strings.label_seat_off:
 					seat_heat_chosen = 0;
 					break;
 
-				case Rez.Strings.seat_low:
+				case Rez.Strings.label_seat_low:
 					seat_heat_chosen = 1;
 					break;
 
-				case Rez.Strings.seat_medium:
+				case Rez.Strings.label_seat_medium:
 					seat_heat_chosen = 2;
 					break;
 
-				case Rez.Strings.seat_high:
+				case Rez.Strings.label_seat_high:
 					seat_heat_chosen = 3;
 					break;
 					
@@ -605,15 +617,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
             _handler.invoke([1, Ui.loadResource(seat_chosen)]);
 
-	        if (seat_chosen == Rez.Strings.seat_driver) {
+	        if (seat_chosen == Rez.Strings.label_seat_driver) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.seat_passenger) {
+	        } else if (seat_chosen == Rez.Strings.label_seat_passenger) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 1, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.seat_rear_left) {
+	        } else if (seat_chosen == Rez.Strings.label_seat_rear_left) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 2, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.seat_rear_center) {
+	        } else if (seat_chosen == Rez.Strings.label_seat_rear_center) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 4, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.seat_rear_right) {
+	        } else if (seat_chosen == Rez.Strings.label_seat_rear_right) {
 	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 5, seat_heat_chosen);
 			}
 		}
@@ -661,6 +673,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
             _homelink = false;
             _handler.invoke([1, Ui.loadResource(Rez.Strings.label_homelink)]);
 	        _tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+        }
+
+        if (_remote_boombox) {
+// 2022-10-10 logMessage("StateMachine: Remote Boombox - calling vehicleStateHandler");
+            _remote_boombox = false;
+            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
+	        _tesla.remoteBoombox(_vehicle_id, method(:genericHandler));
         }
 
 		if (_set_refresh_time) {
@@ -807,7 +826,42 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	        _open_port = true;
 		}
 		else {
-			Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
+			var menu = new Ui.Menu();
+
+			if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("ft") == 0) {
+				menu.addItem(Rez.Strings.menu_label_open_frunk, :open_frunk);
+			}
+			else if (Application.getApp().getProperty("HansshowFrunk")) {
+				menu.addItem(Rez.Strings.menu_label_close_frunk, :open_frunk);
+			}
+
+			if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("rt") == 0) {
+				menu.addItem(Rez.Strings.menu_label_open_trunk, :open_trunk);
+			}
+			else {
+				menu.addItem(Rez.Strings.menu_label_close_trunk, :open_trunk);
+			}
+
+			if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charge_port_door_open") == false) {
+				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
+			} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Disconnected")) {
+				menu.addItem(Rez.Strings.menu_label_close_port, :close_port);
+			} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
+				menu.addItem(Rez.Strings.menu_label_stop_charging, :toggle_charge);
+			} else {
+				menu.addItem(Rez.Strings.menu_label_unlock_port, :open_port);
+			}
+
+			if (Application.getApp().getProperty("venting") == 0) {
+				menu.addItem(Rez.Strings.menu_label_open_vent, :vent);
+			}
+			else {
+				menu.addItem(Rez.Strings.menu_label_close_vent, :vent);
+			}
+
+			Ui.pushView(menu, new TrunksMenuDelegate(self), Ui.SLIDE_UP );
+
+			//Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
         }
 // 2022-10-10 logMessage("stateMachine: doPreviousPage");
         stateMachine();
@@ -839,8 +893,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_index < 0) {
 			_index = 0;
 		}
-		else if (_index > 21) {
-			_index = 21;
+		else if (_index > 22) {
+			_index = 22;
 		}
 
 		switch (_index) {
@@ -901,29 +955,38 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 			case 10:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("ft") == 0) {
-					menu.addItem(Rez.Strings.menu_label_open_frunk_open, :open_frunk);
+					menu.addItem(Rez.Strings.menu_label_open_frunk, :open_frunk);
 				}
-				else {
-					menu.addItem(Rez.Strings.menu_label_open_frunk_opened, :open_frunk);
+				else if (Application.getApp().getProperty("HansshowFrunk")) {
+					menu.addItem(Rez.Strings.menu_label_close_frunk, :open_frunk);
 				}
 				break;
 			case 11:
 		        if (_data._vehicle_data != null && _data._vehicle_data.get("vehicle_state").get("rt") == 0) {
-					menu.addItem(Rez.Strings.menu_label_open_trunk_open, :open_trunk);
+					menu.addItem(Rez.Strings.menu_label_open_trunk, :open_trunk);
 				}
 				else {
-					menu.addItem(Rez.Strings.menu_label_open_trunk_close, :open_trunk);
+					menu.addItem(Rez.Strings.menu_label_close_trunk, :open_trunk);
 				}
 				break;
 			case 12:
-				menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
+				if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charge_port_door_open") == false) {
+					menu.addItem(Rez.Strings.menu_label_open_port, :open_port);
+				} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Disconnected")) {
+					menu.addItem(Rez.Strings.menu_label_close_port, :close_port);
+				} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
+					menu.addItem(Rez.Strings.menu_label_stop_charging, :toggle_charge);
+				} else {
+					menu.addItem(Rez.Strings.menu_label_unlock_port, :open_port);
+				}
+
 				break;
 			case 13:
 				if (Application.getApp().getProperty("venting") == 0) {
-					menu.addItem(Rez.Strings.menu_label_vent_open, :vent);
+					menu.addItem(Rez.Strings.menu_label_open_vent, :vent);
 				}
 				else {
-					menu.addItem(Rez.Strings.menu_label_vent_close, :vent);
+					menu.addItem(Rez.Strings.menu_label_close_vent, :vent);
 				}
 				break;
 			case 14:
@@ -949,6 +1012,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 			case 21:
 				menu.addItem(Rez.Strings.menu_label_refresh, :refresh);
+				break;
+			case 22:
+				menu.addItem(Rez.Strings.menu_label_remote_boombox, :remote_boombox);
 				break;
 		}
 	}

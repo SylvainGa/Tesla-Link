@@ -19,12 +19,17 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     function onBackgroundData(data) {
         Application.getApp().setProperty("status", data["status"]);
+//var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+//var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+//System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
+
         Ui.requestUpdate();
     }  
 
     (:glance)
     function getGlanceView() {
         Application.getApp().setProperty("canGlance", true);
+//		System.println("Glance: Starting glance view");
         Background.registerForTemporalEvent(new Time.Duration(60*5));
         return [ new GlanceView() ];
     }

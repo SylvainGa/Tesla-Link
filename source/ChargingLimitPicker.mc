@@ -21,7 +21,7 @@ class ChargingLimitPicker extends WatchUi.Picker {
     	_charging_limit = charging_limit;
 
     	var startPos = [_charging_limit.toNumber() - _min_limit];
-        var title = new WatchUi.Text({:text=>Rez.Strings.charginglimit_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_charginglimit_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(_min_limit.toNumber(), _max_limit.toNumber(), 1, {})], :defaults=>startPos});
     }
 

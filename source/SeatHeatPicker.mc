@@ -6,22 +6,22 @@ class SeatHeatPicker extends WatchUi.Picker {
 	
     public function initialize (seat) {
 		
-        var title = new WatchUi.Text({:text=>Rez.Strings.temp_choose_heat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_heat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
 //        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(0, 3, 1, {})], :defaults=>_heat});
 		var frontSeat = false;
-		if (seat == Rez.Strings.seat_driver || seat == Rez.Strings.seat_passenger || seat == Rez.Strings.seat_front) {
+		if (seat == Rez.Strings.label_seat_driver || seat == Rez.Strings.label_seat_passenger || seat == Rez.Strings.label_seat_front) {
 			frontSeat = true;
 		}
 
         var seatHeat = new [frontSeat ? 5 : 4];
 
-        seatHeat[0] = Rez.Strings.seat_off;
-        seatHeat[1] = Rez.Strings.seat_low;
-        seatHeat[2] = Rez.Strings.seat_medium;
-        seatHeat[3] = Rez.Strings.seat_high;
+        seatHeat[0] = Rez.Strings.label_seat_off;
+        seatHeat[1] = Rez.Strings.label_seat_low;
+        seatHeat[2] = Rez.Strings.label_seat_medium;
+        seatHeat[3] = Rez.Strings.label_seat_high;
 		if (frontSeat) {
-	        seatHeat[4] = Rez.Strings.seat_auto;
+	        seatHeat[4] = Rez.Strings.label_seat_auto;
 	    }
     
         var factory = new WordFactory(seatHeat);
@@ -54,22 +54,22 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
         _selected = values[0];
 		Application.getApp().setProperty("seat_heat_chosen", _selected);
 
-		if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.seat_front) {
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.seat_driver);
+		if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_front) {
+			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_driver);
 	        _controller._set_seat_heat = true;
 	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.seat_passenger);
+			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_passenger);
 	        _controller._set_seat_heat = true;
 	        _controller.stateMachine();
 	    }
-		else if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.seat_rear) {
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.seat_rear_left);
+		else if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_rear) {
+			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_left);
 	        _controller._set_seat_heat = true;
 	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.seat_rear_center);
+			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_center);
 	        _controller._set_seat_heat = true;
 	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.seat_rear_right);
+			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_right);
 	        _controller._set_seat_heat = true;
 	        _controller.stateMachine();
 		}

@@ -17,7 +17,7 @@ class TemperaturePicker extends WatchUi.Picker {
     public function initialize(temperature, max_temp, min_temp) {
     	_temperature = temperature;
 
-        var title = new WatchUi.Text({:text=>Rez.Strings.temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
         if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
  	    	var startPos = [temperature.toNumber() - min_temp.toNumber()];

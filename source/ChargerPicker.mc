@@ -21,7 +21,7 @@ class ChargerPicker extends WatchUi.Picker {
     	_charging_amps = charging_amps;
 
     	var startPos = [_charging_amps.toNumber() - _min_amps];
-        var title = new WatchUi.Text({:text=>Rez.Strings.amps_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_amps_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(_min_amps.toNumber(), _max_amps.toNumber(), 1, {})], :defaults=>startPos});
     }
 
