@@ -41,6 +41,8 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 ## Changelog since forking from srwalter:
 
+V7.4.1 Fixed corruption in the Swedish language file
+
 V7.4.0 Added the following items
 - Remote Boombox under Menu (you need to move it into one of the available 16 slots from your phone using the widget parameters)
 - Glance fetches less data so hopefully it will help for watches with less memory available for glance
