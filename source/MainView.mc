@@ -300,12 +300,12 @@ class MainView extends Ui.View {
 
                     // Update the climate state indicator, note we have blue or red icons depending on heating or cooling
                     var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
-                    var climate_defrost = _data._vehicle_data.get("climate_state").get("defrost_mode");
+                    var climate_defrost = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
                     var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
                     var left_temp_direction = _data._vehicle_data.get("climate_state").get("left_temp_direction");
 //                    var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
-
-//logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction);
+//var defrost_mode = _data._vehicle_data.get("climate_state").get("defrost_mode");
+// logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " defrost_mode: " + defrost_mode);
 //logMessage("venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
 
                     if (climate_state == false)
@@ -316,7 +316,7 @@ class MainView extends Ui.View {
 	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon));
 	                    }
                     }
-                    else if (climate_state == true && left_temp_direction < 0 && !climate_defrost)
+                    else if (left_temp_direction < 0 && !climate_defrost)
                     {
 //logMessage("Cooling drv:" + driver_temp + " inside:" + inside_temp);
                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_blue));
@@ -324,7 +324,7 @@ class MainView extends Ui.View {
                     else
                     {
 //logMessage("Heating drv:" + driver_temp + " inside:" + inside_temp);
-                    	if (climate_defrost == 2) {
+                    	if (climate_defrost) {
 	                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_red_defrost));
 	                    } else if (climate_batterie_preheat) {
 	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_preheat));

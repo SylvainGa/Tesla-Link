@@ -61,7 +61,7 @@
     <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
 
 	<!--  Items in Settings only -->
-    <string id="setting_token_label">API REFRESH Token (optionnal) </string>
+    <string id="setting_token_label">API REFRESH Token (optional) </string>
     <string id="setting_token_prompt">Enter your Tesla Account token</string>
 	<string id="setting_number_of_slots">How many filled slots?</string>
     <string id="setting_enhancedTouch">Enhanced touch experience?</string>

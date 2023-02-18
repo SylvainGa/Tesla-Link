@@ -9,6 +9,7 @@ using Toybox.WatchUi as Ui;
 class TeslaLink extends App.AppBase {
 
     function initialize() {
+//2023-02-18 logMessage("Starting app");
         AppBase.initialize();
     }
 
@@ -70,16 +71,17 @@ class TeslaLink extends App.AppBase {
     }
 }
 
-(:debug)
+//(:debug)
+(:background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 	System.println(dateStr + " : " + message);
 }
 
-(:release)
+/*(:release)
 function logMessage(output) {
-}
+}*/
 var errorsStr = {
 	"0" => "UNKNOWN_ERROR",
 	"-1" => "BLE_ERROR",

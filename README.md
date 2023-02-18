@@ -41,6 +41,8 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 ## Changelog since forking from srwalter:
 
+V7.4.2 Fixed the repeated prompt to login and new way of detecting if heating or cooling
+
 V7.4.1 Fixed corruption in the Swedish language file
 
 V7.4.0 Added the following items

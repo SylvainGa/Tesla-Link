@@ -96,13 +96,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
         if (_token != null && _token.length() != 0 && answer == true ) {
             _need_auth = false;
             _auth_done = true;
-			var expireAt = new Time.Moment(createdAt + expireIn);
+/*2023-02-18 			var expireAt = new Time.Moment(createdAt + expireIn);
 			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-// 2022-10-10 logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
+			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");*/
+//2023-02-18 logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
 
         } else {
-// 2022-10-10 logMessage("initialize:No token, will need to get one through a refresh token or authentication");
+//2023-02-18 logMessage("initialize:No token, will need to get one through a refresh token or authentication");
             _need_auth = true;
             _auth_done = false;
         }
@@ -182,65 +182,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
         return true;
 	}
 
-// STEP 4 no longer required. Bearer access token given by step 3	
-    function bearerForAccessOnReceive(responseCode, data) {
-//logMessage("bearerForAccessOnReceive " + responseCode);
-        if (responseCode == 200) {
-            _saveToken(data["access_token"]);
-//logMessage("StateMachine: bearerForAccessOnReceive");
-            stateMachine();
-        }
-        else {
-        	if (responseCode == 401) {
-	            _need_auth = true;
-        	}
-            _resetToken();
-            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-			_sleep_timer.start(method(:stateMachine), 500, false);
-        }
-    }
-
-    function codeForBearerOnReceive(responseCode, data) {
-        if (responseCode == 200) {
-            var bearerForAccessUrl = "https://" + Application.getApp().getProperty("serverAPILocation") + "/oauth/token";
-            var bearerForAccessParams = {
-                "grant_type" => "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                "client_id" => "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384",
-                "client_secret" => "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
-            };
-//logMessage("codeForBearerOnReceive data is " + data);
-
-            var bearerForAccessOptions = {
-                :method => Communications.HTTP_REQUEST_METHOD_POST,
-                :headers => {
-                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON,
-                   "Authorization" => "Bearer " + data["access_token"],
-				   "User-Agent" => "Tesla-Link for Garmin"
-                },
-                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
-            };
-
-            Communications.makeWebRequest(bearerForAccessUrl, bearerForAccessParams, bearerForAccessOptions, method(:bearerForAccessOnReceive));
-        }
-        else {
-//logMessage("codeForBearerOnReceive " + responseCode);
-			if (responseCode == 404) { // If we can't find that page, we're probably not connected to the internet, say so
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_no_phone_internet)]);
-	            _need_auth = true;
-			}
-			else {
-	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-	      }
-        _resetToken();
-		_sleep_timer.start(method(:stateMachine), 500, false);
-      } 
-    }
-
     function onOAuthMessage(message) {
-// 2022-10-10 logMessage("onOAuthMessage message: " + message);
         var code = message.data[$.OAUTH_CODE];
         var error = message.data[$.OAUTH_ERROR];
         if (message.data != null) {
+//2023-02-18 logMessage("onOAuthMessage code: '" + code + "' error: '" + error + "'");
             var codeForBearerUrl = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
             var codeForBearerParams = {
                 "grant_type" => "authorization_code",
@@ -259,8 +205,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             };
 
-// Since step 4 is no longer required, we'll process the token we just received
-//            Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:codeForBearerOnReceive));
+//2023-02-18 logMessage("onOAuthMessage makeWebRequest codeForBearerUrl: '" + codeForBearerUrl + "' codeForBearerParams: '" + codeForBearerParams + "' codeForBearerOptions: '" + codeForBearerOptions + "'");
             Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
         } else {
             _need_auth = true;
@@ -268,7 +213,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
         	if (error == 404) {
 				_vehicle_id = null;
 	        }
-//logMessage("onOAuthMessage " + responseCode);
+//2023-02-18 logMessage("onOAuthMessage " + error + " reseting token");
             _resetToken();
             _handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
 			_sleep_timer.start(method(:stateMachine), 500, false);
@@ -276,8 +221,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveToken(responseCode, data) {
-// 2022-10-10 logMessage("onReceiveToken responseCode is " + responseCode);
-// 2022-10-10 if (data != null) { logMessage("onReceiveToken data is " + data.toString().substring(0,60) + "..."); }
+//2023-02-18 logMessage("onReceiveToken responseCode is " + responseCode);
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -285,12 +229,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			var refreshToken = data["refresh_token"];
 			var expires_in = data["expires_in"];
 			var created_at = Time.now().value();
+
+//2023-02-18 var expireAt = new Time.Moment(created_at + expires_in);
+//2023-02-18 var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+//2023-02-18 var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+
 			_saveToken(accessToken);
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
+/*2023-02-18 if (accessToken != null) {
+	logMessage("onReceiveToken refresh token: " + refreshToken.substring(0,20) + "... + access token: " + accessToken.substring(0,20) + "... which expires at " + dateStr);
+} else {
+	logMessage("onReceiveToken refresh token: " + refreshToken.substring(0,20) + "... + NO ACCESS TOKEN");
+}*/
 				Settings.setRefreshToken(refreshToken, expires_in, created_at);
 			}
+/*2023-02-18 else {
+	logMessage("onReceiveToken NO REFRESH TOKEN + access token: " + accessToken.substring(0,20) + "... which expires at " + dateStr);
+}*/
 			_handler.invoke([0, null]);
         } else {
+//2023-02-18 logMessage("onReceiveToken couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
             _need_auth = true;
             _auth_done = false;
@@ -318,7 +276,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function stateMachine() {
-//logMessage("Running stateMachine " + _need_auth + " " + _tesla + " " + _auth_done);
+//2023-02-18 logMessage("stateMachine vehicle_id " + _vehicle_id + " vehicle_state " + _vehicle_state + " _need_auth " + _need_auth + " _auth_done " + _auth_done);
 		var _spinner = Application.getApp().getProperty("spinner");
 		if (_spinner.equals("+")) {
 			Application.getApp().setProperty("spinner", "-");
@@ -334,6 +292,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var resetNeeded = Application.getApp().getProperty("ResetNeeded");
 		if (resetNeeded != null && resetNeeded == true) {
 			Application.getApp().setProperty("ResetNeeded", false);
+			_vehicle_id = -1;
 			_need_auth = true;
 		}
 
@@ -343,40 +302,63 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_refreshToken != null && _refreshToken.length() != 0) {
-// 2022-10-10 logMessage("stateMachine: Asking for access token through refresh token " + _refreshToken);
+//2023-02-18 logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
 				 GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
-// 2022-10-10 logMessage("stateMachine: Asking for access token through user credentials ");
+//2023-02-18 logMessage("stateMachine: Asking for access token through user credentials with uri " + Application.getApp().getProperty("serverAUTHLocation") + " + api " + Application.getApp().getProperty("serverAPILocation"));
+
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
 	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-	                :toRepresentation => StringUtil.REPRESENTATION_STRING_HEX,
+	                :toRepresentation => StringUtil.REPRESENTATION_STRING_HEX
 	            });
 	
 	            var code_verifier_bytes = StringUtil.convertEncodedString(_code_verifier, {
 	                :fromRepresentation => StringUtil.REPRESENTATION_STRING_PLAIN_TEXT,
-	                :toRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
+	                :toRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY
 	            });
 	            
-	            var hmac = new Cryptography.HashBasedMessageAuthenticationCode({
-	                :algorithm => Cryptography.HASH_SHA256,
-	                :key => code_verifier_bytes
-	            });
-	
+	            var hmac = new Cryptography.Hash({ :algorithm => Cryptography.HASH_SHA256 });
+				hmac.update(code_verifier_bytes);
+
 	            var code_challenge = StringUtil.convertEncodedString(hmac.digest(), {
 	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-	                :toRepresentation => StringUtil.REPRESENTATION_STRING_BASE64,
+	                :toRepresentation => StringUtil.REPRESENTATION_STRING_BASE64
 	            });
-	
+
+				// Need to make code_challenge URL safe. '+' becomes '-', '/' becomes '_' and '=' are skipped
+				var cc_array = code_challenge.toCharArray();
+				var cc_len = code_challenge.length();
+				var code_challenge_fixed = "";
+
+				for (var i = 0; i < cc_len; i++) {
+					switch (cc_array[i]) {
+						case '+':
+							code_challenge_fixed=code_challenge_fixed + '-';
+							break;
+
+						case '/':
+							code_challenge_fixed=code_challenge_fixed + '_';
+							break;
+
+						case '=':
+							break;
+
+						default:
+							code_challenge_fixed=code_challenge_fixed + cc_array[i].toString();
+					}
+				}	
+
 	            var params = {
 	                "client_id" => "ownerapi",
-	                "code_challenge" => code_challenge,
+	                "code_challenge" => code_challenge_fixed,
 	                "code_challenge_method" => "S256",
 	                "redirect_uri" => "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/void/callback",
 	                "response_type" => "code",
 	                "scope" => "openid email offline_access",
-	                "state" => "123"                
+	                "state" => "123"
 	            };
+//2023-02-18 logMessage("params=" + params);
 	            
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 	
@@ -408,12 +390,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_vehicle_id = -1;
 			return;
 		}
-// 2022-10-17 logMessage("stateMachine: vehicle_id = " + _vehicle_id + " vehicle_state = '" + _vehicle_state + "' 408_count = " + _408_count + " check_wake = " + _check_wake + " need_wake = " + _need_wake);
+//logMessage("stateMachine: vehicle_id = " + _vehicle_id + " vehicle_state = '" + _vehicle_state + "' 408_count = " + _408_count + " check_wake = " + _check_wake + " need_wake = " + _need_wake);
         if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
 			if (_vehicle_id == null) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			} else {
-// 2022-10-10 logMessage("StateMachine: Asking to test if we're awake");
+//2023-02-18 logMessage("StateMachine: Asking to test if we're awake");
 			}
             _tesla.getVehicleId(method(:onReceiveVehicles));
             return;
@@ -437,7 +419,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-// 2022-10-17 logMessage("stateMachine:Asking to wake vehicle");
+//2023-02-18 logMessage("stateMachine:Asking to wake vehicle");
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
             return;
@@ -1151,7 +1133,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveVehicles(responseCode, data) {
-// 2022-10-17 logMessage("onReceiveVehicles:responseCode is " + responseCode);
+//2023-02-18 logMessage("onReceiveVehicles:responseCode is " + responseCode);
 //logMessage("onReceiveVehicles:data is " + data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
@@ -1222,7 +1204,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (response != null && response.hasKey("charge_state") && response.get("charge_state").hasKey("timestamp") && response.get("charge_state").get("timestamp") > _lastTimeStamp) {
 				_data._vehicle_data = response;
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
-//logMessage("onReceiveVehicleData received " + _data._vehicle_data);
+// logMessage("onReceiveVehicleData received " + _data._vehicle_data);
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 					_408_count = 0; // Reset the count of timeouts since we got our data
 					_firstTime = false;
@@ -1438,6 +1420,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function _resetToken() {
+//2023-02-18 logMessage("_resetToken called");
         _token = null;
         _auth_done = false;
         Settings.setToken(null);
