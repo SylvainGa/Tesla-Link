@@ -42,16 +42,16 @@ If you like the widget, please consider [leaving a positive review](https://apps
 ## Changelog since forking from srwalter:
 
 V7.5.0  Added the following
-- Optmimized the Glance/background code to only load on glance enabled watch, giving some breathing space for older devices
+- Optimized the Glance/background code to only load on glance enabled watch, giving some breathing space for older devices
 - Like before, glance data is updated at 5 minutes intervals when in Glance mode, but when the main view is active, Glance data is kept up to date
-- Optimized the drawing of the climate symbol to accomodate more options which are independant of one another. The following can appear wheter the cabin climate is off, cooling or heating
+- Optimized the drawing of the climate symbol to accommodate more options which are independent of one another. The following can appear whether the cabin climate is off, cooling or heating
   - The 'waves' on the upper right blade means battery is preconditioning
   - The 'waves' on the upper left blade means defrost was automatically turned on
   - The 'waves' on the lower left blade means the rear defrost is on
   - The 'waves' on the lower right blade means defrost was manually activated
 - Removed the request to press a key to launch the app on non touch, non Glance devices. One less step before interacting with the car!
 
-Regarding Glance, keep in mind that when the watch boot, it will take some time for the Glance code to authenticate to the car (cannot do multiple calls per iteration of the Glance code) and retreive its first set of data. One way to circumvent this is to launch the app, which will update the data right away. Going back to the Glance mode will reactive its 5 minutes view refresh (limitation imposed by Garmin) but with the most recent data.
+Regarding Glance, keep in mind that when the watch boot, it will take some time for the Glance code to authenticate to the car (cannot do multiple calls per iteration of the Glance code) and retrieve its first set of data. One way to circumvent this is to launch the app, which will update the data right away. Going back to the Glance mode will reactive its 5 minutes view refresh (limitation imposed by Garmin) but with the most recent data.
 
 V7.4.2 Fixed the repeated prompt to login and new way of detecting if heating or cooling
 
