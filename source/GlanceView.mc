@@ -1,7 +1,7 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 
-(:glance)
+(:glance, :can_glance)
 class GlanceView extends Ui.GlanceView {
 	
   function initialize() {

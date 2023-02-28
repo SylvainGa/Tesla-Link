@@ -23,7 +23,6 @@ class Tesla {
         );
     }
 
-    (:background)
     hidden function genericPost(url, notify) {
         Communications.makeWebRequest(
             url,
@@ -47,25 +46,21 @@ class Tesla {
         genericGet("https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", notify);
     }
 
-    (:background)
     function getVehicle(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString();
         genericGet(url, notify);
     }
 
-    (:background)
     function getVehicleData(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data";
         genericGet(url, notify);
     }
 
-    (:background)
     function getVehicleState(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/vehicle_state";
         genericGet(url, notify);
     }
 
-    (:background)
     function getClimateState(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/climate_state";
         genericGet(url, notify);

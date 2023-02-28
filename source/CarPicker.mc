@@ -29,6 +29,13 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onCancel () {
+        if (_controller._vehicle_id == -1) {
+            _controller._vehicle_id = -3;
+        }
+        else {
+            _controller._vehicle_id = -2;
+        }
+        _controller.stateMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 

@@ -166,19 +166,19 @@
             <color>000000</color>
         </palette>
     </bitmap>
-    <bitmap id="climate_off_icon_preheat" filename="climateoff_preheat.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="climate_waves_off" filename="heat_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>00AA00</color>
             <color>000000</color>
         </palette>
     </bitmap>
-    <bitmap id="climate_on_icon_preheat" filename="climateon_preheat.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="climate_waves_blue" filename="heat_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
-            <color>FF0000</color>
+            <color>00AAFF</color>
             <color>000000</color>
         </palette>
     </bitmap>
-    <bitmap id="climate_on_icon_red_defrost" filename="climateon_defrost.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="climate_waves_red" filename="heat_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FF0000</color>
             <color>000000</color>

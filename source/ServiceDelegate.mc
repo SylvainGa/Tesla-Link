@@ -4,7 +4,7 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.WatchUi as Ui;
 
-(:background)
+(:background, :can_glance)
 class MyServiceDelegate extends System.ServiceDelegate {
 
     var _token;

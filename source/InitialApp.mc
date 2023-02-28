@@ -13,24 +13,29 @@ class TeslaLink extends App.AppBase {
         AppBase.initialize();
     }
 
+    (:can_glance)
     function getServiceDelegate(){
         return [ new MyServiceDelegate() ];
     }
 
     // This fires when the background service returns
+    (:can_glance)
     function onBackgroundData(data) {
+        Application.getApp().setProperty("canGlance", true);
         Application.getApp().setProperty("status", data["status"]);
 //var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 //var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 //System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
 
+        Background.registerForTemporalEvent(new Time.Duration(60*5));
+
         Ui.requestUpdate();
     }  
 
-    (:glance)
+    (:glance, :can_glance)
     function getGlanceView() {
         Application.getApp().setProperty("canGlance", true);
-//		System.println("Glance: Starting glance view");
+//System.println("Glance: Starting glance view");
         Background.registerForTemporalEvent(new Time.Duration(60*5));
         return [ new GlanceView() ];
     }
@@ -40,6 +45,8 @@ class TeslaLink extends App.AppBase {
         if (!System.getDeviceSettings().phoneConnected) {
             return [ new OfflineView() ];
         }
+
+		Application.getApp().setProperty("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
 
         var data = new TeslaData();
 		var useTouch = Application.getApp().getProperty("useTouch");
@@ -53,35 +60,21 @@ class TeslaLink extends App.AppBase {
 			Application.getApp().setProperty("useTouch", useTouch);
 		}
         
-        if (Application.getApp().getProperty("canGlance"))
-        {
-            var view = new MainView(data);
-            return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
-        }
-        else if (useTouch)
-        {
-            var view = new MainView(data);
-            return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
-		}
-		else
-		{
-            var view = new NoGlanceView();
-            return [ view, new NoGlanceDelegate(data) ];
-        }        
+		var view = new MainView(data);
+		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
     }
 }
 
-//(:debug)
-(:background)
+(:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 	System.println(dateStr + " : " + message);
 }
 
-/*(:release)
+(:release, :background)
 function logMessage(output) {
-}*/
+}
 var errorsStr = {
 	"0" => "UNKNOWN_ERROR",
 	"-1" => "BLE_ERROR",

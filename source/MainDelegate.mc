@@ -206,6 +206,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
             };
 
 //2023-02-18 logMessage("onOAuthMessage makeWebRequest codeForBearerUrl: '" + codeForBearerUrl + "' codeForBearerParams: '" + codeForBearerParams + "' codeForBearerOptions: '" + codeForBearerOptions + "'");
+//2023-02-28 logMessage("stateMachine: Asking for access token through an OAUTH2");
             Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
         } else {
             _need_auth = true;
@@ -221,7 +222,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveToken(responseCode, data) {
-//2023-02-18 logMessage("onReceiveToken responseCode is " + responseCode);
+//2023-02-28 logMessage("onReceiveToken responseCode is " + responseCode);
         if (responseCode == 200) {
             _auth_done = true;
 
@@ -276,7 +277,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function stateMachine() {
-//2023-02-18 logMessage("stateMachine vehicle_id " + _vehicle_id + " vehicle_state " + _vehicle_state + " _need_auth " + _need_auth + " _auth_done " + _auth_done);
+//2023-02-28 logMessage("stateMachine vehicle_id " + _vehicle_id + " vehicle_state " + _vehicle_state + " _need_auth " + _need_auth + " _auth_done " + _auth_done + " _check_wake " + _check_wake + " _need_wake " + _need_wake + " _wake_done " + _wake_done );
 		var _spinner = Application.getApp().getProperty("spinner");
 		if (_spinner.equals("+")) {
 			Application.getApp().setProperty("spinner", "-");
@@ -302,11 +303,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_refreshToken != null && _refreshToken.length() != 0) {
-//2023-02-18 logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
+//2023-02-28 logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
 				 GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
 //2023-02-18 logMessage("stateMachine: Asking for access token through user credentials with uri " + Application.getApp().getProperty("serverAUTHLocation") + " + api " + Application.getApp().getProperty("serverAPILocation"));
+//2023-02-28 logMessage("stateMachine: Building an OAUTH2 request");
 
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
 	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
@@ -362,6 +364,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 	
+//2023-02-28 logMessage("stateMachine: Registring an OAUTH2 request");
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
 	            Communications.makeOAuthRequest(
 	                "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/authorize",
@@ -397,6 +400,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 //2023-02-18 logMessage("StateMachine: Asking to test if we're awake");
 			}
+//2023-02-28 logMessage("StateMachine: Getting vehicles list");
             _tesla.getVehicleId(method(:onReceiveVehicles));
             return;
         }
@@ -419,7 +423,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-//2023-02-18 logMessage("stateMachine:Asking to wake vehicle");
+//2023-02-28 logMessage("stateMachine:Asking to wake vehicle");
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
             return;
@@ -680,7 +684,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (!_skipGetVehicleData) {
 			if (!_waitingForVehicleData) {
-// 2022-05-21 logMessage("StateMachine: Requesting data");
+//2023-02-28 logMessage("StateMachine: Requesting data");
 				_lastDataRun = System.getTimer();
 				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
 				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
@@ -696,7 +700,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_need_wake = false;
 		_wake_done = false;
 		_wakeTime = System.getTimer();
-// 2022-10-17 logMessage("wakeConfirmed:Asking to wake vehicle");
+//2023-02-28 logMessage("wakeConfirmed:Asking to wake vehicle");
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
     }
 
@@ -1133,7 +1137,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveVehicles(responseCode, data) {
-//2023-02-18 logMessage("onReceiveVehicles:responseCode is " + responseCode);
+//2023-02-28 logMessage("onReceiveVehicles:responseCode is " + responseCode);
 //logMessage("onReceiveVehicles:data is " + data);
         if (responseCode == 200) {
             var vehicles = data.get("response");
@@ -1188,7 +1192,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveVehicleData(responseCode, data) {
-// 2022-10-17 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
+//2023-02-28 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
 		_waitingForVehicleData = false;
 		
 		if (_skipGetVehicleData) {
@@ -1202,6 +1206,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
 			var response = data.get("response");
 			if (response != null && response.hasKey("charge_state") && response.get("charge_state").hasKey("timestamp") && response.get("charge_state").get("timestamp") > _lastTimeStamp) {
+				// Update the glance data
+				if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
+					var battery_level = response.get("charge_state").get("battery_level");
+					var battery_range = response.get("charge_state").get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
+					var charging_state = response.get("charge_state").get("charging_state");
+
+					var suffix;
+					try {
+						var clock_time = System.getClockTime();
+						suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+					} catch (e) {
+						suffix = "";
+					}
+					Application.getApp().setProperty("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + suffix);
+//2023-02-28 logMessage("onReceiveVehicleData set status to '" + Application.getApp().getProperty("status") + "'");
+				}
+
 				_data._vehicle_data = response;
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
 // logMessage("onReceiveVehicleData received " + _data._vehicle_data);
@@ -1230,6 +1251,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
         } else {
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
+				if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
+					var suffix;
+					try {
+						var clock_time = System.getClockTime();
+						suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+					} catch (e) {
+						suffix = "";
+					}
+					Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
+				}
+
 // 2022-10-17 logMessage("onReceiveVehicleData: Got 408, 408_count = " + _408_count + " firstTime = " + _firstTime);
 	        	if ((_408_count % 20 == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
 					if (_408_count < 2) { // Only when we first started to get the errors do we keep the start time
@@ -1259,7 +1291,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function onReceiveAwake(responseCode, data) {
-// 2022-10-17 logMessage("onReceiveAwake:responseCode is " + responseCode);
+//2023-02-28 logMessage("onReceiveAwake:responseCode is " + responseCode);
         if (responseCode == 200) {
             _wake_done = true;
 //logMessage("stateMachine: onReceiveWake");
@@ -1285,7 +1317,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
    function onReceiveVehicleState(responseCode, data) {
-// 2022-10-10 logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
+//2023-02-28 logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1314,7 +1346,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
    function onReceiveClimateState(responseCode, data) {
-// 2022-10-10 logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
+//2023-02-28 logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1334,7 +1366,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
    function onReceiveChargeState(responseCode, data) {
-// 2022-10-10 logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
+//2023-02-28 logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
         if (responseCode == 200) {
 			var response = data.get("response");
 			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
@@ -1354,7 +1386,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function getVehicleState() {
-// 2022-10-10 logMessage("getVehicleState: Calling onReceiveVehicleState");
+//2023-02-28 logMessage("getVehicleState: Calling onReceiveVehicleState");
 		_tesla.getVehicleState(_vehicle_id, method(:onReceiveVehicleState));
 	}
 
@@ -1370,7 +1402,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function getClimateState() {
-// 2022-10-10 logMessage("getClimateState: Calling onReceiveClimateState");
+//2023-02-28 logMessage("getClimateState: Calling onReceiveClimateState");
 		_tesla.getClimateState(_vehicle_id, method(:onReceiveClimateState));
 	}
 
@@ -1387,7 +1419,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
     }
 
     function getChargeState() {
-// 2022-10-10 logMessage("getChargeState: Calling onReceiveChargeState");
+//2023-02-28 logMessage("getChargeState: Calling onReceiveChargeState");
 		_tesla.getChargeState(_vehicle_id, method(:onReceiveChargeState));
 	}
 

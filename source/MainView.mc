@@ -68,9 +68,6 @@ class MainView extends Ui.View {
             font_montserrat=Graphics.FONT_TINY;
         }
 
-        // Next background update in 5 mins!
-        Background.registerForTemporalEvent(new Time.Duration(60*5));
-
         // Redraw the layout and wipe the canvas
         if (_display != null || (_errorTimer > 0 && _previousDisplayType != 1)) {
             // We're showing a message, so set 'ready' false to prevent touches
@@ -303,34 +300,57 @@ class MainView extends Ui.View {
                     var climate_defrost = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
                     var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
                     var left_temp_direction = _data._vehicle_data.get("climate_state").get("left_temp_direction");
-//                    var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
-//var defrost_mode = _data._vehicle_data.get("climate_state").get("defrost_mode");
-// logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " defrost_mode: " + defrost_mode);
+                    var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
+                    var defrost_mode = _data._vehicle_data.get("climate_state").get("defrost_mode");
+                    var rear_defrost = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
+
+                    /*climate_state = true;
+                    climate_batterie_preheat = true;
+                    defrost_mode = 2;
+                    climate_defrost = true;
+                    rear_defrost = true;
+                    left_temp_direction = -1;*/
+
+//logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " right_temp_direction: " + right_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " rear_defrost: " + rear_defrost + " defrost_mode: " + defrost_mode);
 //logMessage("venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
 
-                    if (climate_state == false)
-                    {
-                    	if (climate_batterie_preheat) {
-	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon_preheat));
-	                    } else {
-	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_off_icon));
-	                    }
+                    var bm;
+                    var bm_waves;
+                    var bm_width;
+                    var bm_height;
+
+                    if (climate_state == false) {
+                        bm = Ui.loadResource(Rez.Drawables.climate_off_icon) as BitmapResource;
+                        bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_off) as BitmapResource;
                     }
-                    else if (left_temp_direction < 0 && !climate_defrost)
-                    {
+                    else if (left_temp_direction < 0 && !climate_defrost) {
 //logMessage("Cooling drv:" + driver_temp + " inside:" + inside_temp);
-                       dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_blue));
+                        bm = Ui.loadResource(Rez.Drawables.climate_on_icon_blue) as BitmapResource;
+                        bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_blue) as BitmapResource;
                     }
-                    else
-                    {
+                    else {
 //logMessage("Heating drv:" + driver_temp + " inside:" + inside_temp);
-                    	if (climate_defrost) {
-	                        dc.drawBitmap(image_x_right,image_y_top, Ui.loadResource(Rez.Drawables.climate_on_icon_red_defrost));
-	                    } else if (climate_batterie_preheat) {
-	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_preheat));
-	                    } else {
-	                        dc.drawBitmap(image_x_right,image_y_top.toNumber(), Ui.loadResource(Rez.Drawables.climate_on_icon_red));
-	                    }
+                        bm = Ui.loadResource(Rez.Drawables.climate_on_icon_red) as BitmapResource;
+                        bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_red) as BitmapResource;
+                    }
+
+                    bm_width = bm.getWidth();
+                    bm_height = bm.getHeight();
+
+                    dc.drawBitmap(image_x_right,image_y_top, bm);
+                    if (climate_batterie_preheat) {
+                        dc.drawBitmap(image_x_right + bm_width / 2 + bm_width / 8, image_y_top + bm_height / 4, bm_waves);
+                    }
+                    if (climate_defrost) {
+                        dc.drawBitmap(image_x_right + bm_width / 4, image_y_top + bm_height / 4, bm_waves);
+                    }
+
+                    if (rear_defrost) {
+                        dc.drawBitmap(image_x_right + bm_width / 4, image_y_top + bm_height / 2 + bm_height / 8, bm_waves);
+                    }
+
+                    if (defrost_mode == 2) {
+                        dc.drawBitmap(image_x_right + bm_width / 2 + bm_width / 8, image_y_top + bm_height / 2 + bm_height / 8, bm_waves);
                     }
                     
                     if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
