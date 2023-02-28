@@ -6,7 +6,7 @@ Tesla Link Widget is a Garmin ConnectIQ widget for Tesla vehicle control.
 https://bit.ly/sylvainga
 
 Based on the work of srwalter and paulobrien and posted with their blessing. Link to their github is at the end of this file.
-My work includes enhancing the touch display interface, increased the reliability of the communication, added many features to the Option menu, added the selection/order of the Option menu and added data screens. I try to keep the application up to date with new features added by Tesla once they become available to the community.
+My work includes enhancing the touch display interface, increasing the reliability of the communication, adding many features to the Option menu, adding the selection/order of the Option menu and adding data screens. I try to keep the application up to date with new features added by Tesla once they become available to the community.
 
 <p align="center">
   <img src="https://github.com/SylvainGa/Tesla-Link/blob/develop/blob/venu2.png?raw=true" />
@@ -51,7 +51,7 @@ V7.5.0  Added the following
   - The 'waves' on the lower right blade means defrost was manually activated
 - Removed the request to press a key to launch the app on non touch, non Glance devices. One less step before interacting with the car!
 
-Regarding Glance, keep in mind that when the watch boot, it will take some time for the Glance code to authenticate to the car (cannot do multiple calls per iteration of the Glance code) and retrieve its first set of data. One way to circumvent this is to launch the app, which will update the data right away. Going back to the Glance mode will reactive its 5 minutes view refresh (limitation imposed by Garmin) but with the most recent data.
+Regarding Glance, keep in mind that when the watch boot, it will take some time for the Glance code to authenticate to the car (cannot do multiple calls per iteration of the Glance code) and retrieve its first set of data. One way to circumvent this is to launch the app, which will update the data right away. Going back to the Glance mode will reactivate its 5 minutes view refresh (limitation imposed by Garmin) but with the most recent data.
 
 V7.4.2 Fixed the repeated prompt to login and new way of detecting if heating or cooling
 
