@@ -61,7 +61,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             	min_temp = min_temp * 9.0 / 5.0 + 32.0;
             }
 
-            Ui.pushView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(_controller), Ui.SLIDE_UP);
+            Ui.switchToView(new TemperaturePicker(driver_temp, max_temp, min_temp), new TemperaturePickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_charging_amps) {
         	var max_amps = _controller._data._vehicle_data.get("charge_state").get("charge_current_request_max");
             var charging_amps = _controller._data._vehicle_data.get("charge_state").get("charge_current_request");
@@ -74,11 +74,11 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             	}
             }
             
-            Ui.pushView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(_controller), Ui.SLIDE_UP);
+            Ui.switchToView(new ChargerPicker(charging_amps, max_amps), new ChargerPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_charging_limit) {
         	var charging_limit = _controller._data._vehicle_data.get("charge_state").get("charge_limit_soc");
             
-            Ui.pushView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(_controller), Ui.SLIDE_UP);
+            Ui.switchToView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_seat_heat) {
 			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
 	        var seats = new [rear_seats_avail != null ? 7 : 3];
@@ -96,7 +96,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 		        seats[2] = Rez.Strings.label_seat_front;
 	        }
 
-	        Ui.pushView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
+	        Ui.switchToView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :defrost) {
             _controller._set_climate_defrost = true;
             _controller.stateMachine();
@@ -115,7 +115,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 	            _controller.stateMachine();
             }
             else {
-				Ui.pushView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
+				Ui.switchToView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
             }
         } else if (item == :toggle_sentry) {
             _controller._sentry_mode = true;
@@ -126,7 +126,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             _controller.stateMachine();
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-            Ui.pushView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
+            Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
             _controller._view_datascreen = true;
             _controller.stateMachine();
@@ -136,6 +136,15 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
         } else if (item == :remote_boombox) {
             _controller._remote_boombox = true;
             _controller.stateMachine();
+        } else if (item == :climate_mode) {
+	        var modes = new [4];
+
+	        modes[0] = Rez.Strings.label_climate_off;
+	        modes[1] = Rez.Strings.label_climate_on;
+	        modes[2] = Rez.Strings.label_climate_dog;
+	        modes[3] = Rez.Strings.label_climate_camp;
+
+	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         }
     }
 
@@ -149,7 +158,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
                 vinsName[i] = vehicles[i].get("display_name");
                 vinsId[i] = vehicles[i].get("id");
             }
-            Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
+            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
         } else {
             _controller._handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }

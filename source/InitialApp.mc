@@ -9,7 +9,7 @@ using Toybox.WatchUi as Ui;
 class TeslaLink extends App.AppBase {
 
     function initialize() {
-//2023-02-18 logMessage("Starting app");
+//logMessage("Starting app");
         AppBase.initialize();
     }
 
@@ -21,7 +21,6 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     (:can_glance)
     function onBackgroundData(data) {
-        Application.getApp().setProperty("canGlance", true);
         Application.getApp().setProperty("status", data["status"]);
 //var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 //var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");

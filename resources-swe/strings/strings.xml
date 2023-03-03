@@ -9,17 +9,12 @@
     <string id="label_launch_widget" scope="background">Starta widget</string>    
     <string id="label_waiting_data" scope="background">Väntar på data</string>   
 
-    <!-- No glance view -->
-    <string id="label_touch">Pekskärm</string>
-    <string id="label_press">Tryck på start</string>
-    <string id="label_connect">för att ansluta</string>
-
-    <!--  Main layout -->
+	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Telefonkontakt</string>
     <string id="label_offline2">krävs</string>
 
-    <!--  Tesla layout -->
+	<!--  Text mode layout -->
     <string id="button_climate_on">Klimat</string>
     <string id="button_door">Dörr</string>
     <string id="button_frunk">Frunk</string>
@@ -59,6 +54,7 @@
     <string id="menu_label_wake">Väck bilen</string>
     <string id="menu_label_refresh">Uppdatera</string>
     <string id="menu_label_remote_boombox">Fjärt</string> 
+    <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (frivillig)</string>
@@ -114,6 +110,7 @@
 
     <!--  Handler text -->
     <string id="label_error">Error</string>
+    <string id="label_might_have_failed">Command might have failed</string>  <!--  NEW -->
     <string id="label_getting_vehicles">Hämtar fordon</string>
     <string id="label_frunk_opening">Frunk öppnas</string>
     <string id="label_frunk_closing">Frunk stängs</string>
@@ -126,11 +123,18 @@
     <string id="label_unlock_port">Lås upp laddport</string>  
     <string id="label_hvac_on">Klimat på</string>
     <string id="label_hvac_off">Klimat av</string>
+    <string id="label_climate_set">Climate set to </string>  <!--  NEW -->
+    <string id="label_charging_limit">Charge limit set to </string>  <!--  NEW -->
+    <string id="label_charging_amps">Current set to </string>  <!--  NEW -->
     <string id="label_lock_doors">Lås dörrar</string>
     <string id="label_unlock_doors">Lås upp dörrar</string>
     <string id="label_login_on_phone">Logga in på telefonen!</string>
     <string id="label_oauth_error">OAuth error</string>
     <string id="label_requesting_data">Hämtar data</string>
+    <string id="label_requesting_data_waiting">Still waiting</string>  <!--  NEW -->
+    <string id="label_authenticating_with_token">Authenticating with token</string>  <!--  NEW -->
+    <string id="label_authenticating_with_login">Authenticating with login</string>  <!--  NEW -->
+    <string id="label_got_token">Got our token</string>  <!--  NEW -->
     <string id="label_waking_vehicle">Väcker fordon</string>
     <string id="label_no_vehicles">Inga fordon</string>
     <string id="label_vent_opening">Fönster öppnas</string>
@@ -144,12 +148,13 @@
     <string id="label_stop_departure">Avresa avaktiverad</string>
     <string id="label_sentry_on">Sentry på</string>
     <string id="label_sentry_off">Sentry av</string>
-    <string id="label_homelink">Homelink</string>
+    <string id="label_homelink">Homelink activated</string>  <!--  NEW -->
     <string id="label_unauthorized">Auktorisation saknas</string>
     <string id="label_no_phone_internet">Inget mobilt internet</string>
-    <string id="label_remote_boombox">Fjärt</string>  
+    <string id="label_remote_boombox">Fjärt acivated</string>  <!--  NEW -->
     <string id="label_stop_charging">Stoppa laddning</string>    
     <string id="label_start_charging">Starta laddning</string>   
+    <string id="label_climate_mode">Climate mode set to </string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Öppna frunk</string>
@@ -188,6 +193,11 @@
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
     <string id="label_refresh_chooser_title">Uppdateringsfrekvens msec</string>
+    <string id="label_climate_which">Which mode?</string>  <!--  NEW -->
+    <string id="label_climate_off">Off</string>  <!--  NEW -->
+    <string id="label_climate_on">On</string>  <!--  NEW -->
+    <string id="label_climate_dog">Dog</string>  <!--  NEW -->
+    <string id="label_climate_camp">Camp</string>  <!--  NEW -->
 
     <!--  Subview text -->
     <string id="subview_label_charge_limit_soc">Laddgräns</string>

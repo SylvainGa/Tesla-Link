@@ -9,17 +9,12 @@
     <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
     <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
 
-    <!-- No glance view -->
-    <string id="label_touch">Touch Screen</string>
-    <string id="label_press">Press Start</string>
-    <string id="label_connect">to Connect</string>
-    
-	<!--  Main layout -->
+	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Phone connection</string>
     <string id="label_offline2">is required</string>
 
-	<!--  Tesla layout -->
+	<!--  Text mode layout -->
     <string id="button_climate_on">Climate</string>
     <string id="button_door">Door</string>
     <string id="button_frunk">Frunk</string>
@@ -59,6 +54,7 @@
     <string id="menu_label_wake">Force Wake</string>
     <string id="menu_label_refresh">Set refresh time</string>
     <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
+    <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
 
 	<!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (optional) </string>
@@ -114,6 +110,7 @@
 
 	<!--  Handler text -->
     <string id="label_error">Error: </string>
+    <string id="label_might_have_failed">Command might have failed</string>  <!--  NEW -->
     <string id="label_getting_vehicles">Getting vehicles</string>
     <string id="label_frunk_opening">Frunk opening</string>
     <string id="label_frunk_closing">Frunk closing</string>
@@ -126,11 +123,18 @@
     <string id="label_unlock_port">Unlocking port</string>  <!--  NEW -->
     <string id="label_hvac_on">Climate On</string>
     <string id="label_hvac_off">Climate Off</string>
+    <string id="label_climate_set">Climate set to </string>  <!--  NEW -->
+    <string id="label_charging_limit">Charge limit set to </string>  <!--  NEW -->
+    <string id="label_charging_amps">Current set to </string>  <!--  NEW -->
     <string id="label_lock_doors">Locking Doors</string>
     <string id="label_unlock_doors">Unlocking Doors</string>
     <string id="label_login_on_phone">Login on Phone!</string>
     <string id="label_oauth_error">OAuth error</string>
     <string id="label_requesting_data">Retrieving data</string>
+    <string id="label_requesting_data_waiting">Still waiting</string>
+    <string id="label_authenticating_with_token">Authenticating with token</string>  <!--  NEW -->
+    <string id="label_authenticating_with_login">Authenticating with login</string>  <!--  NEW -->
+    <string id="label_got_token">Got our token</string>  <!--  NEW -->
     <string id="label_waking_vehicle">Waking vehicle</string>
     <string id="label_no_vehicles">No vehicles</string>
     <string id="label_vent_opening">Venting</string>
@@ -144,12 +148,13 @@
 	<string id="label_stop_departure">departure disabled</string>
     <string id="label_sentry_on">Sentry on</string>
     <string id="label_sentry_off">Sentry off</string>
-    <string id="label_homelink">Homelink</string>
+    <string id="label_homelink">Homelink activated</string>
     <string id="label_unauthorized">Unauthorized</string>
     <string id="label_no_phone_internet">Phone not connected\nto the internet</string>
-    <string id="label_remote_boombox">Boombox</string>  <!--  NEW -->
+    <string id="label_remote_boombox">Boombox activated</string>  <!--  NEW -->
     <string id="label_stop_charging">Stopping charge</string>  <!--  NEW -->
     <string id="label_start_charging">Starting charge</string>  <!--  NEW -->
+    <string id="label_climate_mode">Climate mode set to </string>  <!--  NEW -->
 
 	<!--  Popup text -->
     <string id="label_open_frunk">Open Frunk?</string>
@@ -188,6 +193,11 @@
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
     <string id="label_refresh_chooser_title">In msec</string>
+    <string id="label_climate_which">Which mode?</string>  <!--  NEW -->
+    <string id="label_climate_off">Off</string>  <!--  NEW -->
+    <string id="label_climate_on">On</string>  <!--  NEW -->
+    <string id="label_climate_dog">Dog</string>  <!--  NEW -->
+    <string id="label_climate_camp">Camp</string>  <!--  NEW -->
 
 	<!--  Subview text -->
     <string id="subview_label_charge_limit_soc">Charge limit</string>

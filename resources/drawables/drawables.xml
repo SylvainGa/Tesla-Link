@@ -184,6 +184,24 @@
             <color>000000</color>
         </palette>
     </bitmap>
+    <bitmap id="climate_blades_off" filename="cool_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>00AA00</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="climate_blades_blue" filename="cool_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>00AAFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="climate_blades_red" filename="cool_on.png" dithering="none" scaleX="4%" scaleY="4%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FF0000</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
     <bitmap id="locked_icon" filename="locked.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>00AA00</color>

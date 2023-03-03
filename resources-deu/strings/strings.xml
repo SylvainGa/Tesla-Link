@@ -6,26 +6,22 @@
     <string id="vehicle" scope="glance">Fahrzeug</string>
     <string id="label_asleep" scope="background">Schläft</string>
     <string id="label_status_unknown" scope="glance">Status unbekannt</string>
-
-    <!-- No glance view -->
-    <string id="label_touch">Touch Screen</string>
-    <string id="label_press">Drücke Start</string>
-    <string id="label_connect">um zu verbinden</string>
     <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
     <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
 
-    <!--  Main layout -->
+	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Telefonverbindung</string>
     <string id="label_offline2">wird benötigt</string>
 
-    <!--  Tesla layout -->
+	<!--  Text mode layout -->
     <string id="button_climate_on">Lüftung</string>
     <string id="button_door">Tür</string>
     <string id="button_frunk">Frunk</string>
 
     <!--  Option menu -->
     <string id="menu_label_reset">Zurücksetzen</string>
+    <string id="label_might_have_failed">Command might have failed</string>  <!--  NEW -->
     <string id="menu_label_honk">Hupen</string>
     <string id="menu_label_open_port">Ladeport öffnen</string>
     <string id="menu_label_close_port">Close Port</string>  <!--  NEW -->
@@ -59,6 +55,7 @@
     <string id="menu_label_wake">Erzwinge Aufwachen</string>
     <string id="menu_label_refresh">Ändere Aktualisierungsintervall</string>
     <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
+    <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (optional) </string>
@@ -114,6 +111,7 @@
 
     <!--  Handler text -->
     <string id="label_error">Fehler: </string>
+    <string id="label_might_have_failed">Command might have failed</string>  <!--  NEW -->
     <string id="label_getting_vehicles">Getting vehicles</string>
     <string id="label_frunk_opening">Frunk öffnet</string>
     <string id="label_frunk_closing">Frunk schließt</string>
@@ -126,11 +124,18 @@
     <string id="label_unlock_port">Unlocking port</string>  <!--  NEW -->
     <string id="label_hvac_on">Lüftung an</string>
     <string id="label_hvac_off">Lüftung aus</string>
+    <string id="label_climate_set">Climate set to </string>  <!--  NEW -->
+    <string id="label_charging_limit">Charge limit set to </string>  <!--  NEW -->
+    <string id="label_charging_amps">Current set to </string>  <!--  NEW -->
     <string id="label_lock_doors">Türen verschließen</string>
     <string id="label_unlock_doors">Öffne Türen</string>
     <string id="label_login_on_phone">Logge dich auf\ndem Smartphone ein!</string>
     <string id="label_oauth_error">OAuth Fehler</string>
     <string id="label_requesting_data">Empfange Daten</string>
+    <string id="label_requesting_data_waiting">Still waiting</string>  <!--  NEW -->
+    <string id="label_authenticating_with_token">Authenticating with token</string>  <!--  NEW -->
+    <string id="label_authenticating_with_login">Authenticating with login</string>  <!--  NEW -->
+    <string id="label_got_token">Got our token</string>  <!--  NEW -->
     <string id="label_waking_vehicle">Wecke Fahrzeug auf</string>
     <string id="label_no_vehicles">Keine Fahrzeuge</string>
     <string id="label_vent_opening">Fensterspalt geöffnet</string>
@@ -144,12 +149,13 @@
     <string id="label_stop_departure">Gepl. Abfahrt deativiert</string>
     <string id="label_sentry_on">Überwachung AN</string>
     <string id="label_sentry_off">Überwachung AUS</string>
-    <string id="label_homelink">Homelink</string>
+    <string id="label_homelink">Homelink activated</string>   <!--  NEW -->
     <string id="label_unauthorized">Nicht berechtigt</string>
     <string id="label_no_phone_internet">Telefon ist nicht mit dem\n Internet verbunden</string>
-    <string id="label_remote_boombox">Boombox</string>  <!--  NEW -->
+    <string id="label_remote_boombox">Boombox activated</string>  <!--  NEW -->
     <string id="label_stop_charging">Stopping charge</string>  <!--  NEW -->
     <string id="label_start_charging">Starting charge</string>  <!--  NEW -->
+    <string id="label_climate_mode">Climate mode set to </string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>
@@ -188,6 +194,11 @@
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
     <string id="label_refresh_chooser_title">In msec</string>
+    <string id="label_climate_which">Which mode?</string>  <!--  NEW -->
+    <string id="label_climate_off">Off</string>  <!--  NEW -->
+    <string id="label_climate_on">On</string>  <!--  NEW -->
+    <string id="label_climate_dog">Dog</string>  <!--  NEW -->
+    <string id="label_climate_camp">Camp</string>  <!--  NEW -->
 
     <!--  Subview text -->
     <string id="subview_label_charge_limit_soc">Ladelimit</string>

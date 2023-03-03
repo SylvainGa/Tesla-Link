@@ -1,10 +1,10 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
 
-class SeatPicker extends WatchUi.Picker {
-    function initialize (seats) {
-        var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_seat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
-        var factory = new WordFactory(seats);
+class ClimateModePicker extends WatchUi.Picker {
+    function initialize (modes) {
+        var title = new WatchUi.Text({:text=>Rez.Strings.label_climate_which, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
+        var factory = new WordFactory(modes);
         Picker.initialize({:pattern => [factory], :title => title});
     }
 
@@ -15,7 +15,7 @@ class SeatPicker extends WatchUi.Picker {
     }
 }
 
-class SeatPickerDelegate extends WatchUi.PickerDelegate {
+class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
     var _selected;
 
@@ -30,8 +30,11 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function onAccept (values) {
         _selected = values[0];
-		Application.getApp().setProperty("seat_chosen", _selected);
+		Application.getApp().setProperty("climate_mode_chosen", _selected);
 
-        WatchUi.switchToView(new SeatHeatPicker(_selected), new SeatHeatPickerDelegate(_controller), WatchUi.SLIDE_UP);
+        _controller._climate_mode = true;
+        _controller.stateMachine();
+
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }
