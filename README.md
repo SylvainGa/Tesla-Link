@@ -42,8 +42,8 @@ If you like the widget, please consider [leaving a positive review](https://apps
 ## Changelog since forking from srwalter:
 
 V7.6.0 Added the following
-- Optmized the display of text messages and added more texts to be more desciptive of what's happening while waiting for the screen to show up
-- Once an item of the menu has been chosing, you're automatically brought back to the main screen
+- Optimized the display of text messages and added more texts to be more descriptive of what's happening while waiting for the screen to show up
+- Once an item of the menu has been choosing, you're automatically brought back to the main screen
 - The lower right blade of the climate icon has a new icon, a fan (so yeah, a fan within a fan). While the 'waves' indicate that defrost was manually started, the 'fan' indicate that the defogging was manually started. Although it is still impossible to activate defogging remotely unfortunately
 - The Climate keeper command has been added. The available options are : Off, On, Dog mode and Camp mode.
 
