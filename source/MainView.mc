@@ -4,6 +4,8 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
 
+import Toybox.WatchUi;
+
 /* For displayType
 	Message received with type 0 : Will last 2 seconds
 	Message received with type 1 : Will last 1 seconds

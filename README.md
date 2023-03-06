@@ -41,6 +41,8 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 ## Changelog since forking from srwalter:
 
+V7.6.1 Compiled with Connect IQ 4.2.1 which added support for the Forerunner 265, 265s and 965. 
+
 V7.6.0 Added the following
 - Optimized the display of text messages and added more texts to be more descriptive of what's happening while waiting for the screen to show up
 - Once an item of the menu has been choosing, you're automatically brought back to the main screen

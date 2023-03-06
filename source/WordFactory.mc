@@ -1,5 +1,6 @@
 using Toybox.Graphics;
 using Toybox.WatchUi;
+import Toybox.Lang;
 
 class WordFactory extends WatchUi.PickerFactory {
     var mWords;

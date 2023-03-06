@@ -1,4 +1,5 @@
 project.manifest = manifest.xml
+
 base.excludeAnnotations = can_glance
 d2airx10.excludeAnnotations = cant_glance
 d2mach1.excludeAnnotations = cant_glance
@@ -15,11 +16,14 @@ fr245m.excludeAnnotations = cant_glance
 fr255.excludeAnnotations = cant_glance
 fr255s.excludeAnnotations = cant_glance
 fr255m.excludeAnnotations = cant_glance
+fr265.excludeAnnotations = cant_glance
+fr265s.excludeAnnotations = cant_glance
 fr255sm.excludeAnnotations = cant_glance
 fr745.excludeAnnotations = cant_glance
 fr945.excludeAnnotations = cant_glance
 fr945lte.excludeAnnotations = cant_glance
 fr955.excludeAnnotations = cant_glance
+fr965.excludeAnnotations = cant_glance
 marqadventurer.excludeAnnotations = cant_glance
 marqathlete.excludeAnnotations = cant_glance
 marqaviator.excludeAnnotations = cant_glance
@@ -35,3 +39,5 @@ venu2plus.excludeAnnotations = cant_glance
 venu2s.excludeAnnotations = cant_glance
 venusq2.excludeAnnotations = cant_glance
 venusq2m.excludeAnnotations = cant_glance
+
+project.typecheck = 0
