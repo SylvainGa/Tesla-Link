@@ -40,4 +40,3 @@ venu2s.excludeAnnotations = cant_glance
 venusq2.excludeAnnotations = cant_glance
 venusq2m.excludeAnnotations = cant_glance
 
-project.typecheck = 0
