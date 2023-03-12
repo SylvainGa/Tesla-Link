@@ -91,6 +91,11 @@
     <string id="menu_label_set_steering_wheel_heat">Lenkradheizung</string>
     <string id="menu_label_defrost">Enteisung</string>
     <string id="menu_label_sentry">Überwachungsmodus</string>
+    <string id="setting_holdActionUpperLeft">Touch hold action for upper left quadrant</string>  <!--  NEW -->
+    <string id="setting_holdActionUpperRight">Touch hold action for upper right quadrant</string>  <!--  NEW -->
+    <string id="setting_holdActionLowerLeft">Touch hold action for lower left quadrant</string>  <!--  NEW -->
+    <string id="setting_holdActionLowerRight">Touch hold action for lower right quadrant</string>  <!--  NEW -->
+    <string id="menu_label_none">Disabled</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Innenraum: </string>

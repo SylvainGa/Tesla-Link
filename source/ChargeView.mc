@@ -28,14 +28,8 @@ class ChargeView extends Ui.View {
     function onUpdate(dc) {
         var width = dc.getWidth();
         var height = dc.getHeight();
-        var extra = (width/7+width/28) * ((width.toFloat()/height.toFloat())-1);
-        var image_x_left = (width/7+width/28+extra).toNumber();
-        var image_y_top = (height/7+height/21).toNumber();
-        var image_x_right = (width/7*4-width/28+extra).toNumber();
-        var image_y_bottom = (height/7*4-height/21).toNumber();
         var center_x = dc.getWidth()/2;
         var center_y = dc.getHeight()/2;
-        var sentry_y = image_y_top - height/21;
         
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
@@ -58,19 +52,12 @@ class ChargeView extends Ui.View {
             // Showing the main layouts, so we can process touches now
             _data._ready = true;
 
-            // We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
-            var is_touchscreen = System.getDeviceSettings().isTouchScreen;
-
-			// Read temperature unit from the watch settings
-			//Application.getApp().setProperty("imperial", System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE);
-
             // We're loading the image layout
             setLayout(Rez.Layouts.DataScreenLayout(dc));
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.clear();
             View.onUpdate(dc);
             
-            var title = View.findDrawableById("Title");
 		    var lineText = new [8];
 		    var lineValue = new [8];
             

@@ -80,8 +80,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_handler = handler;
 		_tesla = null;
 
-//		_debugTimer = System.getTimer();
-//		Application.getApp().setProperty("overrideCode", 0);
+		if (Application.getApp().getProperty("enhancedTouch")) {
+			Application.getApp().setProperty("spinner", "+");
+		}
+		else {
+			Application.getApp().setProperty("spinner", "/");
+		}
+		
+// _debugTimer = System.getTimer(); Application.getApp().setProperty("overrideCode", 0);
 
 		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
 		if (createdAt == null) {
@@ -224,23 +230,23 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			};
 
 //2023-02-18 logMessage("onOAuthMessage makeWebRequest codeForBearerUrl: '" + codeForBearerUrl + "' codeForBearerParams: '" + codeForBearerParams + "' codeForBearerOptions: '" + codeForBearerOptions + "'");
-//2023-03-03 logMessage("stateMachine: Asking for access token through an OAUTH2");
+//2023-03-12 logMessage("stateMachine: Asking for access token through an OAUTH2");
 			Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
 		} else {
 			_need_auth = true;
 			_auth_done = false;
-			if (error == 404) { //Not found, 
-				_vehicle_id = null;
+			if (error == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
+				_vehicle_id = -2;
 	        }
 //2023-02-18 logMessage("onOAuthMessage " + error + " reseting token");
 			_resetToken();
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-			_sleep_timer.start(method(:stateMachine), 500, false);
+			_sleep_timer.start(method(:stateMachine), 100, false);
 		}
 	}
 
 	function onReceiveToken(responseCode, data) {
-//2023-03-03 logMessage("onReceiveToken responseCode is " + responseCode);
+//2023-03-12 logMessage("onReceiveToken " + responseCode);
 		if (responseCode == 200) {
 			_auth_done = true;
 
@@ -252,9 +258,10 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			var expires_in = data["expires_in"];
 			var created_at = Time.now().value();
 
-//2023-02-18 var expireAt = new Time.Moment(created_at + expires_in);
-//2023-02-18 var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-//2023-02-18 var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+/*2023-03-12 var expireAt = new Time.Moment(created_at + expires_in);
+var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+logMessage("onReceiveToken acces token expires at " + dateStr);*/
 
 			_saveToken(accessToken);
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
@@ -279,7 +286,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 	    }
 
-		_sleep_timer.start(method(:stateMachine), 500, false);
+		_sleep_timer.start(method(:stateMachine), 100, false);
 	}
 
 	function GetAccessToken(token, notify) {
@@ -301,16 +308,22 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 	}
 
 	function stateMachine() {
-//2023-03-03 logMessage("stateMachine vehicle_id " + _vehicle_id + " vehicle_state " + _vehicle_state + " _need_auth " + _need_auth + " _auth_done " + _auth_done + " _check_wake " + _check_wake + " _need_wake " + _need_wake + " _wake_done " + _wake_done );
+//2023-03-12 logMessage("stateMachine " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : ""));
 		var _spinner = Application.getApp().getProperty("spinner");
 		if (_spinner.equals("+")) {
 			Application.getApp().setProperty("spinner", "-");
-		} else {
+		}
+		else if (_spinner.equals("-")) {
 			Application.getApp().setProperty("spinner", "+");
+		}
+		else if (_spinner.equals("/")) {
+			Application.getApp().setProperty("spinner", "\\");
+		} else {
+			Application.getApp().setProperty("spinner", "/");
 		}
 
 		if (_skipGetVehicleData) {
-// 2022-10-10 logMessage("StateMachine: Skipping stateMachine");
+//2023-03-12 logMessage("StateMachine: Skipping stateMachine");
 			return;
 		}
 
@@ -327,14 +340,13 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_refreshToken != null && _refreshToken.length() != 0) {
-//2023-03-03 logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
+//2023-03-12 logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
 	    		_handler.invoke([3, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				_showingRequestingData = true;
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
-//2023-02-18 logMessage("stateMachine: Asking for access token through user credentials with uri " + Application.getApp().getProperty("serverAUTHLocation") + " + api " + Application.getApp().getProperty("serverAPILocation"));
-//2023-03-03 logMessage("stateMachine: Building an OAUTH2 request");
+//2023-03-12 logMessage("stateMachine: Building an OAUTH2 request");
 	        	_handler.invoke([3, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_login)]);
 				_showingRequestingData = true;
 
@@ -392,7 +404,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 	            
 	            _handler.invoke([3, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 	
-//2023-03-03 logMessage("stateMachine: Registring an OAUTH2 request");
+//2023-03-12 logMessage("stateMachine: Registring an OAUTH2 request");
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
 	            Communications.makeOAuthRequest(
 	                "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/authorize",
@@ -409,6 +421,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (!_auth_done) {
+//2023-03-12 logMessage("StateMachine: auth NOT done");
 			return;
 		}
 
@@ -421,14 +434,13 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			_vehicle_id = -1;
 			return;
 		}
-//logMessage("stateMachine: vehicle_id = " + _vehicle_id + " vehicle_state = '" + _vehicle_state + "' 408_count = " + _408_count + " check_wake = " + _check_wake + " need_wake = " + _need_wake);
 		if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
+//2023-03-12 logMessage("StateMachine: Need to get vehicles list with _vehicle_id " +  (_vehicle_id != null && _vehicle_id > 0 ? "set" : _vehicle_id) + " and _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			} else {
 //2023-02-18 logMessage("StateMachine: Asking to test if we're awake");
 			}
-//2023-03-03 logMessage("StateMachine: Getting vehicles list");
 			_tesla.getVehicleId(method(:onReceiveVehicles));
 			return;
 		}
@@ -447,6 +459,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_need_wake) { // Asked to wake up
+//2023-03-12 logMessage("stateMachine:Need to wake vehicle");
 			if (_firstTime) { // As if we should wake the vehicle
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Application.getApp().getProperty("vehicle_name") + "?");
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
@@ -454,7 +467,6 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			} else {
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-//2023-03-03 logMessage("stateMachine:Asking to wake vehicle");
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
 			return;
@@ -465,7 +477,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_climate_on) {
-//logMessage("StateMachine: Climate On - calling climateStateHandler");
+//2023-03-12 logMessage("StateMachine: Climate On - waiting for climateStateHandler");
 			_set_climate_on = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_on)]);
@@ -473,7 +485,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_climate_off) {
-//logMessage("StateMachine: Climate Off - calling climateStateHandler");
+//2023-03-12 logMessage("StateMachine: Climate Off - waiting for climateStateHandler");
 			_set_climate_off = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_hvac_off)]);
@@ -481,6 +493,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_climate_defrost) {
+//2023-03-12 logMessage("StateMachine: Climate Defrost - waiting for climateStateHandler");
 			_set_climate_defrost = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
@@ -488,6 +501,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_climate_set) {
+//2023-03-12 logMessage("StateMachine: Climate set temperature - waiting for genericHandler");
 			_set_climate_set = false;
 			var temperature = Application.getApp().getProperty("driver_temp");
 			if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
@@ -500,12 +514,14 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_toggle_charging_set) {
+//2023-03-12 logMessage("StateMachine: Toggling charging - waiting for genericHandler");
 			_toggle_charging_set = false;
 			_handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
 			_tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
 		}
 
 		if (_set_charging_limit_set) {
+//2023-03-12 logMessage("StateMachine: Setting charge limit - waiting for genericHandler");
 			_set_charging_limit_set = false;
 			var charging_limit = Application.getApp().getProperty("charging_limit");
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_charging_limit) + charging_limit + "%"]);
@@ -513,6 +529,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_charging_amps_set) {
+//2023-03-12 logMessage("StateMachine: Setting max current - waiting for genericHandler");
 			_set_charging_amps_set = false;
 			var charging_amps = Application.getApp().getProperty("charging_amps");
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_charging_amps) + charging_amps + "A"]);
@@ -521,12 +538,18 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		if (_honk_horn) {
 			_honk_horn = false;
-			var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
-			var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), null);
-			Ui.pushView(view, delegate, Ui.SLIDE_UP);
+			if (_bypass_confirmation) {
+				_bypass_confirmation = false;
+				honkHornConfirmed();
+			} else {
+				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
+				var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), null);
+				Ui.pushView(view, delegate, Ui.SLIDE_UP);
+			}
 		}
 
 		if (_open_port) {
+//2023-03-12 logMessage("StateMachine: Opening on charge port - waiting for chargeStateHandler");
 			_open_port = false;
 			_skipGetVehicleData = true;
 	    	_handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
@@ -534,6 +557,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_close_port) {
+//2023-03-12 logMessage("StateMachine: Closing on charge port - waiting for chargeStateHandler");
 			_close_port = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_close_port)]);
@@ -541,7 +565,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_unlock) {
-//logMessage("StateMachine: Unlock - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Unlock - waiting for vehicleStateHandler");
 			_unlock = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
@@ -549,7 +573,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_lock) {
-//logMessage("StateMachine: Lock - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Lock - waiting for vehicleStateHandler");
 			_lock = false;
 			_skipGetVehicleData = true;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_lock_doors)]);
@@ -609,6 +633,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_set_seat_heat) {
+//2023-03-12 logMessage("StateMachine: Setting seat heat - waiting for genericHandler");
 			_set_seat_heat = false;
 			var seat_chosen = Application.getApp().getProperty("seat_chosen");
 			var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
@@ -638,7 +663,6 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 					seat_heat_chosen = 0;
 					break;
 			}
-//logMessage("seat_chosen = " + seat_chosen + " seat_heat_chosen = " + seat_heat_chosen);
 
 			_handler.invoke([2, Ui.loadResource(seat_chosen)]);
 
@@ -657,10 +681,13 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		if (_set_steering_wheel_heat) {
 			_set_steering_wheel_heat = false;
+//2023-03-12 logMessage("StateMachine: Setting steering wheel heat - waiting for climateStateHandler");
 	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
 	            _handler.invoke([1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
+	            _sleep_timer.start(method(:stateMachine), 100, false);
 	        }
 	        else {
+				_skipGetVehicleData = true;
 	            _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
 	            _tesla.climateSteeringWheel(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
 	        }
@@ -670,12 +697,12 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			_adjust_departure = false;
 			_skipGetVehicleData = true;
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-//logMessage("StateMachine: Preconditionning off - calling chargeStateHandler");
+//2023-03-12 logMessage("StateMachine: Preconditionning off - waiting for chargeStateHandler");
 	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_stop_departure)]);
 	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), false);
 	        }
 	        else {
-//logMessage("StateMachine: Preconditionning on - calling chargeStateHandler");
+//2023-03-12 logMessage("StateMachine: Preconditionning on - waiting for chargeStateHandler");
 	            _handler.invoke([2, Ui.loadResource(Rez.Strings.label_start_departure)]);
 	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), true);
 	        }
@@ -694,21 +721,20 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		}
 
 		if (_homelink) {
-// 2022-10-10 logMessage("StateMachine: Homelink - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Homelink - waiting for genericHandler");
 			_homelink = false;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_homelink)]);
 	        _tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
 		}
 
 		if (_remote_boombox) {
-// 2022-10-10 logMessage("StateMachine: Remote Boombox - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Remote Boombox - waiting for genericHandler");
 			_remote_boombox = false;
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
 	        _tesla.remoteBoombox(_vehicle_id, method(:genericHandler));
 		}
 
 		if (_climate_mode) {
-// 2022-10-10 logMessage("StateMachine: Remote Boombox - calling vehicleStateHandler");
 			_climate_mode = false;
 
 			var mode_chosen_str;
@@ -729,7 +755,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 					mode_chosen = 3;
 					break;
 			}
-//2023-03-03 logMessage("StateMachine: ClimateMode - setting mode to " + Ui.loadResource(mode_chosen_str));
+//2023-03-12 logMessage("StateMachine: ClimateMode - setting mode to " + Ui.loadResource(mode_chosen_str) + "- calling genericHandler");
 			_handler.invoke([2, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(mode_chosen_str)]);
 	        _tesla.setClimateMode(_vehicle_id, method(:genericHandler), mode_chosen);
 		}
@@ -740,7 +766,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			if (_refreshTimeInterval == null) {
 				_refreshTimeInterval = 1000;
 			}
-//logMessage("_refreshTimeInterval at " + _refreshTimeInterval);
+//2023-03-12 logMessage("StateMachine: refreshTimeInterval at " + _refreshTimeInterval + " - not calling a handler");
 		}
 		
 		if (_view_datascreen) {
@@ -750,26 +776,24 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		if (!_skipGetVehicleData) {
 			if (!_waitingForVehicleData) {
-//2023-03-03 logMessage("StateMachine: Requesting data");
 				_lastDataRun = System.getTimer();
 				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
 				if (_showingRequestingData) {
-//2023-03-03 logMessage("StateMachine: starting wait for data timer");
 					_waiting_data_timer.start(method(:waitingVehicleData), 5000, false);
 				}
 				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 			} else {
-// 2022-10-10 logMessage("StateMachine: Already waiting for data, skipping");
+//2023-03-12 logMessage("StateMachine: Already waiting for data, skipping");
 			}
 		} else {
-// 2022-10-10 logMessage("StateMachine: Skipping requesting data");
+//2023-03-12 logMessage("StateMachine: Skipping requesting data");
 		}
 	}
 
 	function waitingVehicleData()
 	{
 		if (_showingRequestingData && _waitingForVehicleData && _view._data._ready == false) { // Are we still showing the requested data message?
-//2023-03-03 logMessage("waitingVehicleData: We're STILL waiting for data");
+//2023-03-12 logMessage("waitingVehicleData: We're STILL waiting for data");
 			_handler.invoke([3, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting)]);
 		}
 	}
@@ -778,7 +802,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		_need_wake = false;
 		_wake_done = false;
 		_wakeTime = System.getTimer();
-//2023-03-03 logMessage("wakeConfirmed:Asking to wake vehicle");
+//2023-03-12 logMessage("wakeConfirmed:Asking to wake vehicle");
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 	}
 
@@ -789,21 +813,20 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 	function openVentConfirmed() {
 		_handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_opening)]);
-//        Application.getApp().setProperty("venting", 4); Let onUpdate deal with that
-//logMessage("StateMachine: Open vent - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Open vent - waiting for vehicleStateHandler");
 		_skipGetVehicleData = true;
 		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "vent", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
 	}
 
 	function closeVentConfirmed() {
 	    _handler.invoke([2, Ui.loadResource(Rez.Strings.label_vent_closing)]);
-//        Application.getApp().setProperty("venting", 0); Let onUpdate deal with that
-//logMessage("StateMachine: Close vent - calling vehicleStateHandler");
+//2023-03-12 logMessage("StateMachine: Close vent - waiting for vehicleStateHandler");
 		_skipGetVehicleData = true;
 		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "close", Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
 	}
 
 	function frunkConfirmed() {
+//2023-03-12 logMessage("StateMachine: Acting on frunk - waiting for vehicleStateHandler");
 		var hansshowFrunk = Application.getApp().getProperty("HansshowFrunk");
 		if (hansshowFrunk) {
 	        _handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
@@ -816,18 +839,20 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
 			} else {
 				_handler.invoke([1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
-	            _sleep_timer.start(method(:stateMachine), 500, false);
+	            _sleep_timer.start(method(:stateMachine), 100, false);
 			}
 		}
 	}
 
 	function trunkConfirmed() {
+//2023-03-12 logMessage("StateMachine: Acting on trunk - waiting for vehicleStateHandler");
 		_handler.invoke([2, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
 		_skipGetVehicleData = true;
 		_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "rear");
 	}
 
 	function honkHornConfirmed() {
+//2023-03-12 logMessage("StateMachine: Honking - waiting for genericHandler");
 		_handler.invoke([2, Ui.loadResource(Rez.Strings.label_honk)]);
 		_tesla.honkHorn(_vehicle_id, method(:genericHandler));
 	}
@@ -924,8 +949,6 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			}
 
 			Ui.pushView(menu, new TrunksMenuDelegate(self), Ui.SLIDE_UP );
-
-			//Ui.pushView(new Rez.Menus.TrunksMenu(), new TrunksMenuDelegate(self), Ui.SLIDE_UP);
 		}
 // 2022-10-10 logMessage("stateMachine: doPreviousPage");
 		stateMachine();
@@ -1125,6 +1148,11 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		var x = coords[0];
 		var y = coords[1];
 		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
+		if (enhancedTouch == null) {
+			enhancedTouch = true;
+		}
+
+//2023-03-12 logMessage("stateMachine: onTap - enhancedTouch=" + enhancedTouch);
 
 		// Tap on vehicle name
 		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
@@ -1133,14 +1161,12 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		// Tap on the space used by the 'Eye'
 		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
 			_sentry_mode = true;
-//logMessage("stateMachine: onTap");
 			stateMachine();
 		}
 		// Tap on the middle text line where Departure is written
 		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 	            _adjust_departure = true;
-// 2022-10-10 logMessage("stateMachine: onTap");
 	            stateMachine();
 			}
 			else {
@@ -1201,6 +1227,101 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 		return true;
 	}
 
+	function onHold(click) {
+		if (!_data._ready)
+		{
+			return true;
+		}
+		
+		var coords = click.getCoordinates();
+		var x = coords[0];
+		var y = coords[1];
+
+		if (x < _settings.screenWidth/2) {
+			if (y < _settings.screenHeight/2) {
+//2023-03-12 logMessage("stateMachine: onHold - Upper Left action");
+				switch (Application.getApp().getProperty("holdActionUpperLeft")) {
+					case 1:
+						_open_frunk = true;
+						_bypass_confirmation = true;
+						stateMachine();
+						break;
+
+					case 2:
+						_open_trunk = true;
+						_bypass_confirmation = true;
+						stateMachine();
+						break;
+
+					case 3:
+						if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charge_port_door_open") == false) {
+							_open_port = true;
+						} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Disconnected")) {
+							_close_port = true;
+						} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
+							_toggle_charging_set = true;
+						} else {
+							_open_port = true;
+						}
+						stateMachine();
+						break;
+
+					case 3:
+						_vent = true;
+						_bypass_confirmation = true;
+						stateMachine();
+						break;
+
+					default:
+						break;
+				}
+			} else {
+//2023-03-12 logMessage("stateMachine: onHold - Lower Left action");
+				switch (Application.getApp().getProperty("holdActionLowerLeft")) {
+					case 1:
+						_honk_horn = true;
+						_bypass_confirmation = true;
+						stateMachine();
+						break;
+
+					default:
+						break;
+				}
+			}
+		} else {
+			if (y < _settings.screenHeight/2) {
+//2023-03-12 logMessage("stateMachine: onHold - Upper Right action");
+				switch (Application.getApp().getProperty("holdActionUpperRight")) {
+					case 1:
+						_set_climate_defrost = true;
+						stateMachine();
+						break;
+
+					default:
+						break;
+				}
+			} else {
+//2023-03-12 logMessage("stateMachine: onHold - Lower Right action");
+				switch (Application.getApp().getProperty("holdActionLowerRight")) {
+					case 1:
+						_homelink = true;
+						stateMachine();
+						break;
+
+					case 2:
+						_remote_boombox = true;
+						stateMachine();
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	function selectVehicle(responseCode, data) {
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
@@ -1218,7 +1339,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 	}
 
 	function onReceiveVehicles(responseCode, data) {
-//2023-03-03 logMessage("onReceiveVehicles:responseCode is " + responseCode);
+//2023-03-12 logMessage("onReceiveVehicles: " + responseCode);
 //logMessage("onReceiveVehicles:data is " + data);
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
@@ -1252,7 +1373,6 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				Application.getApp().setProperty("vehicle", _vehicle_id);
 				Application.getApp().setProperty("vehicle_name", vehicles[vehicle_index].get("display_name"));
 
-//logMessage("stateMachine: onReceiveVehicles");
 				stateMachine();
 				return;
 			} else {
@@ -1263,12 +1383,11 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				// Unauthorized
 				_resetToken();
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-				return;
 			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 	            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 	        }
 
-			_sleep_timer.start(method(:stateMachine), 500, false);
+			_sleep_timer.start(method(:stateMachine), 100, false);
 		}
 	}
 
@@ -1287,12 +1406,12 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			responseCode = 408;
 		}
 */
-//2023-03-03 logMessage("onReceiveVehicleData: responseCode is " + responseCode);
+//2023-03-12 logMessage("onReceiveVehicleData: " + responseCode);
 		_waitingForVehicleData = false;
 		_showingRequestingData = false;
 
 		if (_skipGetVehicleData) {
-// 2022-10-10 logMessage("onReceiveVehicleData: Asked to skip");
+//2023-03-12 logMessage("onReceiveVehicleData: Asked to skip");
 			return;
 		}
 
@@ -1323,6 +1442,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
 // logMessage("onReceiveVehicleData received " + _data._vehicle_data);
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+//2023-03-12 if (_408_count) { logMessage("onReceiveVehicleData clearing _408_count"); }
 					_408_count = 0; // Reset the count of timeouts since we got our data
 					_firstTime = false;
 					_handler.invoke([1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
@@ -1363,26 +1483,24 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 					_showingRequestingData = true;
 				}
 
-// 2022-10-17 logMessage("onReceiveVehicleData: Got 408, 408_count = " + _408_count + " firstTime = " + _firstTime);
+//2023-03-12 logMessage("onReceiveVehicleData: 408_count=" + _408_count + " firstTime=" + _firstTime);
 	        	if ((_408_count % 20 == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
 					if (_408_count < 2 && !_firstTime) { // Only when we first started to get the errors do we keep the start time
 						_wakeTime = System.getTimer();
 					}
 // 2022-10-10 logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");
-//		            _vehicle_id = -1;
 					_check_wake = true;
 	            }
 				_408_count++;
 			} else {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-					_vehicle_id = null;
+					_vehicle_id = -2;
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 				} else if (responseCode == 401) {
 	                // Unauthorized, retry
 	                _need_auth = true;
 	                _resetToken();
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-	                return;
 				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 		            _handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		        }
@@ -1392,10 +1510,9 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 	}
 
 	function onReceiveAwake(responseCode, data) {
-//2023-03-03 logMessage("onReceiveAwake:responseCode is " + responseCode);
+//2023-03-12 logMessage("onReceiveAwake: " + responseCode);
 		if (responseCode == 200) {
 			_wake_done = true;
-//logMessage("stateMachine: onReceiveWake");
 			stateMachine();
 			return;
 	   } else {
@@ -1403,22 +1520,21 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 			_need_wake = true;
 			_wake_done = false;
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-				_vehicle_id = null;
+				_vehicle_id = -2;
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			} else if (responseCode == 401) { // Unauthorized, retry
 				_resetToken();
 				_need_auth = true;
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-				return;
 			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 				_handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			}
 		}
-		_sleep_timer.start(method(:stateMachine), 500, false);
+		_sleep_timer.start(method(:stateMachine), 100, false);
 	}
 
    function onReceiveVehicleState(responseCode, data) {
-//2023-03-03 logMessage("onReceiveVehicleState: responseCode is " + responseCode + " calling StateMachine");
+//2023-03-12 logMessage("onReceiveVehicleState: " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1437,7 +1553,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				_data._vehicle_data.get("vehicle_state").put("ft", response.get("ft"));
 				_data._vehicle_data.get("vehicle_state").put("rt", response.get("rt"));
 			} else {
-// 2022-10-10 logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
+//2023-03-12 logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
@@ -1445,11 +1561,11 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		_handler.invoke([0, result]);
 		_skipGetVehicleData = false;
-		_sleep_timer.start(method(:stateMachine), 500, false);
+		_sleep_timer.start(method(:stateMachine), 100, false);
 	}
 
    function onReceiveClimateState(responseCode, data) {
-//2023-03-03 logMessage("onReceiveClimateState responseCode is " + responseCode + " calling StateMachine");
+//2023-03-12 logMessage("onReceiveClimateState " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1459,7 +1575,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				_data._vehicle_data.get("climate_state").put("defrost_mode", response.get("defrost_mode"));
 				_data._vehicle_data.get("climate_state").put("battery_heater", response.get("battery_heater"));
 			} else {
-// 2022-10-10 logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
+//2023-03-12 logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
@@ -1467,11 +1583,11 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		_handler.invoke([0, result]);
 		_skipGetVehicleData = false;
-		_sleep_timer.start(method(:stateMachine), 500, false);
+		_sleep_timer.start(method(:stateMachine), 100, false);
 	}
 
    function onReceiveChargeState(responseCode, data) {
-//2023-03-03 logMessage("onReceiveChargeState responseCode is " + responseCode + " calling StateMachine");
+//2023-03-12 logMessage("onReceiveChargeState " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1481,7 +1597,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 				_data._vehicle_data.get("charge_state").put("scheduled_departure_time_minutes", response.get("scheduled_departure_time_minutes"));
 				_data._vehicle_data.get("charge_state").put("charge_port_door_open", response.get("charge_port_door_open"));
 			} else {
-// 2022-10-10 logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
+//2023-03-12 logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
@@ -1489,67 +1605,75 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 
 		_handler.invoke([0, result]);
 		_skipGetVehicleData = false;
-		_sleep_timer.start(method(:stateMachine), 500, false);
+		_sleep_timer.start(method(:stateMachine), 100, false);
 	}
 
 	function getVehicleState() {
-//2023-03-03 logMessage("getVehicleState: Calling onReceiveVehicleState");
+//2023-03-12 logMessage("getVehicleState: waiting for onReceiveVehicleState");
 		_tesla.getVehicleState(_vehicle_id, method(:onReceiveVehicleState));
 	}
 
 	function vehicleStateHandler(responseCode, data) {
-//2023-03-03 logMessage("vehicleStateHandler: responseCode is " + responseCode + " Calling getVehicleState");
 		if (responseCode == 200) {
+//2023-03-12 logMessage("vehicleStateHandler: " + responseCode + " Calling getVehicleState in 1 sec");
 	        _handler_timer.start(method(:getVehicleState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 		} else {  // Our call failed, say the error and back to the main code
+//2023-03-12 logMessage("vehicleStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_skipGetVehicleData = false;
-			_handler_timer.start(method(:stateMachine), 500, false);
+			_handler_timer.start(method(:stateMachine), 100, false);
 		}
 	}
 
 	function getClimateState() {
-//2023-03-03 logMessage("getClimateState: Calling onReceiveClimateState");
+//2023-03-12 logMessage("getClimateState: waiting for onReceiveClimateState");
 		_tesla.getClimateState(_vehicle_id, method(:onReceiveClimateState));
 	}
 
 	function climateStateHandler(responseCode, data) {
-//2023-03-03 logMessage("climateStateHandler: responseCode is " + responseCode + " Calling getClimateState");
 		if (responseCode == 200) {
+//2023-03-12 logMessage("climateStateHandler: " + responseCode + " Calling getClimateState in 1 sec");
 	        _handler_timer.start(method(:getClimateState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 			return;
 		} else { // Our call failed, say the error and back to the main code
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_skipGetVehicleData = false;
-			_handler_timer.start(method(:stateMachine), 500, false);
+//2023-03-12 logMessage("climateStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
+			_handler_timer.start(method(:stateMachine), 100, false);
 		}
 	}
 
 	function getChargeState() {
-//2023-03-03 logMessage("getChargeState: Calling onReceiveChargeState");
+//2023-03-12 logMessage("getChargeState: waiting for onReceiveChargeState");
 		_tesla.getChargeState(_vehicle_id, method(:onReceiveChargeState));
 	}
 
 	function chargeStateHandler(responseCode, data) {
-//2023-03-03 logMessage("chargeStateHandler: responseCode is " + responseCode + " Calling getChargeState");
 		if (responseCode == 200) {
+//2023-03-12 logMessage("chargeStateHandler: " + responseCode + " Calling getChargeState in 1 sec");
 	        _handler_timer.start(method(:getChargeState), 1000, false); // Give it time to process the change of data otherwise we'll get the value BEFORE the change
 			return;
 		} else { // Our call failed, say the error and back to the main code
+//2023-03-12 logMessage("chargeStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_skipGetVehicleData = false;
-			_handler_timer.start(method(:stateMachine), 500, false);
+			_handler_timer.start(method(:stateMachine), 100, false);
 		}
 	}
 
 	function genericHandler(responseCode, data) {
-//2023-03-03 logMessage("genericHandler: responseCode is " + responseCode);
+//2023-03-12 logMessage("genericHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 		if (responseCode == 200) {
 			_handler.invoke([0, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 			_handler.invoke([0, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
-		_handler_timer.start(method(:stateMachine), 500, false);
+
+		if (_skipGetVehicleData) {
+//2023-03-12 logMessage("genericHandler: WARNING _skipGetVehicleData IS TRUE!!! Should not be for genericHandler");
+			_skipGetVehicleData = false; // Shouldn't be required but just to be safe
+		}
+		_handler_timer.start(method(:stateMachine), 100, false);
 	}
 
 	function _saveToken(token) {
@@ -1559,7 +1683,7 @@ logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which exp
 	}
 
 	function _resetToken() {
-//2023-02-18 logMessage("_resetToken called");
+l//2023-03-12 ogMessage("_resetToken called");
 		_token = null;
 		_auth_done = false;
 		Settings.setToken(null);

@@ -90,6 +90,11 @@
     <string id="menu_label_set_steering_wheel_heat">Steering wheel heat</string>
 	<string id="menu_label_defrost">Defrost toggle</string>
     <string id="menu_label_sentry">Sentry Toggle</string>
+    <string id="setting_holdActionUpperLeft">Touch hold action for upper left quadrant</string>
+    <string id="setting_holdActionUpperRight">Touch hold action for upper right quadrant</string>
+    <string id="setting_holdActionLowerLeft">Touch hold action for lower left quadrant</string>
+    <string id="setting_holdActionLowerRight">Touch hold action for lower right quadrant</string>
+    <string id="menu_label_none">Disabled</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>

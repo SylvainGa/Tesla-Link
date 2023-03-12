@@ -31,6 +31,38 @@
 		</settingConfig>
 	</setting>
 
+	<setting propertyKey="@Properties.holdActionUpperLeft" title="@Strings.setting_holdActionUpperLeft">
+		<settingConfig type="list">
+			<listEntry value="1">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="2">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="3">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="4">@Strings.menu_label_vent</listEntry>
+   			<listEntry value="0">@Strings.menu_label_none</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.holdActionUpperRight" title="@Strings.setting_holdActionUpperRight">
+		<settingConfig type="list">
+			<listEntry value="1">@Strings.menu_label_defrost</listEntry>
+   			<listEntry value="0">@Strings.menu_label_none</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.holdActionLowerLeft" title="@Strings.setting_holdActionLowerLeft">
+		<settingConfig type="list">
+			<listEntry value="1">@Strings.menu_label_honk</listEntry>
+   			<listEntry value="0">@Strings.menu_label_none</listEntry>
+		</settingConfig>
+	</setting>
+
+	<setting propertyKey="@Properties.holdActionLowerRight" title="@Strings.setting_holdActionLowerRight">
+		<settingConfig type="list">
+			<listEntry value="1">@Strings.menu_label_homelink</listEntry>
+			<listEntry value="2">@Strings.menu_label_remote_boombox</listEntry>
+   			<listEntry value="0">@Strings.menu_label_none</listEntry>
+		</settingConfig>
+	</setting>
+
 	<setting propertyKey="@Properties.NumberOfSlots" title="@Strings.setting_number_of_slots">
 		<settingConfig type="numeric" min="1" max="16" required="true"/>
 	</setting>

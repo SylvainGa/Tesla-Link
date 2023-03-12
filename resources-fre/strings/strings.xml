@@ -90,6 +90,11 @@
     <string id="menu_label_set_steering_wheel_heat">Volant chauffant</string>
     <string id="menu_label_defrost">Actionner Dégivrage</string>
     <string id="menu_label_sentry">Mode Sentinelle</string>
+    <string id="setting_holdActionUpperLeft">Action pour un appui prolongé sur le cartier supérieur gauche</string>
+    <string id="setting_holdActionUpperRight">Action pour un appui prolongé sur le cartier supérieur droit</string>
+    <string id="setting_holdActionLowerLeft">Action pour un appui prolongé sur le cartier inférieur gauche</string>
+    <string id="setting_holdActionLowerRight">Action pour un appui prolongé sur le cartier inférieur droit</string>
+    <string id="menu_label_none">Désactivé</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>

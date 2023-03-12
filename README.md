@@ -41,6 +41,20 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 ## Changelog since forking from srwalter:
 
+V7.7.0 Added the following
+- Brings touch screen "Hold" function. By holding your finger pressed to one of the four quadrants of the screen, it can perform other functions. You configure these through the app parameters on your phone. The options are
+    - Upper Left quadrant : Frunk, Trunk, Port, Vent or Disabled (just like the menu). These will NOT ask to confirm the action and will peform it as soon as a Hold has been detected.
+    - Upper Right quadrant : Toogle defrost or Disabled
+    - Lower Left quadrant : Honk or Disabled
+    - Lower Right quadrant: Homelink, Remote boombox (why not) or Disabled
+    Default for each quadrant is Disabled
+- The 'spinner' to show when a new set of data has been received now has two type, '+ -' and '/ \'. It's basically to differentiate if enhancedTouch is active "+ -" or not "/ \".
+- Default is now Enabled for enhancedTouch 
+- Made the display a bit more snappy, but don't expect much. There is only so much power these little CPU have and the car sends a lot of data to be processed
+- If for some reason the access to the car itself is denied (no longer yours?), it will pop up a list of cars that you have access to choose from
+- If you entered a wrong password when authenticating on the phone, it should now prompt you again instead of hanging
+- Fixed a potential hang when turning on the steeringwheel heater
+
 V7.6.1 Compiled with Connect IQ 4.2.1 which added support for the Forerunner 265, 265s and 965. 
 
 V7.6.0 Added the following
