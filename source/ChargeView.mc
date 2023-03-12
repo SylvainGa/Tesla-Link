@@ -26,8 +26,6 @@ class ChargeView extends Ui.View {
     }
 
     function onUpdate(dc) {
-        var width = dc.getWidth();
-        var height = dc.getHeight();
         var center_x = dc.getWidth()/2;
         var center_y = dc.getHeight()/2;
         
