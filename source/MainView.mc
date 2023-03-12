@@ -329,7 +329,6 @@ class MainView extends Ui.View {
 					var climate_defrost = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
 					var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
 					var left_temp_direction = _data._vehicle_data.get("climate_state").get("left_temp_direction");
-					var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
 					var defrost_mode = _data._vehicle_data.get("climate_state").get("defrost_mode");
 					var rear_defrost = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
 
@@ -340,7 +339,8 @@ climate_defrost = false;
 rear_defrost = true;
 left_temp_direction = -1;*/ 
 
-/*2023-03-12 if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
+/*2023-03-12 var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
+if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
 logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " right_temp_direction: " + right_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " rear_defrost: " + rear_defrost + " defrost_mode: " + defrost_mode);
 _showLogMessage = true;
 old_climate_state = climate_state; old_left_temp_direction = left_temp_direction; old_right_temp_direction = right_temp_direction; old_climate_defrost = climate_defrost; old_climate_batterie_preheat = climate_batterie_preheat; old_rear_defrost = rear_defrost; old_defrost_mode = defrost_mode;
