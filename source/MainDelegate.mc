@@ -1683,7 +1683,7 @@ logMessage("onReceiveToken acces token expires at " + dateStr);*/
 	}
 
 	function _resetToken() {
-l//2023-03-12 ogMessage("_resetToken called");
+//2023-03-12 ogMessage("_resetToken called");
 		_token = null;
 		_auth_done = false;
 		Settings.setToken(null);
