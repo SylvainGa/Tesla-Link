@@ -95,6 +95,9 @@
     <string id="setting_holdActionLowerLeft">Touch hold action for lower left quadrant</string>
     <string id="setting_holdActionLowerRight">Touch hold action for lower right quadrant</string>
     <string id="menu_label_none">Disabled</string>
+    <string id="setting_quickReturn">Quick return to main screen (don't wait for the command to show being completed)</string>
+    <string id="menu_label_popUpMenu">PopUp Menu</string>
+    <string id="setting_defaultUpperLeft">Default option for upper left quadrant</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>

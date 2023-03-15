@@ -11,6 +11,19 @@
 		<settingConfig type="boolean" required="true"/>
 	</setting>
 
+	<setting propertyKey="@Properties.quickReturn" title="@Strings.setting_quickReturn">
+		<settingConfig type="boolean" required="true"/>
+	</setting>
+
+	<setting propertyKey="@Properties.swap_frunk_for_port" title="@Strings.setting_defaultUpperLeft">
+		<settingConfig type="list">
+			<listEntry value="0">@Strings.menu_label_open_frunk</listEntry>
+			<listEntry value="1">@Strings.menu_label_open_trunk</listEntry>
+			<listEntry value="2">@Strings.menu_label_open_port</listEntry>
+			<listEntry value="3">@Strings.menu_label_popUpMenu</listEntry>
+		</settingConfig>
+	</setting>
+
 	<setting propertyKey="@Properties.HansshowFrunk" title="@Strings.setting_HansshowFrunk">
 		<settingConfig type="boolean" required="true"/>
 	</setting>

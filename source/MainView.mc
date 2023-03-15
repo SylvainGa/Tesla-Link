@@ -22,7 +22,7 @@ class MainView extends Ui.View {
 	hidden var _errorTimer;
 	var _data;
 	var _refreshTimer;
-//2023-03-12 var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
+var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
 	// Initial load - show the 'requesting data' string, make sure we don't process touches
 	function initialize(data) {
@@ -31,7 +31,7 @@ class MainView extends Ui.View {
 		_data._ready = false;
 		_errorTimer = 0;
 		_displayType = -1;
-//2023-03-12 _showLogMessage = false; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
+_showLogMessage = false; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
 
 		_display = Ui.loadResource(Rez.Strings.label_requesting_data);
 
@@ -45,7 +45,7 @@ class MainView extends Ui.View {
 
 	function refreshScreen() {
 //logMessage("MainView: requesting update");
-//2023-03-12 _showLogMessage = false;
+_showLogMessage = false;
 		Ui.requestUpdate();
 	}
 
@@ -64,7 +64,7 @@ class MainView extends Ui.View {
 	}
 
 	function onReceive(args) {
-//2023-03-12 _showLogMessage = false;
+_showLogMessage = false;
 
 		if (System.getTimer() > _errorTimer) { // Have we timed out our previous text display
 			_errorTimer = 0;
@@ -72,24 +72,24 @@ class MainView extends Ui.View {
 
 		if (args[1] != null) {
 			if (args[0] == 0) {
-//2023-03-12 logMessage("Receiving a priority Message: '" + args[1] + "'");
+logMessage("Receiving a priority Message: '" + args[1] + "'");
 				_errorTimer = System.getTimer() + 2000; // priority message stays two seconds
-//2023-03-12 if (_display == null || !_display.equals(args[1])) { _showLogMessage = true; }
+if (_display == null || !_display.equals(args[1])) { _showLogMessage = true; }
 				_display = args[1];
 				_displayType = args[0];
 			} else if (_errorTimer == 0 || _displayType == args[0]) {
-//2023-03-12 logMessage("Receiving a type " + args[0] + " message: '" + args[1] + "'");
+logMessage("Receiving a type " + args[0] + " message: '" + args[1] + "'");
 				if (args[0] == 1) { // Informational message stays a second
 					_errorTimer = System.getTimer() + 1000;
 				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 15 seconds has passed and type 3 with a null with type 1 is received
 					_errorTimer = System.getTimer() + 15000;
 				}
-//2023-03-12 if (_display == null || !_display.equals(args[1])) { _showLogMessage = true; }
+if (_display == null || !_display.equals(args[1])) { _showLogMessage = true; }
 				_display = args[1];
 				_displayType = args[0];
 			}
 		} else if (_errorTimer == 0 || args[0] == 0 || (args[0] == 1 && _displayType == 3)) {
-//2023-03-12 if (args[0] != 1 || _errorTimer != 0) { logMessage("Receiving a null message and args[0] is " + args[0] + " with _errorTimer at " + _errorTimer); }
+if (args[0] != 1 || _errorTimer != 0) { logMessage("Receiving a null message and args[0] is " + args[0] + " with _errorTimer at " + _errorTimer); }
 			_display = null;
 			_displayType = -1;
 			_errorTimer = 0;
@@ -124,7 +124,7 @@ class MainView extends Ui.View {
 			// We're showing a message, so set 'ready' false to prevent touches
 			_data._ready = false;
 
-//2023-03-12 if (_showLogMessage) { logMessage("Showing Message '" + _display + "'"); }
+if (_showLogMessage) { logMessage("Showing Message '" + _display + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
 			dc.drawText(center_x, center_y, font_montserrat, _display, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
@@ -339,13 +339,13 @@ climate_defrost = false;
 rear_defrost = true;
 left_temp_direction = -1;*/ 
 
-/*2023-03-12 var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
+var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
 if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
 logMessage("Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " right_temp_direction: " + right_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " rear_defrost: " + rear_defrost + " defrost_mode: " + defrost_mode);
 _showLogMessage = true;
 old_climate_state = climate_state; old_left_temp_direction = left_temp_direction; old_right_temp_direction = right_temp_direction; old_climate_defrost = climate_defrost; old_climate_batterie_preheat = climate_batterie_preheat; old_rear_defrost = rear_defrost; old_defrost_mode = defrost_mode;
 //logMessage("venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
-} */
+}
 					var bm;
 					var bm_waves;
 					var bm_blades;
@@ -358,13 +358,13 @@ old_climate_state = climate_state; old_left_temp_direction = left_temp_direction
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_off) as BitmapResource;
 					}
 					else if (left_temp_direction < 0 && !climate_defrost) {
-//2023-03-12 if (_showLogMessage) { logMessage("Cooling drv:" + driver_temp + " inside:" + inside_temp); }
+if (_showLogMessage) { logMessage("Cooling drv:" + driver_temp + " inside:" + inside_temp); }
 						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_blue) as BitmapResource;
 						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_blue) as BitmapResource;
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_blue) as BitmapResource;
 					}
 					else {
-//2023-03-12 if (_showLogMessage) { logMessage("Heating drv:" + driver_temp + " inside:" + inside_temp); }
+if (_showLogMessage) { logMessage("Heating drv:" + driver_temp + " inside:" + inside_temp); }
 						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_red) as BitmapResource;
 						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_red) as BitmapResource;
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_red) as BitmapResource;

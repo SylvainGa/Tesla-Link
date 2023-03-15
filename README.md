@@ -39,12 +39,18 @@ Please raise an issue if anything doesn't work correctly, or if you use an unsup
 
 If you like the widget, please consider [leaving a positive review](https://apps.garmin.com/en-US/apps/3ca805c7-b4e6-469e-a3fc-7a5c707fca54).
 
+If you want to have the widget translated to your language, contact me through email or github.
+
 ## Changelog since forking from srwalter:
+
+V7.8.0 Added the following two new parameters options
+- Quick return to main screen - Instead of waiting to see if the state of the vehicle has changed after a command is sent, return as soon as the command was processed. This means for example if you asked to lock the doors, the display will still show until the next vehicle data refresh that the car is unlocked but it also means you can send another command sooner.
+- The default option for the upper left quadrant can be set within the parameters. After an app update, you won't need to change it to your prefered option through the watch.
 
 V7.7.0 Added the following
 - Brings touch screen "Hold" function. By holding your finger pressed to one of the four quadrants of the screen, it can perform other functions. You configure these through the app parameters on your phone. The options are
-    - Upper Left quadrant : Frunk, Trunk, Port, Vent or Disabled (just like the menu). These will NOT ask to confirm the action and will peform it as soon as a Hold has been detected.
-    - Upper Right quadrant : Toogle defrost or Disabled
+    - Upper Left quadrant : Frunk, Trunk, Port, Vent or Disabled (just like the menu). These will NOT ask to confirm the action and will perform it as soon as a Hold has been detected.
+    - Upper Right quadrant : Toggle defrost or Disabled
     - Lower Left quadrant : Honk or Disabled
     - Lower Right quadrant: Homelink, Remote boombox (why not) or Disabled
     Default for each quadrant is Disabled
@@ -53,7 +59,7 @@ V7.7.0 Added the following
 - Made the display a bit more snappy, but don't expect much. There is only so much power these little CPU have and the car sends a lot of data to be processed
 - If for some reason the access to the car itself is denied (no longer yours?), it will pop up a list of cars that you have access to choose from
 - If you entered a wrong password when authenticating on the phone, it should now prompt you again instead of hanging
-- Fixed a potential hang when turning on the steeringwheel heater
+- Fixed a potential hang when turning on the steering wheel heater
 
 V7.6.1 Compiled with Connect IQ 4.2.1 which added support for the Forerunner 265, 265s and 965. 
 

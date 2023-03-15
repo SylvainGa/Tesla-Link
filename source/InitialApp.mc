@@ -72,7 +72,7 @@ function logMessage(message) {
 }
 
 (:release, :background)
-function logMessage(output) {
+function logMessage(message) {
 }
 var errorsStr = {
 	"0" => "UNKNOWN_ERROR",

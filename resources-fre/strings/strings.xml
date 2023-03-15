@@ -95,6 +95,9 @@
     <string id="setting_holdActionLowerLeft">Action pour un appui prolongé sur le cartier inférieur gauche</string>
     <string id="setting_holdActionLowerRight">Action pour un appui prolongé sur le cartier inférieur droit</string>
     <string id="menu_label_none">Désactivé</string>  <!--  NEW -->
+    <string id="setting_quickReturn">Retour rapide à l'écran principal (pas d'attente que la commande envoyée termine)</string>
+    <string id="menu_label_popUpMenu">Menu contextuel</string>
+    <string id="setting_defaultUpperLeft">Opération par défaut pour le cartier supérieur gauche</string>
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>
