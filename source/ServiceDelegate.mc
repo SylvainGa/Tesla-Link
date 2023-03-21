@@ -15,7 +15,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         System.ServiceDelegate.initialize();
         
         _token = Settings.getToken();
-//System.println("ServiceDelegate: token = " + _token);
+        //System.println("ServiceDelegate: token = " + _token);
         _tesla = new Tesla(_token);
         _vehicle_id = Application.getApp().getProperty("vehicle");
     }
@@ -23,10 +23,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
 
-//System.println("onTemporalEvent");
+        //System.println("ServiceDelegate: onTemporalEvent");
         if (_token != null && _vehicle_id != null)
         {
-//System.println("onTemporalEvent getting data");
+            //System.println("ServiceDelegate: onTemporalEvent getting data");
             _tesla.getChargeState(_vehicle_id, method(:onReceiveVehicleData));
         }
     }
@@ -37,8 +37,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (data == null) {
             data = {};
 		}
-//System.println("onReceiveVehicleData: responseCode = " + responseCode);
-//System.println("onReceiveVehicleData: responseData = " + responseData);
+        //System.println("ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
+        //System.println("ServiceDelegate:onReceiveVehicleData: responseData = " + responseData);
 
         // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
         if (responseCode == 200) {

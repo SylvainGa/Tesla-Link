@@ -29,14 +29,10 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onCancel () {
-        if (_controller._vehicle_id == -1) {
-            _controller._vehicle_id = -3;
-        }
-        else {
-            _controller._vehicle_id = -2;
-        }
-        _controller.stateMachine();
+        _controller._vehicle_id = -2;
+        gWaitTime = System.getTimer();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        _controller.stateMachine();
     }
 
     function onAccept (values) {
@@ -61,7 +57,6 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     _controller._check_wake = false;
                     _controller._need_wake = false;
                     _controller._wake_done = true;
-                    _controller._wakeTime = System.getTimer();
             		_controller._vehicle_state = "online";
                     _controller._vehicle_id = _carsId[i];
                 }
@@ -72,7 +67,10 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
 // 2022-10-17 logMessage("CarPickerDelegate: No match?!?");
         }
 
-        _controller.stateMachine();
+        gWaitTime = System.getTimer();
+        _controller._handler.invoke([3, true, WatchUi.loadResource(Rez.Strings.label_requesting_data)]);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        WatchUi.requestUpdate();
+        _controller.stateMachine();
     }
 }

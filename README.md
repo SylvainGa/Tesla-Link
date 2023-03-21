@@ -43,6 +43,12 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.8.1 Added the following
+- Fixed an issue with the screen blanking at start
+- Fixed a rare crash that could happen if Bluetooth is lost while we're waiting to authenticate with Tesla's servers
+- Made the waiting for data at start a bit more chatty so you know what's going on
+- Added a vibrating confirmation when a hold action is detected.
+
 V7.8.0 Added the following two new parameters options
 - Quick return to main screen - Instead of waiting to see if the state of the vehicle has changed after a command is sent, return as soon as the command was processed. This means for example if you asked to lock the doors, the display will still show until the next vehicle data refresh that the car is unlocked but it also means you can send another command sooner.
 - The default option for the upper left quadrant can be set within the parameters. After an app update, you won't need to change it to your prefered option through the watch.

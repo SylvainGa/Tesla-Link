@@ -9,9 +9,17 @@ using Toybox.WatchUi as Ui;
 class TeslaLink extends App.AppBase {
 
     function initialize() {
-//logMessage("Starting app");
+		// 2023-03-20 logMessage("App: Initialising app");
         AppBase.initialize();
     }
+
+	function onStart(state) {
+		// 2023-03-20 logMessage("App: starting app with state set to " + state);
+	}
+
+	function onStop(state) {
+		// 2023-03-20 logMessage("App: stopping app with state set to " + state);
+	}
 
     (:can_glance)
     function getServiceDelegate(){
@@ -22,9 +30,9 @@ class TeslaLink extends App.AppBase {
     (:can_glance)
     function onBackgroundData(data) {
         Application.getApp().setProperty("status", data["status"]);
-//var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-//var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-//System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
+		//var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+		//var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+		//System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
 
         Background.registerForTemporalEvent(new Time.Duration(60*5));
 
@@ -34,7 +42,7 @@ class TeslaLink extends App.AppBase {
     (:glance, :can_glance)
     function getGlanceView() {
         Application.getApp().setProperty("canGlance", true);
-//System.println("Glance: Starting glance view");
+		//System.println("Glance: Starting glance view");
         Background.registerForTemporalEvent(new Time.Duration(60*5));
         return [ new GlanceView() ];
     }
