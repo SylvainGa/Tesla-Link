@@ -7,3 +7,5 @@ manifest.xml
 .vscode/tasks.json
 *.bak
 .DS_Store
+.vscode.org/launch.json
+.vscode.org/settings.json
