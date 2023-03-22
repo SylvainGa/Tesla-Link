@@ -27,6 +27,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _need_wake;
 	var _wake_done;
 	var _firstTime;
+	var _wakeWasConfirmed;
 	var _refreshTimeInterval;
 	var _408_count;
 	var _lastTimeStamp;
@@ -126,7 +127,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_need_wake = false; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
 		_wake_done = true;
 		gWaitTime = System.getTimer();
-		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the the first 408 generate a wake commmand
+		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the first 408 generate a wake commmand
+		_wakeWasConfirmed = false; // So we only display the Asking to wake only once
 		_showingRequestingData = true; // When we launch, that string will be displayed so flag it true here
 		_endingText = "";
 
@@ -339,7 +341,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function actionMachine() {
-		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : ""));
+		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (!_firstTime ? " _firstTime true" : ""));
 
 		if (_view._data._ready == false) { // We're not having valid data so wait until we get some before sending the command
 			_stateMachineCounter = 1;
@@ -421,7 +423,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				honkHornConfirmed();
 			} else {
 				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
-				var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), null);
+				var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), method(:operationCanceled));
 				Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			}
 		}
@@ -462,7 +464,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			else {
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
-	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), null);
+	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), method(:operationCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	        }
 		}
@@ -475,7 +477,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			else {
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_trunk));
-	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), null);
+	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), method(:operationCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	        }
 		}
@@ -490,7 +492,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            	openVentConfirmed();
 	            } else {
 		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), null);
+		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), method(:operationCanceled));
 		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 		        }
 			}
@@ -500,7 +502,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            	closeVentConfirmed();
 	            } else {
 		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), null);
+		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), method(:operationCanceled));
 		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 	            }
 			}
@@ -647,7 +649,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : ""));
+		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (!_firstTime ? " _firstTime true" : ""));
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 
@@ -755,7 +757,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (_vehicle_id == -2) {
             _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
-			_tesla.getVehicleId(method(:selectVehicle));
+			_stateMachineCounter = -1;
+			_tesla.getVehicleId(method(:onSelectVehicle));
 			_vehicle_id = -1;
 			return;
 		}
@@ -765,7 +768,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			} else {
-				logMessage("StateMachine: Asking to test if we're awake");
+				logMessage("StateMachine: Asked to test if we're awake");
 			}
 			_tesla.getVehicleId(method(:onReceiveVehicles));
 			return;
@@ -784,12 +787,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_need_wake) { // Asked to wake up
-			logMessage("stateMachine: Need to wake vehicle");
-			if (_firstTime) { // Ask if we should wake the vehicle
+			if (_firstTime && !_wakeWasConfirmed) { // Ask if we should wake the vehicle
+				logMessage("stateMachine: Asking if it's OK to wake the vehicle");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Application.getApp().getProperty("vehicle_name") + "?");
+				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
+				logMessage("stateMachine: Waking the vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
@@ -880,7 +885,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_stateMachineCounter--;
 				}
 			} else {
-				logMessage("stateTimer:Skipping because _stateMachineCounter is " + _stateMachineCounter);
+				logMessage("stateTimer: " + _stateMachineCounter);
 			}
 		}
 	}
@@ -904,11 +909,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 
+	function operationCanceled() {
+		logMessage("operationCanceled: Reseting _stateMachineCounter to 1");
+		_stateMachineCounter = 1;
+	}
+
+
 	function wakeConfirmed() {
 		_need_wake = false;
 		_wake_done = false;
+		_wakeWasConfirmed = true;
+		_endingText = "";
 		gWaitTime = System.getTimer();
-		logMessage("wakeConfirmed: Asking to wake vehicle");
+		logMessage("wakeConfirmed: Waking the vehicle");
 		_pendingTimerRequests["waitingVehicleWake"] = 80;
 
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
@@ -917,6 +930,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function wakeCanceled() {
 		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
 		gWaitTime = System.getTimer();
+		logMessage("wakeCancelled: Reseting _stateMachineCounter to 1");
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 		_stateMachineCounter = 1;
 	}
@@ -1279,7 +1293,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		// Tap on vehicle name
 		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
-			_tesla.getVehicleId(method(:selectVehicle));
+			_stateMachineCounter = -1;
+			_tesla.getVehicleId(method(:onSelectVehicle));
 		}
 		// Tap on the space used by the 'Eye'
 		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
@@ -1450,7 +1465,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 
-	function selectVehicle(responseCode, data) {
+	function onSelectVehicle(responseCode, data) {
+		logMessage("onSelectVehicle: " + responseCode);
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
 			var size = vehicles.size();
@@ -1625,8 +1641,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				logMessage("onReceiveVehicleData: 408_count=" + _408_count + " firstTime=" + _firstTime);
-	        	if ((_408_count % 20 == 0 && _firstTime) || (_408_count % 20 == 1 && !_firstTime)) { // First (if we've starting up), second (to let through a spurious 408) and every consecutive 20th 408 recieved will generate a test for the vehicle state. 
-					if (_408_count < 2 && !_firstTime) { // Only when we first started to get the errors do we keep the start time
+	        	if ((_408_count % 10 == 0 && _firstTime) || (_408_count % 10 == 1 && !_firstTime)) { // First (if we've starting up), and every consecutive 10th 408 recieved (skipping a spurious 408 when we aren't started up) will generate a test for the vehicle state. 
+					if (_408_count < 2 && !_firstTime) { // Only when we first started to get the errors do we keep the start time, unless we've started because our start time has been recorded already
 						gWaitTime = System.getTimer();
 					}
 					// 2022-10-10 logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");

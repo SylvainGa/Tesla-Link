@@ -12,15 +12,12 @@ import Toybox.WatchUi;
 
 //! Picker that allows the user to choose a charging curremt
 class ChargerPicker extends WatchUi.Picker {
-	var _charging_amps;
-
     //! Constructor
     public function initialize(charging_amps, max_amps) {
     	var _min_amps = 5;
     	var _max_amps = max_amps;
-    	_charging_amps = charging_amps;
 
-    	var startPos = [_charging_amps.toNumber() - _min_amps];
+    	var startPos = [charging_amps.toNumber() - _min_amps];
         var title = new WatchUi.Text({:text=>Rez.Strings.label_amps_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(_min_amps.toNumber(), _max_amps.toNumber(), 1, {})], :defaults=>startPos});
     }
@@ -37,31 +34,34 @@ class ChargerPicker extends WatchUi.Picker {
 //! Responds to a charger picker selection or cancellation
 class ChargerPickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
-	var _charging_amps;
 	
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        _controller._stateMachineCounter = -1;
+        logMessage("ChargerPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
+        logMessage("ChargerPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 
     //! Handle a confirm event from the picker
     //! @param values The values chosen in the picker
     //! @return true if handled, false otherwise
     function onAccept (values) {
-        _charging_amps = values[0];
+        var charging_amps = values[0];
+        logMessage("ChargerPickerDelegate: onAccept called with charging_amps set to " + charging_amps);
         
-        Application.getApp().setProperty("charging_amps", _charging_amps);
+        Application.getApp().setProperty("charging_amps", charging_amps);
         _controller._set_charging_amps_set = true;
-        _controller.actionMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        _controller.actionMachine();
+        return true;
     }
 }

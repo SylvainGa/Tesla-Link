@@ -11,12 +11,8 @@ import Toybox.WatchUi;
 
 //! Picker that allows the user to choose a temperature
 class TemperaturePicker extends WatchUi.Picker {
-	var _temperature;
-
     //! Constructor
     public function initialize(temperature, max_temp, min_temp) {
-    	_temperature = temperature;
-
         var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
         if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
@@ -41,35 +37,39 @@ class TemperaturePicker extends WatchUi.Picker {
 //! Responds to a temperature picker selection or cancellation
 class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
-	var _temperature;
 	
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        _controller._stateMachineCounter = -1;
+        logMessage("TemperaturePickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
+        logMessage("TemperaturePickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 
     //! Handle a confirm event from the picker
     //! @param values The values chosen in the picker
     //! @return true if handled, false otherwise
     function onAccept (values) {
-        _temperature = values[0];
+        var temperature = values[0];
 
         if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
-			_temperature = (_temperature - 32.0) * 5.0 / 9.0;	
+			temperature = (temperature - 32.0) * 5.0 / 9.0;	
         }
-        
-        Application.getApp().setProperty("driver_temp", _temperature);
+
+        logMessage("TemperaturePickerDelegate: onAccept called with temperature set to " + temperature);
+
+        Application.getApp().setProperty("driver_temp", temperature);
         _controller._set_climate_set = true;
-        _controller.actionMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        _controller.actionMachine();
+        return true;
     }
 }

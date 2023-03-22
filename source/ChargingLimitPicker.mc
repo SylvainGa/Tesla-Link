@@ -12,15 +12,12 @@ import Toybox.WatchUi;
 
 //! Picker that allows the user to choose a charging curremt
 class ChargingLimitPicker extends WatchUi.Picker {
-	var _charging_limit;
-
     //! Constructor
     public function initialize(charging_limit) {
     	var _min_limit = 50;
     	var _max_limit = 100;
-    	_charging_limit = charging_limit;
 
-    	var startPos = [_charging_limit.toNumber() - _min_limit];
+    	var startPos = [charging_limit.toNumber() - _min_limit];
         var title = new WatchUi.Text({:text=>Rez.Strings.label_charginglimit_chooser_title, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(_min_limit.toNumber(), _max_limit.toNumber(), 1, {})], :defaults=>startPos});
     }
@@ -37,31 +34,35 @@ class ChargingLimitPicker extends WatchUi.Picker {
 //! Responds to a charger picker selection or cancellation
 class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
 	var _controller;
-	var _charging_limit;
 	
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        _controller._stateMachineCounter = -1;
+        logMessage("ChargingLimitPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
+        logMessage("ChargingLimitPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 
     //! Handle a confirm event from the picker
     //! @param values The values chosen in the picker
     //! @return true if handled, false otherwise
     function onAccept (values) {
-        _charging_limit = values[0];
+        var charging_limit = values[0];
         
-        Application.getApp().setProperty("charging_limit", _charging_limit);
+        logMessage("ChargingLimitPickerDelegate: onAccept called with charging_limit set to " + charging_limit);
+
+        Application.getApp().setProperty("charging_limit", charging_limit);
         _controller._set_charging_limit_set = true;
-        _controller.actionMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        _controller.actionMachine();
+        return true;
     }
 }

@@ -17,23 +17,27 @@ class SeatPicker extends WatchUi.Picker {
 
 class SeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
-    var _selected;
 
     function initialize (controller) {
         _controller = controller;
-        _controller._stateMachineCounter = -1;
+        logMessage("SeatPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     function onCancel () {
+        logMessage("SeatPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 
     function onAccept (values) {
-        _selected = values[0];
-		Application.getApp().setProperty("seat_chosen", _selected);
+        var selected = values[0];
+		Application.getApp().setProperty("seat_chosen", selected);
 
-        WatchUi.switchToView(new SeatHeatPicker(_selected), new SeatHeatPickerDelegate(_controller), WatchUi.SLIDE_UP);
+        logMessage("SeatPickerDelegate: onAccept called with selected set to " + selected);
+
+        WatchUi.switchToView(new SeatHeatPicker(selected), new SeatHeatPickerDelegate(_controller), WatchUi.SLIDE_UP);
+        return true;
     }
 }

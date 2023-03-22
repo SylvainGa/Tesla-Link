@@ -25,29 +25,31 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         _carsName = carsName;
         _carsId = carsId;
         _controller = controller;
-        _controller._stateMachineCounter = 0;
+        logMessage("CarPickerDelegate: _stateMachineCounter was " + _controller._stateMachineCounter);
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     function onCancel () {
         _controller._vehicle_id = -2;
         gWaitTime = System.getTimer();
+        _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
+        logMessage("CarPickerDelegate: Cancel called");
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller._stateMachineCounter = 1;
+        return true;
     }
 
     function onAccept (values) {
         var _selected = values[0];
-//        _controller._tesla.getVehicleId(method(:onReceiveVehicles));
 
         var size = _carsName.size();
 
-// 2022-10-17 logMessage("CarPickerDelegate: Have " + size + " vehicles");
+        // 2022-10-17 logMessage("CarPickerDelegate: Have " + size + " vehicles");
         var i;
         for (i = 0; i < size; i++) {
-// 2022-10-17 logMessage("CarPickerDelegate: vehicle " + i + ": '" + _carsName[i] + "'");
+            // 2022-10-17 logMessage("CarPickerDelegate: vehicle " + i + ": '" + _carsName[i] + "'");
             if (_selected.equals(_carsName[i])) {
-// 2022-10-17 logMessage("CarPickerDelegate: Got a match!");
+                logMessage("CarPickerDelegate: Got a match!");
                 if (Application.getApp().getProperty("vehicle") != _carsId[i]) { // If it's a new car, start fresh
                     Application.getApp().setProperty("vehicle", _carsId[i]);
                     Application.getApp().setProperty("vehicle_name", _selected);
@@ -58,20 +60,20 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     _controller._check_wake = false;
                     _controller._need_wake = false;
                     _controller._wake_done = true;
+                    _controller._wakeWasConfirmed = false
             		_controller._vehicle_state = "online";
                     _controller._vehicle_id = _carsId[i];
                 }
                 break;
             }
         }
-        if (i == size) {
-// 2022-10-17 logMessage("CarPickerDelegate: No match?!?");
-        }
+        if (i == size) { logMessage("CarPickerDelegate: No match?!?"); }
 
         gWaitTime = System.getTimer();
         _controller._handler.invoke([3, _controller._408_count, WatchUi.loadResource(Rez.Strings.label_requesting_data)]);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         WatchUi.requestUpdate();
-        _controller._stateMachineCounter = 1;
+        _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
+        return true;
     }
 }
