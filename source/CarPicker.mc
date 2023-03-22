@@ -60,7 +60,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     _controller._check_wake = false;
                     _controller._need_wake = false;
                     _controller._wake_done = true;
-                    _controller._wakeWasConfirmed = false
+                    _controller._wakeWasConfirmed = false;
             		_controller._vehicle_state = "online";
                     _controller._vehicle_id = _carsId[i];
                 }

@@ -160,7 +160,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_408_count = 0;
 		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-		if (_refreshTimeInterval == null) {
+		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
 			_refreshTimeInterval = 4000;
 		}
 
@@ -325,18 +325,37 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		);
 	}
 
-	function SpinSpinner() {
+	function SpinSpinner(responseCode) {
 		var _spinner = Application.getApp().getProperty("spinner");
-		if (_spinner.equals("+")) {
-			Application.getApp().setProperty("spinner", "-");
+		if (responseCode == 200) {
+			if (_spinner.equals("+")) {
+				Application.getApp().setProperty("spinner", "-");
+			}
+			else if (_spinner.equals("-")) {
+				Application.getApp().setProperty("spinner", "+");
+			}
+			else if (_spinner.equals("/")) {
+				Application.getApp().setProperty("spinner", "\\");
+			}
+			else if (_spinner.equals("\\")) {
+				Application.getApp().setProperty("spinner", "/");
+			}
+			else {
+				if (Application.getApp().getProperty("enhancedTouch")) {
+					Application.getApp().setProperty("spinner", "+");
+				}
+				else {
+					Application.getApp().setProperty("spinner", "/");
+				}
+			}
 		}
-		else if (_spinner.equals("-")) {
-			Application.getApp().setProperty("spinner", "+");
-		}
-		else if (_spinner.equals("/")) {
-			Application.getApp().setProperty("spinner", "\\");
-		} else {
-			Application.getApp().setProperty("spinner", "/");
+		else {
+			if (_spinner.equals("?")) {
+				Application.getApp().setProperty("spinner", "*");
+			}
+			else {
+				Application.getApp().setProperty("spinner", "?");
+			}
 		}
 	}
 
@@ -780,10 +799,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle) + _endingText]);
 				_showingRequestingData = false;
 
-	        } else {
+	        } /*else {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
 				_showingRequestingData = true;
-	        }
+	        }*/
 		}
 
 		if (_need_wake) { // Asked to wake up
@@ -1559,7 +1578,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		SpinSpinner();
+		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
 			_vehicle_state = "online"; // We got data so we got to be online
@@ -1636,8 +1655,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				if (_vehicle_state.equals("online") == true && _firstTime && _view._data._ready == false) { // We think we're online, it's our first pass and we have already a message displayed
-					_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
-					_showingRequestingData = true;
+					//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
+					//_showingRequestingData = true;
 				}
 
 				logMessage("onReceiveVehicleData: 408_count=" + _408_count + " firstTime=" + _firstTime);
@@ -1668,7 +1687,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onReceiveAwake(responseCode, data) {
 		logMessage("onReceiveAwake: " + responseCode);
-		SpinSpinner();
+		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
 			_wake_done = true;
@@ -1693,7 +1712,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveVehicleState(responseCode, data) {
-		SpinSpinner();
+		SpinSpinner(responseCode);
 		logMessage("onReceiveVehicleState: " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
@@ -1724,7 +1743,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveClimateState(responseCode, data) {
-		SpinSpinner();
+		SpinSpinner(responseCode);
 		logMessage("onReceiveClimateState: " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
@@ -1746,7 +1765,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveChargeState(responseCode, data) {
-		SpinSpinner();
+		SpinSpinner(responseCode);
 		logMessage("onReceiveChargeState: " + responseCode + " calling StateMachine in  0.1 sec");
 		var result = null;
 		if (responseCode == 200) {
