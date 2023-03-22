@@ -63,10 +63,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	var _pendingPriorityRequests;
 	var _pendingTimerRequests;
-<<<<<<< Updated upstream
 	var _actionMachineFlag;
-=======
->>>>>>> Stashed changes
 	var _stateMachineCounter;
 	var _dataRequestCounter;
 
@@ -168,7 +165,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastTimeStamp = 0;
 
 		_pendingPriorityRequests = {};
-<<<<<<< Updated upstream
 		_pendingTimerRequests = {};
 		_stateMachineCounter = 0;
 		_actionMachineFlag = false;
@@ -177,14 +173,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_timer.start(method(:stateTimer), 100, true);
 
 		stateMachine(); // Launch getting the states right away.
-=======
-		_stateMachineCounter = 1;
-
-		// 2023-03-20 logMessage("MainDelegate:Initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
-		_timer.start(method(:stateTimer), 100, true);
-
-		//stateMachine();
->>>>>>> Stashed changes
 	}
 
 	function onReceive(args) {
@@ -266,11 +254,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_resetToken();
 
-<<<<<<< Updated upstream
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_oauth_error)]);
-=======
-			_handler.invoke([0, false, Ui.loadResource(Rez.Strings.label_oauth_error)]);
->>>>>>> Stashed changes
 			_stateMachineCounter = 1;
 		}
 	}
@@ -357,16 +341,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function actionMachine() {
 		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : ""));
 
-<<<<<<< Updated upstream
 		if (_view._data._ready == false) { // We're not having valid data so wait until we get some before sending the command
 			_stateMachineCounter = 1;
 			_actionMachineFlag = true;
-=======
-		_stateMachineCounter = 0;
-
-		if (_skipGetVehicleData) {
-			// 2023-03-20 logMessage("StateMachine: Skipping stateMachine");
->>>>>>> Stashed changes
 			return;
 		}
 
@@ -580,11 +557,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_set_steering_wheel_heat = false;
 			logMessage("actionMachine: Setting steering wheel heat - waiting for climateStateHandler");
 	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
-<<<<<<< Updated upstream
 	            _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
-=======
-	            _handler.invoke([1, false, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
->>>>>>> Stashed changes
 	            _stateMachineCounter = 1;
 	        }
 	        else {
@@ -673,7 +646,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 
-<<<<<<< Updated upstream
 	function stateMachine() {
 		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : ""));
 
@@ -792,17 +764,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			logMessage("StateMachine: Need to get vehicles list with _vehicle_id " +  (_vehicle_id != null && _vehicle_id > 0 ? "set" : _vehicle_id) + " and _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
-=======
-		if (!_skipGetVehicleData) {
-			if (!_waitingForVehicleData) {
-				_lastDataRun = System.getTimer();
-				_waitingForVehicleData = true; // So we don't overrun our buffers by multiple calls doing the same thing
-				if (_showingRequestingData) {
-					_pendingTimerRequests["waitingVehicleData"] = 50;
-				}
-				// 2023-03-20 logMessage("StateMachine: Asking for data");
-				_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
->>>>>>> Stashed changes
 			} else {
 				logMessage("StateMachine: Asking to test if we're awake");
 			}
@@ -924,9 +885,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 
-	function stateTimer()
+	function waitingVehicleWake()
 	{
-<<<<<<< Updated upstream
 		if (_vehicle_state.equals("online") == false && _view._data._ready == false) { // Are we still showing the requested data message?
 			logMessage("waitingVehicleake: We're STILL waiting for the vehicle to wake up");
 			_endingText = "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting);
@@ -941,18 +901,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			logMessage("waitingVehicleData: We're STILL waiting for data");
 			_endingText = "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting);
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
-=======
-		if (_pendingPriorityRequests.keys().size() > 0) {
-
-		} else if (_stateMachineCounter > 0) {
-			if (_stateMachineCounter == 1) {
-				stateMachine();
-			} else {
-				_stateMachineCounter--;
-			}
-		} else {
-			logMessage("stateTimer:Skipping because _stateMachineCounter is 0");
->>>>>>> Stashed changes
 		}
 	}
 
@@ -960,11 +908,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_need_wake = false;
 		_wake_done = false;
 		gWaitTime = System.getTimer();
-<<<<<<< Updated upstream
 		logMessage("wakeConfirmed: Asking to wake vehicle");
-=======
-		// 2023-03-20 logMessage("wakeConfirmed: Asking to wake vehicle");
->>>>>>> Stashed changes
 		_pendingTimerRequests["waitingVehicleWake"] = 80;
 
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
@@ -973,11 +917,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function wakeCanceled() {
 		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
 		gWaitTime = System.getTimer();
-<<<<<<< Updated upstream
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
-=======
-		_handler.invoke([3, true, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
->>>>>>> Stashed changes
 		_stateMachineCounter = 1;
 	}
 
@@ -1004,11 +944,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
 				_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
 			} else {
-<<<<<<< Updated upstream
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
-=======
-				_handler.invoke([1, false, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
->>>>>>> Stashed changes
 	            _stateMachineCounter = 1;
 			}
 		}
@@ -1526,11 +1462,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, self), Ui.SLIDE_UP);
 		} else {
-<<<<<<< Updated upstream
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-=======
-			_handler.invoke([0, false, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
->>>>>>> Stashed changes
 			_stateMachineCounter = 1;
 		}
 	}
@@ -1584,10 +1516,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 	        }
 
-<<<<<<< Updated upstream
-=======
-			_stateMachineCounter = 1;
->>>>>>> Stashed changes
 		}
 		_stateMachineCounter = 1;
 	}
@@ -1609,15 +1537,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		*/
 		logMessage("onReceiveVehicleData: " + responseCode);
 
-<<<<<<< Updated upstream
 		if (_stateMachineCounter < 0) {
 			if (_stateMachineCounter == -1) { logMessage("onReceiveVehicleData: skipping because we're in a menu"); }
 			if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: skipping because actionMachine called"); }
-=======
-		if (_skipGetVehicleData) {
-			// 2023-03-20 logMessage("onReceiveVehicleData: Asked to skip");
-			_stateMachineCounter = 1;
->>>>>>> Stashed changes
 			return;
 		}
 
@@ -1781,12 +1703,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
-<<<<<<< Updated upstream
 		_handler.invoke([0, -1, result]);
-=======
-		_handler.invoke([0, false, result]);
-		_skipGetVehicleData = false;
->>>>>>> Stashed changes
 		_stateMachineCounter = 1;
 	}
 
@@ -1808,12 +1725,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
-<<<<<<< Updated upstream
 		_handler.invoke([0, -1, result]);
-=======
-		_handler.invoke([0, false, result]);
-		_skipGetVehicleData = false;
->>>>>>> Stashed changes
 		_stateMachineCounter = 1;
 	}
 
@@ -1835,12 +1747,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
-<<<<<<< Updated upstream
 		_handler.invoke([0, -1, result]);
-=======
-		_handler.invoke([0, false, result]);
-		_skipGetVehicleData = false;
->>>>>>> Stashed changes
 		_stateMachineCounter = 1;
 	}
 
@@ -1852,7 +1759,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function vehicleStateHandler(responseCode, data) {
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
-<<<<<<< Updated upstream
 				logMessage("vehicleStateHandler: " + responseCode + " skiping getVehicleState, calling stateMachine in  0.1 sec");
 				_stateMachineCounter = 1;
 			} else {
@@ -1862,19 +1768,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} else {  // Our call failed, say the error and back to the main code
 			logMessage("vehicleStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-=======
-				// 2023-03-20 logMessage("vehicleStateHandler: " + responseCode + " skiping getVehicleState, calling stateMachine in  0.1 sec");
-				_skipGetVehicleData = false;
-				_stateMachineCounter = 1;
-			} else {
-				// 2023-03-20 logMessage("vehicleStateHandler: " + responseCode + " Calling getVehicleState in 1 sec");
-				_pendingPriorityRequests["getVehicleState"] = 10;
-			}
-		} else {  // Our call failed, say the error and back to the main code
-			// 2023-03-20 logMessage("vehicleStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
-			_handler.invoke([0, false, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			_skipGetVehicleData = false;
->>>>>>> Stashed changes
 			_stateMachineCounter = 1;
 		}
 	}
@@ -1887,7 +1780,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function climateStateHandler(responseCode, data) {
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
-<<<<<<< Updated upstream
 				logMessage("climateStateHandler: " + responseCode + " skiping getClimateState, calling stateMachine in  0.1 sec");
 				_stateMachineCounter = 1;
 			} else {
@@ -1897,19 +1789,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} else { // Our call failed, say the error and back to the main code
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			logMessage("climateStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
-=======
-				// 2023-03-20 logMessage("climateStateHandler: " + responseCode + " skiping getClimateState, calling stateMachine in  0.1 sec");
-				_skipGetVehicleData = false;
-				_stateMachineCounter = 1;
-			} else {
-				// 2023-03-20 logMessage("climateStateHandler: " + responseCode + " Calling getClimateState in 1 sec");
-				_pendingPriorityRequests["getClimateState"] = 10;
-			}
-		} else { // Our call failed, say the error and back to the main code
-			_handler.invoke([0, false, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			_skipGetVehicleData = false;
-			// 2023-03-20 logMessage("climateStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
->>>>>>> Stashed changes
 			_stateMachineCounter = 1;
 		}
 	}
@@ -1922,7 +1801,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function chargeStateHandler(responseCode, data) {
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
-<<<<<<< Updated upstream
 				logMessage("chargeStateHandler: " + responseCode + " skipping getChargeState, calling stateMachine in  0.1 sec");
 				_stateMachineCounter = 1;
 			} else {
@@ -1932,19 +1810,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} else { // Our call failed, say the error and back to the main code
 			logMessage("chargeStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-=======
-				// 2023-03-20 logMessage("chargeStateHandler: " + responseCode + " skipping getChargeState, calling stateMachine in  0.1 sec");
-				_skipGetVehicleData = false;
-				_stateMachineCounter = 1;
-			} else {
-				// 2023-03-20 logMessage("chargeStateHandler: " + responseCode + " Calling getChargeState in 1 sec");
-				_pendingPriorityRequests["getChargeState"] = 10;
-			}
-		} else { // Our call failed, say the error and back to the main code
-			// 2023-03-20 logMessage("chargeStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
-			_handler.invoke([0, false, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
-			_skipGetVehicleData = false;
->>>>>>> Stashed changes
 			_stateMachineCounter = 1;
 		}
 	}
@@ -1957,13 +1822,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
 
-<<<<<<< Updated upstream
-=======
-		if (_skipGetVehicleData) {
-			// 2023-03-20 logMessage("genericHandler: WARNING _skipGetVehicleData IS TRUE!!! Should not be for genericHandler");
-			_skipGetVehicleData = false; // Shouldn't be required but just to be safe
-		}
->>>>>>> Stashed changes
 		_stateMachineCounter = 1;
 	}
 
