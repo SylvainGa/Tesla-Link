@@ -355,7 +355,7 @@ class MainView extends Ui.View {
 					}
 
 	        		var _spinner = Application.getApp().getProperty("spinner");
-					if (_spinner.equals("+") || _spinner.equals("-") || _spinner.equals("?") || _spinner.equals("/") || _spinner.equals("\\")) {
+					if (_spinner != null && (_spinner.equals("+") || _spinner.equals("-") || _spinner.equals("?") || _spinner.equals("¿") || _spinner.equals("/") || _spinner.equals("\\"))) {
 	                    var spinner_drawable = View.findDrawableById("spinner");
 	                    spinner_drawable.setText(_spinner.toString());
 	                    spinner_drawable.draw(dc);
@@ -376,8 +376,8 @@ class MainView extends Ui.View {
 					rear_defrost = true;
 					left_temp_direction = -1;*/ 
 
-					var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
-					/* 2023-03-20 if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
+					/* 2023-03-20 var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
+					if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
 						logMessage("MainView:onUpdate: Climate_state: " + climate_state + " left_temp_direction: " + left_temp_direction + " right_temp_direction: " + right_temp_direction + " climate_defrost: " + climate_defrost + " climate_batterie_preheat: " + climate_batterie_preheat + " rear_defrost: " + rear_defrost + " defrost_mode: " + defrost_mode);
 						// 2023-03-20 _showLogMessage = true;
 						old_climate_state = climate_state; old_left_temp_direction = left_temp_direction; old_right_temp_direction = right_temp_direction; old_climate_defrost = climate_defrost; old_climate_batterie_preheat = climate_batterie_preheat; old_rear_defrost = rear_defrost; old_defrost_mode = defrost_mode;

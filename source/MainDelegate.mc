@@ -350,8 +350,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		}
 		else {
-			if (_spinner.equals("?")) {
-				Application.getApp().setProperty("spinner", "*");
+				if (_spinner.equals("?")) {
+				Application.getApp().setProperty("spinner", "¿");
 			}
 			else {
 				Application.getApp().setProperty("spinner", "?");
