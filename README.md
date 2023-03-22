@@ -43,6 +43,12 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.9.0 Added the following (beside the first item, the other three are more technical than anything else)
+- A 'driving' icon is displayed instead of the car icon in the upper left quadrant when the vehicle is not parked and you can't interact with it.
+- A error '408' counter is shown beside the number of seconds waiting when requesting data. That 408 error means Tesla's servers cannot talk to the car, either it doesn't have cellular coverage but most likely, it's asleep. Once it wakes up, the 408 errors stops. This is just to give a visual representation of what's going on and why the wait. Long pause between inscrease in this number is because Tesla's servers are taking a long time to respond.
+- The upper left quadrant menu and the Option menu have been modified to use the Menu2 menu view instead of the old Menu view.
+- The version bump however, is hopefully transparent but is a major revamp of the code that handles the vehicle states and actions. Both events used to be in the same humongous routine that three timers would call for different reasons and codes needed to be added to prevent one timer from interfering with another. Now it only has one timer and a call queue with priorities handle de dispatchind of fetching vehicle state and performing action.
+
 V7.8.1 Added the following
 - Fixed an issue with the screen blanking at start
 - Fixed a rare crash that could happen if Bluetooth is lost while we're waiting to authenticate with Tesla's servers

@@ -21,10 +21,12 @@ class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
 
     function initialize (controller) {
         _controller = controller;
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     function onCancel () {
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 
@@ -33,7 +35,7 @@ class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
 		Application.getApp().setProperty("climate_mode_chosen", _selected);
 
         _controller._climate_mode = true;
-        _controller.stateMachine();
+        _controller.actionMachine();
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }

@@ -1,15 +1,27 @@
 using Toybox.WatchUi as Ui;
 using Toybox.System;
 
-class OptionMenuDelegate extends Ui.MenuInputDelegate {
+class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
 	
     function initialize(controller) {
         Ui.MenuInputDelegate.initialize();
         _controller = controller;
+        _controller._stateMachineCounter = -1;
+        logMessage("OptionMenuDelegate: initialize");
     }
 
-    function onMenuItem(item) {
+    //! Handle a cancel event from the picker
+    //! @return true if handled, false otherwise
+    function onBack() {
+        _controller._stateMachineCounter = 1;
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onSelect(selected_item) {
+        var item = selected_item.getId();
+
         if (item == :reset) {
             Settings.setToken(null);
             Settings.setRefreshToken(null, 0, 0);
@@ -17,18 +29,18 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 			Application.getApp().setProperty("ResetNeeded", true);
         } else if (item == :honk) {
             _controller._honk_horn = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :select_car) {
             _controller._tesla.getVehicleId(method(:onReceiveVehicles));
         } else if (item == :open_port) {
             _controller._open_port = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :open_frunk) {
             _controller._open_frunk = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :open_trunk) {
             _controller._open_trunk = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :toggle_view) {
             var view = Application.getApp().getProperty("image_view");
             if (view) {
@@ -99,43 +111,43 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 	        Ui.switchToView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :defrost) {
             _controller._set_climate_defrost = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :set_steering_wheel_heat) {
             _controller._set_steering_wheel_heat = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :vent) {
             _controller._vent = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :toggle_charge) {
             _controller._toggle_charging_set = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :adjust_departure) {
 			if (_controller._data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 	            _controller._adjust_departure = true;
-	            _controller.stateMachine();
+	            _controller.actionMachine();
             }
             else {
 				Ui.switchToView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
             }
         } else if (item == :toggle_sentry) {
             _controller._sentry_mode = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :wake) {
             _controller._need_wake = true;
             _controller._wake_done = false;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
             Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
             _controller._view_datascreen = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :homelink) {
             _controller._homelink = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :remote_boombox) {
             _controller._remote_boombox = true;
-            _controller.stateMachine();
+            _controller.actionMachine();
         } else if (item == :climate_mode) {
 	        var modes = new [4];
 
@@ -146,6 +158,8 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         }
+
+        return true;
     }
 
     function onReceiveVehicles(responseCode, data) {
@@ -160,7 +174,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
             Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
         } else {
-            _controller._handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+            _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
     }
 }

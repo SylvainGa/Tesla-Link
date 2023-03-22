@@ -23,6 +23,7 @@ class MainView extends Ui.View {
 	hidden var _displayTimer;
 	hidden var _displayType;
 	hidden var _errorTimer;
+	hidden var _408_count;
 	var _data;
 	var _refreshTimer;
 	// DEBUG variables
@@ -41,6 +42,7 @@ class MainView extends Ui.View {
 
 		_display = Ui.loadResource(Rez.Strings.label_requesting_data);
 		_displayTimer = "";
+		_408_count = 0;
 
 		// 2023-03-20 logMessage("MainView:initialize: _display at " + _display);
 
@@ -72,7 +74,7 @@ class MainView extends Ui.View {
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
 			if (timeWaiting > 1000) {
-				_displayTimer = "\n(" + timeWaiting / 1000 + "s)";
+				_displayTimer = "\n(" + _408_count + " - " + timeWaiting / 1000 + "s)";
 			}
 		}
 		Ui.requestUpdate();
@@ -104,10 +106,11 @@ class MainView extends Ui.View {
 				_displayType = args[0];
 			}
 
-			if (args[1] == true) { //Add the timer to the string being displayed
+			if (args[1] != -1) { //Add the timer to the string being displayed
+				_408_count = args[1];
 				var timeWaiting = System.getTimer() - gWaitTime;
 				if (timeWaiting > 1000) {
-					_displayTimer = "\n(" + timeWaiting / 1000 + "s)";
+					_displayTimer = "\n(" + _408_count + " - " + timeWaiting / 1000 + "s)";
 				} else {
 					_displayTimer = "";
 				}
@@ -163,7 +166,7 @@ class MainView extends Ui.View {
 				_displayTimer = "";
 			}
 		} else if (_data._vehicle_data != null) {
-			// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Showing data screen"); }
+			if (/*_showLogMessage*/true) { logMessage("MainView:onUpdate: Showing data screen"); }
 			// Showing the main layouts, so we can process touches now
 			_data._ready = true;
 			_errorTimer = 0;
@@ -271,42 +274,46 @@ class MainView extends Ui.View {
 				{
 					// Update the car status if it's the dynamic icon to display
 					if (swap_frunk_for_port == 3) {
-						var which_bitmap = 0;
-						var iconList = [
-							Rez.Drawables.frunk0trunk0port0vent0_icon_white,
-							Rez.Drawables.frunk1trunk0port0vent0_icon_white,
-							Rez.Drawables.frunk0trunk1port0vent0_icon_white,
-							Rez.Drawables.frunk1trunk1port0vent0_icon_white,
-							Rez.Drawables.frunk0trunk0port1vent0_icon_white,
-							Rez.Drawables.frunk1trunk0port1vent0_icon_white,
-							Rez.Drawables.frunk0trunk1port1vent0_icon_white,
-							Rez.Drawables.frunk1trunk1port1vent0_icon_white,
-							Rez.Drawables.frunk0trunk0port0vent1_icon_white,
-							Rez.Drawables.frunk1trunk0port0vent1_icon_white,
-							Rez.Drawables.frunk0trunk1port0vent1_icon_white,
-							Rez.Drawables.frunk1trunk1port0vent1_icon_white,
-							Rez.Drawables.frunk0trunk0port1vent1_icon_white,
-							Rez.Drawables.frunk1trunk0port1vent1_icon_white,
-							Rez.Drawables.frunk0trunk1port1vent1_icon_white,
-							Rez.Drawables.frunk1trunk1port1vent1_icon_white
-						];
+						var drive_state = _data._vehicle_data.get("drive_state");
+						if (drive_state != null && drive_state.get("shift_state") != null) {
+							dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.driving_icon));
+						} else {
+							var which_bitmap = 0;
+							var iconList = [
+								Rez.Drawables.frunk0trunk0port0vent0_icon_white,
+								Rez.Drawables.frunk1trunk0port0vent0_icon_white,
+								Rez.Drawables.frunk0trunk1port0vent0_icon_white,
+								Rez.Drawables.frunk1trunk1port0vent0_icon_white,
+								Rez.Drawables.frunk0trunk0port1vent0_icon_white,
+								Rez.Drawables.frunk1trunk0port1vent0_icon_white,
+								Rez.Drawables.frunk0trunk1port1vent0_icon_white,
+								Rez.Drawables.frunk1trunk1port1vent0_icon_white,
+								Rez.Drawables.frunk0trunk0port0vent1_icon_white,
+								Rez.Drawables.frunk1trunk0port0vent1_icon_white,
+								Rez.Drawables.frunk0trunk1port0vent1_icon_white,
+								Rez.Drawables.frunk1trunk1port0vent1_icon_white,
+								Rez.Drawables.frunk0trunk0port1vent1_icon_white,
+								Rez.Drawables.frunk1trunk0port1vent1_icon_white,
+								Rez.Drawables.frunk0trunk1port1vent1_icon_white,
+								Rez.Drawables.frunk1trunk1port1vent1_icon_white
+							];
 
-						if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
-							which_bitmap = 1;
-						}
-						if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
-							which_bitmap += 2;
-						}
-						if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
-							which_bitmap += 4;
-						}
-						if (venting) {
-							which_bitmap += 8;
-						}
+							if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
+								which_bitmap = 1;
+							}
+							if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
+								which_bitmap += 2;
+							}
+							if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
+								which_bitmap += 4;
+							}
+							if (venting) {
+								which_bitmap += 8;
+							}
 
-						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(iconList[which_bitmap]));
+							dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(iconList[which_bitmap]));
+						}
 					}
-
 					// Update the lock state indicator
 					dc.drawBitmap(image_x_left.toNumber(),image_y_bottom,(_data._vehicle_data.get("vehicle_state").get("locked") ? Ui.loadResource(Rez.Drawables.locked_icon) : door_open ? Ui.loadResource(Rez.Drawables.door_open_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
 

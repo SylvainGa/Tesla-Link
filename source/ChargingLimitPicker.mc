@@ -42,12 +42,14 @@ class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 
@@ -59,7 +61,7 @@ class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
         
         Application.getApp().setProperty("charging_limit", _charging_limit);
         _controller._set_charging_limit_set = true;
-        _controller.stateMachine();
+        _controller.actionMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }

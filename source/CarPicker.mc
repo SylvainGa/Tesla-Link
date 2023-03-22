@@ -25,6 +25,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         _carsName = carsName;
         _carsId = carsId;
         _controller = controller;
+        _controller._stateMachineCounter = 0;
         PickerDelegate.initialize();
     }
 
@@ -32,7 +33,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         _controller._vehicle_id = -2;
         gWaitTime = System.getTimer();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller.stateMachine();
+        _controller._stateMachineCounter = 1;
     }
 
     function onAccept (values) {
@@ -68,9 +69,9 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         }
 
         gWaitTime = System.getTimer();
-        _controller._handler.invoke([3, true, WatchUi.loadResource(Rez.Strings.label_requesting_data)]);
+        _controller._handler.invoke([3, _controller._408_count, WatchUi.loadResource(Rez.Strings.label_requesting_data)]);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         WatchUi.requestUpdate();
-        _controller.stateMachine();
+        _controller._stateMachineCounter = 1;
     }
 }

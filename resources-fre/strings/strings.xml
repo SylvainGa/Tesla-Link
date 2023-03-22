@@ -55,6 +55,7 @@
     <string id="menu_label_refresh">temps de rafraichissement</string>
     <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
     <string id="menu_label_climate_mode">Mode de la climatisation</string>  <!--  NEW -->
+    <string id="menu_label_select">Sélectionner</string>
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>

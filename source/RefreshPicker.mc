@@ -40,12 +40,14 @@ class RefreshPickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 
@@ -57,7 +59,7 @@ class RefreshPickerDelegate extends WatchUi.PickerDelegate {
 
         Application.getApp().setProperty("refreshTimeInterval", _refreshTime);
         _controller._set_refresh_time = true;
-        _controller.stateMachine();
+        _controller.actionMachine();
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 }

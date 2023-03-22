@@ -128,6 +128,13 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
+    <bitmap id="driving_icon" filename="driving.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+            <color>AAAAAA</color>
+        </palette>
+    </bitmap>
     <bitmap id="frunk_icon_white" filename="frunk.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>

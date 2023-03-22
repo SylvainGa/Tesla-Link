@@ -1,15 +1,26 @@
 using Toybox.WatchUi as Ui;
 
 
-class TrunksMenuDelegate extends Ui.MenuInputDelegate {
+class TrunksMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
 	
     function initialize(controller) {
-        Ui.MenuInputDelegate.initialize();
+        Ui.Menu2InputDelegate.initialize();
         _controller = controller;
+        _controller._stateMachineCounter = -1;
     }
 
-    function onMenuItem(item) {
+    //! Handle a cancel event from the picker
+    //! @return true if handled, false otherwise
+    function onBack() {
+        _controller._stateMachineCounter = 1;
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onSelect(selected_item) {
+        var item = selected_item.getId();
+
         if (item == :open_frunk) {
         	_controller._open_frunk = true;
         	_controller._bypass_confirmation = true;
@@ -27,6 +38,6 @@ class TrunksMenuDelegate extends Ui.MenuInputDelegate {
         	_controller._bypass_confirmation = true;
         }
 
-        _controller.stateMachine();
+        _controller.actionMachine();
     }
 }

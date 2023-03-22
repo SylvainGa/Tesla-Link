@@ -83,12 +83,14 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     public function onCancel() as Boolean {
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -110,7 +112,7 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
 	        Application.getApp().setProperty("departure_time", time);
 	        
 	        _controller._adjust_departure = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 	
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	        return true;

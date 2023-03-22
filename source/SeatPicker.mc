@@ -21,10 +21,12 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function initialize (controller) {
         _controller = controller;
+        _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     function onCancel () {
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 

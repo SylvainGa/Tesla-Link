@@ -43,10 +43,12 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function initialize (controller) {
         _controller = controller;
+		_controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
 
     function onCancel () {
+		_controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
 
@@ -57,25 +59,25 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
 		if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_front) {
 			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_driver);
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_passenger);
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 	    }
 		else if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_rear) {
 			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_left);
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_center);
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_right);
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 		}
 		else {
 	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
+	        _controller.actionMachine();
 	    }
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
     }
