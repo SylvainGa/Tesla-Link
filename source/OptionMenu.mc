@@ -10,7 +10,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         _controller = controller;
         _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
-        logMessage("OptionMenuDelegate: _stateMachineCounter was " + _previous_stateMachineCounter);
+        logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
     }
 
@@ -19,7 +19,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     function onBack() {
         // Unless we missed data, restore _stateMachineCounter
         _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
-        logMessage("OptionMenuDelegate: Cancel called, returning _stateMachineCounter to " + _controller._stateMachineCounter);
+        logMessage("OptionMenuDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -27,7 +27,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     function onSelect(selected_item) {
         var item = selected_item.getId();
 
-        logMessage("OptionMenuDelegate: Select called for " + selected_item.getLabel());
+        logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
         if (item == :reset) {
             Settings.setToken(null);
             Settings.setRefreshToken(null, 0, 0);

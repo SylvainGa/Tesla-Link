@@ -26,6 +26,7 @@ class MainView extends Ui.View {
 	hidden var _408_count;
 	var _data;
 	var _refreshTimer;
+	var _viewUpdated;
 	// DEBUG variables
 	var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
@@ -52,6 +53,7 @@ class MainView extends Ui.View {
 		}
 
 		Ui.requestUpdate();
+		_viewUpdated = false;
 	}
 
 	function onLayout(dc) {
@@ -60,7 +62,7 @@ class MainView extends Ui.View {
 
 	function onShow() {
 		_refreshTimer = new Timer.Timer();
-		_refreshTimer.start(method(:refreshScreen), 500, true);
+		_refreshTimer.start(method(:refreshView), 500, true);
 	}
 	
 	function onHide() {
@@ -68,8 +70,8 @@ class MainView extends Ui.View {
 		_refreshTimer = null;
 	}
 
-	function refreshScreen() {
-		//logMessage("MainView:refreshScreen: requesting update");
+	function refreshView() {
+		//logMessage("MainView:refreshView: requesting update");
 		_showLogMessage = false;
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
@@ -77,7 +79,12 @@ class MainView extends Ui.View {
 				_displayTimer = "\n(" + _408_count + "x - " + timeWaiting / 1000 + "s)";
 			}
 		}
-		Ui.requestUpdate();
+		if (_viewUpdated) {
+			Ui.requestUpdate();
+			_viewUpdated = false;
+		}
+		else {
+			logMessage("MainView:refreshView: skipping, already waiting for a viewUpdate");
 	}
 
 	function onReceive(args) {
@@ -91,13 +98,13 @@ class MainView extends Ui.View {
 		if (args[2] != null) {
 			tmpDisplay = _display;
 			if (args[0] == 0) {
-				logMessage("MainView:onReceive: Receiving a priority Message: '" + args[2] + "'");
+				logMessage("MainView:onReceive: priority msg: '" + args[2] + "'");
 				_errorTimer = System.getTimer() + 2000; // priority message stays two seconds
 				if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			} else if (_errorTimer == 0 || _displayType == args[0]) {
-				logMessage("MainView:onReceive: Receiving a type " + args[0] + " message: '" + args[2] + "'");
+				logMessage("MainView:onReceive: type " + args[0] + " msg: '" + args[2] + "'");
 				if (args[0] == 1) { // Informational message stays a second
 					_errorTimer = System.getTimer() + 1000;
 				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 60 seconds has passed and type 3 with a null when type 1 is received
@@ -124,7 +131,7 @@ class MainView extends Ui.View {
 				_displayTimer = null;
 			}
 		} else if (_errorTimer == 0 || args[0] == 0 || (args[0] == 1 && _displayType == 3)) {
-			if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: Receiving a null message and args[0] is " + args[0] + " with _errorTimer at " + _errorTimer); }
+			if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: null msg, args[0]=" + args[0] + ", _errorTimer=" + _errorTimer); }
 			_display = null;
 			_displayTimer = null;
 			_displayType = -1;
@@ -132,6 +139,7 @@ class MainView extends Ui.View {
 		}
 
 		Ui.requestUpdate();
+		_viewUpdated = false;
 	}
 
 	function onUpdate(dc) {
@@ -146,7 +154,9 @@ class MainView extends Ui.View {
 		var center_x = dc.getWidth()/2;
 		var center_y = dc.getHeight()/2;
 		var sentry_y = image_y_top - height/21;
-		
+
+		_viewUpdated = true; // Tell refreshScreen that we updated our view
+
 		// Load our custom font if it's there, generally only for high res, high mem devices
 		var font_montserrat;
 		if (Rez.Fonts has :montserrat) {
@@ -160,19 +170,19 @@ class MainView extends Ui.View {
 			// We're showing a message, so set 'ready' false to prevent touches
 			_data._ready = false;
 
-			if (_showLogMessage) { logMessage("MainView:onUpdate: Showing Message '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
+			if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
 			dc.drawText(center_x, center_y, font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
 			if (System.getTimer() > _errorTimer && _errorTimer != 0 && _data._vehicle_data != null) { // Have we timed out our text display and we have something to display
-				logMessage("MainView:onUpdate: Clearing timer and display");
+				logMessage("MainView:onUpdate: Clearing timer/display");
 				_errorTimer = 0;
 				_display = null;
 				_displayTimer = "";
 			}
 		} else if (_data._vehicle_data != null) {
-			if (_showLogMessage) { logMessage("MainView:onUpdate: Showing data screen"); }
+			if (_showLogMessage) { logMessage("MainView:onUpdate: drawing"); }
 			// Showing the main layouts, so we can process touches now
 			_data._ready = true;
 			_errorTimer = 0;
