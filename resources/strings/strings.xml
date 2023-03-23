@@ -140,7 +140,6 @@
     <string id="label_login_on_phone">Login on Phone!</string>
     <string id="label_oauth_error">OAuth error</string>
     <string id="label_requesting_data">Retrieving data</string>
-    <string id="label_requesting_data_waiting">Still waiting</string>
     <string id="label_authenticating_with_token">Authenticating with token</string>  <!--  NEW -->
     <string id="label_authenticating_with_login">Authenticating with login</string>  <!--  NEW -->
     <string id="label_got_token">Got our token</string>  <!--  NEW -->
@@ -164,6 +163,7 @@
     <string id="label_stop_charging">Stopping charge</string>  <!--  NEW -->
     <string id="label_start_charging">Starting charge</string>  <!--  NEW -->
     <string id="label_climate_mode">Climate mode set to </string>  <!--  NEW -->
+    <string id="label_waiting_online">Waiting for the vehicle\nto come back online</string>  <!--  NEW -->
 
 	<!--  Popup text -->
     <string id="label_open_frunk">Open Frunk?</string>

@@ -9,14 +9,14 @@ import Toybox.WatchUi;
 /* For displayType
 	Message received with type 0 : Will last 2 seconds
 	Message received with type 1 : Will last 1 seconds
-	Message received with type 2 : Will last 10 seconds or cleared if message null with type 0 received
+	Message received with type 2 : Will last 15 seconds or cleared if message null with type 0 received
 	Message received with type 3 : Will disappear as soon as the screen can be displayed
 	Messages with the same type as the previous overrides the previous message
 	No message with type 0: Timer reset, sceen will be displayed
 	No message with any other types, ignored
 */
 
-var gWaitTime; // Sorry, easiest way of dealing with variables used in subviews (carPicket in this situation)
+var gWaitTime; // Sorry, easiest way of dealing with variables used in subviews (carPicker in this situation)
 
 class MainView extends Ui.View {
 	hidden var _display;
@@ -27,7 +27,7 @@ class MainView extends Ui.View {
 	var _data;
 	var _refreshTimer;
 	// DEBUG variables
-	// 2023-03-20 var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
+	var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
 	// Initial load - show the 'requesting data' string, make sure we don't process touches
 	function initialize(data) {
@@ -38,7 +38,7 @@ class MainView extends Ui.View {
 		_displayType = -1;
 		gWaitTime = System.getTimer();
 		// DEBUG variables
-		// 2023-03-20 _showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
+		_showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
 
 		_display = Ui.loadResource(Rez.Strings.label_requesting_data);
 		_displayTimer = "";
@@ -70,47 +70,53 @@ class MainView extends Ui.View {
 
 	function refreshScreen() {
 		//logMessage("MainView:refreshScreen: requesting update");
-		// 2023-03-20 _showLogMessage = false;
+		_showLogMessage = false;
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
 			if (timeWaiting > 1000) {
-				_displayTimer = "\n(" + _408_count + " - " + timeWaiting / 1000 + "s)";
+				_displayTimer = "\n(" + _408_count + "x - " + timeWaiting / 1000 + "s)";
 			}
 		}
 		Ui.requestUpdate();
 	}
 
 	function onReceive(args) {
-		// 2023-03-20 _showLogMessage = false;
+		_showLogMessage = false;
+		var tmpDisplay;
 
 		if (System.getTimer() > _errorTimer) { // Have we timed out our previous text display
 			_errorTimer = 0;
 		}
 
 		if (args[2] != null) {
+			tmpDisplay = _display;
 			if (args[0] == 0) {
-				// 2023-03-20 logMessage("MainView:onReceive: Receiving a priority Message: '" + args[2] + "'");
+				logMessage("MainView:onReceive: Receiving a priority Message: '" + args[2] + "'");
 				_errorTimer = System.getTimer() + 2000; // priority message stays two seconds
-				// 2023-03-20 if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
+				if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			} else if (_errorTimer == 0 || _displayType == args[0]) {
-				// 2023-03-20 logMessage("MainView:onReceive: Receiving a type " + args[0] + " message: '" + args[2] + "'");
+				logMessage("MainView:onReceive: Receiving a type " + args[0] + " message: '" + args[2] + "'");
 				if (args[0] == 1) { // Informational message stays a second
 					_errorTimer = System.getTimer() + 1000;
-				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 15 seconds has passed and type 3 with a null with type 1 is received
-					_errorTimer = System.getTimer() + 15000;
+				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 60 seconds has passed and type 3 with a null when type 1 is received
+					_errorTimer = System.getTimer() + 60000;
 				}
-				// 2023-03-20 if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
+				if (_display == null || _display.equals(args[2]) == false) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			}
 
 			if (args[1] != -1) { //Add the timer to the string being displayed
+				// If we're calling with a different sting, then reset the counter.
+				if (tmpDisplay == null || tmpDisplay.equals(args[2]) == false) {
+					gWaitTime = System.getTimer();
+				}
 				_408_count = args[1];
 				var timeWaiting = System.getTimer() - gWaitTime;
 				if (timeWaiting > 1000) {
-					_displayTimer = "\n(" + _408_count + " - " + timeWaiting / 1000 + "s)";
+					_displayTimer = "\n(" + _408_count + "x - " + timeWaiting / 1000 + "s)";
 				} else {
 					_displayTimer = "";
 				}
@@ -118,7 +124,7 @@ class MainView extends Ui.View {
 				_displayTimer = null;
 			}
 		} else if (_errorTimer == 0 || args[0] == 0 || (args[0] == 1 && _displayType == 3)) {
-			// 2023-03-20 if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: Receiving a null message and args[0] is " + args[0] + " with _errorTimer at " + _errorTimer); }
+			if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: Receiving a null message and args[0] is " + args[0] + " with _errorTimer at " + _errorTimer); }
 			_display = null;
 			_displayTimer = null;
 			_displayType = -1;
@@ -154,19 +160,19 @@ class MainView extends Ui.View {
 			// We're showing a message, so set 'ready' false to prevent touches
 			_data._ready = false;
 
-			// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Showing Message '" + _display + _displayTimer + "'"); }
+			if (_showLogMessage) { logMessage("MainView:onUpdate: Showing Message '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
 			dc.drawText(center_x, center_y, font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
 			if (System.getTimer() > _errorTimer && _errorTimer != 0 && _data._vehicle_data != null) { // Have we timed out our text display and we have something to display
-				// 2023-03-20 logMessage("MainView:onUpdate: Clearing timer and display");
+				logMessage("MainView:onUpdate: Clearing timer and display");
 				_errorTimer = 0;
 				_display = null;
 				_displayTimer = "";
 			}
 		} else if (_data._vehicle_data != null) {
-			if (/*_showLogMessage*/true) { logMessage("MainView:onUpdate: Showing data screen"); }
+			if (_showLogMessage) { logMessage("MainView:onUpdate: Showing data screen"); }
 			// Showing the main layouts, so we can process touches now
 			_data._ready = true;
 			_errorTimer = 0;

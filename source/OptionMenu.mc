@@ -8,7 +8,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     function initialize(controller) {
         Ui.MenuInputDelegate.initialize();
         _controller = controller;
-        _previous_stateMachineCounter = _controller._stateMachineCounter;
+        _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
         logMessage("OptionMenuDelegate: _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
@@ -17,8 +17,9 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onBack() {
-        _controller._stateMachineCounter = _previous_stateMachineCounter;
-        logMessage("OptionMenuDelegate: Cancel called, returning _stateMachineCounter to " + _previous_stateMachineCounter);
+        // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+        logMessage("OptionMenuDelegate: Cancel called, returning _stateMachineCounter to " + _controller._stateMachineCounter);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -32,7 +33,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             Settings.setRefreshToken(null, 0, 0);
             Application.getApp().setProperty("vehicle", null);
 			Application.getApp().setProperty("ResetNeeded", true);
-            _controller._stateMachineCounter = _previous_stateMachineCounter;
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :honk) {
             _controller._honk_horn = true;
             _controller.actionMachine();
@@ -54,7 +56,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             } else {
                 Application.getApp().setProperty("image_view", true);
             }
-            _controller._stateMachineCounter = _previous_stateMachineCounter;
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :swap_frunk_for_port) {
             var swap = Application.getApp().getProperty("swap_frunk_for_port");
             if (swap == 0 || swap == null) {
@@ -69,7 +72,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 			else {
                 Application.getApp().setProperty("swap_frunk_for_port", 0);
 	        }
-            _controller._stateMachineCounter = _previous_stateMachineCounter;
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :set_temperature) {
             var driver_temp = Application.getApp().getProperty("driver_temp");
             var max_temp = _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
@@ -185,6 +189,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
         }
 
-        _controller._stateMachineCounter = _previous_stateMachineCounter;
+        // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
     }
 }

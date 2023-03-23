@@ -8,7 +8,7 @@ class TrunksMenuDelegate extends Ui.Menu2InputDelegate {
     function initialize(controller) {
         Ui.Menu2InputDelegate.initialize();
         _controller = controller;
-        _previous_stateMachineCounter = _controller._stateMachineCounter;
+        _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
         logMessage("TrunksMenuDelegate: _stateMachineCounter was " + _previous_stateMachineCounter);
     }
@@ -16,8 +16,9 @@ class TrunksMenuDelegate extends Ui.Menu2InputDelegate {
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onBack() {
-        _controller._stateMachineCounter = _previous_stateMachineCounter;
-        logMessage("TrunksMenuDelegate: Cancel called, returning _stateMachineCounter to " + _previous_stateMachineCounter);
+        // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+        logMessage("TrunksMenuDelegate: Cancel called, returning _stateMachineCounter to " + _controller._stateMachineCounter);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }

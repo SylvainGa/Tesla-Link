@@ -30,11 +30,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _wakeWasConfirmed;
 	var _refreshTimeInterval;
 	var _408_count;
+	var _lastError;
 	var _lastTimeStamp;
 	var _lastDataRun;
 	// 2023-03-20 var _debugTimer;
-	var _showingRequestingData;
-	var _endingText;
 
 	var _set_climate_on;
 	var _set_climate_off;
@@ -63,8 +62,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _bypass_confirmation;
 
 	var _pendingPriorityRequests;
-	var _pendingTimerRequests;
-	var _actionMachineFlag;
+	var _actionsArePending;
 	var _stateMachineCounter;
 	var _dataRequestCounter;
 
@@ -129,8 +127,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		gWaitTime = System.getTimer();
 		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the first 408 generate a wake commmand
 		_wakeWasConfirmed = false; // So we only display the Asking to wake only once
-		_showingRequestingData = true; // When we launch, that string will be displayed so flag it true here
-		_endingText = "";
 
 		_set_climate_on = false;
 		_set_climate_off = false;
@@ -159,6 +155,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_bypass_confirmation = false;
 
 		_408_count = 0;
+		_lastError = null;
 		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
 		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
 			_refreshTimeInterval = 4000;
@@ -167,12 +164,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastTimeStamp = 0;
 
 		_pendingPriorityRequests = {};
-		_pendingTimerRequests = {};
 		_stateMachineCounter = 0;
-		_actionMachineFlag = false;
+		_actionsArePending = false;
 
 		logMessage("initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
-		_timer.start(method(:stateTimer), 100, true);
+		_timer.start(method(:workerTimer), 100, true);
 
 		stateMachine(); // Launch getting the states right away.
 	}
@@ -228,7 +224,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (error == null) {
 			logMessage("onOAuthMessage code: '" + code + "' error: '" + error + "'");
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
-			_showingRequestingData = true;
 			var codeForBearerUrl = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
 			var codeForBearerParams = {
 				"grant_type" => "authorization_code",
@@ -267,7 +262,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_auth_done = true;
 
 			_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_got_token)]);
-			_showingRequestingData = true;
 
 			var accessToken = data["access_token"];
 			var refreshToken = data["refresh_token"];
@@ -299,6 +293,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
+
 			Settings.setRefreshToken(null, 0, 0);
 
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
@@ -360,15 +355,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function actionMachine() {
-		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (!_firstTime ? " _firstTime true" : ""));
+		if (_view._data._ready == false || _lastError != null) { // Our display ain't ready yet our last command terminated with a error, wait until we get some before sending the command
+			if (_stateMachineCounter < 0 || !_actionsArePending) {
+				_stateMachineCounter = 1;
+			}
+			_actionsArePending = true;
 
-		if (_view._data._ready == false) { // We're not having valid data so wait until we get some before sending the command
-			_stateMachineCounter = 1;
-			_actionMachineFlag = true;
+			if (_stateMachineCounter > 0) {
+				_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
+				logMessage("actionMachine: Differing, ready=" + _view._data._ready + " lastError=" + _lastError);
+				stateMachine();
+			}
 			return;
 		}
 
-		_stateMachineCounter = -2; // Don't bother us with getting states when we do our things
+		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
+
+		_actionsArePending = false;
+
+		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
 		var _handlerType;
 		if (Application.getApp().getProperty("quickReturn")) {
@@ -668,7 +673,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (!_firstTime ? " _firstTime true" : ""));
+		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 
@@ -687,13 +692,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (_refreshToken != null && _refreshToken.length() != 0) {
 				logMessage("stateMachine: Asking for access token through saved refresh token " + _refreshToken.substring(0,20) + "...");
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
-				_showingRequestingData = true;
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
 				logMessage("stateMachine: Building an OAUTH2 request");
 	        	_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_login)]);
-				_showingRequestingData = true;
 
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
 	                :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
@@ -796,12 +799,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		// 2022-05-21 logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = " + _408_count + " _need_wake = " + _need_wake);
 		if (_vehicle_state.equals("online") == false) { // Only matters if we're not online, otherwise be silent
 			if (_firstTime) {
-	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle) + _endingText]);
-				_showingRequestingData = false;
+	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
 	        } /*else {
-	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
-				_showingRequestingData = true;
+	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
 	        }*/
 		}
 
@@ -826,19 +827,18 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		_lastDataRun = System.getTimer();
-		if (_showingRequestingData) {
-			_pendingTimerRequests["waitingVehicleData"] = 50;
-		}
 		logMessage("StateMachine: Asking for data");
 		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 	}
 
-	function stateTimer()
+	function workerTimer()
 	{
-		if (_actionMachineFlag && _view._data._ready == true) { // We're waiting for an action to be performed and our data is valid, this takes precedence over anything else
-			_actionMachineFlag = false;
+		// We're waiting for an action to be performed, our data is now valid and last request was successful, perform the action. This takes precedence over anything else
+		if (_actionsArePending) { 
 			actionMachine();
-		} else if (_pendingPriorityRequests.keys().size() > 0) { // Our priority queue (checking the state of an action performed) comes next
+		}
+		// Our priority queue (checking the state of an action performed) comes next
+		else if (_pendingPriorityRequests.keys().size() > 0) { 
 			if (_pendingPriorityRequests.hasKey("getVehicleState")) {
 				var value = _pendingPriorityRequests.get("getVehicleState");
 				if (value != null && value > 0) {
@@ -872,59 +872,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 				}
 			}
-		} else {
-			if (_pendingTimerRequests.keys().size() > 0) { // We have nothing else to do?, check if we've waiting long enough to wake or for data and say so if's the case 
-				if (_pendingTimerRequests.hasKey("waitingVehicleWake")) {
-					var value = _pendingTimerRequests.get("waitingVehicleWake");
-					if (value != null && value > 0) {
-						value--;
-						_pendingTimerRequests.put("waitingVehicleWake", value);
-						if (value == 0) {
-							_pendingTimerRequests.remove("waitingVehicleWake");
-							waitingVehicleWake();
-						}
-					}
-				}
-				if (_pendingTimerRequests.hasKey("waitingVehicleData")) {
-					var value = _pendingTimerRequests.get("waitingVehicleData");
-					if (value != null && value > 0) {
-						value--;
-						_pendingTimerRequests.put("waitingVehicleData", value);
-						if (value == 0) {
-							_pendingTimerRequests.remove("waitingVehicleData");
-							waitingVehicleData();
-						}
-					}
-				}
-			}
-			if (_stateMachineCounter > 0) { // Last, get the current states of the vehicle if it's time, otherwise we do nothing this time around.
+		}
+		// We have no priority tasks to do?
+		else {
+			// Get the current states of the vehicle if it's time, otherwise we do nothing this time around.
+			if (_stateMachineCounter > 0) { 
 				if (_stateMachineCounter == 1) {
 					stateMachine();
 				} else {
 					_stateMachineCounter--;
+					//logMessage("workerTimer: " + _stateMachineCounter);
 				}
 			} else {
-				logMessage("stateTimer: " + _stateMachineCounter);
+				//logMessage("workerTimer: " + _stateMachineCounter);
 			}
-		}
-	}
-
-	function waitingVehicleWake()
-	{
-		if (_vehicle_state.equals("online") == false && _view._data._ready == false) { // Are we still showing the requested data message?
-			logMessage("waitingVehicleake: We're STILL waiting for the vehicle to wake up");
-			_endingText = "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting);
-			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle) + _endingText]);
-		}
-	}
-
-	function waitingVehicleData()
-	{
-		if (_showingRequestingData && _view._data._ready == false) { // Are we still showing the requested data message?
-			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting)]);
-			logMessage("waitingVehicleData: We're STILL waiting for data");
-			_endingText = "\n" + Ui.loadResource(Rez.Strings.label_requesting_data_waiting);
-			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
 		}
 	}
 
@@ -933,15 +894,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 1;
 	}
 
-
 	function wakeConfirmed() {
 		_need_wake = false;
 		_wake_done = false;
 		_wakeWasConfirmed = true;
-		_endingText = "";
 		gWaitTime = System.getTimer();
 		logMessage("wakeConfirmed: Waking the vehicle");
-		_pendingTimerRequests["waitingVehicleWake"] = 80;
 
 		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 	}
@@ -1061,6 +1019,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		var drive_state = _data._vehicle_data.get("drive_state");
 		if (drive_state != null && drive_state.get("shift_state") != null) {
+			logMessage("doPreviousPage: Moving, ignoring command");
 			return;
 		}
 
@@ -1265,7 +1224,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 	
 	function doMenu() {
-		logMessage("doMenu: call actionMachine");
+		logMessage("doMenu: Building menu");
 		if (!_data._ready) {
 			logMessage("doMenu: Not ready to do action");
 			return;
@@ -1299,7 +1258,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		{
 			return true;
 		}
-		
+
+		if (!Application.getApp().getProperty("image_view")) { // Touch device on the text screen is limited to show the menu so it can swich back to the image layout
+			doMenu();
+			return true;
+		}
+
 		var coords = click.getCoordinates();
 		var x = coords[0];
 		var y = coords[1];
@@ -1506,6 +1470,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 		if (responseCode == 200) {
+
 			var vehicles = data.get("response");
 			var size = vehicles.size();
 			if (size > 0) {
@@ -1573,16 +1538,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		logMessage("onReceiveVehicleData: " + responseCode);
 
 		if (_stateMachineCounter < 0) {
-			if (_stateMachineCounter == -1) { logMessage("onReceiveVehicleData: skipping because we're in a menu"); }
-			if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: skipping because actionMachine called"); }
+			if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping because actionMachine called"); }
+			if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: skipping again because of the menu?"); }
+			if (_stateMachineCounter == -1) { logMessage("onReceiveVehicleData: skipping because we're in a menu");
+				 _stateMachineCounter = -2; // Let the menu blocking us know that we missed data
+			}
 			return;
 		}
 
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
+			_lastError = null;
 			_vehicle_state = "online"; // We got data so we got to be online
-			_endingText = "";
 
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
 			var response = data.get("response");
@@ -1608,27 +1576,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
 				// logMessage("onReceiveVehicleData: received " + _data._vehicle_data);
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-					_showingRequestingData = false;
-					if (_pendingTimerRequests.hasKey("waitingVehicleData")) {
-						_pendingTimerRequests.remove("waitingVehicleData");
-						logMessage("onReceiveVehicleData: clearing waitingVehicleData");
-					}
-
 					if (_408_count) { logMessage("onReceiveVehicleData: clearing _408_count"); }
 					_408_count = 0; // Reset the count of timeouts since we got our data
 					_firstTime = false;
-
-					if (_pendingTimerRequests.hasKey("waitingVehicleWake")) {
-						_pendingTimerRequests.remove("waitingVehicleWake");
-					}
 
 					_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 					var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
 					// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
 					timeDelta = _refreshTimeInterval - timeDelta;
 					if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
-						// 2022-05-21 logMessage("onReceiveVehicleData: Running StateMachine in " + timeDelta + " msec");
 	                	_stateMachineCounter = (timeDelta / 100).toNumber();
+						logMessage("onReceiveVehicleData: Running StateMachine in " + _stateMachineCounter + " 0.1 sec cycles");
 						return;
 					} else {
 						// 2022-05-21 logMessage("onReceiveVehicleData: Running StateMachine in no less than 500 msec");
@@ -1642,6 +1600,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_stateMachineCounter = 5;
 			return;
 		} else {
+			_lastError = responseCode;
+
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
 				if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 					var suffix;
@@ -1655,8 +1615,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				if (_vehicle_state.equals("online") == true && _firstTime && _view._data._ready == false) { // We think we're online, it's our first pass and we have already a message displayed
-					//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + _endingText]);
-					//_showingRequestingData = true;
+					_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
 				}
 
 				logMessage("onReceiveVehicleData: 408_count=" + _408_count + " firstTime=" + _firstTime);
@@ -1735,6 +1694,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveVehicleState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
+			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1757,6 +1717,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveClimateState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
+			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1779,6 +1740,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveChargeState: Out of order data or missing timestamp, ignoring");
 			}
 		} else {
+			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1801,6 +1763,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getVehicleState"] = 10;
 			}
 		} else {  // Our call failed, say the error and back to the main code
+			SpinSpinner(responseCode);
 			logMessage("vehicleStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_stateMachineCounter = 1;
@@ -1822,6 +1785,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getClimateState"] = 10;
 			}
 		} else { // Our call failed, say the error and back to the main code
+			SpinSpinner(responseCode);
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			logMessage("climateStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_stateMachineCounter = 1;
@@ -1843,6 +1807,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getChargeState"] = 10;
 			}
 		} else { // Our call failed, say the error and back to the main code
+			SpinSpinner(responseCode);
 			logMessage("chargeStateHandler: " + responseCode + " Calling stateMachine in  0.1 sec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_stateMachineCounter = 1;
@@ -1854,6 +1819,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+			SpinSpinner(responseCode);
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
 

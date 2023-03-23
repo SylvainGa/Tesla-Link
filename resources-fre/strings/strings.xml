@@ -140,7 +140,6 @@
     <string id="label_login_on_phone">Connexion sur tél.</string>
     <string id="label_oauth_error">Erreur OAuth</string>
     <string id="label_requesting_data">Récup. données</string>
-    <string id="label_requesting_data_waiting">Toujours en attente</string>  <!--  NEW -->
     <string id="label_authenticating_with_token">Authen. par jeton</string>  <!--  NEW -->
     <string id="label_authenticating_with_login">Authen. par connexion</string>  <!--  NEW -->
     <string id="label_got_token">Jeton reçu</string>  <!--  NEW -->
@@ -164,6 +163,7 @@
     <string id="label_stop_charging">Arrêt de la charge</string>  <!--  NEW -->
     <string id="label_start_charging">Démarrage de la charge</string>  <!--  NEW -->
     <string id="label_climate_mode">Mode climat à </string>  <!--  NEW -->
+    <string id="label_waiting_online">En attente que le\nvéhicule revienne en ligne</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>
