@@ -186,7 +186,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             }
             Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
         } else {
-            _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+            _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString()]);
         }
 
         // Unless we missed data, restore _stateMachineCounter

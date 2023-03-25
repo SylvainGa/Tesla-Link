@@ -3,12 +3,8 @@ using Toybox.WatchUi as Ui;
 using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
-using Toybox.Graphics as Gfx;
 
 import Toybox.WatchUi;
-
-var gThemeColor = Gfx.Graphics.COLOR_YELLOW;
-
 
 /* For displayType
 	Message received with type 0 : Will last 2 seconds

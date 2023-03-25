@@ -124,13 +124,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var interval = 5 * 60;
 		var answer = (timeNow + interval < createdAt + expireIn);
 		
-		if (/*DEBUG*/false && _token != null && _token.length() != 0 && answer == true ) {
+		if (/*DEBUG false &&*/ _token != null && _token.length() != 0 && answer == true ) {
 			_need_auth = false;
 			_auth_done = true;
 			var expireAt = new Time.Moment(createdAt + expireIn);
 			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
 			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-			logMessage("initialize:Using token '" + _token.substring(0,10) + "...' which expires at " + dateStr);
+			logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
 		} else {
 			logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
 			_need_auth = true;
@@ -209,7 +209,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		}
 
-		logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + code);
+		logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
 
 		if (error == null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
@@ -268,14 +268,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_saveToken(accessToken);
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
-					logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... + access token=" + accessToken.substring(0,10) + "... which expires at " + dateStr);
+					logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 				} else {
-					logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... + NO ACCESS TOKEN");
+					logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
 				}
 				Settings.setRefreshToken(refreshToken, expires_in, created_at);
 			}
 			else {
-				logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN + access token: " + accessToken.substring(0,20) + "... which expires at " + dateStr);
+				logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
 		} else {
 			logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
@@ -359,7 +359,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			spinner = spinner + "W";
 		}
 
-		logMessage("SpinSpinner: '" + spinner + "'");
+		// 2023-03-25 logMessage("SpinSpinner: '" + spinner + "'");
 		Application.getApp().setProperty("spinner", spinner);
 	}
 
@@ -763,7 +763,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		logMessage("stateMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
+		logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 
@@ -779,8 +779,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
-			if (/*DEBUG*/false && _refreshToken != null && _refreshToken.length() != 0) {
-				logMessage("stateMachine: auth through refresh token " + _refreshToken.substring(0,20) + "...");
+			if (/*DEBUGfalse &&*/ _refreshToken != null && _refreshToken.length() != 0) {
+				logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
@@ -841,7 +841,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//logMessage("stateMachine: params=" + params);
 	            
 	            _handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
-	
+
+				logMessage("stateMachine: serverAUTHLocation: " + Application.getApp().getProperty("serverAUTHLocation"));	
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
 	            Communications.makeOAuthRequest(
 	                "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/authorize",
@@ -875,7 +876,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
-			logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
+			// 2023-03025 logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
@@ -914,7 +915,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		_lastDataRun = System.getTimer();
-		logMessage("StateMachine: getVehicleData");
+		// 2023-03-25 logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
 	}
 
@@ -1674,10 +1675,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					timeDelta = _refreshTimeInterval - timeDelta;
 					if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
 	                	_stateMachineCounter = (timeDelta / 100).toNumber();
-						logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
+						// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
 						return;
 					} else {
-						logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
+						// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
 					}
 				} else {
 					logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
@@ -1952,4 +1953,60 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_auth_done = false;
 		Settings.setToken(null);
 	}
+
+	var errorsStr = {
+		"0" => "UNKNOWN_ERROR",
+		"-1" => "BLE_ERROR",
+		"-2" => "BLE_HOST_TIMEOUT",
+		"-3" => "BLE_SERVER_TIMEOUT",
+		"-4" => "BLE_NO_DATA",
+		"-5" => "BLE_REQUEST_CANCELLED",
+		"-101" => "BLE_QUEUE_FULL",
+		"-102" => "BLE_REQUEST_TOO_LARGE",
+		"-103" => "BLE_UNKNOWN_SEND_ERROR",
+		"-104" => "BLE_CONNECTION_UNAVAILABLE",
+		"-200" => "INVALID_HTTP_HEADER_FIELDS_IN_REQUEST",
+		"-201" => "INVALID_HTTP_BODY_IN_REQUEST",
+		"-202" => "INVALID_HTTP_METHOD_IN_REQUEST",
+		"-300" => "NETWORK_REQUEST_TIMED_OUT",
+		"-400" => "INVALID_HTTP_BODY_IN_NETWORK_RESPONSE",
+		"-401" => "INVALID_HTTP_HEADER_FIELDS_IN_NETWORK_RESPONSE",
+		"-402" => "NETWORK_RESPONSE_TOO_LARGE",
+		"-403" => "NETWORK_RESPONSE_OUT_OF_MEMORY",
+		"-1000" => "STORAGE_FULL",
+		"-1001" => "SECURE_CONNECTION_REQUIRED",
+		"-1002" => "UNSUPPORTED_CONTENT_TYPE_IN_RESPONSE",
+		"-1003" => "REQUEST_CANCELLED",
+		"-1004" => "REQUEST_CONNECTION_DROPPED",
+		"-1005" => "UNABLE_TO_PROCESS_MEDIA",
+		"-1006" => "UNABLE_TO_PROCESS_IMAGE",
+		"-1007" => "UNABLE_TO_PROCESS_HLS",
+		"400" => "Bad_Request",
+		"401" => "Unauthorized",
+		"402" => "Payment_Required",
+		"403" => "Forbidden",
+		"404" => "Not_Found",
+		"405" => "Method_Not_Allowed",
+		"406" => "Not_Acceptable",
+		"407" => "Proxy_Authentication_Required",
+		"408" => "Request_Timeout",
+		"409" => "Conflict",
+		"410" => "Gone",
+		"411" => "Length_Required",
+		"412" => "Precondition_Failed",
+		"413" => "Request_Too_Large",
+		"414" => "Request-URI_Too_Long",
+		"415" => "Unsupported_Media_Type",
+		"416" => "Range_Not_Satisfiable",
+		"417" => "Expectation_Failed",
+		"500" => "Internal_Server_Error",
+		"501" => "Not_Implemented",
+		"502" => "Bad_Gateway",
+		"503" => "Service_Unavailable",
+		"504" => "Gateway_Timeout",
+		"505" => "HTTP_Version_Not_Supported",
+		"511" => "Network_Authentication_Required",
+		"540" => "Vehicle_Server_Error"
+	};
+
 }
