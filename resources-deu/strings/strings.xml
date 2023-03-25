@@ -164,7 +164,6 @@
     <string id="label_stop_charging">Stopping charge</string>  <!--  NEW -->
     <string id="label_start_charging">Starting charge</string>  <!--  NEW -->
     <string id="label_climate_mode">Climate mode set to </string>  <!--  NEW -->
-    <string id="label_waiting_online">Waiting for the vehicle\nto come back online</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>
@@ -192,6 +191,7 @@
     <string id="label_seat_rear_center">Rück-\nbank\n Mitte</string>
     <string id="label_seat_rear_right">Rück-\nbank\n rechts</string>
     <string id="label_seat_front">Sitze\nvorne</string>
+	<string id="label_seat_all">All</string>  <!--  NEW -->
     <string id="label_seat_rear">Sitze\nRück-\nbank</string>
     <string id="label_seat_auto">Auto</string>
     <string id="label_seat_off">Aus</string>

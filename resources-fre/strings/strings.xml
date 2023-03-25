@@ -163,7 +163,6 @@
     <string id="label_stop_charging">Arrêt de la charge</string>  <!--  NEW -->
     <string id="label_start_charging">Démarrage de la charge</string>  <!--  NEW -->
     <string id="label_climate_mode">Mode climat à </string>  <!--  NEW -->
-    <string id="label_waiting_online">En attente que le\nvéhicule revienne en ligne</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>
@@ -192,6 +191,7 @@
     <string id="label_seat_rear_right">Arrière droite</string>
     <string id="label_seat_front">Avant</string>
     <string id="label_seat_rear">Arrière</string>
+	<string id="label_seat_all">Tous</string>  <!--  NEW -->
     <string id="label_seat_auto">Auto</string>
     <string id="label_seat_off">Éteint</string>
     <string id="label_seat_low">Bas</string>

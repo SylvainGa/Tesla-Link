@@ -247,6 +247,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onReceiveToken(responseCode, data) {
 		logMessage("onReceiveToken: " + responseCode);
+
 		if (responseCode == 200) {
 			_auth_done = true;
 
@@ -309,37 +310,57 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function SpinSpinner(responseCode) {
-		var _spinner = Application.getApp().getProperty("spinner");
+		var waitTag = null;
+		var spinner = Application.getApp().getProperty("spinner");
+
+		if (spinner == null) {
+			logMessage("SpinSpinner: WARNING should not be null");
+			spinner = "";
+		}
+
+		if (spinner.length() > 1) {
+			waitTag = spinner.substring(1,2);
+		}
+
+		spinner = spinner.substring(0,1);
+
 		if (responseCode == 200) {
-			if (_spinner.equals("+")) {
-				Application.getApp().setProperty("spinner", "-");
+			if (spinner.equals("+")) {
+				spinner = "-";
 			}
-			else if (_spinner.equals("-")) {
-				Application.getApp().setProperty("spinner", "+");
+			else if (spinner.equals("-")) {
+				spinner = "+";
 			}
-			else if (_spinner.equals("/")) {
-				Application.getApp().setProperty("spinner", "\\");
+			else if (spinner.equals("/")) {
+				spinner = "\\";
 			}
-			else if (_spinner.equals("\\")) {
-				Application.getApp().setProperty("spinner", "/");
+			else if (spinner.equals("\\")) {
+				spinner = "/";
 			}
 			else {
 				if (Application.getApp().getProperty("enhancedTouch")) {
-					Application.getApp().setProperty("spinner", "+");
+					spinner = "+";
 				}
 				else {
-					Application.getApp().setProperty("spinner", "/");
+					spinner = "/";
 				}
 			}
 		}
 		else {
-				if (_spinner.equals("?")) {
-				Application.getApp().setProperty("spinner", "¿");
+			if (spinner.equals("?")) {
+				spinner = "¿";
 			}
 			else {
-				Application.getApp().setProperty("spinner", "?");
+				spinner = "?";
 			}
 		}
+
+		if (_pendingActionRequests.size() > 0) {
+			spinner = spinner + "W";
+		}
+
+		logMessage("SpinSpinner: '" + spinner + "'");
+		Application.getApp().setProperty("spinner", spinner);
 	}
 
 	function actionMachine() {
@@ -565,9 +586,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				logMessage("actionMachine: Setting seat heat - waiting for genericHandler");
-				var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
-
-				switch (seat_heat_chosen) {
+				var seat_heat_chosen_label = Application.getApp().getProperty("seat_heat_chosen");
+				var seat_heat_chosen;
+				switch (seat_heat_chosen_label) {
 					case Rez.Strings.label_seat_auto:
 						seat_heat_chosen = -1;
 						break;
@@ -589,32 +610,44 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 						
 					default:
+						logMessage("actionMachine: seat_heat_chosen is invalid '" + seat_heat_chosen_label + "'");
 						seat_heat_chosen = 0;
-						break;
+						_stateMachineCounter = 1;
+			            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+						return;
 				}
+
+				var label;
+				var position;
 
 				switch (option) {
 					case ACTION_OPTION_SEAT_DRIVER:
-						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_driver)]);
-						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
+						label = Rez.Strings.label_seat_driver;
+						position = 0;
 						break;
 					case ACTION_OPTION_SEAT_PASSENGER:
-						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_passenger)]);
-						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 1, seat_heat_chosen);
+						label = Rez.Strings.label_seat_passenger;
+						position = 1;
 						break;
 					case ACTION_OPTION_SEAT_REAR_DRIVER:
-						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_left)]);
-						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 2, seat_heat_chosen);
+						label = Rez.Strings.label_seat_rear_left;
+						position = 2;
 						break;
 					case ACTION_OPTION_SEAT_REAR_CENTER:
-						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_center)]);
-						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 4, seat_heat_chosen);
+						label = Rez.Strings.label_seat_rear_center;
+						position = 4;
 						break;
 					case ACTION_OPTION_SEAT_REAR_PASSENGER:
-						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_right)]);
-						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 5, seat_heat_chosen);
+						label = Rez.Strings.label_seat_rear_right;
+						position = 5;
+						break;
+					default:
+						logMessage("actionMachine: Seat Heat option is invalid '" + option + "'");
 						break;
 				}
+
+				_handler.invoke([_handlerType, -1, Ui.loadResource(label) + " - " + Ui.loadResource(seat_heat_chosen_label)]);
+				_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), position, seat_heat_chosen);
 				break;
 
 			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
@@ -930,7 +963,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			// Say actions are pending and call stateMachine as soon as you can
 			else {
-				_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
+				//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
 				logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError);
 
 				stateMachine();
@@ -1345,7 +1378,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		// Tap on the middle text line where Departure is written
 		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
-			var time = _controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
+			var time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 				_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 			}
@@ -1501,6 +1534,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onSelectVehicle(responseCode, data) {
 		logMessage("onSelectVehicle: " + responseCode);
+
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
 			var size = vehicles.size();
@@ -1520,6 +1554,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function onReceiveVehicles(responseCode, data) {
 		logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
+
+		SpinSpinner(responseCode);
+
 		if (responseCode == 200) {
 
 			var vehicles = data.get("response");
@@ -1588,6 +1625,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		*/
 		logMessage("onReceiveVehicleData: " + responseCode);
 
+		SpinSpinner(responseCode);
+
 		if (_stateMachineCounter < 0) {
 			if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
 			if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
@@ -1596,8 +1635,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			return;
 		}
-
-		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
 			_lastError = null;
@@ -1698,6 +1735,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onReceiveAwake(responseCode, data) {
 		logMessage("onReceiveAwake: " + responseCode);
+
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
@@ -1723,8 +1761,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveVehicleState(responseCode, data) {
-		SpinSpinner(responseCode);
 		logMessage("onReceiveVehicleState: " + responseCode + " running StateMachine in 100msec");
+
+		SpinSpinner(responseCode);
+
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1746,7 +1786,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveVehicleState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1755,8 +1794,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveClimateState(responseCode, data) {
-		SpinSpinner(responseCode);
 		logMessage("onReceiveClimateState: " + responseCode + " running StateMachine in 100msec");
+
+		SpinSpinner(responseCode);
+
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1769,7 +1810,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveClimateState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1778,8 +1818,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
    function onReceiveChargeState(responseCode, data) {
-		SpinSpinner(responseCode);
 		logMessage("onReceiveChargeState: " + responseCode + " running StateMachine in 100msec");
+
+		SpinSpinner(responseCode);
+
 		var result = null;
 		if (responseCode == 200) {
 			var response = data.get("response");
@@ -1792,7 +1834,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onReceiveChargeState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			SpinSpinner(responseCode);
 			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
 		}
 
@@ -1806,6 +1847,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function vehicleStateHandler(responseCode, data) {
+		SpinSpinner(responseCode);
+
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
 				logMessage("vehicleStateHandler: " + responseCode + " skiping getVehicleState, running StateMachine in 100msec");
@@ -1815,7 +1858,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getVehicleState"] = 10;
 			}
 		} else {  // Our call failed, say the error and back to the main code
-			SpinSpinner(responseCode);
 			logMessage("vehicleStateHandler: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_stateMachineCounter = 1;
@@ -1828,6 +1870,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function climateStateHandler(responseCode, data) {
+		SpinSpinner(responseCode);
+
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
 				logMessage("climateStateHandler: " + responseCode + " skiping getClimateState, running StateMachine in 100msec");
@@ -1837,7 +1881,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getClimateState"] = 10;
 			}
 		} else { // Our call failed, say the error and back to the main code
-			SpinSpinner(responseCode);
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			logMessage("climateStateHandler: " + responseCode + " running StateMachine in 100msec");
 			_stateMachineCounter = 1;
@@ -1850,6 +1893,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function chargeStateHandler(responseCode, data) {
+		SpinSpinner(responseCode);
+
 		if (responseCode == 200) {
 			if (Application.getApp().getProperty("quickReturn")) {
 				logMessage("chargeStateHandler: " + responseCode + " skipping getChargeState, running StateMachine in 100msec");
@@ -1859,7 +1904,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getChargeState"] = 10;
 			}
 		} else { // Our call failed, say the error and back to the main code
-			SpinSpinner(responseCode);
 			logMessage("chargeStateHandler: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 			_stateMachineCounter = 1;
@@ -1867,11 +1911,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function genericHandler(responseCode, data) {
+		SpinSpinner(responseCode);
+
 		logMessage("genericHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-			SpinSpinner(responseCode);
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
 
@@ -1879,6 +1924,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function revokeHandler(responseCode, data) {
+		SpinSpinner(responseCode);
+
 		logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
             Settings.setToken(null);
@@ -1887,13 +1934,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Application.getApp().setProperty("ResetNeeded", true);
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-			SpinSpinner(responseCode);
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 		}
 
 		_stateMachineCounter = 1;
 	}
-
 
 	function _saveToken(token) {
 		_token = token;

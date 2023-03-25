@@ -101,13 +101,20 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
         var min = values[2];
 
         if ((hour != null) && (min != null)) {
-			var time = hour * 60 + min;
-			
             if (values.size() == $.FACTORY_COUNT_12_HOUR) {
-            	time += 12 * 60;
+                if (hour == 12) {
+                    hour = 0;
+                }
+
+                var ampm = values[3];
+                if (ampm == Rez.Strings.label_afternoon) {
+                	hour += 12;
+                }
             }
 
-            logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h " + min + "m");
+			var time = hour * 60 + min;
+			
+            logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h" + min + "m");
 
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);

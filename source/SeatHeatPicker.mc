@@ -61,14 +61,14 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         switch (Application.getApp().getProperty("seat_chosen")) {
-/*            case Rez.Strings.label_seat_all:
+            case Rez.Strings.label_seat_all:
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_CENTER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
                 break;
-*/            case Rez.Strings.label_seat_front:
+            case Rez.Strings.label_seat_front:
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
                 break;

@@ -3,8 +3,12 @@ using Toybox.WatchUi as Ui;
 using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
+using Toybox.Graphics as Gfx;
 
 import Toybox.WatchUi;
+
+var gThemeColor = Gfx.Graphics.COLOR_YELLOW;
+
 
 /* For displayType
 	Message received with type 0 : Will last 2 seconds
@@ -220,8 +224,11 @@ class MainView extends Ui.View {
 
 			// We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
 			var is_touchscreen = System.getDeviceSettings().isTouchScreen;
-			var use_image_layout = Application.getApp().getProperty("image_view") == null ? System.getDeviceSettings().isTouchScreen : Application.getApp().getProperty("image_view");
-			Application.getApp().setProperty("image_view", use_image_layout);
+			var use_image_layout = Application.getApp().getProperty("image_view");
+			if (use_image_layout == null) {					   /* Defaults to image_layout for all watches */
+				Application.getApp().setProperty("image_view", /* System.getDeviceSettings().isTouchScreen */ true);
+				logMessage("MainView:onUpdate: defaulting to image layout");
+			}
 
 			// Swap frunk for port?
 			// New value : Frunk = 0, Trunk = 1. Port = 2
@@ -402,7 +409,7 @@ class MainView extends Ui.View {
 					}
 
 	        		var _spinner = Application.getApp().getProperty("spinner");
-					if (_spinner != null && (_spinner.equals("+") || _spinner.equals("-") || _spinner.equals("?") || _spinner.equals("¿") || _spinner.equals("/") || _spinner.equals("\\"))) {
+					if (_spinner != null) {
 	                    var spinner_drawable = View.findDrawableById("spinner");
 	                    spinner_drawable.setText(_spinner.toString());
 	                    spinner_drawable.draw(dc);
