@@ -75,8 +75,24 @@ class MainView extends Ui.View {
 		_showLogMessage = false;
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
+			var tmpStr = null;
+			if (_408_count > 0) {
+				tmpStr = "(408x" + _408_count;
+			}
 			if (timeWaiting > 1000) {
-				_displayTimer = "\n(" + _408_count + "x - " + timeWaiting / 1000 + "s)";
+				if (tmpStr) {
+					tmpStr = tmpStr + " - ";
+				}
+				else {
+					tmpStr = "(";
+				}
+				_displayTimer = "\n" + tmpStr + timeWaiting / 1000 + "s)";
+			}
+			else if (tmpStr != null) {
+				_displayTimer = "\n" + tmpStr + ")";
+			}
+			else {
+				_displayTimer = "";
 			}
 		}
 		if (_viewUpdated) {
@@ -84,7 +100,8 @@ class MainView extends Ui.View {
 			_viewUpdated = false;
 		}
 		else {
-			logMessage("MainView:refreshView: skipping, already waiting for a viewUpdate");
+			//logMessage("MainView:refreshView: skipping, already waiting for a viewUpdate");
+		}
 	}
 
 	function onReceive(args) {
@@ -122,9 +139,23 @@ class MainView extends Ui.View {
 				}
 				_408_count = args[1];
 				var timeWaiting = System.getTimer() - gWaitTime;
+				var tmpStr = null;
+				if (_408_count > 0) {
+					tmpStr = "(408x" + _408_count;
+				}
 				if (timeWaiting > 1000) {
-					_displayTimer = "\n(" + _408_count + "x - " + timeWaiting / 1000 + "s)";
-				} else {
+					if (tmpStr) {
+						tmpStr = tmpStr + " - ";
+					}
+					else {
+						tmpStr = "(";
+					}
+					_displayTimer = "\n" + tmpStr + timeWaiting / 1000 + "s)";
+				}
+				else if (tmpStr != null) {
+					_displayTimer = "\n" + tmpStr + ")";
+				}
+				else {
 					_displayTimer = "";
 				}
 			} else {

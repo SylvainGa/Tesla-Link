@@ -10,6 +10,49 @@ using Toybox.Time.Gregorian;
 const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
 
+enum /* ACTION_OPTIONS */ {
+	ACTION_OPTION_NONE = 0,
+	ACTION_OPTION_BYPASS_CONFIRMATION = 1,
+	ACTION_OPTION_SEAT_DRIVER = 2,
+	ACTION_OPTION_SEAT_PASSENGER = 3,
+	ACTION_OPTION_SEAT_REAR_DRIVER = 4,
+	ACTION_OPTION_SEAT_REAR_CENTER = 5,
+	ACTION_OPTION_SEAT_REAR_PASSENGER = 6
+}
+
+enum /* ACTION_TYPES */ {
+	ACTION_TYPE_RESET = 0,
+	ACTION_TYPE_HONK = 1,
+	ACTION_TYPE_SELECT_CAR = 2, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_OPEN_PORT = 3,
+	ACTION_TYPE_CLOSE_PORT = 4,
+	ACTION_TYPE_OPEN_FRUNK = 5,
+	ACTION_TYPE_OPEN_TRUNK = 6,
+	ACTION_TYPE_TOGGLE_VIEW = 7, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_SWAP_FRUNK_FOR_PORT = 8, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_SET_CHARGING_AMPS = 10,
+	ACTION_TYPE_SET_CHARGING_LIMIT = 11,
+	ACTION_TYPE_SET_SEAT_HEAT = 12,
+	ACTION_TYPE_SET_STEERING_WHEEL_HEAT = 14,
+	ACTION_TYPE_VENT = 15,
+	ACTION_TYPE_TOGGLE_CHARGE = 16,
+	ACTION_TYPE_ADJUST_DEPARTURE = 17,
+	ACTION_TYPE_TOGGLE_SENTRY = 18,
+	ACTION_TYPE_WAKE = 19, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_REFRESH = 20,
+	ACTION_TYPE_DATA_SCREEN = 21,
+	ACTION_TYPE_HOMELINK = 22,
+	ACTION_TYPE_REMOTE_BOOMBOX = 23,
+	ACTION_TYPE_CLIMATE_MODE = 24,
+	ACTION_TYPE_CLIMATE_DEFROST = 13,
+	ACTION_TYPE_CLIMATE_SET = 9,
+	// Following are through buttons or touch screen input
+	ACTION_TYPE_CLIMATE_ON = 25,
+	ACTION_TYPE_CLIMATE_OFF = 26,
+	ACTION_TYPE_LOCK = 27,
+	ACTION_TYPE_UNLOCK = 28
+}
+
 class MainDelegate extends Ui.BehaviorDelegate {
 	var _view as MainView;
 	var _settings;
@@ -35,37 +78,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastDataRun;
 	// 2023-03-20 var _debugTimer;
 
-	var _set_climate_on;
-	var _set_climate_off;
-	var _set_climate_set;
-	var _set_climate_defrost;
-	var _set_charging_amps_set;
-	var _set_charging_limit_set;
-	var _toggle_charging_set;
-	var _honk_horn;
-	var _open_port;
-	var _close_port;
-	var _open_frunk;
-	var _open_trunk;
-	var _unlock;
-	var _lock;
-	var _vent;
-	var _set_seat_heat;
-	var _set_steering_wheel_heat;
-	var _adjust_departure;
-	var _sentry_mode;
-	var _homelink;
-	var _remote_boombox;
-	var _climate_mode;
-	var _set_refresh_time;
-	var _view_datascreen;
-	var _bypass_confirmation;
-
 	var _pendingPriorityRequests;
-	var _actionsArePending;
+	var _pendingActionRequests;
 	var _stateMachineCounter;
-	var _dataRequestCounter;
-
+	
 	function initialize(view as MainView, data, handler) {
 		BehaviorDelegate.initialize();
 		_view = view;
@@ -108,7 +124,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var interval = 5 * 60;
 		var answer = (timeNow + interval < createdAt + expireIn);
 		
-		if (_token != null && _token.length() != 0 && answer == true ) {
+		if (/*DEBUG*/false && _token != null && _token.length() != 0 && answer == true ) {
 			_need_auth = false;
 			_auth_done = true;
 			var expireAt = new Time.Moment(createdAt + expireIn);
@@ -128,32 +144,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_firstTime = true; // So the Waking up is displayed right away if it's the first time and the first 408 generate a wake commmand
 		_wakeWasConfirmed = false; // So we only display the Asking to wake only once
 
-		_set_climate_on = false;
-		_set_climate_off = false;
-		_set_climate_defrost = false;
-		_set_climate_set = false;
-		_set_charging_amps_set = false;
-		_set_charging_limit_set = false;
-		_toggle_charging_set = false;
-		_honk_horn = false;
-		_open_port = false;
-		_close_port = false;
-		_open_frunk = false;
-		_open_trunk = false;
-		_unlock = false;
-		_lock = false;
-		_vent = false;
-		_set_seat_heat = false;
-		_set_steering_wheel_heat = false;
-		_adjust_departure = false;
-		_sentry_mode = false;
-		_homelink = false;
-		_remote_boombox = false;
-		_climate_mode = false;
-		_set_refresh_time = false;
-		_view_datascreen = false;
-		_bypass_confirmation = false;
-
 		_408_count = 0;
 		_lastError = null;
 		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
@@ -164,8 +154,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastTimeStamp = 0;
 
 		_pendingPriorityRequests = {};
+		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
-		_actionsArePending = false;
 
 		logMessage("initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
 		_timer.start(method(:workerTimer), 100, true);
@@ -353,23 +343,30 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function actionMachine() {
-		if (_view._data._ready == false || _lastError != null) { // Our display ain't ready yet our last command terminated with a error, wait until we get some before sending the command
-			if (_stateMachineCounter < 0 || !_actionsArePending) {
-				_stateMachineCounter = 1;
-			}
-			_actionsArePending = true;
+		logMessage("actionMachine: _pendingActionRequest size is " + _pendingActionRequests.size() + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
 
-			if (_stateMachineCounter > 0) {
-				_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
-				logMessage("actionMachine: Differing, ready=" + _view._data._ready + " lastError=" + _lastError);
-				stateMachine();
-			}
+		// Sanity check
+		if (_pendingActionRequests.size() <= 0) {
+			logMessage("actionMachine: WARNING _pendingActionSize can't be less than 1 if we're here");
 			return;
 		}
 
-		logMessage("actionMachine: " + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_firstTime ? " _firstTime true" : ""));
+		var request = _pendingActionRequests[0];
 
-		_actionsArePending = false;
+		logMessage("actionMachine: _pendingActionRequests[0] is " + request);
+
+		// Sanity check
+		if (request == null) {
+			logMessage("actionMachine: WARNING the request shouldn't be null");
+			return;
+		}
+
+		var action = request.get("Action");
+		var option = request.get("Option");
+		var value = request.get("Value");
+		var tick = request.get("Tick");
+
+		_pendingActionRequests.remove(request);
 
 		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
@@ -381,292 +378,354 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_handlerType = 2;
 		}
 
-		if (_set_climate_on) {
-			logMessage("actionMachine: Climate On - waiting for climateStateHandler");
-			_set_climate_on = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
-			_tesla.climateOn(_vehicle_id, method(:climateStateHandler));
-		}
+		switch (action) {
+			case ACTION_TYPE_RESET:
+				//_pendingActionRequests.remove(ACTION_TYPE_RESET);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_set_climate_off) {
-			logMessage("actionMachine: Climate Off - waiting for climateStateHandler");
-			_set_climate_off = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
-			_tesla.climateOff(_vehicle_id, method(:climateStateHandler));
-		}
+				logMessage("actionMachine: Reset - waiting for revokeHandler");
+				_tesla.revoke(method(:revokeHandler));
+				break;
 
-		if (_set_climate_defrost) {
-			logMessage("actionMachine: Climate Defrost - waiting for climateStateHandler");
-			_set_climate_defrost = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
-			_tesla.climateDefrost(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
-		}
+			case ACTION_TYPE_CLIMATE_ON:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLIMATE_ON);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_set_climate_set) {
-			logMessage("actionMachine: Climate set temperature - waiting for genericHandler");
-			_set_climate_set = false;
-			var temperature = Application.getApp().getProperty("driver_temp");
-			if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
-				temperature = temperature * 9 / 5 + 32;
-				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%d") + "°F"]);
-			} else {
-				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
-			}
-			_tesla.climateSet(_vehicle_id, method(:genericHandler), temperature);
-		}
+				logMessage("actionMachine: Climate On - waiting for climateStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
+				_tesla.climateOn(_vehicle_id, method(:climateStateHandler));
+				break;
 
-		if (_toggle_charging_set) {
-			logMessage("actionMachine: Toggling charging - waiting for genericHandler");
-			_toggle_charging_set = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
-			_tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
-		}
+			case ACTION_TYPE_CLIMATE_OFF:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLIMATE_OFF);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_set_charging_limit_set) {
-			logMessage("actionMachine: Setting charge limit - waiting for genericHandler");
-			_set_charging_limit_set = false;
-			var charging_limit = Application.getApp().getProperty("charging_limit");
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + charging_limit + "%"]);
-			_tesla.setChargingLimit(_vehicle_id, method(:genericHandler), charging_limit);
-		}
+				logMessage("actionMachine: Climate Off - waiting for climateStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
+				_tesla.climateOff(_vehicle_id, method(:climateStateHandler));
+				break;
 
-		if (_set_charging_amps_set) {
-			logMessage("actionMachine: Setting max current - waiting for genericHandler");
-			_set_charging_amps_set = false;
-			var charging_amps = Application.getApp().getProperty("charging_amps");
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + charging_amps + "A"]);
-			_tesla.setChargingAmps(_vehicle_id, method(:genericHandler), charging_amps);
-		}
+			case ACTION_TYPE_CLIMATE_DEFROST:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLIMATE_DEFROST);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_honk_horn) {
-			_honk_horn = false;
-			if (_bypass_confirmation) {
-				_bypass_confirmation = false;
-				honkHornConfirmed();
-			} else {
-				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
-				var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), method(:operationCanceled));
-				Ui.pushView(view, delegate, Ui.SLIDE_UP);
-			}
-		}
+				logMessage("actionMachine: Climate Defrost - waiting for climateStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
+				_tesla.climateDefrost(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+				break;
 
-		if (_open_port) {
-			logMessage("actionMachine: Opening on charge port - waiting for chargeStateHandler");
-			_open_port = false;
-	    	_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
-			_tesla.openPort(_vehicle_id, method(:chargeStateHandler));
-		}
+			case ACTION_TYPE_CLIMATE_SET:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLIMATE_SET);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_close_port) {
-			logMessage("actionMachine: Closing on charge port - waiting for chargeStateHandler");
-			_close_port = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
-			_tesla.closePort(_vehicle_id, method(:chargeStateHandler));
-		}
+				logMessage("actionMachine: Climate set temperature - waiting for genericHandler");
+				var temperature = value;
+				if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
+					temperature = temperature * 9 / 5 + 32;
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%d") + "°F"]);
+				} else {
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
+				}
+				_tesla.climateSet(_vehicle_id, method(:genericHandler), temperature);
+				break;
 
-		if (_unlock) {
-			logMessage("actionMachine: Unlock - waiting for vehicleStateHandler");
-			_unlock = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
-			_tesla.doorUnlock(_vehicle_id, method(:vehicleStateHandler));
-		}
+			case ACTION_TYPE_TOGGLE_CHARGE:
+				//_pendingActionRequests.remove(ACTION_TYPE_TOGGLE_CHARGE);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_lock) {
-			logMessage("actionMachine: Lock - waiting for vehicleStateHandler");
-			_lock = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
-			_tesla.doorLock(_vehicle_id, method(:vehicleStateHandler));
-		}
+				logMessage("actionMachine: Toggling charging - waiting for genericHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
+				_tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
+				break;
 
-		if (_open_frunk) {
-			_open_frunk = false;
-			if (_bypass_confirmation) {
-				_bypass_confirmation = false;
-				frunkConfirmed();
-			}
-			else {
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
-	            var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), method(:operationCanceled));
-	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
-	        }
-		}
+			case ACTION_TYPE_SET_CHARGING_LIMIT:
+				//_pendingActionRequests.remove(ACTION_TYPE_SET_CHARGING_LIMIT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_open_trunk) {
-			_open_trunk = false;
-			if (_bypass_confirmation) {
-				_bypass_confirmation = false;
-				trunkConfirmed();
-			}
-			else {
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_trunk));
-	            var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), method(:operationCanceled));
-	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
-	        }
-		}
+				logMessage("actionMachine: Setting charge limit - waiting for genericHandler");
+				var charging_limit = value;
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + charging_limit + "%"]);
+				_tesla.setChargingLimit(_vehicle_id, method(:genericHandler), charging_limit);
+				break;
 
-		if (_vent) {
-			_vent = false;
-			var venting = Application.getApp().getProperty("venting");
+			case ACTION_TYPE_SET_CHARGING_AMPS:
+				//_pendingActionRequests.remove(ACTION_TYPE_SET_CHARGING_AMPS);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-			if (venting == 0) {
-	            if (_bypass_confirmation) {
-	            	_bypass_confirmation = false;
-	            	openVentConfirmed();
-	            } else {
-		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), method(:operationCanceled));
-		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
-		        }
-			}
-			else {
-	            if (_bypass_confirmation) {
-	            	_bypass_confirmation = false;
-	            	closeVentConfirmed();
-	            } else {
-		            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
-		            var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), method(:operationCanceled));
-		            Ui.pushView(view, delegate, Ui.SLIDE_UP);
-	            }
-			}
-		}
+				logMessage("actionMachine: Setting max current - waiting for genericHandler");
+				var charging_amps = value;
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + charging_amps + "A"]);
+				_tesla.setChargingAmps(_vehicle_id, method(:genericHandler), charging_amps);
+				break;
 
-		if (_set_seat_heat) {
-			logMessage("actionMachine: Setting seat heat - waiting for genericHandler");
-			_set_seat_heat = false;
-			var seat_chosen = Application.getApp().getProperty("seat_chosen");
-			var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
+			case ACTION_TYPE_HONK:
+				//_pendingActionRequests.remove(ACTION_TYPE_HONK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-			switch (seat_heat_chosen) {
-				case Rez.Strings.label_seat_auto:
-					seat_heat_chosen = -1;
-					break;
+				if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
+					honkHornConfirmed();
+				} else {
+					var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
+					var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), method(:operationCanceled));
+					Ui.pushView(view, delegate, Ui.SLIDE_UP);
+				}
+				break;
 
-				case Rez.Strings.label_seat_off:
-					seat_heat_chosen = 0;
-					break;
+			case ACTION_TYPE_OPEN_PORT:
+				//_pendingActionRequests.remove(ACTION_TYPE_OPEN_PORT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				case Rez.Strings.label_seat_low:
-					seat_heat_chosen = 1;
-					break;
+				logMessage("actionMachine: Opening on charge port - waiting for chargeStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
+				_tesla.openPort(_vehicle_id, method(:chargeStateHandler));
+				break;
 
-				case Rez.Strings.label_seat_medium:
-					seat_heat_chosen = 2;
-					break;
+			case ACTION_TYPE_CLOSE_PORT:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLOSE_PORT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				case Rez.Strings.label_seat_high:
-					seat_heat_chosen = 3;
-					break;
-					
-				default:
-					seat_heat_chosen = 0;
-					break;
-			}
+				logMessage("actionMachine: Closing on charge port - waiting for chargeStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
+				_tesla.closePort(_vehicle_id, method(:chargeStateHandler));
+				break;
 
-			_handler.invoke([_handlerType, -1, Ui.loadResource(seat_chosen)]);
+			case ACTION_TYPE_UNLOCK:
+				//_pendingActionRequests.remove(ACTION_TYPE_UNLOCK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-	        if (seat_chosen == Rez.Strings.label_seat_driver) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.label_seat_passenger) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 1, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.label_seat_rear_left) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 2, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.label_seat_rear_center) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 4, seat_heat_chosen);
-	        } else if (seat_chosen == Rez.Strings.label_seat_rear_right) {
-	            _tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 5, seat_heat_chosen);
-			}
-		}
+				logMessage("actionMachine: Unlock - waiting for vehicleStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
+				_tesla.doorUnlock(_vehicle_id, method(:vehicleStateHandler));
+				break;
 
-		if (_set_steering_wheel_heat) {
-			_set_steering_wheel_heat = false;
-			logMessage("actionMachine: Setting steering wheel heat - waiting for climateStateHandler");
-	        if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
-	            _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
-	            _stateMachineCounter = 1;
-	        }
-	        else {
-	            _handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
-	            _tesla.climateSteeringWheel(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
-	        }
-		}
-		
-		if (_adjust_departure) {
-			_adjust_departure = false;
-			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-				logMessage("actionMachine: Preconditionning off - waiting for chargeStateHandler");
-	            _handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), false);
-	        }
-	        else {
-				logMessage("actionMachine: Preconditionning on - waiting for chargeStateHandler");
-	            _handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-	            _tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), Application.getApp().getProperty("departure_time"), true);
-	        }
-		}
+			case ACTION_TYPE_LOCK:
+				//_pendingActionRequests.remove(ACTION_TYPE_LOCK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_sentry_mode) {
-			_sentry_mode = false;
-			if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
-	            _handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
-	            _tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), false);
-			} else {
-	            _handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
-	            _tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), true);
-			}
-		}
+				logMessage("actionMachine: Lock - waiting for vehicleStateHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
+				_tesla.doorLock(_vehicle_id, method(:vehicleStateHandler));
+				break;
 
-		if (_homelink) {
-			logMessage("actionMachine: Homelink - waiting for genericHandler");
-			_homelink = false;
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
-	        _tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
-		}
+			case ACTION_TYPE_OPEN_FRUNK:
+				//_pendingActionRequests.remove(ACTION_TYPE_OPEN_FRUNK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_remote_boombox) {
-			logMessage("actionMachine: Remote Boombox - waiting for genericHandler");
-			_remote_boombox = false;
-		_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
-	        _tesla.remoteBoombox(_vehicle_id, method(:genericHandler));
-		}
+				if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
+					frunkConfirmed();
+				}
+				else {
+					var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_frunk));
+					var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), method(:operationCanceled));
+					Ui.pushView(view, delegate, Ui.SLIDE_UP);
+				}
+				break;
 
-		if (_climate_mode) {
-			_climate_mode = false;
+			case ACTION_TYPE_OPEN_TRUNK:
+				//_pendingActionRequests.remove(ACTION_TYPE_OPEN_TRUNK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-			var mode_chosen_str;
-			var mode_chosen;
+				if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
+					trunkConfirmed();
+				}
+				else {
+					var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_trunk));
+					var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), method(:operationCanceled));
+					Ui.pushView(view, delegate, Ui.SLIDE_UP);
+				}
+				break;
 
-			mode_chosen_str = Application.getApp().getProperty("climate_mode_chosen");
-			switch (mode_chosen_str) {
-				case Rez.Strings.label_climate_off:
-					mode_chosen = 0;
-					break;
-				case Rez.Strings.label_climate_on:
-					mode_chosen = 1;
-					break;
-				case Rez.Strings.label_climate_dog:
-					mode_chosen = 2;
-					break;
-				case Rez.Strings.label_climate_camp:
-					mode_chosen = 3;
-					break;
-			}
-			logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(mode_chosen_str) + "- calling genericHandler");
-			_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(mode_chosen_str)]);
-	        _tesla.setClimateMode(_vehicle_id, method(:genericHandler), mode_chosen);
-		}
+			case ACTION_TYPE_VENT:
+				//_pendingActionRequests.remove(ACTION_TYPE_VENT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-		if (_set_refresh_time) {
-			_set_refresh_time = false;
-			_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
-			if (_refreshTimeInterval == null) {
-				_refreshTimeInterval = 1000;
-			}
-			logMessage("actionMachine: refreshTimeInterval at " + _refreshTimeInterval + " - not calling a handler");
-		}
-		
-		if (_view_datascreen) {
-			_view_datascreen = false;
-			onReceive(1); // Show the first submenu
+				var venting = Application.getApp().getProperty("venting");
+				if (venting == 0) {
+					if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
+						openVentConfirmed();
+					} else {
+						var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
+						var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), method(:operationCanceled));
+						Ui.pushView(view, delegate, Ui.SLIDE_UP);
+					}
+				}
+				else {
+					if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
+						closeVentConfirmed();
+					} else {
+						var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
+						var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), method(:operationCanceled));
+						Ui.pushView(view, delegate, Ui.SLIDE_UP);
+					}
+				}
+				break;
+
+			case ACTION_TYPE_SET_SEAT_HEAT:
+				//_pendingActionRequests.remove(ACTION_TYPE_SET_SEAT_HEAT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				logMessage("actionMachine: Setting seat heat - waiting for genericHandler");
+				var seat_heat_chosen = Application.getApp().getProperty("seat_heat_chosen");
+
+				switch (seat_heat_chosen) {
+					case Rez.Strings.label_seat_auto:
+						seat_heat_chosen = -1;
+						break;
+
+					case Rez.Strings.label_seat_off:
+						seat_heat_chosen = 0;
+						break;
+
+					case Rez.Strings.label_seat_low:
+						seat_heat_chosen = 1;
+						break;
+
+					case Rez.Strings.label_seat_medium:
+						seat_heat_chosen = 2;
+						break;
+
+					case Rez.Strings.label_seat_high:
+						seat_heat_chosen = 3;
+						break;
+						
+					default:
+						seat_heat_chosen = 0;
+						break;
+				}
+
+				switch (option) {
+					case ACTION_OPTION_SEAT_DRIVER:
+						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_driver)]);
+						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 0, seat_heat_chosen);
+						break;
+					case ACTION_OPTION_SEAT_PASSENGER:
+						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_passenger)]);
+						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 1, seat_heat_chosen);
+						break;
+					case ACTION_OPTION_SEAT_REAR_DRIVER:
+						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_left)]);
+						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 2, seat_heat_chosen);
+						break;
+					case ACTION_OPTION_SEAT_REAR_CENTER:
+						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_center)]);
+						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 4, seat_heat_chosen);
+						break;
+					case ACTION_OPTION_SEAT_REAR_PASSENGER:
+						_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_seat_rear_right)]);
+						_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), 5, seat_heat_chosen);
+						break;
+				}
+				break;
+
+			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
+				//_pendingActionRequests.remove(ACTION_TYPE_SET_STEERING_WHEEL_HEAT);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				logMessage("actionMachine: Setting steering wheel heat - waiting for climateStateHandler");
+				if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
+					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
+					_stateMachineCounter = 1;
+				}
+				else {
+					_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
+					_tesla.climateSteeringWheel(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+				}
+				break;
+
+			case ACTION_TYPE_ADJUST_DEPARTURE:
+				//_pendingActionRequests.remove(ACTION_TYPE_ADJUST_DEPARTURE);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
+					logMessage("actionMachine: Preconditionning off - waiting for chargeStateHandler");
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
+					_tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), value, false);
+				}
+				else {
+					logMessage("actionMachine: Preconditionning on - waiting for chargeStateHandler");
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_start_departure)]);
+					_tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), value, true);
+				}
+				break;
+
+			case ACTION_TYPE_TOGGLE_SENTRY:
+				//_pendingActionRequests.remove(ACTION_TYPE_TOGGLE_SENTRY);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
+					_tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), false);
+				} else {
+					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
+					_tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), true);
+				}
+				break;
+
+			case ACTION_TYPE_HOMELINK:
+				//_pendingActionRequests.remove(ACTION_TYPE_HOMELINK);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				logMessage("actionMachine: Homelink - waiting for genericHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
+				_tesla.homelink(_vehicle_id, method(:genericHandler), Application.getApp().getProperty("latitude"), Application.getApp().getProperty("longitude"));
+				break;
+
+			case ACTION_TYPE_REMOTE_BOOMBOX:
+				//_pendingActionRequests.remove(ACTION_TYPE_REMOTE_BOOMBOX);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				logMessage("actionMachine: Remote Boombox - waiting for genericHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
+				_tesla.remoteBoombox(_vehicle_id, method(:genericHandler));
+				break;
+
+			case ACTION_TYPE_CLIMATE_MODE:
+				//_pendingActionRequests.remove(ACTION_TYPE_CLIMATE_MODE);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				var mode_chosen;
+
+				switch (value) {
+					case Rez.Strings.label_climate_off:
+						mode_chosen = 0;
+						break;
+					case Rez.Strings.label_climate_on:
+						mode_chosen = 1;
+						break;
+					case Rez.Strings.label_climate_dog:
+						mode_chosen = 2;
+						break;
+					case Rez.Strings.label_climate_camp:
+						mode_chosen = 3;
+						break;
+				}
+				logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling genericHandler");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(value)]);
+				_tesla.setClimateMode(_vehicle_id, method(:genericHandler), mode_chosen);
+				break;
+
+			case ACTION_TYPE_REFRESH:
+				//_pendingActionRequests.remove(ACTION_TYPE_REFRESH);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+				if (_refreshTimeInterval == null) {
+					_refreshTimeInterval = 1000;
+				}
+				logMessage("actionMachine: refreshTimeInterval at " + _refreshTimeInterval + " - not calling a handler");
+				break;
+
+			case ACTION_TYPE_DATA_SCREEN:
+				//_pendingActionRequests.remove(ACTION_TYPE_DATA_SCREEN);
+				logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				logMessage("actionMachine: viewing DataScreen - not calling a handler");
+				onReceive(1); // Show the first submenu
+				break;
+
+			default:
+				logMessage("actionMachine: WARNING Invalid action");
+				break;
 		}
 	}
 
@@ -687,7 +746,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
-			if (_refreshToken != null && _refreshToken.length() != 0) {
+			if (/*DEBUG*/false && _refreshToken != null && _refreshToken.length() != 0) {
 				logMessage("stateMachine: auth through refresh token " + _refreshToken.substring(0,20) + "...");
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
@@ -792,7 +851,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		// 2022-05-21 logMessage("stateMachine: vehicle_state = '" + _vehicle_state + "' _408_count = " + _408_count + " _need_wake = " + _need_wake);
-		if (_vehicle_state.equals("online") == false) { // Only matters if we're not online, otherwise be silent
+		if (_vehicle_state.equals("online") == false) { // If we're not online and never saw any data yet
 			if (_firstTime) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
@@ -828,12 +887,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function workerTimer()
 	{
-		// We're waiting for an action to be performed, our data is now valid and last request was successful, perform the action. This takes precedence over anything else
-		if (_actionsArePending) { 
-			actionMachine();
-		}
 		// Our priority queue (checking the state of an action performed) comes next
-		else if (_pendingPriorityRequests.keys().size() > 0) { 
+		if (_pendingPriorityRequests.keys().size() > 0) { 
 			if (_pendingPriorityRequests.hasKey("getVehicleState")) {
 				var value = _pendingPriorityRequests.get("getVehicleState");
 				if (value != null && value > 0) {
@@ -868,7 +923,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			}
 		}
-		// We have no priority tasks to do?
+		// We're waiting for an action to be performed, we're not displaying a message on screen, the last webRequest returned responseCode 200 and we aren't already within a stateMachine call
+		else if (_pendingActionRequests.size() > 0 && _stateMachineCounter != 0) { 
+			if (_view._data._ready == true && _lastError == null) {
+				actionMachine();
+			}
+			// Say actions are pending and call stateMachine as soon as you can
+			else {
+				_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
+				logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError);
+
+				stateMachine();
+			}
+		}
+		// We have no priority tasks to do and no actions waiting
 		else {
 			// Get the current states of the vehicle if it's time, otherwise we do nothing this time around.
 			if (_stateMachineCounter > 0) { 
@@ -965,11 +1033,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_data._vehicle_data != null && _data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
-			_set_climate_on = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_ON, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		} else {
-			_set_climate_off = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_OFF, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
-		actionMachine();
 	}
 
 	function onNextPage() {
@@ -989,11 +1056,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_data._vehicle_data != null && !_data._vehicle_data.get("vehicle_state").get("locked")) {
-			_lock = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		} else {
-			_unlock = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
-		actionMachine();
 	}
 
 	function onPreviousPage() {
@@ -1019,13 +1085,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (Application.getApp().getProperty("swap_frunk_for_port") == 0) {
-			_open_frunk = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_FRUNK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		else if (Application.getApp().getProperty("swap_frunk_for_port") == 1) {
-			_open_trunk = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_TRUNK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		else if (Application.getApp().getProperty("swap_frunk_for_port") == 2) {
-	        _open_port = true;
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		else {
 			var menu = new Ui.Menu2({:title=>Rez.Strings.menu_label_select});
@@ -1064,7 +1130,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Ui.pushView(menu, new TrunksMenuDelegate(self), Ui.SLIDE_UP );
 			return;
 		}
-		actionMachine();
 	}
 
 	function onMenu() {
@@ -1276,17 +1341,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		// Tap on the space used by the 'Eye'
 		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
-			_sentry_mode = true;
-			actionMachine();
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		// Tap on the middle text line where Departure is written
 		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
+			var time = _controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-	            _adjust_departure = true;
-	            actionMachine();
+				_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 			}
 			else {
-				Ui.pushView(new DepartureTimePicker(_data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(self), Ui.SLIDE_IMMEDIATE);
+				Ui.pushView(new DepartureTimePicker(time), new DepartureTimePickerDelegate(self), Ui.SLIDE_IMMEDIATE);
 			}
 		} 
 		// Tap on bottom line on screen
@@ -1363,49 +1427,42 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onHold: Upper Left");
 				switch (Application.getApp().getProperty("holdActionUpperLeft")) {
 					case 1:
-						_open_frunk = true;
-						_bypass_confirmation = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_FRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					case 2:
-						_open_trunk = true;
-						_bypass_confirmation = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_TRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					case 3:
 						if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charge_port_door_open") == false) {
-							_open_port = true;
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Disconnected")) {
-							_close_port = true;
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_CLOSE_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						} else if (_data._vehicle_data != null && _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
-							_toggle_charging_set = true;
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_CHARGE, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						} else {
-							_open_port = true;
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						}
-						actionMachine();
 						break;
 
 					case 3:
-						_vent = true;
-						_bypass_confirmation = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_VENT, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					default:
+						logMessage("onHold: Upper Left WARNING Invalid");
 						break;
 				}
 			} else {
 				logMessage("onHold: Lower Left");
 				switch (Application.getApp().getProperty("holdActionLowerLeft")) {
 					case 1:
-						_honk_horn = true;
-						_bypass_confirmation = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					default:
+						logMessage("onHold: Lower Left WARNING Invalid");
 						break;
 				}
 			}
@@ -1414,27 +1471,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				logMessage("onHold: Upper Right");
 				switch (Application.getApp().getProperty("holdActionUpperRight")) {
 					case 1:
-						_set_climate_defrost = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_DEFROST, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					default:
+						logMessage("onHold: Upper Right WARNING Invalid");
 						break;
 				}
 			} else {
 				logMessage("onHold: Lower Right");
 				switch (Application.getApp().getProperty("holdActionLowerRight")) {
 					case 1:
-						_homelink = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_HOMELINK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					case 2:
-						_remote_boombox = true;
-						actionMachine();
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_BOOMBOX, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					default:
+						logMessage("onHold: Lower Right WARNING Invalid");
 						break;
 				}
 			}
@@ -1609,11 +1665,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
 				}
 
+				var i = _408_count + 1;
+				logMessage("onReceiveVehicleData: 408_count=" + i + " firstTime=" + _firstTime);
 				if (_vehicle_state.equals("online") == true && _firstTime && _view._data._ready == false) { // We think we're online, it's our first pass and we have already a message displayed
-					_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
+					_handler.invoke([3, i, Ui.loadResource(Rez.Strings.label_requesting_data)]);
 				}
 
-				logMessage("onReceiveVehicleData: 408_count=" + _408_count + " firstTime=" + _firstTime);
 	        	if ((_408_count % 10 == 0 && _firstTime) || (_408_count % 10 == 1 && !_firstTime)) { // First (if we've starting up), and every consecutive 10th 408 recieved (skipping a spurious 408 when we aren't started up) will generate a test for the vehicle state. 
 					if (_408_count < 2 && !_firstTime) { // Only when we first started to get the errors do we keep the start time, unless we've started because our start time has been recorded already
 						gWaitTime = System.getTimer();
@@ -1820,6 +1877,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_stateMachineCounter = 1;
 	}
+
+	function revokeHandler(responseCode, data) {
+		logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
+		if (responseCode == 200) {
+            Settings.setToken(null);
+            Settings.setRefreshToken(null, 0, 0);
+            Application.getApp().setProperty("vehicle", null);
+			Application.getApp().setProperty("ResetNeeded", true);
+			_handler.invoke([0, -1, null]);
+		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+			SpinSpinner(responseCode);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		}
+
+		_stateMachineCounter = 1;
+	}
+
 
 	function _saveToken(token) {
 		_token = token;

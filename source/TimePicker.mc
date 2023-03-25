@@ -107,14 +107,10 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
             	time += 12 * 60;
             }
 
-	        Application.getApp().setProperty("departure_time", time);
-
             logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h " + min + "m");
 
-	        _controller._adjust_departure = true;
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-	        _controller.actionMachine();
-	
 	        return true;
         }
 		else {

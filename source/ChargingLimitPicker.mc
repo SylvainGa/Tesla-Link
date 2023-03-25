@@ -59,10 +59,8 @@ class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
         
         logMessage("ChargingLimitPickerDelegate: onAccept called with charging_limit set to " + charging_limit);
 
-        Application.getApp().setProperty("charging_limit", charging_limit);
-        _controller._set_charging_limit_set = true;
+        _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_CHARGING_LIMIT, "Option" => ACTION_OPTION_NONE, "Value" => charging_limit, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller.actionMachine();
         return true;
     }
 }

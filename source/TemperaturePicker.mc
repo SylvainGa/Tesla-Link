@@ -67,9 +67,8 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
         logMessage("TemperaturePickerDelegate: onAccept called with temperature set to " + temperature);
 
         Application.getApp().setProperty("driver_temp", temperature);
-        _controller._set_climate_set = true;
+        _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_SET, "Option" => ACTION_OPTION_NONE, "Value" => temperature, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller.actionMachine();
         return true;
     }
 }

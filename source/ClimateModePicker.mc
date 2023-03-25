@@ -33,13 +33,11 @@ class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
 
     function onAccept (values) {
         var selected = values[0];
-		Application.getApp().setProperty("climate_mode_chosen", selected);
 
         logMessage("ClimateModePickerDelegate: onAccept called with selected set to " + selected);
 
-        _controller._climate_mode = true;
+        _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_MODE, "Option" => ACTION_OPTION_NONE, "Value" => selected, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller.actionMachine();
         return true;
     }
 }

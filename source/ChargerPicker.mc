@@ -56,12 +56,11 @@ class ChargerPickerDelegate extends WatchUi.PickerDelegate {
     //! @return true if handled, false otherwise
     function onAccept (values) {
         var charging_amps = values[0];
+
         logMessage("ChargerPickerDelegate: onAccept called with charging_amps set to " + charging_amps);
-        
-        Application.getApp().setProperty("charging_amps", charging_amps);
-        _controller._set_charging_amps_set = true;
+
+        _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_CHARGING_AMPS, "Option" => ACTION_OPTION_NONE, "Value" => charging_amps, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        _controller.actionMachine();
         return true;
     }
 }

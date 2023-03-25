@@ -29,26 +29,20 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
         logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
         if (item == :reset) {
-            Settings.setToken(null);
-            Settings.setRefreshToken(null, 0, 0);
-            Application.getApp().setProperty("vehicle", null);
-			Application.getApp().setProperty("ResetNeeded", true);
-            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_RESET, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :honk) {
-            _controller._honk_horn = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :select_car) {
             _controller._tesla.getVehicleId(method(:onReceiveVehicles));
         } else if (item == :open_port) {
-            _controller._open_port = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            _controller._pendingActionRequests.add(ACTION_TYPE_OPEN_PORT);
         } else if (item == :open_frunk) {
-            _controller._open_frunk = true;
-            _controller.actionMachine();
-        } else if (item == :open_trunk) {
-            _controller._open_trunk = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_FRUNK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+       } else if (item == :open_trunk) {
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_TRUNK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :toggle_view) {
             var view = Application.getApp().getProperty("image_view");
             if (view) {
@@ -56,8 +50,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             } else {
                 Application.getApp().setProperty("image_view", true);
             }
-            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :swap_frunk_for_port) {
             var swap = Application.getApp().getProperty("swap_frunk_for_port");
             if (swap == 0 || swap == null) {
@@ -72,8 +66,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 			else {
                 Application.getApp().setProperty("swap_frunk_for_port", 0);
 	        }
-            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :set_temperature) {
             var driver_temp = Application.getApp().getProperty("driver_temp");
             var max_temp = _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
@@ -122,44 +116,37 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
 	        Ui.switchToView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :defrost) {
-            _controller._set_climate_defrost = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_DEFROST, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :set_steering_wheel_heat) {
-            _controller._set_steering_wheel_heat = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_STEERING_WHEEL_HEAT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :vent) {
-            _controller._vent = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_VENT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :toggle_charge) {
-            _controller._toggle_charging_set = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_CHARGE, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :adjust_departure) {
+            var time = _controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_controller._data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-	            _controller._adjust_departure = true;
-	            _controller.actionMachine();
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
             }
             else {
-				Ui.switchToView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
+				Ui.switchToView(new DepartureTimePicker(time), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
             }
         } else if (item == :toggle_sentry) {
-            _controller._sentry_mode = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :wake) {
             _controller._need_wake = true;
             _controller._wake_done = false;
-            _controller.actionMachine();
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
             Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
-            _controller._view_datascreen = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_DATA_SCREEN, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :homelink) {
-            _controller._homelink = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HOMELINK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :remote_boombox) {
-            _controller._remote_boombox = true;
-            _controller.actionMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_BOOMBOX, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
         } else if (item == :climate_mode) {
 	        var modes = new [4];
 
