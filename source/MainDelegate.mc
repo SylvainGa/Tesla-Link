@@ -166,22 +166,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function onReceive(args) {
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, display our main view
 			//logMessage("StateMachine: onReceive");
-			//stateMachine(); 
+			_stateMachineCounter = 1;
 		}
-		else if (args == 1) { // Swiped left on subview 1, show subview 2
+		else if (args == 1) { // Swiped left from main screen, show subview 1
 			var view = new ChargeView(_view._data);
 			var delegate = new ChargeDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
-		else if (args == 2) { // Swiped left on subview 2, show subview 3
+		else if (args == 2) { // Swiped left on subview 1, show subview 2
 			var view = new ClimateView(_view._data);
 			var delegate = new ClimateDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
-		else if (args == 3) { // Swiped left on subview 3, show subview 4 (but none so go back to main screen)
+		else if (args == 3) { // Swiped left on subview 2, show subview 3
 			var view = new DriveView(_view._data);
 			var delegate = new DriveDelegate(view, method(:onReceive));
-			Ui.pushView(view, delegate, Ui.SLIDE_LEFT); // <<<<<<<<<<<==================== TODO Check if change from _view to Ui affects the display of the data fields. 
+			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
+		}
+		else { // Swiped left on subview 3, we're back at the main display
+			_stateMachineCounter = 1;
 		}
 	    Ui.requestUpdate();
 	}
