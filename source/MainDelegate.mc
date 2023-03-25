@@ -124,7 +124,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var interval = 5 * 60;
 		var answer = (timeNow + interval < createdAt + expireIn);
 		
-		if (/*DEBUG*/ false && _token != null && _token.length() != 0 && answer == true ) {
+		if (/*DEBUG false &&*/ _token != null && _token.length() != 0 && answer == true ) {
 			_need_auth = false;
 			_auth_done = true;
 			var expireAt = new Time.Moment(createdAt + expireIn);
@@ -779,7 +779,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
-			if (/*DEBUG false && */_refreshToken != null && _refreshToken.length() != 0) {
+			if (/*DEBUG false &&*/ _refreshToken != null && _refreshToken.length() != 0) {
 				logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
