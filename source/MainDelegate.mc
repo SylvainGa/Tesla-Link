@@ -225,11 +225,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				"redirect_uri" => "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/void/callback"
 			};
 
+			var mySettings = System.getDeviceSettings();
+			var id = mySettings.uniqueIdentifier;
+
 			var codeForBearerOptions = {
 				:method => Communications.HTTP_REQUEST_METHOD_POST,
 				:headers => {
 				   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON,
-				   "User-Agent" => "Tesla-Link for Garmin"
+				   "User-Agent" => "Tesla-Link for Garmin device " + id
 				},
 				:responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
 			};
