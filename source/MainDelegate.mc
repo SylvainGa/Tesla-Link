@@ -30,22 +30,22 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_OPEN_TRUNK = 6,
 	ACTION_TYPE_TOGGLE_VIEW = 7, // Done in OptionMenu, not ActionMachine
 	ACTION_TYPE_SWAP_FRUNK_FOR_PORT = 8, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_SET_CHARGING_AMPS = 10,
-	ACTION_TYPE_SET_CHARGING_LIMIT = 11,
-	ACTION_TYPE_SET_SEAT_HEAT = 12,
-	ACTION_TYPE_SET_STEERING_WHEEL_HEAT = 14,
-	ACTION_TYPE_VENT = 15,
-	ACTION_TYPE_TOGGLE_CHARGE = 16,
-	ACTION_TYPE_ADJUST_DEPARTURE = 17,
-	ACTION_TYPE_TOGGLE_SENTRY = 18,
-	ACTION_TYPE_WAKE = 19, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_REFRESH = 20,
-	ACTION_TYPE_DATA_SCREEN = 21,
-	ACTION_TYPE_HOMELINK = 22,
-	ACTION_TYPE_REMOTE_BOOMBOX = 23,
-	ACTION_TYPE_CLIMATE_MODE = 24,
-	ACTION_TYPE_CLIMATE_DEFROST = 13,
-	ACTION_TYPE_CLIMATE_SET = 9,
+	ACTION_TYPE_SET_CHARGING_AMPS = 9,
+	ACTION_TYPE_SET_CHARGING_LIMIT = 10,
+	ACTION_TYPE_SET_SEAT_HEAT = 11,
+	ACTION_TYPE_SET_STEERING_WHEEL_HEAT = 12,
+	ACTION_TYPE_VENT = 13,
+	ACTION_TYPE_TOGGLE_CHARGE = 14,
+	ACTION_TYPE_ADJUST_DEPARTURE = 15,
+	ACTION_TYPE_TOGGLE_SENTRY = 16,
+	ACTION_TYPE_WAKE = 17, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_REFRESH = 18,
+	ACTION_TYPE_DATA_SCREEN = 19,
+	ACTION_TYPE_HOMELINK = 20,
+	ACTION_TYPE_REMOTE_BOOMBOX = 21,
+	ACTION_TYPE_CLIMATE_MODE = 22,
+	ACTION_TYPE_CLIMATE_DEFROST = 23,
+	ACTION_TYPE_CLIMATE_SET = 24,
 	// Following are through buttons or touch screen input
 	ACTION_TYPE_CLIMATE_ON = 25,
 	ACTION_TYPE_CLIMATE_OFF = 26,
@@ -76,6 +76,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastError;
 	var _lastTimeStamp;
 	var _lastDataRun;
+	var _debug_auth;
 	// 2023-03-20 var _debugTimer;
 
 	var _pendingPriorityRequests;
@@ -103,6 +104,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		
 		// _debugTimer = System.getTimer(); Application.getApp().setProperty("overrideCode", 0);
+		_debug_auth = false;
 
 		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
 		if (createdAt == null) {
@@ -118,13 +120,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		else {
 			expireIn = expireIn.toNumber();
 		}
-		
+
 		// Check if we need to refresh our access token
 		var timeNow = Time.now().value();
 		var interval = 5 * 60;
-		var answer = (timeNow + interval < createdAt + expireIn);
+		var expired = (timeNow + interval < createdAt + expireIn);
 		
-		if (/*DEBUG false &&*/ _token != null && _token.length() != 0 && answer == true ) {
+		if (/*DEBUG*/ _debug_auth == false && _token != null && _token.length() > 0 && expired == true ) {
 			_need_auth = false;
 			_auth_done = true;
 			var expireAt = new Time.Moment(createdAt + expireIn);
@@ -785,7 +787,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
-			if (/*DEBUG false &&*/ _refreshToken != null && _refreshToken.length() != 0) {
+			if (/*DEBUG*/ _debug_auth == false && _refreshToken != null && _refreshToken.length() != 0) {
 				logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
@@ -1574,7 +1576,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				var vehicle_name = Application.getApp().getProperty("vehicle_name");
 				if (vehicle_name != null) {
 					while (vehicle_index < size) {
-						if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
+					if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
 							break;
 						}
 						vehicle_index++;
