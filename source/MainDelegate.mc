@@ -965,16 +965,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			}
 		}
-		// We're waiting for an action to be performed, we're not displaying a message on screen, the last webRequest returned responseCode 200 and we aren't already within a stateMachine call
-		else if (_pendingActionRequests.size() > 0 && _stateMachineCounter != 0) { 
+		// We're waiting for an action to be performed, we're not displaying a message on screen and the last webRequest returned responseCode 200
+		else if (_pendingActionRequests.size() > 0) { 
 			if (_view._data._ready == true && _lastError == null) {
 				actionMachine();
 			}
 			// Say actions are pending and call stateMachine as soon as you can
-			else {
+			else if (_stateMachineCounter != 0) {
 				//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
-				logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError);
-
+				logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
 				stateMachine();
 			}
 		}
@@ -1114,7 +1113,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function doPreviousPage() {
-		logMessage("doPreviousPage: trunk/frunk");
+		logMessage("doPreviousPage: trunk/frunk/port");
 		if (!_data._ready) {
 			logMessage("doPreviousPage: WARNING Not ready to do action");
 			return;
@@ -1564,8 +1563,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 
-		SpinSpinner(responseCode);
-
 		if (responseCode == 200) {
 
 			var vehicles = data.get("response");
@@ -1618,20 +1615,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicleData(responseCode, data) {
-		// DEBUG CODE FOR TESTING ERRORS
-		/*		//Application.getApp().setProperty("overrideCode", 0);
-				var x = Application.getApp().getProperty("overrideCode");
-				if (x != null and x != 0) {
-					responseCode = x.toNumber();
-				}
-
-				if (System.getTimer() < _debugTimer + 10000 ) {
-					responseCode = 408;
-				}
-				else if (System.getTimer() > _debugTimer + 20000 && System.getTimer() < _debugTimer + 30000) {
-					responseCode = 408;
-				}
-		*/
 		logMessage("onReceiveVehicleData: " + responseCode);
 
 		SpinSpinner(responseCode);
@@ -1675,7 +1658,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 					if (_408_count) { logMessage("onReceiveVehicleData: clearing _408_count"); }
 					_408_count = 0; // Reset the count of timeouts since we got our data
-					_firstTime = false;
+					if (_firstTime) { // We got our first responseCode 200 since launching
+						_firstTime = false;
+						if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
+							logMessage("onReceiveVehicleData: sending gratious wake");
+							_need_wake = false;
+							_wake_done = false;
+							_stateMachineCounter = 1; // Make sure we check on the next workerTimer
+							_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
+							return;
+						}
+					}
 
 					_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 					var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
@@ -1744,8 +1737,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onReceiveAwake(responseCode, data) {
 		logMessage("onReceiveAwake: " + responseCode);
-
-		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
 			_wake_done = true;
@@ -2016,5 +2007,4 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		"511" => "Network_Authentication_Required",
 		"540" => "Vehicle_Server_Error"
 	};
-
 }
