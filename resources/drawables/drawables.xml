@@ -1,6 +1,6 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="frunk0trunk0port0vent0_icon_white" filename="frunk0trunk0port0vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="vehicle" filename="vehicle.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -8,7 +8,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk1trunk0port0vent0_icon_white" filename="frunk1trunk0port0vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="frunkOpened" filename="frunk_opened.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -16,7 +16,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk0trunk1port0vent0_icon_white" filename="frunk0trunk1port0vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="frunkAction" filename="frunkAction.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -24,7 +24,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk1trunk1port0vent0_icon_white" filename="frunk1trunk1port0vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="trunkOpened" filename="trunk_opened.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -32,7 +32,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk0trunk0port1vent0_icon_white" filename="frunk0trunk0port1vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="trunkAction" filename="trunkAction.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -40,7 +40,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk1trunk0port1vent0_icon_white" filename="frunk1trunk0port1vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="portOpened" filename="port_opened.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -48,7 +48,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk0trunk1port1vent0_icon_white" filename="frunk0trunk1port1vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="portAction" filename="portAction.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -56,7 +56,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk1trunk1port1vent0_icon_white" filename="frunk1trunk1port1vent0.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="popMenu" filename="popMenu.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -64,7 +64,7 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk0trunk0port0vent1_icon_white" filename="frunk0trunk0port0vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="windowsOpened" filename="windows_opened.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
@@ -72,82 +72,12 @@
             <color>00AA00</color>
         </palette>
     </bitmap>
-    <bitmap id="frunk1trunk0port0vent1_icon_white" filename="frunk1trunk0port0vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
+    <bitmap id="driving" filename="driving.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>000000</color>
             <color>AAAAAA</color>
             <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk0trunk1port0vent1_icon_white" filename="frunk0trunk1port0vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk1trunk1port0vent1_icon_white" filename="frunk1trunk1port0vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk0trunk0port1vent1_icon_white" filename="frunk0trunk0port1vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk1trunk0port1vent1_icon_white" filename="frunk1trunk0port1vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk0trunk1port1vent1_icon_white" filename="frunk0trunk1port1vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk1trunk1port1vent1_icon_white" filename="frunk1trunk1port1vent1.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="driving_icon" filename="driving.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-            <color>00AA00</color>
-        </palette>
-    </bitmap>
-    <bitmap id="frunk_icon_white" filename="frunk.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
-        </palette>
-    </bitmap>
-    <bitmap id="trunk_icon_white" filename="trunk.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-            <color>AAAAAA</color>
         </palette>
     </bitmap>
     <bitmap id="climate_off_icon" filename="climateoff.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
@@ -165,12 +95,6 @@
     <bitmap id="climate_on_icon_blue" filename="climateon.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>00AAFF</color>
-            <color>000000</color>
-        </palette>
-    </bitmap>
-    <bitmap id="climate_on_icon_white" filename="climateon.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
             <color>000000</color>
         </palette>
     </bitmap>
@@ -216,12 +140,6 @@
             <color>000000</color>
         </palette>
     </bitmap>
-    <bitmap id="locked_icon_white" filename="locked.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
-            <color>000000</color>
-        </palette>
-    </bitmap>
     <bitmap id="unlocked_icon" filename="unlocked.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FF0000</color>
@@ -243,12 +161,6 @@
     <bitmap id="back_icon" filename="back.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>CCCCCC</color>
-            <color>000000</color>
-        </palette>
-    </bitmap>
-    <bitmap id="charge_icon" filename="charge.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
-        <palette disableTransparency="false">
-            <color>FFFFFF</color>
             <color>000000</color>
         </palette>
     </bitmap>

@@ -25,7 +25,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         _carsName = carsName;
         _carsId = carsId;
         _controller = controller;
-        logMessage("CarPickerDelegate: _stateMachineCounter was " + _controller._stateMachineCounter);
+        /*DEBUG*/ logMessage("CarPickerDelegate: _stateMachineCounter was " + _controller._stateMachineCounter);
         _controller._stateMachineCounter = -1;
         PickerDelegate.initialize();
     }
@@ -34,7 +34,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         _controller._vehicle_id = -2;
         gWaitTime = System.getTimer();
         _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
-        logMessage("CarPickerDelegate: Cancel called");
+        /*DEBUG*/ logMessage("CarPickerDelegate: Cancel called");
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -49,13 +49,13 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         for (i = 0; i < size; i++) {
             // 2022-10-17 logMessage("CarPickerDelegate: vehicle " + i + ": '" + _carsName[i] + "'");
             if (_selected.equals(_carsName[i])) {
-                logMessage("CarPickerDelegate: Got a match!");
+                /*DEBUG*/ logMessage("CarPickerDelegate: Got a match!");
                 if (Application.getApp().getProperty("vehicle") != _carsId[i]) { // If it's a new car, start fresh
                     Application.getApp().setProperty("vehicle", _carsId[i]);
                     Application.getApp().setProperty("vehicle_name", _selected);
 
                     // Start fresh as if we just loaded
-                    _controller._firstTime = true;
+                    _controller._waitingFirstData = 1;
                     _controller._408_count = 0;
                     _controller._check_wake = false;
                     _controller._need_wake = false;
@@ -67,7 +67,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                 break;
             }
         }
-        if (i == size) { logMessage("CarPickerDelegate: No match?!?"); }
+        /*DEBUG*/ if (i == size) { logMessage("CarPickerDelegate: No match?!?"); }
 
         gWaitTime = System.getTimer();
         _controller._handler.invoke([3, _controller._408_count, WatchUi.loadResource(Rez.Strings.label_requesting_data)]);

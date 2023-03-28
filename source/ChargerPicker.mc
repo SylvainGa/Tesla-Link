@@ -38,14 +38,14 @@ class ChargerPickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        logMessage("ChargerPickerDelegate: initialize");
+        /*DEBUG*/ logMessage("ChargerPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
-        logMessage("ChargerPickerDelegate: Cancel called");
+        /*DEBUG*/ logMessage("ChargerPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -57,7 +57,7 @@ class ChargerPickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         var charging_amps = values[0];
 
-        logMessage("ChargerPickerDelegate: onAccept called with charging_amps set to " + charging_amps);
+        /*DEBUG*/ logMessage("ChargerPickerDelegate: onAccept called with charging_amps set to " + charging_amps);
 
         _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_CHARGING_AMPS, "Option" => ACTION_OPTION_NONE, "Value" => charging_amps, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);

@@ -27,7 +27,7 @@
     <string id="menu_label_unlock_port">Unlock Port</string>  <!--  NEW -->
     <string id="menu_label_open_frunk">Ouvrir Frunk</string>
     <string id="menu_label_close_frunk">Close Frunk</string>  <!--  NEW -->
-    <string id="menu_label_open_frunk_opened">Frunk ouvert</string>
+    <string id="menu_label_open_frunk_opened">Frunk déjà ouvert</string>
     <string id="menu_label_toggle_view">Change de vue</string>
     <string id="menu_label_swap_frunk_for_port">Valise arrière/Avant/Port</string>
     <string id="menu_label_defrost_on">Activer Dégivrage</string>
@@ -163,6 +163,7 @@
     <string id="label_stop_charging">Arrêt de la charge</string>  <!--  NEW -->
     <string id="label_start_charging">Démarrage de la charge</string>  <!--  NEW -->
     <string id="label_climate_mode">Mode climat à </string>  <!--  NEW -->
+    <string id="label_still_waiting_data">Toujours en attente</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>

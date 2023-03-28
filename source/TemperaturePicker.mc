@@ -41,14 +41,14 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        logMessage("TemperaturePickerDelegate: initialize");
+        /*DEBUG*/ logMessage("TemperaturePickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
-        logMessage("TemperaturePickerDelegate: Cancel called");
+        /*DEBUG*/ logMessage("TemperaturePickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -64,9 +64,8 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
 			temperature = (temperature - 32.0) * 5.0 / 9.0;	
         }
 
-        logMessage("TemperaturePickerDelegate: onAccept called with temperature set to " + temperature);
+        /*DEBUG*/ logMessage("TemperaturePickerDelegate: onAccept called with temperature set to " + temperature);
 
-        Application.getApp().setProperty("driver_temp", temperature);
         _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_SET, "Option" => ACTION_OPTION_NONE, "Value" => temperature, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;

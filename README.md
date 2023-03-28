@@ -43,7 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.9.0 Added the following (beside the first three items, the others are more technical than anything else)
+V7.9.0 Added the following (beside the first four items, the others are more technical than anything else)
+- The upper left quadrant icon has been modified to show the full vehicle 
 - A 'driving' icon is displayed instead of the car icon in the upper left quadrant when the vehicle is not parked and you can't interact with it.
 - The view defaults to the image view for all watches now, not just for touch screen ones. The text view is now deprecated as it's missing a lot of the visual cues that the image view is showing.
 - The 'Back' icon for button operated watches has been updated

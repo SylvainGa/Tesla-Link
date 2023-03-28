@@ -20,12 +20,12 @@ class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
 
     function initialize (controller) {
         _controller = controller;
-        logMessage("ClimateModePickerDelegate: initialize");
+        /*DEBUG*/ logMessage("ClimateModePickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     function onCancel () {
-        logMessage("ClimateModePickerDelegate: Cancel called");
+        /*DEBUG*/ logMessage("ClimateModePickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -34,7 +34,7 @@ class ClimateModePickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         var selected = values[0];
 
-        logMessage("ClimateModePickerDelegate: onAccept called with selected set to " + selected);
+        /*DEBUG*/ logMessage("ClimateModePickerDelegate: onAccept called with selected set to " + selected);
 
         _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_MODE, "Option" => ACTION_OPTION_NONE, "Value" => selected, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
