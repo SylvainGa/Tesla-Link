@@ -85,6 +85,14 @@
     <string id="OptionMenu_14">Slot 14</string>
     <string id="OptionMenu_15">Slot 15</string>
     <string id="OptionMenu_16">Slot 16</string>
+	<string id="OptionMenu_17">Slot 17</string>
+	<string id="OptionMenu_18">Slot 18</string>
+	<string id="OptionMenu_19">Slot 19</string>
+	<string id="OptionMenu_20">Slot 20</string>
+	<string id="OptionMenu_21">Slot 21</string>
+	<string id="OptionMenu_22">Slot 22</string>
+	<string id="OptionMenu_23">Slot 23</string>
+	<string id="OptionMenu_24">Slot 24</string>
     <string id="menu_label_vent">Ventilation</string>
     <string id="menu_label_adjust_departure">Välj avresetid</string>
     <string id="menu_label_start_stop_charging">Starta/stoppa laddning</string>

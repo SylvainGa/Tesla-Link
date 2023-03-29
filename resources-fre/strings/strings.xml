@@ -85,6 +85,14 @@
     <string id="OptionMenu_14">Emplacement 14</string>
     <string id="OptionMenu_15">Emplacement 15</string>
     <string id="OptionMenu_16">Emplacement 16</string>
+	<string id="OptionMenu_17">Emplacement 17</string>
+	<string id="OptionMenu_18">Emplacement 18</string>
+	<string id="OptionMenu_19">Emplacement 19</string>
+	<string id="OptionMenu_20">Emplacement 20</string>
+	<string id="OptionMenu_21">Emplacement 21</string>
+	<string id="OptionMenu_22">Emplacement 22</string>
+	<string id="OptionMenu_23">Emplacement 23</string>
+	<string id="OptionMenu_24">Emplacement 24</string>
     <string id="menu_label_vent">Ventilé</string>
     <string id="menu_label_adjust_departure">Ajuster départ planifié</string>
     <string id="menu_label_start_stop_charging">Démarrer/arrêter la charge</string>

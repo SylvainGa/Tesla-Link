@@ -85,6 +85,14 @@
     <string id="OptionMenu_14">Funktion 14</string>
     <string id="OptionMenu_15">Funktion 15</string>
     <string id="OptionMenu_16">Funktion 16</string>
+	<string id="OptionMenu_17">Funktion 17</string>
+	<string id="OptionMenu_18">Funktion 18</string>
+	<string id="OptionMenu_19">Funktion 19</string>
+	<string id="OptionMenu_20">Funktion 20</string>
+	<string id="OptionMenu_21">Funktion 21</string>
+	<string id="OptionMenu_22">Funktion 22</string>
+	<string id="OptionMenu_23">Funktion 23</string>
+	<string id="OptionMenu_24">Funktion 24</string>
     <string id="menu_label_vent">Fensterspalt</string>
     <string id="menu_label_adjust_departure">Passe Abfahrtszeit an</string>
     <string id="menu_label_start_stop_charging">Ladung starten/stoppen</string>
