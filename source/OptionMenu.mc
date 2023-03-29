@@ -1,34 +1,51 @@
 using Toybox.WatchUi as Ui;
 using Toybox.System;
 
-class OptionMenuDelegate extends Ui.MenuInputDelegate {
+class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
-	
+    var _previous_stateMachineCounter;
+
     function initialize(controller) {
         Ui.MenuInputDelegate.initialize();
         _controller = controller;
+        _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
+        _controller._stateMachineCounter = -1;
+        //DEBUG logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
+        //logMessage("OptionMenuDelegate: initialize");
     }
 
-    function onMenuItem(item) {
+    //! Handle a cancel event from the picker
+    //! @return true if handled, false otherwise
+    function onBack() {
+        // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
+        //DEBUG logMessage("OptionMenuDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onSelect(selected_item) {
+        var item = selected_item.getId();
+
+        //DEBUG logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
         if (item == :reset) {
-            Settings.setToken(null);
-            Settings.setRefreshToken(null, 0, 0);
-            Application.getApp().setProperty("vehicle", null);
-			Application.getApp().setProperty("ResetNeeded", true);
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_RESET, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :honk) {
-            _controller._honk_horn = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :select_car) {
             _controller._tesla.getVehicleId(method(:onReceiveVehicles));
         } else if (item == :open_port) {
-            _controller._open_port = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :open_frunk) {
-            _controller._open_frunk = true;
-            _controller.stateMachine();
-        } else if (item == :open_trunk) {
-            _controller._open_trunk = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_FRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+       } else if (item == :open_trunk) {
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_TRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :toggle_view) {
             var view = Application.getApp().getProperty("image_view");
             if (view) {
@@ -36,6 +53,8 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             } else {
                 Application.getApp().setProperty("image_view", true);
             }
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :swap_frunk_for_port) {
             var swap = Application.getApp().getProperty("swap_frunk_for_port");
             if (swap == 0 || swap == null) {
@@ -50,10 +69,12 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 			else {
                 Application.getApp().setProperty("swap_frunk_for_port", 0);
 	        }
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :set_temperature) {
-            var driver_temp = Application.getApp().getProperty("driver_temp");
-            var max_temp = _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
-            var min_temp = _controller._data._vehicle_data.get("climate_state").get("min_avail_temp");
+            var driver_temp = _controller._data._vehicle_data.get("climate_state").get("driver_temp_setting");
+            var max_temp =    _controller._data._vehicle_data.get("climate_state").get("max_avail_temp");
+            var min_temp =    _controller._data._vehicle_data.get("climate_state").get("min_avail_temp");
             
             if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
             	driver_temp = driver_temp * 9.0 / 5.0 + 32.0;
@@ -81,7 +102,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             Ui.switchToView(new ChargingLimitPicker(charging_limit), new ChargingLimitPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :set_seat_heat) {
 			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
-	        var seats = new [rear_seats_avail != null ? 7 : 3];
+	        var seats = new [rear_seats_avail != null ? 8 : 3];
 
 	        seats[0] = Rez.Strings.label_seat_driver;
 	        seats[1] = Rez.Strings.label_seat_passenger;
@@ -91,6 +112,7 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 		        seats[4] = Rez.Strings.label_seat_rear_right;
 		        seats[5] = Rez.Strings.label_seat_front;
 		        seats[6] = Rez.Strings.label_seat_rear;
+		        seats[7] = Rez.Strings.label_seat_all;
 	        }
 	        else {
 		        seats[2] = Rez.Strings.label_seat_front;
@@ -98,44 +120,46 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 
 	        Ui.switchToView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :defrost) {
-            _controller._set_climate_defrost = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_DEFROST, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :set_steering_wheel_heat) {
-            _controller._set_steering_wheel_heat = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_STEERING_WHEEL_HEAT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :vent) {
-            _controller._vent = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_VENT, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :toggle_charge) {
-            _controller._toggle_charging_set = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_CHARGE, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :adjust_departure) {
+            var time = _controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_controller._data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-	            _controller._adjust_departure = true;
-	            _controller.stateMachine();
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
+                WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             }
             else {
-				Ui.switchToView(new DepartureTimePicker(_controller._data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes")), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
+				Ui.switchToView(new DepartureTimePicker(time), new DepartureTimePickerDelegate(_controller), Ui.SLIDE_IMMEDIATE);
             }
         } else if (item == :toggle_sentry) {
-            _controller._sentry_mode = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :wake) {
             _controller._need_wake = true;
             _controller._wake_done = false;
-            _controller.stateMachine();
+            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :refresh) {
             var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
             Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
-            _controller._view_datascreen = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_DATA_SCREEN, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :homelink) {
-            _controller._homelink = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HOMELINK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :remote_boombox) {
-            _controller._remote_boombox = true;
-            _controller.stateMachine();
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_REMOTE_BOOMBOX, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :climate_mode) {
 	        var modes = new [4];
 
@@ -146,6 +170,8 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         }
+
+        return true;
     }
 
     function onReceiveVehicles(responseCode, data) {
@@ -160,7 +186,10 @@ class OptionMenuDelegate extends Ui.MenuInputDelegate {
             }
             Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
         } else {
-            _controller._handler.invoke([0, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+            _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString()]);
         }
+
+        // Unless we missed data, restore _stateMachineCounter
+        _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
     }
 }

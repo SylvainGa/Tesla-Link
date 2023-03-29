@@ -43,6 +43,20 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.9.0 Added the following (beside the first four items, the others are more technical than anything else)
+- The upper left quadrant icon has been modified to be like the pop up menu icon, except arrows will point to what action is to be performed and the status of the frunk, trunk, port and windows will be shown. Same for when the vehicle is in movement. Its icon will be modified accordingly to represent being in movement.
+- The view defaults to the image view for all watches now, not just for touch screen ones. The text view is now deprecated as it's missing a lot of the visual cues that the image view is showing.
+- The 'Back' icon for button operated watches has been updated
+- Open Port menu item will expand to two menu items when the cable is locked but not charging, Start Charging and Unlock port.
+- A tentative fix has been implemented for Glance aware watches that kept asking to login. A big thanks to Martin Smeaton for working with a debug version of the app to help me fix this issue. Hopefully the fix will work just as well on the release version of the app.
+- Fixed an am/pm error when setting departure time
+- The watch will try and delay sending a command until its last data poll is successful. A W 'tag' was added to the spinner symbols. This tag is added when at least a command is in the buffer queue. If it stays there for a few seconds, it means the watch is having issues talking to the vehicle.
+- Added ? and ¿ as spinner symbols. These two indicate that an error was received by the watch instead of valid data.
+- A '408' error counter is shown beside the number of seconds waiting when requesting data. That 408 error means Tesla's servers cannot talk to the car, either it doesn't have a good cellular/wifi coverage or it's asleep. Once it wakes up or coverage is better, the 408 errors stops. This is just to give a visual representation of what's going on and why the wait. Long pause between increments of this counter means Tesla's servers are taking a long time to respond. This disappears as soon as valid data is finally received.
+- The upper left quadrant menu and the Option menu have been modified to use the Menu2 menu view instead of the old Menu view. This means that unlike Menu, Menu2 isn't limited to 16 items, so the 24 items can be listed.
+- The version bump however, is hopefully transparent but is a major revamp of the code that handles the vehicle states and actions. Both events used to be in the same humongous routine that three timers would call for different reasons and codes needed to be added to prevent one timer from interfering with another. Now it only has one timer and a call queue with priorities handling the dispatchind of fetching vehicle state and performing actions. The use of discrete variables to flag actions has been replaced by a FIFO queue that can handle more than one command at a time and in the order they were given (currently used when setting seat's temperature for more than one seat at a time).
+Also new to this version is an operating guide in PDF format. This should hopefully answer most questions you have about the features and operation of this app. You can find that guide here https://github.com/SylvainGa/Tesla-Link/blob/OneDelegateTimer/Tesla-Link%20-%20Operating%20Guide.pdf
+
 V7.8.1 Added the following
 - Fixed an issue with the screen blanking at start
 - Fixed a rare crash that could happen if Bluetooth is lost while we're waiting to authenticate with Tesla's servers

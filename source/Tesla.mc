@@ -385,8 +385,8 @@ class Tesla {
                 :method => Communications.HTTP_REQUEST_METHOD_POST,
                 :headers => {
                     "Authorization" => _token,
-				   "User-Agent" => "Tesla-Link for Garmin",
-                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
+                    "User-Agent" => "Tesla-Link for Garmin",
+                    "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
                 },
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             },
@@ -397,5 +397,24 @@ class Tesla {
     function remoteBoombox(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_boombox";
         genericPost(url, notify);
+    }
+
+    function revoke(notify) {
+        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/oauth/revoke";
+        Communications.makeWebRequest(
+            url,
+            {
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                   "Authorization" => _token,
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
     }
 }

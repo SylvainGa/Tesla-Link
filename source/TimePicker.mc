@@ -16,11 +16,8 @@ const MINUTE_FORMAT = "%02d";
 
 //! Picker that allows the user to choose a time
 class DepartureTimePicker extends WatchUi.Picker {
-	var _time;
-	
     //! Constructor
     public function initialize(time) {
-		_time = time;
 
         var title = new WatchUi.Text({:text=>$.Rez.Strings.label_timePickerTitle, :locX=>WatchUi.LAYOUT_HALIGN_CENTER,
             :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
@@ -40,9 +37,9 @@ class DepartureTimePicker extends WatchUi.Picker {
         factories[2] = new $.NumberFactory(0, 59, 15, {:format=>$.MINUTE_FORMAT});
 
         var defaults = new Array<Number>[factories.size()];
-        if (_time != null) {
-            var hour = (_time / 60).toLong();
-            var min = (((_time / 60.0) - hour) * 60).toLong();
+        if (time != null) {
+            var hour = (time / 60).toLong();
+            var min = (((time / 60.0) - hour) * 60).toLong();
 			
             if (hour != null) {
             	if (defaults.size() == $.FACTORY_COUNT_12_HOUR) {
@@ -69,11 +66,11 @@ class DepartureTimePicker extends WatchUi.Picker {
 
     //! Update the view
     //! @param dc Device Context
-    public function onUpdate(dc as Dc) as Void {
+    /*public function onUpdate(dc as Dc) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
         Picker.onUpdate(dc);
-    }
+    }*/
 }
 
 //! Responds to a time picker selection or cancellation
@@ -83,12 +80,15 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
+        //DEBUG logMessage("DepartureTimePickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     public function onCancel() as Boolean {
+        //DEBUG logMessage("DepartureTimePickerDelegate: Cancel called");
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -101,22 +101,30 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
         var min = values[2];
 
         if ((hour != null) && (min != null)) {
-			var time = hour * 60 + min;
-			
             if (values.size() == $.FACTORY_COUNT_12_HOUR) {
-            	time += 12 * 60;
+                if (hour == 12) {
+                    hour = 0;
+                }
+
+                var ampm = values[3];
+                if (ampm == Rez.Strings.label_afternoon) {
+                	hour += 12;
+                }
             }
 
-	        Application.getApp().setProperty("departure_time", time);
-	        
-	        _controller._adjust_departure = true;
-	        _controller.stateMachine();
-	
+			var time = hour * 60 + min;
+			
+            //DEBUG logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h" + min + "m");
+
+            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	        return true;
         }
 		else {
-			return false;
+            //DEBUG logMessage("DepartureTimePickerDelegate: onAccept called withan invalid time hour = " + hour + " min = " + min);
+            _controller._stateMachineCounter = 1;
+	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+			return true;
 		}
     }
 }

@@ -2,13 +2,13 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 
 class SeatHeatPicker extends WatchUi.Picker {
-	var _heat;
+	// var _heat;
 	
     public function initialize (seat) {
 		
         var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_heat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
 
-//        Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(0, 3, 1, {})], :defaults=>_heat});
+        // Picker.initialize({:title=>title, :pattern=>[new $.NumberFactory(0, 3, 1, {})], :defaults=>_heat});
 		var frontSeat = false;
 		if (seat == Rez.Strings.label_seat_driver || seat == Rez.Strings.label_seat_passenger || seat == Rez.Strings.label_seat_front) {
 			frontSeat = true;
@@ -39,45 +39,61 @@ class SeatHeatPicker extends WatchUi.Picker {
 
 class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
-    var _selected;
 
     function initialize (controller) {
         _controller = controller;
+        //DEBUG logMessage("SeatHeatPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     function onCancel () {
+        //DEBUG logMessage("SeatHeatPickerDelegate: Cancel called");
+        _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
 
     function onAccept (values) {
-        _selected = values[0];
-		Application.getApp().setProperty("seat_heat_chosen", _selected);
+        var selected = values[0];
+		Application.getApp().setProperty("seat_heat_chosen", selected);
 
-		if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_front) {
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_driver);
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_passenger);
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-	    }
-		else if (Application.getApp().getProperty("seat_chosen") == Rez.Strings.label_seat_rear) {
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_left);
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_center);
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-			Application.getApp().setProperty("seat_chosen", Rez.Strings.label_seat_rear_right);
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-		}
-		else {
-	        _controller._set_seat_heat = true;
-	        _controller.stateMachine();
-	    }
+        //DEBUG logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
+
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        switch (Application.getApp().getProperty("seat_chosen")) {
+            case Rez.Strings.label_seat_all:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_CENTER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.label_seat_front:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_rear:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_CENTER, "Value" => 0, "Tick" => System.getTimer()});
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_driver:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_passenger:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_rear_left:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_rear_center:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_CENTER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+            case Rez.Strings.Rez.Strings.label_seat_rear_right:
+                _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_REAR_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});
+                break;
+	    }
+        return true;
     }
 }
 

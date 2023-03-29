@@ -64,7 +64,7 @@ class DriveView extends Ui.View {
                 lineValue[i - 1] = View.findDrawableById("Line" + i + "Value");
             }
 
-// logMessage("DriveView:onUpdate: _viewOffset is " + _viewOffset);
+            // logMessage("DriveView:onUpdate: _viewOffset is " + _viewOffset);
             var lineData; 
 			if (_viewOffset == 0) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_drive_data_1_1));
