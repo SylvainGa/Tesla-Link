@@ -43,7 +43,7 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.9.1 Some vehicle uses 'P' for park in shift_state while others uses a 'null'. Why make it simple when you can make it complicated :-/ Broke the upper left quadrant if it was 'P'.
+V7.9.1 Some vehicles use 'P' for park in shift_state while others use a 'null'. Why make it simple when you can make it complicated :-/ Broke the upper left quadrant if it was 'P'. Now fixed.
 
 V7.9.0 Added the following (beside the first four items, the others are more technical than anything else)
 - The upper left quadrant icon has been modified to be like the pop up menu icon, except arrows will point to what action is to be performed and the status of the frunk, trunk, port and windows will be shown. Same for when the vehicle is in movement. Its icon will be modified accordingly to represent being in movement.
