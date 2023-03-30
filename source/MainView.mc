@@ -301,7 +301,7 @@ class MainView extends Ui.View {
 
 				// If we're driving, only show a moving car. No interaction possible!
 				var drive_state = _data._vehicle_data.get("drive_state");
-				if (drive_state != null && drive_state.get("shift_state") != null) {
+				if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
 					dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.driving));
 				}
 				else {

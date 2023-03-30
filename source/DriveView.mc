@@ -71,11 +71,11 @@ class DriveView extends Ui.View {
 
 	            lineData = _data._vehicle_data.get("drive_state").get("shift_state");
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_shift_state));
-	            if (lineData != null) {
+	            if (lineData != null && lineData.equals("P") == false) {
 		            lineValue[2].setText(lineData.toString());
 				}
 				else {
-					lineValue[2].setText("Parked");
+					lineValue[2].setText("P");
 				}
 				
 	            lineData = _data._vehicle_data.get("drive_state").get("speed");
@@ -96,7 +96,7 @@ class DriveView extends Ui.View {
 		            lineValue[4].setText(lineData.toString());
 				}
 					
-	            lineData = _data._vehicle_data.get("drive_state").get("power").toFloat();
+	            lineData = _data._vehicle_data.get("drive_state").get("power").toFloat().format("%2.1f");
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_power));
 	            if (lineData != null) {
 		            lineValue[5].setText(lineData.toString());
