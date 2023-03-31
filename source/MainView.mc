@@ -3,6 +3,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
+using Toybox.Graphics;
 
 import Toybox.WatchUi;
 
@@ -130,7 +131,7 @@ class MainView extends Ui.View {
 				_displayType = args[0];
 			}
 
-			if (args[1] != -1) { //Add the timer to the string being displayed
+			if (args[1] != -1 && _displayType != 0) { //Add the timer to the string being displayed, unless we're showing an error (no counter there)
 				_408_count = args[1];
 				var timeWaiting = System.getTimer() - gWaitTime;
 				var tmpStr = null;
@@ -254,6 +255,7 @@ class MainView extends Ui.View {
 			// Retrieve and display the vehicle name
 			var name_drawable = View.findDrawableById("name");
 			var vehicle_name = _data._vehicle_data.get("display_name");
+			var textWidth = dc.getTextWidthInPixels(vehicle_name, Graphics.FONT_SMALL);
 			if (Application.getApp().getProperty("vehicle_name") == null) {
 				Application.getApp().setProperty("vehicle_name", vehicle_name);
 			}
