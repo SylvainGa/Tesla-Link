@@ -105,6 +105,7 @@
     <string id="setting_holdActionLowerRight">Action pour un appui prolongé sur le cartier inférieur droit</string>
     <string id="menu_label_none">Désactivé</string>  <!--  NEW -->
     <string id="setting_quickReturn">Retour rapide à l'écran principal (pas d'attente que la commande envoyée termine)</string>
+    <string id="setting_titleScrolling">Activer le défilement du nom du véhicle</string>
     <string id="menu_label_popUpMenu">Menu contextuel</string>
     <string id="setting_defaultUpperLeft">Opération par défaut pour le cartier supérieur gauche</string>
 

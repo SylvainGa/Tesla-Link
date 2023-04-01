@@ -77,6 +77,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastTimeStamp;
 	var _lastDataRun;
 	var _debug_auth;
+	var _debug_view;
 	// 2023-03-20 var _debugTimer;
 
 	var _pendingPriorityRequests;
@@ -105,6 +106,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		
 		// _debugTimer = System.getTimer(); Application.getApp().setProperty("overrideCode", 0);
 		_debug_auth = false;
+		_debug_view = false;
 
 		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
 		if (createdAt == null) {
@@ -162,6 +164,252 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		/*DEBUG*/ logMessage("initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
 		_workTimer.start(method(:workerTimer), 100, true);
 
+		if (_debug_view) {
+			if (_tesla == null) {
+				_tesla = new Tesla(_token);
+			}
+			_data._vehicle_data = 
+			{
+				"id" => "1234567890123456",
+				"vehicle_id" => "123456789012",
+				"vin" => "5YJ3E1EA3MF000001",
+				"display_name" => "Tesla",
+				"option_codes" => "AD15,MDL3,PBSB,RENA,BT37,ID3W,RF3G,S3PB,DRLH,DV2W,W39B,APF0,COUS,BC3B,CH07,PC30,FC3P,FG31,GLFR,HL31,HM31,IL31,LTPB,MR31,FM3B,RS3H,SA3P,STCP,SC04,SU3C,T3CA,TW00,TM00,UT3P,WR00,AU3P,APH3,AF00,ZCST,MI00,CDM0",
+				"color" => null,
+				"access_type" => "OWNER",
+				"tokens" => [
+					"1111111111111111",
+					"2222222222222222"
+				],
+				"state" => "asleep",
+				"in_service" => false,
+				"id_s" => "1234567890123456",
+				"calendar_enabled" => true,
+				"api_version" => 36,
+				"backseat_token" => null,
+				"backseat_token_updated_at" => null,
+				"user_id" => "123456789012",
+				"charge_state" => {
+					"battery_heater_on" => false,
+					"battery_level" => 80,
+					"battery_range" => 200.05,
+					"charge_amps" => 32,
+					"charge_current_request" => 32,
+					"charge_current_request_max" => 32,
+					"charge_enable_request" => true,
+					"charge_energy_added" => 1.99,
+					"charge_limit_soc" => 80,
+					"charge_limit_soc_max" => 100,
+					"charge_limit_soc_min" => 50,
+					"charge_limit_soc_std" => 90,
+					"charge_miles_added_ideal" => 9.5,
+					"charge_miles_added_rated" => 9.5,
+					"charge_port_cold_weather_mode" => false,
+					"charge_port_color" => "<invalid>",
+					"charge_port_door_open" => true,
+					"charge_port_latch" => "Engaged",
+					"charge_rate" => 0.0,
+					"charge_to_max_range" => false,
+					"charger_actual_current" => 0,
+					"charger_phases" => 1,
+					"charger_pilot_current" => 32,
+					"charger_power" => 0,
+					"charger_voltage" => 2,
+					"charging_state" => "Complete",
+					"conn_charge_cable" => "SAE",
+					"est_battery_range" => 165.67,
+					"fast_charger_brand" => "<invalid>",
+					"fast_charger_present" => false,
+					"fast_charger_type" => "ACSingleWireCAN",
+					"ideal_battery_range" => 200.05,
+					"managed_charging_active" => false,
+					"managed_charging_start_time" => null,
+					"managed_charging_user_canceled" => false,
+					"max_range_charge_counter" => 0,
+					"minutes_to_full_charge" => 0,
+					"not_enough_power_to_heat" => null,
+					"off_peak_charging_enabled" => false,
+					"off_peak_charging_times" => "all_week",
+					"off_peak_hours_end_time" => 0,
+					"preconditioning_enabled" => false,
+					"preconditioning_times" => "all_week",
+					"scheduled_charging_mode" => "Off",
+					"scheduled_charging_pending" => false,
+					"scheduled_charging_start_time" => null,
+					"scheduled_charging_start_time_app" => 0,
+					"scheduled_departure_time" => "1649079000",
+					"scheduled_departure_time_minutes" => 570,
+					"supercharger_session_trip_planner" => false,
+					"time_to_full_charge" => 0.0,
+					"timestamp" => "1649373163710",
+					"trip_charging" => false,
+					"usable_battery_level" => 79,
+					"user_charge_enable_request" => null
+				},
+				"climate_state" => {
+					"allow_cabin_overheat_protection" => true,
+					"auto_seat_climate_left" => false,
+					"auto_seat_climate_right" => false,
+					"battery_heater" => false,
+					"battery_heater_no_power" => null,
+					"cabin_overheat_protection" => "FanOnly",
+					"cabin_overheat_protection_actively_cooling" => false,
+					"climate_keeper_mode" => "off",
+					"defrost_mode" => 0,
+					"driver_temp_setting" => 21.0,
+					"fan_status" => 0,
+					"hvac_auto_request" => "On",
+					"inside_temp" => 7.4,
+					"is_auto_conditioning_on" => false,
+					"is_climate_on" => false,
+					"is_front_defroster_on" => false,
+					"is_preconditioning" => false,
+					"is_rear_defroster_on" => false,
+					"left_temp_direction" => 0,
+					"max_avail_temp" => 28.0,
+					"min_avail_temp" => 15.0,
+					"outside_temp" => 6.0,
+					"passenger_temp_setting" => 21.0,
+					"remote_heater_control_enabled" => false,
+					"right_temp_direction" => 0,
+					"seat_heater_left" => 0,
+					"seat_heater_rear_center" => 0,
+					"seat_heater_rear_left" => 0,
+					"seat_heater_rear_right" => 0,
+					"seat_heater_right" => 0,
+					"side_mirror_heaters" => false,
+					"steering_wheel_heater" => false,
+					"supports_fan_only_cabin_overheat_protection" => true,
+					"timestamp" => "1649373163710",
+					"wiper_blade_heater" => false
+				},
+				"drive_state" => {
+					"gps_as_of" => "1649371875",
+					"heading" => 170,
+					"latitude" => 40.0,
+					"longitude" => -70.0,
+					"native_latitude" => 4.0,
+					"native_location_supported" => 1,
+					"native_longitude" => -70.0,
+					"native_type" => "wgs",
+					"power" => 0,
+					"shift_state" => null,
+					"speed" => null,
+					"timestamp" => "1649373163710"
+				},
+				"gui_settings" => {
+					"gui_24_hour_time" => true,
+					"gui_charge_rate_units" => "kW",
+					"gui_distance_units" => "km/hr",
+					"gui_range_display" => "Rated",
+					"gui_temperature_units" => "C",
+					"show_range_units" => false,
+					"timestamp" => "1649373163710"
+				},
+				"vehicle_config" => {
+					"badge_version" => 0,
+					"can_accept_navigation_requests" => true,
+					"can_actuate_trunks" => true,
+					"car_special_type" => "base",
+					"car_type" => "model3",
+					"charge_port_type" => "US",
+					"dashcam_clip_save_supported" => true,
+					"default_charge_to_max" => false,
+					"driver_assist" => "TeslaAP3",
+					"ece_restrictions" => false,
+					"efficiency_package" => "M32021",
+					"eu_vehicle" => false,
+					"exterior_color" => "RedMulticoat",
+					"exterior_trim" => "Black",
+					"exterior_trim_override" => "",
+					"has_air_suspension" => false,
+					"has_ludicrous_mode" => false,
+					"has_seat_cooling" => false,
+					"headlamp_type" => "Global",
+					"interior_trim_type" => "Black2",
+					"key_version" => 2,
+					"motorized_charge_port" => true,
+					"paint_color_override" => "10,1,1,0.1,0.04",
+					"performance_package" => "BasePlus",
+					"plg" => true,
+					"pws" => true,
+					"rear_drive_unit" => "PM216MOSFET",
+					"rear_seat_heaters" => 1,
+					"rear_seat_type" => 0,
+					"rhd" => false,
+					"roof_color" => "RoofColorGlass",
+					"seat_type" => null,
+					"spoiler_type" => "None",
+					"sun_roof_installed" => null,
+					"third_row_seats" => "None",
+					"timestamp" => "1649373163710",
+					"trim_badging" => "50",
+					"use_range_badging" => true,
+					"utc_offset" => -14400,
+					"webcam_supported" => true,
+					"wheel_type" => "PinwheelRefresh18"
+				},
+				"vehicle_state" => {
+					"api_version" => 36,
+					"autopark_state_v2" => "unavailable",
+					"calendar_supported" => true,
+					"car_version" => "2022.8.3 e4797d240c70",
+					"center_display_state" => 0,
+					"dashcam_clip_save_available" => true,
+					"dashcam_state" => "Recording",
+					"df" => 0,
+					"dr" => 0,
+					"fd_window" => 0,
+					"feature_bitmask" => "5,0",
+					"fp_window" => 0,
+					"ft" => 0,
+					"is_user_present" => false,
+					"locked" => true,
+					"media_state" => {
+						"remote_control_enabled" => true
+					},
+					"notifications_supported" => true,
+					"odometer" => 8775.268476,
+					"parsed_calendar_supported" => true,
+					"pf" => 0,
+					"pr" => 0,
+					"rd_window" => 0,
+					"remote_start" => false,
+					"remote_start_enabled" => true,
+					"remote_start_supported" => true,
+					"rp_window" => 0,
+					"rt" => 0,
+					"santa_mode" => 0,
+					"sentry_mode" => false,
+					"sentry_mode_available" => true,
+					"software_update" => {
+						"download_perc" => 0,
+						"expected_duration_sec" => 2700,
+						"install_perc" => 1,
+						"status" => "",
+						"version" => " "
+					},
+					"speed_limit_mode" => {
+						"active" => false,
+						"current_limit_mph" => 85.0,
+						"max_limit_mph" => 90,
+						"min_limit_mph" => 50.0,
+						"pin_code_set" => false
+					},
+					"timestamp" => "1649373163710",
+					"tpms_pressure_fl" => 0.0,
+					"tpms_pressure_fr" => 0.0,
+					"tpms_pressure_rl" => 0.0,
+					"tpms_pressure_rr" => 0.0,
+					"valet_mode" => false,
+					"vehicle_name" => "Christine",
+					"vehicle_self_test_progress" => 0,
+					"vehicle_self_test_requested" => false,
+					"webcam_available" => true
+				}
+			};
+		}
+
 		stateMachine(); // Launch getting the states right away.
 	}
 
@@ -216,7 +464,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		/*DEBUG*/ logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
 
-		if (error == null) {
+		if (error == null && code != null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
 			var codeForBearerUrl = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
 			var codeForBearerParams = {
@@ -757,6 +1005,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function stateMachine() {
 		/*DEBUG*/ logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+
+/*DEBUG*/
+		if (_debug_view) {
+			_need_auth = false;
+			_auth_done = true;
+			_need_wake = false;
+			_wake_done = true;
+			_408_count = 0;
+			_waitingFirstData = 0;
+			_stateMachineCounter = 1;
+			_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
+			return;
+		}
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 
@@ -1397,24 +1658,28 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var coords = click.getCoordinates();
 		var x = coords[0];
 		var y = coords[1];
+
 		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
 		if (enhancedTouch == null) {
 			enhancedTouch = true;
 		}
 
 		/*DEBUG*/ logMessage("onTap: enhancedTouch=" + enhancedTouch);
+		if (System.getDeviceSettings().screenShape == System.SCREEN_SHAPE_RECTANGLE && _settings.screenWidth < _settings.screenHeight) {
+			y = y - ((_settings.screenHeight - _settings.screenWidth) / 2.7).toNumber();
+		}
 
 		// Tap on vehicle name
-		if (enhancedTouch && y < _settings.screenHeight / 6 && _tesla != null) {
+		if (enhancedTouch && y < _settings.screenHeight / 7 && _tesla != null) {
 			_stateMachineCounter = -1;
 			_tesla.getVehicleId(method(:onSelectVehicle));
 		}
 		// Tap on the space used by the 'Eye'
-		else if (enhancedTouch && y > _settings.screenHeight / 6 && y < _settings.screenHeight / 4 && x > _settings.screenWidth / 2 - _settings.screenWidth / 19 && x < _settings.screenWidth / 2 + _settings.screenWidth / 19) {
+		else if (enhancedTouch && y > _settings.screenHeight / 7 && y < (_settings.screenHeight / 3.5).toNumber() && x > _settings.screenWidth / 2 - (_settings.screenWidth / 11).toNumber() && x < _settings.screenWidth / 2 + (_settings.screenWidth / 11).toNumber()) {
 			_pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		// Tap on the middle text line where Departure is written
-		else if (enhancedTouch && y > _settings.screenHeight / 2 - _settings.screenHeight / 19 && y < _settings.screenHeight / 2 + _settings.screenHeight / 19) {
+		else if (enhancedTouch && y > (_settings.screenHeight / 2.3).toNumber() && y < (_settings.screenHeight / 1.8).toNumber()) {
 			var time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 				_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
@@ -1424,7 +1689,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		} 
 		// Tap on bottom line on screen
-		else if (enhancedTouch && y > _settings.screenHeight - _settings.screenHeight / 6 && _tesla != null) {
+		else if (enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
 			var screenBottom = Application.getApp().getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
 			switch (screenBottom) {
 				case 0:
@@ -1487,15 +1752,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
-		if (Attention has :vibrate) {
-			var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
-			Attention.vibrate(vibeData);				
-		}
+		var vibrate = true;
 
 		if (x < _settings.screenWidth/2) {
 			if (y < _settings.screenHeight/2) {
 				/*DEBUG*/ logMessage("onHold: Upper Left");
 				switch (Application.getApp().getProperty("holdActionUpperLeft")) {
+					case 0:
+						vibrate = false;
+						break;
+
 					case 1:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_FRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
@@ -1527,6 +1793,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				/*DEBUG*/ logMessage("onHold: Lower Left");
 				switch (Application.getApp().getProperty("holdActionLowerLeft")) {
+					case 0:
+						vibrate = false;
+						break;
+
 					case 1:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
@@ -1540,6 +1810,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (y < _settings.screenHeight/2) {
 				/*DEBUG*/ logMessage("onHold: Upper Right");
 				switch (Application.getApp().getProperty("holdActionUpperRight")) {
+					case 0:
+						vibrate = false;
+						break;
+
 					case 1:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_DEFROST, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
@@ -1551,6 +1825,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				/*DEBUG*/ logMessage("onHold: Lower Right");
 				switch (Application.getApp().getProperty("holdActionLowerRight")) {
+					case 0:
+						vibrate = false;
+						break;
+
 					case 1:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_HOMELINK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
@@ -1564,6 +1842,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 				}
 			}
+		}
+
+		if (Attention has :vibrate && vibrate == true) {
+			var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
+			Attention.vibrate(vibeData);				
 		}
 
 		return true;

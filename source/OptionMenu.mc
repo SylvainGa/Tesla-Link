@@ -36,7 +36,14 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :select_car) {
-            _controller._tesla.getVehicleId(method(:onReceiveVehicles));
+            /*var vinsName = new [2];
+            var vinsId = new [2];
+            vinsName[0] = "Tesla";
+            vinsId[0] = 123456;
+            vinsName[1] = "Tesla Model 3";
+            vinsId[1] = 654321;
+            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
+            //*/_controller._tesla.getVehicleId(method(:onReceiveVehicles));
         } else if (item == :open_port) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
