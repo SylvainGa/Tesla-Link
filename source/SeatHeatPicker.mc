@@ -42,12 +42,12 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function initialize (controller) {
         _controller = controller;
-        //DEBUG logMessage("SeatHeatPickerDelegate: initialize");
+        //DEBUG*/ logMessage("SeatHeatPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     function onCancel () {
-        //DEBUG logMessage("SeatHeatPickerDelegate: Cancel called");
+        //DEBUG*/ logMessage("SeatHeatPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -57,7 +57,7 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
         var selected = values[0];
 		Application.getApp().setProperty("seat_heat_chosen", selected);
 
-        //DEBUG logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
+        //DEBUG*/ logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         switch (Application.getApp().getProperty("seat_chosen")) {

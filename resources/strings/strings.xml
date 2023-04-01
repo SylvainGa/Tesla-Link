@@ -1,5 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
+    <string id="AppVersion">Version 7.9.1</string>
     <string id="AppVersionTitle">App Version</string>
 
     <!--  Glance view -->
@@ -105,6 +106,7 @@
     <string id="setting_holdActionLowerRight">Touch hold action for lower right quadrant</string>
     <string id="menu_label_none">Disabled</string>
     <string id="setting_quickReturn">Quick return to main screen (don't wait for the command to show being completed)</string>
+    <string id="setting_titleScrolling">Enable vehicle name scrolling</string>
     <string id="menu_label_popUpMenu">PopUp Menu</string>
     <string id="setting_defaultUpperLeft">Default option for upper left quadrant</string>
 

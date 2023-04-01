@@ -43,6 +43,15 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.10.0 Added the following
+- The Sentry icon has been updated from an eye to Tesla's red dot in a grey circle, similar to what you see in the app. The circle is permanent on screen and will be filled by a red dot when Sentry is on.
+- An option named "Enable vehicle name scrolling" was added in the parameters to allow long vehicle name to scroll on screen instead of being clipped
+- Rectangular watch with different width/lenght resolution was modified to put the name on top of the display, giving more room
+- Many watch resolution formats were tweaked so everything is more evenly spaced on screen. I only have a Venue and simulate the other watches. If the appearance is odd on yours, send me a picture through email and I'll adjust.
+- Version in the app parameters on the phone should display the correct version now
+- Fixed an issue when the Internet is lost while trying to authenticate
+- onHold will no longer vibrate it its action is 'Disabled'
+
 V7.9.1 Some vehicles use 'P' for park in shift_state while others use a 'null'. Why make it simple when you can make it complicated :-/ Broke the upper left quadrant if it was 'P'. Now fixed.
 
 V7.9.0 Added the following (beside the first four items, the others are more technical than anything else)

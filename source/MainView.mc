@@ -3,6 +3,7 @@ using Toybox.WatchUi as Ui;
 using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
+using Toybox.Graphics;
 
 import Toybox.WatchUi;
 
@@ -24,11 +25,14 @@ class MainView extends Ui.View {
 	hidden var _displayType;
 	hidden var _errorTimer;
 	hidden var _408_count;
+	hidden var _curPosX;
+	hidden var _startPosX;
+	hidden var _xDir;
 	var _data;
 	var _refreshTimer;
 	var _viewUpdated;
 	// DEBUG variables
-	//DEBUG var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
+	//DEBUG*/ var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
 	// Initial load - show the 'requesting data' string, make sure we don't process touches
 	function initialize(data) {
@@ -39,11 +43,14 @@ class MainView extends Ui.View {
 		_displayType = -1;
 		gWaitTime = System.getTimer();
 		// DEBUG variables
-		//DEBUG _showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
+		//DEBUG*/ _showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
 
 		_display = Ui.loadResource(Rez.Strings.label_requesting_data);
 		_displayTimer = "";
 		_408_count = 0;
+		_curPosX = null;
+		_startPosX = null;
+		_xDir = -1;
 
 		// 2023-03-20 logMessage("MainView:initialize: _display at " + _display);
 
@@ -62,7 +69,12 @@ class MainView extends Ui.View {
 
 	function onShow() {
 		_refreshTimer = new Timer.Timer();
-		_refreshTimer.start(method(:refreshView), 500, true);
+		if (Application.getApp().getProperty("titleScrolling")) {
+			_refreshTimer.start(method(:refreshView), 50, true);
+		}
+		else {
+			_refreshTimer.start(method(:refreshView), 500, true);
+		}
 	}
 	
 	function onHide() {
@@ -72,7 +84,7 @@ class MainView extends Ui.View {
 
 	function refreshView() {
 		//logMessage("MainView:refreshView: requesting update");
-		//DEBUG _showLogMessage = false;
+		//DEBUG*/ _showLogMessage = false;
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
 			var tmpStr = null;
@@ -105,7 +117,7 @@ class MainView extends Ui.View {
 	}
 
 	function onReceive(args) {
-		//DEBUG _showLogMessage = false;
+		//DEBUG*/ _showLogMessage = false;
 
 		if (System.getTimer() > _errorTimer) { // Have we timed out our previous text display
 			_errorTimer = 0;
@@ -113,24 +125,24 @@ class MainView extends Ui.View {
 
 		if (args[2] != null) {
 			if (args[0] == 0) {
-				//DEBUG logMessage("MainView:onReceive: priority msg: '" + args[2] + "'");
+				//DEBUG*/ logMessage("MainView:onReceive: priority msg: '" + args[2] + "'");
 				_errorTimer = System.getTimer() + 2000; // priority message stays two seconds
-				//DEBUG if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
+				//DEBUG*/ if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			} else if (_errorTimer == 0 || _displayType == args[0]) {
-				//DEBUG logMessage("MainView:onReceive: type " + args[0] + " msg: '" + args[2] + "'");
+				//DEBUG*/ logMessage("MainView:onReceive: type " + args[0] + " msg: '" + args[2] + "'");
 				if (args[0] == 1) { // Informational message stays a second
 					_errorTimer = System.getTimer() + 1000;
 				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 60 seconds has passed and type 3 with a null when type 1 is received
 					_errorTimer = System.getTimer() + 60000;
 				}
-				//DEBUG if (_display == null || _display.equals(args[2]) == false) { _showLogMessage = true; }
+				//DEBUG*/ if (_display == null || _display.equals(args[2]) == false) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			}
 
-			if (args[1] != -1) { //Add the timer to the string being displayed
+			if (args[1] != -1 && _displayType != 0) { //Add the timer to the string being displayed, unless we're showing an error (no counter there)
 				_408_count = args[1];
 				var timeWaiting = System.getTimer() - gWaitTime;
 				var tmpStr = null;
@@ -156,7 +168,7 @@ class MainView extends Ui.View {
 				_displayTimer = null;
 			}
 		} else if (_errorTimer == 0 || args[0] == 0 || (args[0] == 1 && _displayType == 3)) {
-			//DEBUG if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: null msg, args[0]=" + args[0] + ", _errorTimer=" + _errorTimer); }
+			//DEBUG*/ if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: null msg, args[0]=" + args[0] + ", _errorTimer=" + _errorTimer); }
 			_display = null;
 			_displayTimer = null;
 			_displayType = -1;
@@ -171,13 +183,8 @@ class MainView extends Ui.View {
 		// Set up all our variables for drawing things in the right place!
 		var width = dc.getWidth();
 		var height = dc.getHeight();
-		var extra = (width/7+width/28) * ((width.toFloat()/height.toFloat())-1);
-		var image_x_left = (width/7+width/28+extra).toNumber();
-		var image_y_top = (height/7+height/21).toNumber();
-		var image_x_right = (width/7*4-width/28+extra).toNumber();
-		var image_y_bottom = (height/7*4-height/21).toNumber();
-		var center_x = dc.getWidth()/2;
-		var center_y = dc.getHeight()/2;
+		var center_x = width / 2 - 1;
+		var center_y = height / 2 - 1;
 
 		_viewUpdated = true; // Tell refreshScreen that we updated our view
 
@@ -194,20 +201,20 @@ class MainView extends Ui.View {
 			// We're showing a message, so set 'ready' false to prevent touches
 			_data._ready = false;
 
-			//DEBUG if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
+			//DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
 			dc.drawText(center_x, center_y, font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
 			if (System.getTimer() > _errorTimer && _errorTimer != 0 && _data._vehicle_data != null) { // Have we timed out our text display and we have something to display
-				//DEBUG logMessage("MainView:onUpdate: Clearing timer/display");
+				//DEBUG*/ logMessage("MainView:onUpdate: Clearing timer/display");
 				_errorTimer = 0;
 				_display = null;
 				_displayTimer = "";
 			}
 		}
 		else if (_data._vehicle_data != null) {
-			//DEBUG if (_showLogMessage) { logMessage("MainView:onUpdate: drawing"); }
+			//DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: drawing"); }
 
 			// Showing the main layouts, so we can process touches now
 			_data._ready = true;
@@ -219,7 +226,7 @@ class MainView extends Ui.View {
 			if (use_image_layout == null) {					   /* Defaults to image_layout for all watches */
 				use_image_layout = true;
 				Application.getApp().setProperty("image_view", /* System.getDeviceSettings().isTouchScreen */ true);
-				//DEBUG logMessage("MainView:onUpdate: defaulting to image layout");
+				//DEBUG*/ logMessage("MainView:onUpdate: defaulting to image layout");
 			}
 
 			// Set up our layout based on the mode chosen
@@ -237,28 +244,85 @@ class MainView extends Ui.View {
 			dc.clear();
 			View.onUpdate(dc);
 
-			// Draw the grey arc in an appropriate size for the display
-			dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+			// Dynamic pen width based on screen size
+			var penWidth = Math.round(width/33+0.5).toNumber();
+			dc.setPenWidth(penWidth);
+
 			var radius;
 			if (center_x < center_y) {
-				radius = center_x-3;
-			} else {
-				radius = center_y-3;
+				radius = center_x - penWidth / 2;
+				center_y = center_y + (height - width) / 2;
 			}
-
-			// Dynamic pen width based on screen size
-			dc.setPenWidth(((dc.getWidth()/33)).toNumber());
-			dc.drawArc(center_x, center_y, radius, Graphics.ARC_CLOCKWISE, 225, 315);
+			else {
+				radius = center_y - penWidth / 2;
+			}
 
 			// If we have the vehicle data back from the API, this is where the good stuff happens
 			// Retrieve and display the vehicle name
 			var name_drawable = View.findDrawableById("name");
 			var vehicle_name = _data._vehicle_data.get("display_name");
-			if (Application.getApp().getProperty("vehicle_name") == null) {
+			var app_vehicle_name = Application.getApp().getProperty("vehicle_name");
+			if (app_vehicle_name == null) {
 				Application.getApp().setProperty("vehicle_name", vehicle_name);
 			}
-			name_drawable.setText(vehicle_name);
+			else if (vehicle_name.equals(app_vehicle_name) == false) { // We switched vehicle, have it recalculate our position on screen
+				_curPosX = null;
+			}
+
+			var fontHeight = Graphics.getFontHeight(Graphics.FONT_SMALL);
+			var textWidth = dc.getTextWidthInPixels(vehicle_name, Graphics.FONT_SMALL);
+			var screenShape = System.getDeviceSettings().screenShape;
+			var textPos;
+			var textMaxWidth;
+			if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width < height) {
+				textPos = 0;
+				textMaxWidth = width;
+			}
+			else if (Application.getApp().getProperty("titleScrolling")) {
+				textPos = center_x / 14;
+				var textFromCenter = center_x - textPos - fontHeight / 2;
+				var rad = Math.acos(textFromCenter.toFloat() / radius.toFloat());
+				var halfMaxText = Math.sin(rad) * radius.toFloat();
+				textMaxWidth = 2 * halfMaxText - penWidth;
+			}
+			else {
+				textMaxWidth = width;
+				textPos = center_x / 14;
+			}
+
+			//var textMaxWidth = (2 * radius * Math.sin(Math.toRadians(2 * Math.toDegrees(Math.acos(1 - (15.0 / radius)))) / 2)).toNumber();
+			if (_curPosX == null) {
+				if (textWidth > textMaxWidth + penWidth) {
+					_curPosX = center_x - textMaxWidth / 2;
+					_startPosX = _curPosX;
+				}
+				else {
+					_curPosX = center_x - textWidth / 2;
+					_startPosX = _curPosX;
+				}
+			}
+			else if (textWidth > textMaxWidth+ penWidth) {
+				_curPosX = _curPosX + _xDir;
+				if (_curPosX + textWidth < _startPosX + textMaxWidth && _xDir < 0) {
+					_xDir = 1;
+				}
+				else if (_curPosX >= _startPosX && _xDir > 0) {
+					_xDir = -1;
+				}
+			}
+
+			//name_drawable.setText(vehicle_name);
+			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+			if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width == height) {
+				dc.setClip(center_x - textMaxWidth / 2, 0, textMaxWidth, height);
+			}
+			dc.drawText(_curPosX, textPos, Graphics.FONT_SMALL, vehicle_name, Graphics.TEXT_JUSTIFY_LEFT);
 			name_drawable.draw(dc);
+			dc.clearClip();
+
+			// Draw the grey arc in an appropriate size for the display
+			dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, 315);
 
 			// Grab the data we're going to use around charge and climate
 			var swap_frunk_for_port = Application.getApp().getProperty("swap_frunk_for_port");
@@ -276,7 +340,7 @@ class MainView extends Ui.View {
 			dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
 			var charge_angle = 225 - (battery_level * 270 / 100);
 			charge_angle = charge_angle < 0 ? 360 + charge_angle : charge_angle;
-			dc.drawArc(center_x, center_y, radius, Graphics.ARC_CLOCKWISE, 225, charge_angle);
+			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, charge_angle);
 
 			// Draw the charge limit indicator
 			dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
@@ -285,7 +349,7 @@ class MainView extends Ui.View {
 			limit_start_angle = limit_start_angle < 0 ? 360 + limit_start_angle : limit_start_angle;
 			var limit_end_angle = limit_angle - 2;
 			limit_end_angle = limit_end_angle < 0 ? 360 + limit_end_angle : limit_end_angle;
-			dc.drawArc(center_x, center_y, radius, Graphics.ARC_CLOCKWISE, limit_start_angle, limit_end_angle);
+			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, limit_start_angle, limit_end_angle);
 
 			// Common climate data
 			var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
@@ -294,6 +358,21 @@ class MainView extends Ui.View {
 
 			// Image layout is where most of the stuff is drawn
 			if (use_image_layout) {
+				var spacing = 0;
+				if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width < height) {
+					center_y = center_y - fontHeight / 3;
+					spacing = fontHeight / 3;
+				}
+				
+				var bm = Ui.loadResource(Rez.Drawables.settings_icon);
+				var bm_width = bm.getWidth();
+				var bm_height = bm.getHeight();
+
+				var image_x_left = center_x - center_x / 3 - bm_width / 2;
+				var image_y_top = center_y - center_x / 3 - bm_height / 2;
+				var image_x_right = center_x + center_x / 3 - bm_width / 2;
+				var image_y_bottom = center_y + center_x / 3 - bm_height / 2 + spacing;
+
 				dc.drawBitmap(image_x_right, image_y_bottom, Ui.loadResource(is_touchscreen? Rez.Drawables.settings_icon : Rez.Drawables.back_icon));
 
 				// Draw the dynamic icon for the frunk/trunk/port/vent
@@ -302,7 +381,7 @@ class MainView extends Ui.View {
 				// If we're driving, only show a moving car. No interaction possible!
 				var drive_state = _data._vehicle_data.get("drive_state");
 				if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
-					dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.driving));
+					dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.driving));
 				}
 				else {
 					if (swap_frunk_for_port == null) {
@@ -314,43 +393,48 @@ class MainView extends Ui.View {
 					// Show what we chould interact with
 					switch (swap_frunk_for_port) {
 						case 0:
-							dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.frunkAction));
+							dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.frunkAction));
 							break;
 						case 1:
-							dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.trunkAction));
+							dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.trunkAction));
 							break;
 						case 2:
-							dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.portAction));
+							dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.portAction));
 							break;
 						case 3:
 							if (venting == 0) {
-								dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.popMenu));
+								dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.popMenu));
 							}
 							break;
 					}
 
 					if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
-						dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.frunkOpened));
+						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.frunkOpened));
 					}
 					if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
-						dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.trunkOpened));
+						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.trunkOpened));
 					}
 					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
-						dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.portOpened));
+						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.portOpened));
 					}
 					if (venting) {
-						dc.drawBitmap(image_x_left - extra, image_y_top, Ui.loadResource(Rez.Drawables.windowsOpened));
+						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.windowsOpened));
 					}
 				}
 
 				// Update the lock state indicator
 				dc.drawBitmap(image_x_left, image_y_bottom,(_data._vehicle_data.get("vehicle_state").get("locked") ? Ui.loadResource(Rez.Drawables.locked_icon) : door_open ? Ui.loadResource(Rez.Drawables.door_open_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
 
+				bm = Ui.loadResource(Rez.Drawables.locked_icon);
+				bm_width = bm.getWidth();
+				bm_height = bm.getHeight();
 
 				// Update the climate state indicator, note we have blue or red icons depending on heating or cooling
 				var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
 				var rear_defrost = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
 				var left_temp_direction = _data._vehicle_data.get("climate_state").get("left_temp_direction");
+				var bm_waves;
+				var bm_blades;
 
 				/*DEBUG climate_state = false;
 				climate_batterie_preheat = true;
@@ -368,11 +452,6 @@ class MainView extends Ui.View {
 					old_climate_state = climate_state; old_left_temp_direction = left_temp_direction; old_right_temp_direction = right_temp_direction; old_climate_defrost = climate_defrost; old_climate_batterie_preheat = climate_batterie_preheat; old_rear_defrost = rear_defrost; old_defrost_mode = defrost_mode;
 					//logMessage("MainView:onUpdate: venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
 				}*/
-				var bm;
-				var bm_waves;
-				var bm_blades;
-				var bm_width;
-				var bm_height;
 
 				if (climate_state == false) {
 					bm = Ui.loadResource(Rez.Drawables.climate_off_icon) as BitmapResource;
@@ -396,6 +475,8 @@ class MainView extends Ui.View {
 				bm_width = bm.getWidth();
 				bm_height = bm.getHeight();
 				dc.drawBitmap(image_x_right, image_y_top, bm);
+				image_x_right = image_x_right;
+				image_y_top = image_y_top;
 				if (climate_batterie_preheat) {
 					dc.drawBitmap(image_x_right + bm_width / 2 + bm_width / 8, image_y_top + bm_height / 4, bm_waves);
 				}
@@ -461,13 +542,11 @@ class MainView extends Ui.View {
 				}
 
 				// Draw the Sentry 'eye' icon if activated
-				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
-					var sentry_y = image_y_top - height/21;
-					var bitmap = Ui.loadResource(Rez.Drawables.sentry_icon) as BitmapResource;
-					var bitmap_width = bitmap.getWidth();
-					var bitmap_height = bitmap.getHeight();
-					dc.drawBitmap(center_x - bitmap_width / 2 - 3, sentry_y + bitmap_height / 2, bitmap);
-				}
+				var sentry_y = image_y_top - height/13;
+				var bitmap = Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("sentry_mode") ? Rez.Drawables.sentry_on_icon : Rez.Drawables.sentry_off_icon) as BitmapResource;
+				var bitmap_width = bitmap.getWidth();
+				var bitmap_height = bitmap.getHeight();
+				dc.drawBitmap(center_x - bitmap_width / 2, sentry_y + bitmap_height / 2, bitmap);
 			}
 			else {
 				// Text layout, so update the lock status text   

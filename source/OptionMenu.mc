@@ -10,7 +10,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         _controller = controller;
         _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
-        //DEBUG logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
+        //DEBUG*/ logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
     }
 
@@ -19,7 +19,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     function onBack() {
         // Unless we missed data, restore _stateMachineCounter
         _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
-        //DEBUG logMessage("OptionMenuDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
+        //DEBUG*/ logMessage("OptionMenuDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
@@ -27,7 +27,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     function onSelect(selected_item) {
         var item = selected_item.getId();
 
-        //DEBUG logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
+        //DEBUG*/ logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
         if (item == :reset) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_RESET, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
@@ -36,7 +36,14 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :select_car) {
-            _controller._tesla.getVehicleId(method(:onReceiveVehicles));
+            /*var vinsName = new [2];
+            var vinsId = new [2];
+            vinsName[0] = "Tesla";
+            vinsId[0] = 123456;
+            vinsName[1] = "Tesla Model 3";
+            vinsId[1] = 654321;
+            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
+            //*/_controller._tesla.getVehicleId(method(:onReceiveVehicles));
         } else if (item == :open_port) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
