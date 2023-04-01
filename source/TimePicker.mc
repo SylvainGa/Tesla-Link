@@ -80,14 +80,14 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        //DEBUG*/ logMessage("DepartureTimePickerDelegate: initialize");
+        /*DEBUG*/ logMessage("DepartureTimePickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     public function onCancel() as Boolean {
-        //DEBUG*/ logMessage("DepartureTimePickerDelegate: Cancel called");
+        /*DEBUG*/ logMessage("DepartureTimePickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -114,14 +114,14 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
 
 			var time = hour * 60 + min;
 			
-            //DEBUG*/ logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h" + min + "m");
+            /*DEBUG*/ logMessage("DepartureTimePickerDelegate: onAccept called with time set to " + hour + "h" + min + "m");
 
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	        return true;
         }
 		else {
-            //DEBUG*/ logMessage("DepartureTimePickerDelegate: onAccept called withan invalid time hour = " + hour + " min = " + min);
+            /*DEBUG*/ logMessage("DepartureTimePickerDelegate: onAccept called withan invalid time hour = " + hour + " min = " + min);
             _controller._stateMachineCounter = 1;
 	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 			return true;
