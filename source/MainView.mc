@@ -32,7 +32,7 @@ class MainView extends Ui.View {
 	var _refreshTimer;
 	var _viewUpdated;
 	// DEBUG variables
-	/*DEBUG*/ var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
+	//DEBUG*/ var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
 	// Initial load - show the 'requesting data' string, make sure we don't process touches
 	function initialize(data) {
@@ -43,7 +43,7 @@ class MainView extends Ui.View {
 		_displayType = -1;
 		gWaitTime = System.getTimer();
 		// DEBUG variables
-		/*DEBUG*/ _showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
+		//DEBUG*/ _showLogMessage = true; old_climate_state = false; old_left_temp_direction = 0; old_right_temp_direction = 0; old_climate_defrost = false; old_climate_batterie_preheat = false; old_rear_defrost = false; old_defrost_mode = 0;
 
 		_display = Ui.loadResource(Rez.Strings.label_requesting_data);
 		_displayTimer = "";
@@ -84,7 +84,7 @@ class MainView extends Ui.View {
 
 	function refreshView() {
 		//logMessage("MainView:refreshView: requesting update");
-		/*DEBUG*/ _showLogMessage = false;
+		//DEBUG*/ _showLogMessage = false;
 		if (_displayTimer != null) {
 			var timeWaiting = System.getTimer() - gWaitTime;
 			var tmpStr = null;
@@ -117,7 +117,7 @@ class MainView extends Ui.View {
 	}
 
 	function onReceive(args) {
-		/*DEBUG*/ _showLogMessage = false;
+		//DEBUG*/ _showLogMessage = false;
 
 		if (System.getTimer() > _errorTimer) { // Have we timed out our previous text display
 			_errorTimer = 0;
@@ -125,19 +125,19 @@ class MainView extends Ui.View {
 
 		if (args[2] != null) {
 			if (args[0] == 0) {
-				/*DEBUG*/ logMessage("MainView:onReceive: priority msg: '" + args[2] + "'");
+				//DEBUG*/ logMessage("MainView:onReceive: priority msg: '" + args[2] + "'");
 				_errorTimer = System.getTimer() + 2000; // priority message stays two seconds
-				/*DEBUG*/ if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
+				//DEBUG*/ if (_display == null || !_display.equals(args[2])) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			} else if (_errorTimer == 0 || _displayType == args[0]) {
-				/*DEBUG*/ logMessage("MainView:onReceive: type " + args[0] + " msg: '" + args[2] + "'");
+				//DEBUG*/ logMessage("MainView:onReceive: type " + args[0] + " msg: '" + args[2] + "'");
 				if (args[0] == 1) { // Informational message stays a second
 					_errorTimer = System.getTimer() + 1000;
 				} else if (args[0] > 1) { // Actionable message (type 2) will disappear when type 0 with null is received or 60 seconds has passed and type 3 with a null when type 1 is received
 					_errorTimer = System.getTimer() + 60000;
 				}
-				/*DEBUG*/ if (_display == null || _display.equals(args[2]) == false) { _showLogMessage = true; }
+				//DEBUG*/ if (_display == null || _display.equals(args[2]) == false) { _showLogMessage = true; }
 				_display = args[2];
 				_displayType = args[0];
 			}
@@ -168,7 +168,7 @@ class MainView extends Ui.View {
 				_displayTimer = null;
 			}
 		} else if (_errorTimer == 0 || args[0] == 0 || (args[0] == 1 && _displayType == 3)) {
-			/*DEBUG*/ if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: null msg, args[0]=" + args[0] + ", _errorTimer=" + _errorTimer); }
+			//DEBUG*/ if (args[0] != 1 || _errorTimer != 0) { logMessage("MainView:onReceive: null msg, args[0]=" + args[0] + ", _errorTimer=" + _errorTimer); }
 			_display = null;
 			_displayTimer = null;
 			_displayType = -1;
@@ -201,20 +201,20 @@ class MainView extends Ui.View {
 			// We're showing a message, so set 'ready' false to prevent touches
 			_data._ready = false;
 
-			/*DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
+			//DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
 			dc.drawText(center_x, center_y, font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
 			if (System.getTimer() > _errorTimer && _errorTimer != 0 && _data._vehicle_data != null) { // Have we timed out our text display and we have something to display
-				/*DEBUG*/ logMessage("MainView:onUpdate: Clearing timer/display");
+				//DEBUG*/ logMessage("MainView:onUpdate: Clearing timer/display");
 				_errorTimer = 0;
 				_display = null;
 				_displayTimer = "";
 			}
 		}
 		else if (_data._vehicle_data != null) {
-			/*DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: drawing"); }
+			//DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: drawing"); }
 
 			// Showing the main layouts, so we can process touches now
 			_data._ready = true;
@@ -226,7 +226,7 @@ class MainView extends Ui.View {
 			if (use_image_layout == null) {					   /* Defaults to image_layout for all watches */
 				use_image_layout = true;
 				Application.getApp().setProperty("image_view", /* System.getDeviceSettings().isTouchScreen */ true);
-				/*DEBUG*/ logMessage("MainView:onUpdate: defaulting to image layout");
+				//DEBUG*/ logMessage("MainView:onUpdate: defaulting to image layout");
 			}
 
 			// Set up our layout based on the mode chosen

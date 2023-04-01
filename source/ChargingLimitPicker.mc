@@ -38,14 +38,14 @@ class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        /*DEBUG*/ logMessage("ChargingLimitPickerDelegate: initialize");
+        //DEBUG*/ logMessage("ChargingLimitPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
-        /*DEBUG*/ logMessage("ChargingLimitPickerDelegate: Cancel called");
+        //DEBUG*/ logMessage("ChargingLimitPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -57,7 +57,7 @@ class ChargingLimitPickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         var charging_limit = values[0];
         
-        /*DEBUG*/ logMessage("ChargingLimitPickerDelegate: onAccept called with charging_limit set to " + charging_limit);
+        //DEBUG*/ logMessage("ChargingLimitPickerDelegate: onAccept called with charging_limit set to " + charging_limit);
 
         _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_CHARGING_LIMIT, "Option" => ACTION_OPTION_NONE, "Value" => charging_limit, "Tick" => System.getTimer()});
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);

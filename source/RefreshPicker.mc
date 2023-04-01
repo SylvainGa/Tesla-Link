@@ -38,14 +38,14 @@ class RefreshPickerDelegate extends WatchUi.PickerDelegate {
     //! Constructor
     function initialize(controller) {
     	_controller = controller;
-        /*DEBUG*/ logMessage("RefreshPickerDelegate: initialize");
+        //DEBUG*/ logMessage("RefreshPickerDelegate: initialize");
         PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker
     //! @return true if handled, false otherwise
     function onCancel() {
-        /*DEBUG*/ logMessage("RefreshPickerDelegate: Cancel called");
+        //DEBUG*/ logMessage("RefreshPickerDelegate: Cancel called");
         _controller._stateMachineCounter = 1;
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -57,7 +57,7 @@ class RefreshPickerDelegate extends WatchUi.PickerDelegate {
     function onAccept (values) {
         var refreshTime = values[0];
 
-        /*DEBUG*/ logMessage("RefreshPickerDelegate: onAccept called with refreshTimeselected set to " + refreshTime);
+        //DEBUG*/ logMessage("RefreshPickerDelegate: onAccept called with refreshTimeselected set to " + refreshTime);
 
         Application.getApp().setProperty("refreshTimeInterval", refreshTime);
         _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_REFRESH, "Option" => ACTION_OPTION_NONE, "Value" => refreshTime, "Tick" => System.getTimer()});
