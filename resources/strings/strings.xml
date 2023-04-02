@@ -1,6 +1,5 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppVersion">Version 7.9.1</string>
     <string id="AppVersionTitle">App Version</string>
 
     <!--  Glance view -->
