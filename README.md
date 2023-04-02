@@ -43,6 +43,10 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.10.1 Added the following
+- Filled the Sentry circle with a grey dot when Sentry is off
+- Removed the version info from the Parameters screen.
+
 V7.10.0 Added the following
 - The Sentry icon has been updated from an eye to Tesla's red dot in a grey circle, similar to what you see in the app. The circle is permanent on screen and will be filled by a red dot when Sentry is on.
 - An option named "Enable vehicle name scrolling" was added in the parameters to allow long vehicle name to scroll on screen instead of being clipped
