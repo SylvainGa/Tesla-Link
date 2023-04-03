@@ -29,10 +29,15 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     (:can_glance)
     function onBackgroundData(data) {
-        Application.getApp().setProperty("status", data["status"]);
-		//var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-		//var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-		//System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
+        if (data != null) {
+            var status = data["status"];
+            if (status != null) {
+                Application.getApp().setProperty("status", status);
+                /*DEBUG*/ var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+                /*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+                /*DEBUG*/ System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
+            }
+        }
 
         Background.registerForTemporalEvent(new Time.Duration(60*5));
 
