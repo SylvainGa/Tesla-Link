@@ -32,7 +32,7 @@ class TeslaLink extends App.AppBase {
         if (data != null) {
             var status = data["status"];
             if (status != null) {
-                Application.getApp().setProperty("status", data["status"]);
+                Application.getApp().setProperty("status", status);
                 //DEBUG*/ var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
                 //DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
                 //DEBUG*/ System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
