@@ -43,6 +43,9 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.10.2 Fixed the following
+- Vehicle wouldn't go to sleep in Glance mode.
+
 V7.10.1 Added the following
 - Filled the Sentry circle with a grey dot when Sentry is off
 - Removed the version info from the Parameters screen.
