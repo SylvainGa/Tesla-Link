@@ -39,7 +39,7 @@ class TeslaLink extends App.AppBase {
             }
         }
 
-        Background.registerForTemporalEvent(new Time.Duration(60*5));
+        Background.registerForTemporalEvent(new Time.Duration(300));
 
         Ui.requestUpdate();
     }  
