@@ -26,18 +26,26 @@ class MyServiceDelegate extends System.ServiceDelegate {
         //System.println("ServiceDelegate: onTemporalEvent");
         if (_token != null && _vehicle_id != null)
         {
-            //System.println("ServiceDelegate: onTemporalEvent getting data");
+            //DEBUG*/ var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+            //DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+            //DEBUG*/ System.println(dateStr + " : ServiceDelegate:onTemporalEvent getting data");
             _tesla.getChargeState(_vehicle_id, method(:onReceiveVehicleData));
         }
     }
 
     function onReceiveVehicleData(responseCode, responseData) {
-        // The API request has returned check for any other background data waiting (we don't want to lose it)
+        // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
 		}
-        //System.println("ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
+        else {
+            System.println("ServiceDelegate:onTemporalEvent already has background data! -> " + data);
+        }
+        //DEBUG*/ var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+        //DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+        //DEBUG*/ System.println(dateStr + " : " + "ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
+
         //System.println("ServiceDelegate:onReceiveVehicleData: responseData = " + responseData);
 
         // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
@@ -55,10 +63,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 suffix = "";
             }
             data.put("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + suffix);
-            Background.exit(data);
         } else if (responseCode == 401) {
             data.put("status", Application.loadResource(Rez.Strings.label_launch_widget));
-            Background.exit(data);
         } else if (responseCode == 408) {
             var suffix;
             try {
@@ -68,9 +74,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 suffix = "";
             }
             data.put("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
-            Background.exit(data);
-        } else {
-            Background.exit(data);
         }
+        Background.exit(data);
     }
 }
