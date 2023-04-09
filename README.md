@@ -43,12 +43,19 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.0 Added the following
+- Glance mode always shows the latest charge and range, even when asleep
+- Awoken vehicle will show inside temperature, sentry (S) or preconditioning (P) in glance view
+- While in glance, once the access token expires, it will try to get a new one if the refresh token is valid
+- Glance mode will display if an error other than 408 (vehicle unavailable - Asleep) or 401 (access denied - Need new access token) is received instead of data
+- Brought back the version info to the Parameters screen using a different method that always shows the current version and not just the version when first installed.
+
 V7.10.2 Fixed the following
 - Vehicle wouldn't go to sleep in Glance mode.
 
 V7.10.1 Added the following
 - Filled the Sentry circle with a grey dot when Sentry is off
-- Removed the version info from the Parameters screen.
+- Removed the version info from the Parameters screen
 
 V7.10.0 Added the following
 - The Sentry icon has been updated from an eye to Tesla's red dot in a grey circle, similar to what you see in the app. The circle is permanent on screen and will be filled by a red dot when Sentry is on.

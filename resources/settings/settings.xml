@@ -1,4 +1,8 @@
 <settings>
+	<setting propertyKey="@Properties.AppVersion" title="@Strings.AppNameVersion">
+		<settingConfig type="alphaNumeric" readonly="true"/>
+	</setting>
+
     <setting propertyKey="@Properties.enhancedTouch" title="@Strings.setting_enhancedTouch">
         <settingConfig type="boolean" required="true"/>
     </setting>

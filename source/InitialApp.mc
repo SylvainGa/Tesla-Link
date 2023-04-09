@@ -7,35 +7,49 @@ using Toybox.WatchUi as Ui;
 
 (:background)
 class TeslaLink extends App.AppBase {
+    var _serviceDelegate;
 
     function initialize() {
-		// 2023-03-20 logMessage("App: Initialising app");
+		//DEBUG*/ logMessage("App: Initialising app");
         AppBase.initialize();
     }
 
 	function onStart(state) {
-		// 2023-03-20 logMessage("App: starting app with state set to " + state);
+		//DEBUG*/ logMessage("App: starting app");
 	}
 
 	function onStop(state) {
-		// 2023-03-20 logMessage("App: stopping app with state set to " + state);
+		//DEBUG*/ logMessage("App: stopping app");
 	}
 
     (:can_glance)
     function getServiceDelegate(){
-        return [ new MyServiceDelegate() ];
+		//DEBUG*/ logMessage("App: getServiceDelegate");
+        _serviceDelegate = new MyServiceDelegate();
+        return [ _serviceDelegate ];
     }
 
     // This fires when the background service returns
     (:can_glance)
     function onBackgroundData(data) {
+		//DEBUG*/ logMessage("App: onBackgroundData");
         if (data != null) {
+            //DEBUG*/ logMessage("App: onBackgroundData: " + data["status"]);
+
             var status = data["status"];
             if (status != null) {
                 Application.getApp().setProperty("status", status);
-                //DEBUG*/ var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-                //DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-                //DEBUG*/ System.println(dateStr + " : " + "onBackgroundData: " + data["status"]);
+            }
+
+            var responseCode = data["responseCode"];
+            //DEBUG*/ logMessage("App: onBackgroundData responseCode is " + responseCode);
+            if (responseCode != null && responseCode == 401) {
+                //DEBUG*/ logMessage("App: onBackgroundData needs to refresh our access token");
+                if (_serviceDelegate == null) {
+                    //DEBUG*/ logMessage("App: onBackgroundData needs a service delegate");
+                    _serviceDelegate = new MyServiceDelegate();
+                }
+                _serviceDelegate.GetAccessToken();
             }
         }
 
@@ -46,13 +60,16 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance)
     function getGlanceView() {
+		//DEBUG*/ logMessage("Glance: Starting glance view");
+
         Application.getApp().setProperty("canGlance", true);
-		//System.println("Glance: Starting glance view");
         Background.registerForTemporalEvent(new Time.Duration(60*5));
         return [ new GlanceView() ];
     }
 
     function getInitialView() {
+		//DEBUG*/ logMessage("Glance: Starting main view");
+
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
             return [ new OfflineView() ];
@@ -75,15 +92,4 @@ class TeslaLink extends App.AppBase {
 		var view = new MainView(data);
 		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
     }
-}
-
-(:debug, :background)
-function logMessage(message) {
-	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
-	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-	System.println(dateStr + " : " + message);
-}
-
-(:release, :background)
-function logMessage(message) {
 }

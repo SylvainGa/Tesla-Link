@@ -1,5 +1,5 @@
 <properties>
-	<property id="AppVersion" type="string">7.9.1</property>
+	<property id="AppVersion" type="string"></property>
 	<property id="refreshToken" type="string"></property>
 	<property id="serverAPILocation" type="string">owner-api.teslamotors.com</property>
 	<property id="serverAUTHLocation" type="string">auth.tesla.com</property>

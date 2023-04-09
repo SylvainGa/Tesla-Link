@@ -131,9 +131,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_debug_auth == false && _token != null && _token.length() > 0 && expired == true ) {
 			_need_auth = false;
 			_auth_done = true;
-			var expireAt = new Time.Moment(createdAt + expireIn);
-			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ var expireAt = new Time.Moment(createdAt + expireIn);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 			//DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
 		} else {
 			//DEBUG*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
@@ -449,12 +449,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onOAuthMessage(message) {
-		var responseCode = null;
+		//DEBUG*/ var responseCode = null;
 		var error = null;
 		var code = null;
 
 		if (message != null) {
-			responseCode = message.responseCode; // I don't think this is being used, but log it just in case if logging is compiled
+			//DEBUG*/ responseCode = message.responseCode; // I don't think this is being used, but log it just in case if logging is compiled
 
 			if (message.data != null) {
 				error = message.data[$.OAUTH_ERROR];
@@ -519,9 +519,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken);
 
-			var expireAt = new Time.Moment(created_at + expires_in);
-			var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
@@ -1967,7 +1967,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						} catch (e) {
 							suffix = "";
 						}
-						Application.getApp().setProperty("status", battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range.toNumber() + suffix);
+						Application.getApp().setProperty("status", responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix + "| " );
+
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Application.getApp().getProperty("status") + "'");
 					}
 
@@ -2015,14 +2016,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
 				if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
-					var suffix;
+					/*var suffix;
 					try {
 						var clock_time = System.getClockTime();
 						suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
 					} catch (e) {
 						suffix = "";
-					}
-					Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
+					}*/
+					// Don't mess with the glance data if we get a 408 here. Chances are we're not asleep but can't talk to the vehicle for some reason
+					//Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
 				}
 
 				var i = _408_count + 1;

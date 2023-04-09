@@ -13,7 +13,28 @@ class GlanceView extends Ui.GlanceView {
     var vehicle_name = Application.getApp().getProperty("vehicle_name");
     var status = Application.getApp().getProperty("status");
     vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
-    status = (status == null) ? Ui.loadResource(Rez.Strings.label_waiting_data) : status;
+
+    if (status != null) {
+      var array = to_array(status, "|");
+
+      //var responseCode = array[0].toNumber();
+      var battery_level = array[1];
+      var charging_state = array[2];
+      var battery_range = array[3];
+      var suffix = array[4];
+      var text = array[5];
+
+      // Check ig we have bad data, if so, say we're waiting for data
+      if (text == null || charging_state == null || battery_level.equals("N/A")) {
+        status =  Ui.loadResource(Rez.Strings.label_waiting_data);
+      }
+      else {
+        status = battery_level + "%" + (charging_state.equals("Charging") ? "+" : "") + " / " + battery_range + suffix + text;
+      }
+    }
+    else {
+      status =  Ui.loadResource(Rez.Strings.label_waiting_data);
+    }
 
     // Draw the two rows of text on the glance widget
     dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);

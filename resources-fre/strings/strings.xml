@@ -1,6 +1,5 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppVersionTitle">Version de l'appli</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">véhicule</string>
@@ -8,6 +7,7 @@
     <string id="label_status_unknown" scope="glance">État inconnu</string>
     <string id="label_launch_widget" scope="background">Lancer le widget</string>  <!--  NEW -->
     <string id="label_waiting_data" scope="background">Attente de données</string>  <!--  NEW -->
+    <string id="label_error" scope="background">Erreur: </string>
 
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
@@ -127,7 +127,6 @@
     <string id="label_departure">Départ : </string>
 
     <!--  Handler text -->
-    <string id="label_error">Erreur: </string>
     <string id="label_might_have_failed">La commande a peut-être\néchoué</string>  <!--  NEW -->
     <string id="label_getting_vehicles">Liste vehicules</string>
     <string id="label_frunk_opening">Ouveture du frunk</string>
