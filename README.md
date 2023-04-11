@@ -45,10 +45,11 @@ If you want to have the widget translated to your language, contact me through e
 
 V7.11.0 Added the following
 - Glance mode always shows the latest charge and range, even when asleep
-- Awoken vehicle will show inside temperature, sentry (S) or preconditioning (P) in glance view
+- Awoken vehicle will show inside temperature, sentry (S) or preconditioning (P) in glance view if Glance have three lines to display
 - While in glance, once the access token expires, it will try to get a new one if the refresh token is valid
 - Glance mode will display if an error other than 408 (vehicle unavailable - Asleep) or 401 (access denied - Need new access token) is received instead of data
 - Brought back the version info to the Parameters screen using a different method that always shows the current version and not just the version when first installed.
+- Unfortunately dropped the number of slots from 24 to 16 because not enough memory is left on background processes for watch with just 32 KB of background space.
 
 V7.10.2 Fixed the following
 - Vehicle wouldn't go to sleep in Glance mode.

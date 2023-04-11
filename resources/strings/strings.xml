@@ -3,7 +3,7 @@
     <string id="AppNameVersion">Tesla Link V7.11.0</string>
 
     <!--  Glance view -->
-    <string id="vehicle" scope="glance">vehicle</string>
+    <string id="vehicle" scope="glance">No vehicle</string>
     <string id="label_asleep" scope="background">Asleep</string>
     <string id="label_status_unknown" scope="glance">Status unknown</string>
     <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->

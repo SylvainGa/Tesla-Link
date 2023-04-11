@@ -66,7 +66,6 @@ class Tesla {
         genericGet(url, notify);
     }
 
-    (:background)
     function getChargeState(vehicle, notify) {
         var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/charge_state";
         genericGet(url, notify);

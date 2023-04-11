@@ -39,4 +39,3 @@ function to_array(string, splitter) {
 	return result;*/
 }
 
-

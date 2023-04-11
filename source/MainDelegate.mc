@@ -161,6 +161,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
 
+		var useTouch = Application.getApp().getProperty("useTouch");
+		var hasTouch = System.getDeviceSettings().isTouchScreen;
+		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
+		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
+
+		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
+		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
+			useTouch = hasTouch;
+			Application.getApp().setProperty("useTouch", useTouch);
+		}
+
 		//DEBUG*/ logMessage("initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
 		_workTimer.start(method(:workerTimer), 100, true);
 
@@ -1623,7 +1634,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
 		if (_slot_count == null) {
-			_slot_count = 24;
+			_slot_count = 16;
 		} else if (!(_slot_count instanceof Number)) {
 			_slot_count = _slot_count.toNumber();
 		}
@@ -1631,8 +1642,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_slot_count < 1) {
 			_slot_count = 1;
 		}
-		else if (_slot_count > 24) { // Maximum of 16 entries in a menu
-			_slot_count = 24;
+		else if (_slot_count > 16) { // Maximum of 16 entries in a menu
+			_slot_count = 16;
 		}
 		
 		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});

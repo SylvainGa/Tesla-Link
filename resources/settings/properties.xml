@@ -15,7 +15,7 @@
 	<property id="holdActionUpperRight" type="number">0</property>
 	<property id="holdActionLowerLeft" type="number">0</property>
 	<property id="holdActionLowerRight" type="number">0</property>
-	<property id="NumberOfSlots" type="number">24</property>
+	<property id="NumberOfSlots" type="number">16</property>
 	<property id="option_slot1" type="number">0</property>
 	<property id="option_slot2" type="number">1</property>
 	<property id="option_slot3" type="number">2</property>
@@ -32,12 +32,4 @@
 	<property id="option_slot14" type="number">13</property>
 	<property id="option_slot15" type="number">14</property>
 	<property id="option_slot16" type="number">15</property>
-	<property id="option_slot17" type="number">16</property>
-	<property id="option_slot18" type="number">17</property>
-	<property id="option_slot19" type="number">18</property>
-	<property id="option_slot20" type="number">19</property>
-	<property id="option_slot21" type="number">20</property>
-	<property id="option_slot22" type="number">21</property>
-	<property id="option_slot23" type="number">22</property>
-	<property id="option_slot24" type="number">23</property>
 </properties>
