@@ -38,8 +38,12 @@ class GlanceView extends Ui.GlanceView {
       var battery_level = array[1];
       var charging_state = array[2];
       var battery_range = array[3];
-      var suffix = array[4];
-      text = array[5];
+      var inside_temp = array[4];
+			inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp.toNumber()*9/5) + 32) + "°F" : inside_temp.toNumber() + "°C";
+      var sentry = array[5];
+      var preconditioning = array[6];
+      var suffix = array[7];
+      text = array[8];
       if (text != null && text.equals(" ")) {
         text = null;
       }
@@ -64,6 +68,11 @@ class GlanceView extends Ui.GlanceView {
         else if (charging_state.equals("Charging")) {
           chargeSuffix = "+";
         }
+
+        if (text == null && responseCode == 200 && threeLines) {
+          text = inside_temp + (sentry.equals("true") ? " S On" : " S Off") +  (preconditioning.equals("true") ? " P On" : " P Off");
+        }
+
         status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
       }
     }

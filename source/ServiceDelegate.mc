@@ -38,6 +38,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
     }
 
+    (:can_glance, :bkgnd32kb)
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
 
@@ -63,8 +64,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
             battery_level = array[1];
             charging_state = array[2];
             battery_range = array[3];
-            //suffix = array[4];
-            //text = array[5];
         }
         if (battery_level == null) {
             battery_level = "N/A";
@@ -116,6 +115,116 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         data.put("status", responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix);
+        data.put("responseCode", responseCode);
+
+        Background.exit(data);
+    }
+
+    (:bkgnd64kb)
+    function onReceiveVehicleData(responseCode, responseData) {
+        // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
+
+        var data = Background.getBackgroundData();
+        if (data == null) {
+            data = {};
+		}
+        else {
+            /*DEBUG*/ logMessage("ServiceDelegate:onTemporalEvent already has background data! -> '" + data + "'");
+        }
+        /*DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
+        //DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseData = " + responseData);
+
+        var battery_level;
+        var charging_state;
+        var battery_range;
+        var inside_temp;
+        var sentry;
+        var preconditioning;
+
+        var status = Application.getApp().getProperty("status");
+        if (status != null) {
+            var array = to_array(status, "|");
+
+            //responseCode = array[0].toNumber();
+            battery_level = array[1];
+            charging_state = array[2];
+            battery_range = array[3];
+            inside_temp = array[4];
+            sentry = array[5];
+            preconditioning = array[6];
+            //suffix = array[7];
+            //text = array[8];
+        }
+        if (battery_level == null) {
+            battery_level = "N/A";
+            charging_state = "N/A";
+            battery_range = "0";
+            inside_temp = "0";
+            sentry = "N/A";
+            preconditioning = "N/A";
+        }
+
+        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
+        var suffix;
+        try {
+            var clock_time = System.getClockTime();
+            suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+        }
+        catch (e) {
+            suffix = " ";
+        }
+
+        if (responseCode == 200 && responseData != null) {
+            var pos = responseData.find("battery_level");
+            var str = responseData.substring(pos + 15, pos + 20);
+            var posEnd = str.find(",");
+            battery_level = str.substring(0, posEnd);
+
+            pos = responseData.find("battery_range");
+            str = responseData.substring(pos + 15, pos + 22);
+            posEnd = str.find(",");
+            battery_range = str.substring(0, posEnd);
+
+            pos = responseData.find("charging_state");
+            str = responseData.substring(pos + 17, pos + 37);
+            posEnd = str.find("\"");
+            charging_state = str.substring(0, posEnd);
+
+            pos = responseData.find("inside_temp");
+            str = responseData.substring(pos + 13, pos + 23);
+            posEnd = str.find(",");
+            inside_temp = str.substring(0, posEnd);
+
+            pos = responseData.find("sentry_mode");
+            str = responseData.substring(pos + 13, pos + 19);
+            posEnd = str.find(",");
+            sentry = str.substring(0, posEnd);
+
+            pos = responseData.find("preconditioning_enabled");
+            str = responseData.substring(pos + 25, pos + 31);
+            posEnd = str.find(",");
+            preconditioning = str.substring(0, posEnd);
+
+            suffix = suffix + "| ";
+        }
+        else if (responseCode == 401) {
+            var refreshToken = Application.getApp().getProperty("refreshToken");
+            if (refreshToken != null && refreshToken.length() != 0) {
+                suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_waiting_data);
+            }
+            else {
+                suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_launch_widget);
+            }
+        }
+        else if (responseCode == 408) {
+            suffix = suffix + "|";
+        }
+        else {
+            suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+        }
+
+        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
+        data.put("status", status);
         data.put("responseCode", responseCode);
 
         Background.exit(data);

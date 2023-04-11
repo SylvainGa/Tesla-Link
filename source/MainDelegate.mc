@@ -1970,15 +1970,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						var battery_level = response.get("charge_state").get("battery_level");
 						var battery_range = response.get("charge_state").get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 						var charging_state = response.get("charge_state").get("charging_state");
+						var inside_temp = response.get("climate_state").get("inside_temp");
+						var sentry = response.get("vehicle_state").get("sentry_mode");
+						var preconditioning = response.get("charge_state").get("preconditioning_enabled");
 
 						var suffix;
 						try {
 							var clock_time = System.getClockTime();
-							suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+							suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d") + "| ";
 						} catch (e) {
-							suffix = "";
+							suffix = " | ";
 						}
-						Application.getApp().setProperty("status", responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix + "| " );
+						var status;
+						if (Application.getApp().getProperty("bkgnd32kb")) {
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix;
+						}
+						else {
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
+						}						 
+						Application.getApp().setProperty("status", status);
 
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Application.getApp().getProperty("status") + "'");
 					}
