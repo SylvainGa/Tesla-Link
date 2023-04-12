@@ -15,21 +15,5 @@
 	<property id="holdActionUpperRight" type="number">0</property>
 	<property id="holdActionLowerLeft" type="number">0</property>
 	<property id="holdActionLowerRight" type="number">0</property>
-	<property id="NumberOfSlots" type="number">16</property>
-	<property id="option_slot1" type="number">0</property>
-	<property id="option_slot2" type="number">1</property>
-	<property id="option_slot3" type="number">2</property>
-	<property id="option_slot4" type="number">3</property>
-	<property id="option_slot5" type="number">4</property>
-	<property id="option_slot6" type="number">5</property>
-	<property id="option_slot7" type="number">6</property>
-	<property id="option_slot8" type="number">7</property>
-	<property id="option_slot9" type="number">8</property>
-	<property id="option_slot10" type="number">9</property>
-	<property id="option_slot11" type="number">10</property>
-	<property id="option_slot12" type="number">11</property>
-	<property id="option_slot13" type="number">12</property>
-	<property id="option_slot14" type="number">13</property>
-	<property id="option_slot15" type="number">14</property>
-	<property id="option_slot16" type="number">15</property>
+	<property id="optionMenuOrder" type="string">1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24</property>
 </properties>

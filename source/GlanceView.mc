@@ -11,6 +11,79 @@ class GlanceView extends Ui.GlanceView {
     GlanceView.initialize();
   }
 
+  (:bkgnd32kb)
+  function onUpdate(dc) {
+    // Retrieve the name of the vehicle if we have it, or the generic string otherwise
+    var vehicle_name = Application.getApp().getProperty("vehicle_name");
+    vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
+    var responseCode;
+    var battery_level;
+    var charging_state;
+    var battery_range;
+    var suffix;
+    var text;
+
+    var status = Application.getApp().getProperty("status");
+    if (status != null) {
+      var array = to_array(status, "|");
+
+      if (array.size() == 6) {
+        responseCode = array[0].toNumber();
+        battery_level = array[1];
+        charging_state = array[2];
+        battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
+        suffix = array[4];
+        text = array[5];
+        if (text != null && text.equals("")) {
+          text = null;
+        }
+      }
+
+      if (charging_state == null || battery_level.equals("N/A")) {
+        if (text != null) {
+          status = text + suffix;
+        }
+        else {
+          status = Ui.loadResource(Rez.Strings.label_waiting_data);
+        }
+      }
+      else {
+        var chargeSuffix = "";
+        if (_data._vehicle_awake == false) {
+          chargeSuffix = "s";
+        }
+        else if (responseCode != 200) {
+          chargeSuffix = "?";
+        }
+        else if (charging_state.equals("Charging")) {
+          chargeSuffix = "+";
+        }
+        status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
+      }
+    }
+    else {
+      status =  Ui.loadResource(Rez.Strings.label_waiting_data);
+    }
+
+    // Draw the two rows of text on the glance widget
+    dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+    dc.drawText(
+      0,
+      (dc.getHeight() / 8) * 2,
+      Graphics.FONT_TINY,
+      vehicle_name.toUpper(),
+      Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+    );
+
+    dc.drawText(
+      0,
+      (dc.getHeight() / 8) * 6,
+      Graphics.FONT_TINY,
+      status,
+      Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+    );
+  }
+
   (:bkgnd64kb)
   function onUpdate(dc) {
     // Retrieve the name of the vehicle if we have it, or the generic string otherwise
@@ -18,6 +91,14 @@ class GlanceView extends Ui.GlanceView {
     vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
 
     var status = Application.getApp().getProperty("status");
+    var responseCode;
+    var battery_level;
+    var charging_state;
+    var battery_range;
+    var inside_temp;
+    var sentry;
+    var preconditioning;
+    var suffix;
     var text;
     var threeLines;
 
@@ -31,26 +112,27 @@ class GlanceView extends Ui.GlanceView {
       threeLines = false;
     }
 
-    if (status != null) {
+    if (status != null && status.equals("") == false) {
       var array = to_array(status, "|");
 
-      var responseCode = array[0].toNumber();
-      var battery_level = array[1];
-      var charging_state = array[2];
-      var battery_range = array[3];
-      var inside_temp = array[4];
-			inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp.toNumber()*9/5) + 32) + "°F" : inside_temp.toNumber() + "°C";
-      var sentry = array[5];
-      var preconditioning = array[6];
-      var suffix = array[7];
-      text = array[8];
-      if (text != null && text.equals(" ")) {
-        text = null;
+      if (array.size() == 9) {
+        responseCode = array[0].toNumber();
+        battery_level = array[1];
+        charging_state = array[2];
+        battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
+        inside_temp = array[4].toNumber();
+        inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
+        sentry = array[5];
+        preconditioning = array[6];
+        suffix = array[7];
+        text = array[8];
+        if (text != null && text.equals("")) {
+          text = null;
+        }
       }
-
       if (charging_state == null || battery_level.equals("N/A")) {
         if (text != null) {
-          status = text;
+          status = text + suffix;
           text = null;
         }
         else {
@@ -69,8 +151,16 @@ class GlanceView extends Ui.GlanceView {
           chargeSuffix = "+";
         }
 
-        if (text == null && responseCode == 200 && threeLines) {
-          text = inside_temp + (sentry.equals("true") ? " S On" : " S Off") +  (preconditioning.equals("true") ? " P On" : " P Off");
+        if (text == null && threeLines) {
+          if (responseCode == 200) {
+            text = inside_temp + (sentry.equals("true") ? " S On" : " S Off") +  (preconditioning.equals("true") ? " P On" : " P Off");
+          }
+          else if (_data._vehicle_awake == false) {
+            text = Application.loadResource(Rez.Strings.label_asleep);
+          }
+          else {
+            text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+          }
         }
 
         status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
@@ -114,71 +204,5 @@ class GlanceView extends Ui.GlanceView {
         Graphics.TEXT_JUSTIFY_LEFT
       );
     }
-  }
-
-  (:bkgnd32kb)
-  function onUpdate(dc) {
-    // Retrieve the name of the vehicle if we have it, or the generic string otherwise
-    var vehicle_name = Application.getApp().getProperty("vehicle_name");
-    vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
-    var text;
-
-    var status = Application.getApp().getProperty("status");
-    if (status != null) {
-      var array = to_array(status, "|");
-
-      var responseCode = array[0].toNumber();
-      var battery_level = array[1];
-      var charging_state = array[2];
-      var battery_range = array[3];
-      var suffix = array[4];
-      text = array[5];
-      if (text != null && text.equals(" ")) {
-        text = null;
-      }
-
-      if (charging_state == null || battery_level.equals("N/A")) {
-        if (text != null) {
-          status = text;
-        }
-        else {
-          status = Ui.loadResource(Rez.Strings.label_waiting_data);
-        }
-      }
-      else {
-        var chargeSuffix = "";
-        if (_data._vehicle_awake == false) {
-          chargeSuffix = "s";
-        }
-        else if (responseCode != 200) {
-          chargeSuffix = "?";
-        }
-        else if (charging_state.equals("Charging")) {
-          chargeSuffix = "+";
-        }
-        status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
-      }
-    }
-    else {
-      status =  Ui.loadResource(Rez.Strings.label_waiting_data);
-    }
-
-    // Draw the two rows of text on the glance widget
-    dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-    dc.drawText(
-      0,
-      (dc.getHeight() / 8) * 2,
-      Graphics.FONT_TINY,
-      vehicle_name.toUpper(),
-      Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
-    );
-
-    dc.drawText(
-      0,
-      (dc.getHeight() / 8) * 6,
-      Graphics.FONT_TINY,
-      status,
-      Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
-    );
   }
 }

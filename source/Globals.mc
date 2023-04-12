@@ -15,7 +15,7 @@ function logMessage(message) {
 
 (:background)
 function to_array(string, splitter) {
-	var array = new [9]; //Use maximum expected length
+	var array = new [30]; //Use maximum expected length
 	var index = 0;
 	var location;
 
@@ -30,12 +30,10 @@ function to_array(string, splitter) {
 
 	array[index] = string;
 
-    return array;
-	
-	/*var result = new [index + 1];
+	var result = new [index + 1];
 	for (var i = 0; i <= index; i++) {
 		result[i] = array[i];
 	}
-	return result;*/
+	return result;
 }
 

@@ -1465,25 +1465,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		return true;
 	}
 
-	function addMenuItem(menu, slot)
+	function addMenuItem(menu, index)
 	{
-		var _slot_str = "option_slot" + slot;
-		var _index = Application.getApp().getProperty(_slot_str);
-		if (_index == null) {
-			return;
-		} else if (!(_index instanceof Number)) {
-			_index = _index.toNumber();
-		}
-
-		if (_index < 0) {
-			_index = 0;
-		}
-		else if (_index > 23) {
-			_index = 23;
-		}
-
-		switch (_index) {
-			case 0:
+		switch (index.toNumber()) {
+			case 1:
 		        if (_data._vehicle_data.get("climate_state").get("defrost_mode") == 2) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_defrost_off, null, :defrost, {}));
 				}
@@ -1491,10 +1476,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_defrost_on, null, :defrost, {}));
 				}
 				break;
-			case 1:
+			case 2:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_set_seat_heat, null, :set_seat_heat, {}));
 				break;
-			case 2:
+			case 3:
 		        if (_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_set_steering_wheel_heat_off, null, :set_steering_wheel_heat, {}));
 				}
@@ -1502,13 +1487,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_set_steering_wheel_heat_on, null, :set_steering_wheel_heat, {}));
 				}
 				break;
-			case 3:
+			case 4:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_set_charging_limit, null, :set_charging_limit, {}));
 				break;
-			case 4:
+			case 5:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_set_charging_amps, null, :set_charging_amps, {}));
 				break;
-			case 5:
+			case 6:
 		        if (_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging")) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_stop_charging, null, :toggle_charge, {}));
 				}
@@ -1516,10 +1501,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_start_charging, null, :toggle_charge, {}));
 				}
 				break;
-			case 6:
+			case 7:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_set_temp, null, :set_temperature, {}));
 				break;
-			case 7:
+			case 8:
 				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_stop_departure, null, :adjust_departure, {}));
 				}
@@ -1527,7 +1512,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_start_departure, null, :adjust_departure, {}));
 				}
 				break;
-			case 8:
+			case 9:
 				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_sentry_off, null, :toggle_sentry, {}));
 				}
@@ -1535,10 +1520,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_sentry_on, null, :toggle_sentry, {}));
 				}
 				break;
-			case 9:
+			case 10:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_honk, null, :honk, {}));
 				break;
-			case 10:
+			case 11:
 		        if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
@@ -1549,7 +1534,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk_opened, null, :open_frunk, {}));
 				}
 				break;
-			case 11:
+			case 12:
 		        if (_data._vehicle_data.get("vehicle_state").get("rt") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_trunk, null, :open_trunk, {}));
 				}
@@ -1557,7 +1542,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_trunk, null, :open_trunk, {}));
 				}
 				break;
-			case 12:
+			case 13:
 				// If the door is closed the only option is to open it.
 				if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == false) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_port, null, :open_port, {}));
@@ -1583,7 +1568,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 				}
 				break;
-			case 13:
+			case 14:
 				var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 				if (venting == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_vent, null, :vent, {}));
@@ -1592,35 +1577,38 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_vent, null, :vent, {}));
 				}
 				break;
-			case 14:
+			case 15:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_homelink, null, :homelink, {}));
 				break;
-			case 15:
+			case 16:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_toggle_view, null, :toggle_view, {}));
 				break;
-			case 16:
+			case 17:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_swap_frunk_for_port, null, :swap_frunk_for_port, {}));
 				break;
-			case 17:
+			case 18:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_datascreen, null, :data_screen, {}));
 				break;
-			case 18:
+			case 19:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_select_car, null, :select_car, {}));
 				break;
-			case 19:
+			case 20:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_reset, null, :reset, {}));
 				break;
-			case 20:
+			case 21:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_wake, null, :wake, {}));
 				break;
-			case 21:
+			case 22:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_refresh, null, :refresh, {}));
 				break;
-			case 22:
+			case 23:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_remote_boombox, null, :remote_boombox, {}));
 				break;
-			case 23:
+			case 24:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_climate_mode, null, :climate_mode, {}));
+				break;
+			default:
+				/*DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
 				break;
 		}
 	}
@@ -1632,24 +1620,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		var _slot_count = Application.getApp().getProperty("NumberOfSlots");
-		if (_slot_count == null) {
-			_slot_count = 16;
-		} else if (!(_slot_count instanceof Number)) {
-			_slot_count = _slot_count.toNumber();
-		}
-
-		if (_slot_count < 1) {
-			_slot_count = 1;
-		}
-		else if (_slot_count > 16) { // Maximum of 16 entries in a menu
-			_slot_count = 16;
-		}
-		
 		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});
-		
-		for (var i = 1; i <= _slot_count; i++) {
-			addMenuItem(thisMenu, i);
+		var menuItems = to_array(Application.getApp().getProperty("optionMenuOrder"), ",");
+		for (var i = 0; i < menuItems.size(); i++) {
+			addMenuItem(thisMenu, menuItems[i]);
 		}
 		
 		Ui.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
@@ -1977,9 +1951,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						var suffix;
 						try {
 							var clock_time = System.getClockTime();
-							suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d") + "| ";
+							suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d") + "|";
 						} catch (e) {
-							suffix = " | ";
+							suffix = "|";
 						}
 						var status;
 						if (Application.getApp().getProperty("bkgnd32kb")) {
@@ -1989,6 +1963,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
 						}						 
 						Application.getApp().setProperty("status", status);
+
+						_data._vehicle_awake = true;
 
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Application.getApp().getProperty("status") + "'");
 					}

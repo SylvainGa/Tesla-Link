@@ -7,14 +7,13 @@ using Toybox.WatchUi as Ui;
 
 (:background, :can_glance)
 class MyServiceDelegate extends System.ServiceDelegate {
-
     function initialize() {
         System.ServiceDelegate.initialize();
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
+    (:bkgnd32kb)
     function onTemporalEvent() {
-
         /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent");
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
@@ -34,11 +33,37 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            Background.exit({"responseCode" => 401, "status" => "0|N/A|N/A|0| |" + Application.loadResource(Rez.Strings.label_launch_widget)});
+            Background.exit({"responseCode" => 401, "status" => "0|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
         }
     }
 
-    (:can_glance, :bkgnd32kb)
+    // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
+    (:bkgnd64kb)
+    function onTemporalEvent() {
+        /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent");
+        var token = Application.getApp().getProperty("token");
+        var vehicle = Application.getApp().getProperty("vehicle");
+        if (token != null && vehicle != null) {
+            /*DEBUG*/ logMessage("ServiceDelegate : onTemporalEvent getting data");
+            Communications.makeWebRequest(
+                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                {
+                    :method => Communications.HTTP_REQUEST_METHOD_GET,
+                    :headers => {
+                        "Authorization" => "Bearer " + token,
+                        "User-Agent" => "Tesla-Link for Garmin"
+                    },
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+                },
+                method(:onReceiveVehicleData)
+            );
+        }
+        else {
+            Background.exit({"responseCode" => 401, "status" => "0|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
+        }
+    }
+
+    (:bkgnd32kb)
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
 
@@ -57,13 +82,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var battery_range;
 
         var status = Application.getApp().getProperty("status");
-        if (status != null) {
+        if (status != null && status.equals("") == false) {
             var array = to_array(status, "|");
-
-            //responseCode = array[0].toNumber();
-            battery_level = array[1];
-            charging_state = array[2];
-            battery_range = array[3];
+            if (array.size() == 4) {
+                //responseCode = array[0].toNumber();
+                battery_level = array[1];
+                charging_state = array[2];
+                battery_range = array[3];
+            }
         }
         if (battery_level == null) {
             battery_level = "N/A";
@@ -78,7 +104,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
         }
         catch (e) {
-            suffix = " ";
+            suffix = "";
         }
 
         if (responseCode == 200 && responseData != null) {
@@ -115,6 +141,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         data.put("status", responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix);
+        data.put("status", status);
         data.put("responseCode", responseCode);
 
         Background.exit(data);
@@ -142,18 +169,19 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var preconditioning;
 
         var status = Application.getApp().getProperty("status");
-        if (status != null) {
+        if (status != null && status.equals("") == false) {
             var array = to_array(status, "|");
-
-            //responseCode = array[0].toNumber();
-            battery_level = array[1];
-            charging_state = array[2];
-            battery_range = array[3];
-            inside_temp = array[4];
-            sentry = array[5];
-            preconditioning = array[6];
-            //suffix = array[7];
-            //text = array[8];
+            if (array.size() == 9) {
+                //responseCode = array[0].toNumber();
+                battery_level = array[1];
+                charging_state = array[2];
+                battery_range = array[3];
+                inside_temp = array[4];
+                sentry = array[5];
+                preconditioning = array[6];
+                //suffix = array[7];
+                //text = array[8];
+            }
         }
         if (battery_level == null) {
             battery_level = "N/A";
@@ -171,41 +199,19 @@ class MyServiceDelegate extends System.ServiceDelegate {
             suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
         }
         catch (e) {
-            suffix = " ";
+            suffix = "";
         }
 
         if (responseCode == 200 && responseData != null) {
-            var pos = responseData.find("battery_level");
-            var str = responseData.substring(pos + 15, pos + 20);
-            var posEnd = str.find(",");
-            battery_level = str.substring(0, posEnd);
+			var response = responseData.get("response");
+            battery_level = response.get("charge_state").get("battery_level");
+            battery_range = response.get("charge_state").get("battery_range");
+            charging_state = response.get("charge_state").get("charging_state");
+            inside_temp = response.get("climate_state").get("inside_temp");
+            sentry = response.get("vehicle_state").get("sentry_mode");
+            preconditioning = response.get("charge_state").get("preconditioning_enabled");
 
-            pos = responseData.find("battery_range");
-            str = responseData.substring(pos + 15, pos + 22);
-            posEnd = str.find(",");
-            battery_range = str.substring(0, posEnd);
-
-            pos = responseData.find("charging_state");
-            str = responseData.substring(pos + 17, pos + 37);
-            posEnd = str.find("\"");
-            charging_state = str.substring(0, posEnd);
-
-            pos = responseData.find("inside_temp");
-            str = responseData.substring(pos + 13, pos + 23);
-            posEnd = str.find(",");
-            inside_temp = str.substring(0, posEnd);
-
-            pos = responseData.find("sentry_mode");
-            str = responseData.substring(pos + 13, pos + 19);
-            posEnd = str.find(",");
-            sentry = str.substring(0, posEnd);
-
-            pos = responseData.find("preconditioning_enabled");
-            str = responseData.substring(pos + 25, pos + 31);
-            posEnd = str.find(",");
-            preconditioning = str.substring(0, posEnd);
-
-            suffix = suffix + "| ";
+            suffix = suffix + "|";
         }
         else if (responseCode == 401) {
             var refreshToken = Application.getApp().getProperty("refreshToken");
@@ -224,6 +230,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
+
         data.put("status", status);
         data.put("responseCode", responseCode);
 
