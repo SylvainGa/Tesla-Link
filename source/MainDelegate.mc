@@ -1942,7 +1942,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 						var battery_level = response.get("charge_state").get("battery_level");
-						var battery_range = response.get("charge_state").get("battery_range") * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
+						var battery_range = response.get("charge_state").get("battery_range");
 						var charging_state = response.get("charge_state").get("charging_state");
 						var inside_temp = response.get("climate_state").get("inside_temp");
 						var sentry = response.get("vehicle_state").get("sentry_mode");

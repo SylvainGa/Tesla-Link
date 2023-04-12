@@ -10,7 +10,7 @@ class TeslaLink extends App.AppBase {
     var _data;
 
     function initialize() {
-		/*DEBUG*/ logMessage("App: Initialising app");
+		/*DEBUG*/ logMessage("App: Initialising");
         _data = new TeslaData();
         _data._vehicle_awake = false; // Assume it's asleep. If we get a 200 later on, we'll set it awake
         
@@ -18,11 +18,11 @@ class TeslaLink extends App.AppBase {
     }
 
 	function onStart(state) {
-		/*DEBUG*/ logMessage("App: starting app");
+		/*DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		/*DEBUG*/ logMessage("App: stopping app");
+		/*DEBUG*/ logMessage("App: stopping");
 	}
 
     (:can_glance)
@@ -33,7 +33,7 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance, :bkgnd32kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting glance view");
+		/*DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView(_data) ];
@@ -41,14 +41,14 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance, :bkgnd64kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting glance view");
+		/*DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView(_data) ];
     }
 
     function getInitialView() {
-		/*DEBUG*/ logMessage("Glance: Starting main view");
+		/*DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -64,9 +64,8 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     (:can_glance)
     function onBackgroundData(data) {
-		/*DEBUG*/ logMessage("App: onBackgroundData");
         if (data != null) {
-            /*DEBUG*/ logMessage("App: onBackgroundData: " + data["status"]);
+            /*DEBUG*/ logMessage("onBackgroundData: " + data);
 
             var status = data["status"];
             if (status != null) {
@@ -74,7 +73,6 @@ class TeslaLink extends App.AppBase {
             }
 
             var responseCode = data["responseCode"];
-            /*DEBUG*/ logMessage("App: onBackgroundData responseCode is " + responseCode);
             if (responseCode != null) {
                 if (responseCode == 401) {
                     refreshAccessToken();
@@ -86,6 +84,9 @@ class TeslaLink extends App.AppBase {
                 }
             }
         }
+        else {
+    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+        }
 
         Background.registerForTemporalEvent(new Time.Duration(300));
 
@@ -94,7 +95,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd32kb)
     function testAwake(status) {
-        logMessage("ServiceDelegate:testAwake 32kb backgroundprocess");
+        logMessage("testAwake 32kb backgroundprocess called");
         _data._vehicle_awake = false;
         if (status != null) {
             Application.getApp().setProperty("status", status + Application.loadResource(Rez.Strings.label_asleep));
@@ -104,7 +105,7 @@ class TeslaLink extends App.AppBase {
 
     (:bkgnd64kb)
     function testAwake(status) {
-        logMessage("ServiceDelegate:testAwake");
+        logMessage("testAwake called");
         var token = Application.getApp().getProperty("token");
         Communications.makeWebRequest(
             "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", null,
@@ -148,6 +149,7 @@ class TeslaLink extends App.AppBase {
 				}
 
 				var vehicle_state = vehicles[vehicle_index].get("state");
+            	/*DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
 				if (vehicle_state.equals("online")) {
                     _data._vehicle_awake = true;
                     if (status != null) {
@@ -168,13 +170,13 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd32kb)
     function refreshAccessToken() {
-        logMessage("App:refreshAccessToken 32kb backgroundprocess");
+        logMessage("refreshAccessToken 32kb backgroundprocess");
     }
 
     // Do NOT call from a background process since we're setting registry data in onReceiveToken
     (:bkgnd64kb)
     function refreshAccessToken() {
-        logMessage("App:refreshAccessToken");
+        logMessage("refreshAccessToken");
         var refreshToken = Application.getApp().getProperty("refreshToken");
         if (refreshToken != null && refreshToken.length() != 0) {
             var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";

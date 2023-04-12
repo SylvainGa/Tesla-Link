@@ -14,11 +14,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     (:bkgnd32kb)
     function onTemporalEvent() {
-        /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent");
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("ServiceDelegate : onTemporalEvent getting data");
+            /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent getting data");
             Communications.makeWebRequest(
                 "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
                 {
@@ -33,6 +32,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
+            /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             Background.exit({"responseCode" => 401, "status" => "0|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
         }
     }
@@ -40,11 +40,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     (:bkgnd64kb)
     function onTemporalEvent() {
-        /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent");
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("ServiceDelegate : onTemporalEvent getting data");
+            /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent getting data");
             Communications.makeWebRequest(
                 "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
                 {
@@ -59,6 +58,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
+            /*DEBUG*/ logMessage("ServiceDelegate: onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             Background.exit({"responseCode" => 401, "status" => "0|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
         }
     }
@@ -66,17 +66,16 @@ class MyServiceDelegate extends System.ServiceDelegate {
     (:bkgnd32kb)
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
+        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
 
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
 		}
         else {
-            /*DEBUG*/ logMessage("ServiceDelegate:onTemporalEvent already has background data! -> '" + data + "'");
+            /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
         }
-        /*DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
-        //DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseData = " + responseData);
-
         var battery_level;
         var charging_state;
         var battery_range;
@@ -145,22 +144,23 @@ class MyServiceDelegate extends System.ServiceDelegate {
         data.put("status", status);
         data.put("responseCode", responseCode);
 
+        /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
         Background.exit(data);
     }
 
     (:bkgnd64kb)
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
+        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
 
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
 		}
         else {
-            /*DEBUG*/ logMessage("ServiceDelegate:onTemporalEvent already has background data! -> '" + data + "'");
+            /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
         }
-        /*DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseCode = " + responseCode);
-        //DEBUG*/ logMessage("ServiceDelegate:onReceiveVehicleData: responseData = " + responseData);
 
         var battery_level;
         var charging_state;
@@ -235,6 +235,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         data.put("status", status);
         data.put("responseCode", responseCode);
 
+        /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
         Background.exit(data);
     }
 }
