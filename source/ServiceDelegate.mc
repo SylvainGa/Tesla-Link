@@ -122,7 +122,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
             str = responseData.substring(pos + 17, pos + 37);
             posEnd = str.find("\"");
             charging_state = str.substring(0, posEnd);
-            suffix = suffix + "| ";
+
+            suffix = suffix + "|";
         }
         else if (responseCode == 401) {
             var refreshToken = Application.getApp().getProperty("refreshToken");
@@ -140,7 +141,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
         }
 
-        data.put("status", responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix);
+        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix;
         data.put("status", status);
         data.put("responseCode", responseCode);
 
