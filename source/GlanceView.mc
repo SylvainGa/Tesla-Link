@@ -24,7 +24,7 @@ class GlanceView extends Ui.GlanceView {
     var text;
 
     var status = Application.getApp().getProperty("status");
-    if (status != null) {
+    if (status != null && status.equals("") == false) {
       var array = to_array(status, "|");
 
       if (array.size() == 6) {
@@ -49,7 +49,7 @@ class GlanceView extends Ui.GlanceView {
       }
       else {
         var chargeSuffix = "";
-        if (_data._vehicle_awake == false) {
+        if (responseCode == 408) {
           chargeSuffix = "s";
         }
         else if (responseCode != 200) {
@@ -62,7 +62,9 @@ class GlanceView extends Ui.GlanceView {
       }
     }
     else {
-      status =  Ui.loadResource(Rez.Strings.label_waiting_data);
+      var token = Application.getApp().getProperty("token");
+      var vehicle = Application.getApp().getProperty("vehicle");
+      status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
     // Draw the two rows of text on the glance widget
@@ -90,7 +92,6 @@ class GlanceView extends Ui.GlanceView {
     var vehicle_name = Application.getApp().getProperty("vehicle_name");
     vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
 
-    var status = Application.getApp().getProperty("status");
     var responseCode;
     var battery_level;
     var charging_state;
@@ -112,6 +113,7 @@ class GlanceView extends Ui.GlanceView {
       threeLines = false;
     }
 
+    var status = Application.getApp().getProperty("status");
     if (status != null && status.equals("") == false) {
       var array = to_array(status, "|");
 
@@ -167,11 +169,13 @@ class GlanceView extends Ui.GlanceView {
       }
     }
     else {
-      status =  Ui.loadResource(Rez.Strings.label_waiting_data);
+      var token = Application.getApp().getProperty("token");
+      var vehicle = Application.getApp().getProperty("vehicle");
+      status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
     if (threeLines == false) {
-      text = null;
+      text = null;  
     }
 
     // Draw the two rows of text on the glance widget
