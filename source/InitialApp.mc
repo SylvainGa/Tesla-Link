@@ -8,9 +8,10 @@ using Toybox.WatchUi as Ui;
 (:background)
 class TeslaLink extends App.AppBase {
     var _data;
+    var _serviceDelegate;
 
     function initialize() {
-		//DEBUG*/ logMessage("App: Initialising");
+		/*DEBUG*/ logMessage("App: Initialising");
         _data = new TeslaData();
         _data._vehicle_awake = false; // Assume it's asleep. If we get a 200 later on, we'll set it awake
         
@@ -18,24 +19,24 @@ class TeslaLink extends App.AppBase {
     }
 
 	function onStart(state) {
-		//DEBUG*/ logMessage("App: starting");
+		/*DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		//DEBUG*/ logMessage("App: stopping");
+		/*DEBUG*/ logMessage("App: stopping");
 	}
 
     (:can_glance)
     function getServiceDelegate(){
-		//DEBUG*/ logMessage("App: getServiceDelegate");
-        return [ new MyServiceDelegate() ];
+		/*DEBUG*/ logMessage("App: getServiceDelegate");
+        _serviceDelegate = new MyServiceDelegate();
+        return [ _serviceDelegate ];
     }
 
     (:glance, :can_glance, :bkgnd32kb)
     function getGlanceView() {
-		//DEBUG*/ logMessage("Glance: Starting");
+		/*DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
-        Application.getApp().setProperty("Glance", true); // Flag we're in Glance view so our background process can do its thing
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView(_data) ];
     }
@@ -44,13 +45,12 @@ class TeslaLink extends App.AppBase {
     function getGlanceView() {
 		/*DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
-        Application.getApp().setProperty("Glance", true); // Flag we're in Glance view so our background process can do its thing
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView(_data) ];
     }
 
     function getInitialView() {
-		//DEBUG*/ logMessage("MainView: Starting");
+		/*DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -58,8 +58,6 @@ class TeslaLink extends App.AppBase {
         }
 
 		//Application.getApp().setProperty("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
-        Application.getApp().setProperty("Glance", false); // Flag we're NOT in Glance view so our background process doesn't call getVehicleData
-
         var view = new MainView(_data);
 		return [ view, new MainDelegate(view, _data, view.method(:onReceive)) ];
     }
@@ -222,6 +220,11 @@ class TeslaLink extends App.AppBase {
             Application.getApp().setProperty("refreshToken", refreshToken);
             Application.getApp().setProperty("TokenExpiresIn", expires_in);
             Application.getApp().setProperty("TokenCreatedAt", created_at);
+
+            if (_serviceDelegate == null) {
+                _serviceDelegate = new MyServiceDelegate();
+            }
+            _serviceDelegate.GetVehicleData();
         }
     }
 }

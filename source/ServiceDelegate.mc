@@ -5,6 +5,11 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
 
+enum /* WEB REQUEST CONTEXT */ {
+	CONTEXT_BACKGROUND = 0,
+	CONTEXT_APP = 1
+}
+
 (:background, :can_glance)
 class MyServiceDelegate extends System.ServiceDelegate {
     function initialize() {
@@ -14,13 +19,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     (:bkgnd32kb)
     function onTemporalEvent() {
-        var glance = Application.getApp().getProperty("Glance");
-        if (glance != null && glance == false) {
-            //DEBUG*/ logMessage("onTemporalEvent bypassing because Glance is " + glance);
-            Background.exit(null);
-            return;
-        } 
-
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
         if (token != null && vehicle != null) {
@@ -47,13 +45,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     (:bkgnd64kb)
     function onTemporalEvent() {
-        var glance = Application.getApp().getProperty("Glance");
-        if (glance != null && glance == false) {
-            /*DEBUG*/ logMessage("onTemporalEvent bypassing because Glance is " + glance);
-            Background.exit(null);
-            return;
-        } 
-
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
         if (token != null && vehicle != null) {
@@ -66,7 +57,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
                         "Authorization" => "Bearer " + token,
                         "User-Agent" => "Tesla-Link for Garmin"
                     },
-                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
+                    :context => CONTEXT_BACKGROUND
                 },
                 method(:onReceiveVehicleData)
             );
@@ -156,17 +148,24 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
     (:bkgnd64kb)
-    function onReceiveVehicleData(responseCode, responseData) {
+    function onReceiveVehicleData(responseCode, responseData, context) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
         /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
 
-        var data = Background.getBackgroundData();
-        if (data == null) {
-            data = {};
-		}
+        var data;
+        if (context == CONTEXT_BACKGROUND) {
+            /*DEBUG*/ logMessage("onReceiveVehicleData called from Background");
+            data = Background.getBackgroundData();
+            if (data == null) {
+                data = {};
+            }
+            else {
+                /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
+            }
+        }
         else {
-            /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
+            /*DEBUG*/ logMessage("onReceiveVehicleData called from App");
         }
 
         var battery_level;
@@ -239,10 +238,39 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
 
-        data.put("status", status);
-        data.put("responseCode", responseCode);
+        if (context == CONTEXT_BACKGROUND) {
+            data.put("status", status);
+            data.put("responseCode", responseCode);
 
-        /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
-        Background.exit(data);
+            /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
+            Background.exit(data);
+        }
+        else {
+            /*DEBUG*/ logMessage("onReceiveVehicleData exiting with status=" + status);
+            Application.getApp().setProperty("status", status);
+            Ui.requestUpdate();
+        }
+    }
+
+    (:bkgnd64kb)
+    function GetVehicleData() {
+        var token = Application.getApp().getProperty("token");
+        var vehicle = Application.getApp().getProperty("vehicle");
+        if (token != null && vehicle != null) {
+            /*DEBUG*/ logMessage("GetVehicleData getting data");
+            Communications.makeWebRequest(
+                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                {
+                    :method => Communications.HTTP_REQUEST_METHOD_GET,
+                    :headers => {
+                        "Authorization" => "Bearer " + token,
+                        "User-Agent" => "Tesla-Link for Garmin"
+                    },
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
+                    :context => CONTEXT_APP
+                },
+                method(:onReceiveVehicleData)
+            );
+        }
     }
 }
