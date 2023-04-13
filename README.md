@@ -44,12 +44,13 @@ If you want to have the widget translated to your language, contact me through e
 ## Changelog since forking from srwalter:
 
 V7.11.0 Added the following
-- Glance mode always shows the latest charge and range, even when asleep
-- Awoken vehicle will show inside temperature, sentry (S) or preconditioning (P) in glance view if Glance have three lines to display
-- While in glance, once the access token expires, it will try to get a new one if the refresh token is valid
-- Glance mode will display if an error other than 408 (vehicle unavailable - Asleep) or 401 (access denied - Need new access token) is received instead of data
+- Added new devices D2 Delta, D2 Delta PX, D2 Delta S, MARQ (Gen 2) Adventure, Athlete, Aviator, Captain and Golfer.
+- Glance mode always shows the latest charge and range, even when asleep.
+- Awoken vehicle will show inside temperature, sentry (S) or preconditioning (P) in Glance view if Glance has three lines of display.
+- While in Glance, once the access token expires, devices with 64KB of background memory it will try to get a new one if the refresh token is valid.
+- Glance mode will display if an error other than 408 (vehicle unavailable - Asleep) or 401 (access denied - Need new access token) is received instead of data on devices with three lines of display.
 - Brought back the version info to the Parameters screen using a different method that always shows the current version and not just the version when first installed.
-- Unfortunately dropped the number of slots from 24 to 16 because not enough memory is left on background processes for watch with just 32 KB of background space.
+- Changed the way the Menu options are selected and ordered. It's no longer 24 lists with 24 commands each, but a single comma separated value type field which by default has 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24 in it. See the operating guide for a description of each. There are two main reasons for the change. First is the 24 lists took too much memory, which impacted functionality in Glance mode with watch with just 32 KB of background memory. Second is whenever an update to the app is made and the parameters are reset, you simply need to copy/paste the values back in the field to restore to your liking instead of manually reselecting every list.
 
 V7.10.2 Fixed the following
 - Vehicle wouldn't go to sleep in Glance mode.
