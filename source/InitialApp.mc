@@ -7,50 +7,43 @@ using Toybox.WatchUi as Ui;
 
 (:background)
 class TeslaLink extends App.AppBase {
-    var _data;
-    var _serviceDelegate;
-
     function initialize() {
-		/*DEBUG*/ logMessage("App: Initialising");
-        _data = new TeslaData();
-        _data._vehicle_awake = false; // Assume it's asleep. If we get a 200 later on, we'll set it awake
-        
+		//DEBUG*/ logMessage("App: Initialising");
         AppBase.initialize();
     }
 
 	function onStart(state) {
-		/*DEBUG*/ logMessage("App: starting");
+		//DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		/*DEBUG*/ logMessage("App: stopping");
+		//DEBUG*/ logMessage("App: stopping");
 	}
 
     (:can_glance)
     function getServiceDelegate(){
-		/*DEBUG*/ logMessage("App: getServiceDelegate");
-        _serviceDelegate = new MyServiceDelegate();
-        return [ _serviceDelegate ];
+		//DEBUG*/ logMessage("App: getServiceDelegate");
+        return [ new MyServiceDelegate() ];
     }
 
     (:glance, :can_glance, :bkgnd32kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
-        return [ new GlanceView(_data) ];
+        return [ new GlanceView() ];
     }
 
     (:glance, :can_glance, :bkgnd64kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Application.getApp().setProperty("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
-        return [ new GlanceView(_data) ];
+        return [ new GlanceView() ];
     }
 
     function getInitialView() {
-		/*DEBUG*/ logMessage("MainView: Starting");
+		//DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -58,8 +51,9 @@ class TeslaLink extends App.AppBase {
         }
 
 		//Application.getApp().setProperty("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
-        var view = new MainView(_data);
-		return [ view, new MainDelegate(view, _data, view.method(:onReceive)) ];
+        var data = new TeslaData();
+        var view = new MainView(data);
+		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
     }
 
     // This fires when the background service returns
@@ -85,146 +79,93 @@ class TeslaLink extends App.AppBase {
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
         if (data != null) {
-            /*DEBUG*/ logMessage("onBackgroundData: " + data);
+            //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
-            var status = data["status"];
-            if (status != null) {
-                Application.getApp().setProperty("status", status);
+            // Refresh our tokens
+            var token = data["token"];
+            if (token != null) {
+                Application.getApp().setProperty("token", token);
             }
 
+            token = data["refreshToken"];
+            if (token != null) {
+                Application.getApp().setProperty("refreshToken", token);
+            }
+
+            token = data["TokenExpiresIn"];
+            if (token != null) {
+                Application.getApp().setProperty("TokenExpiresIn", token);
+            }
+
+            token = data["TokenCreatedAt"];
+            if (token != null) {
+                Application.getApp().setProperty("TokenCreatedAt", token);
+            }
+
+            // Fetch was passed to us to process/display
             var responseCode = data["responseCode"];
-            if (responseCode != null) {
-                if (responseCode == 401) {
-                    refreshAccessToken();
+            var timestamp = data["timestamp"];
+            var text;
+
+            // If we have a status field, we got good data at least once since last time we ran so use that to display, otherwise grab the old status and break it down so we can rebuild it
+            var numFields = 8;
+            var status = data["status"];
+            if (status == null) {
+                // No status field in our buffer, built one from our last time we got data. Unless we were down while the vehicle was being used, this data should still be somewhat accurate
+                status = Application.getApp().getProperty("status");
+                numFields = 9;
+                //DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
+            }
+            // Disect our status line into its elements
+            if (status != null && status.equals("") == false) {
+                var array = to_array(status, "|");
+                if (array.size() == numFields) {
+                    //responseCode = array[0].toNumber();
+                    var battery_level = array[1];
+                    var charging_state = array[2];
+                    var battery_range = array[3];
+                    var inside_temp = array[4];
+                    var sentry = array[5];
+                    var preconditioning = array[6];
+                    // These two are not kept so we ignore them
+                    // var timestamp = array[7];
+                    // var label = array[8];
+
+                    status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|";
                 }
-                else if (responseCode == 408) {
-                    testAwake(status);
-                } else if (responseCode == 200) {
-                    _data._vehicle_awake = true;
+                else { // Wrong format, start fresh
+                    status = responseCode + "|N/A|N/A|0|0|N/A|N/A|";
                 }
             }
+
+            if (responseCode == 200) { // Our last vehicle data query was successful, display our status 'as is'
+                text = "";
+            }
+            else if (responseCode == 401) { // We tried but couldn't get or vehicle data because of our token, tell the Glance view to ask the user to launch the widget
+                text = Application.loadResource(Rez.Strings.label_launch_widget);
+            }
+            else if (responseCode == 408) { // We got a vehicle not available, see what the vehicle list returned
+                var vehicleAwake = data["vehicleAwake"];
+                if (vehicleAwake != null && vehicleAwake.equals("asleep") == true) { // We're asleep, say so plus timestap (if any)
+                    text = Application.loadResource(Rez.Strings.label_asleep);
+                }
+                else { // We got a 408 error while not asleep, show the error and timestap (if any)
+                    text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+                }
+            }
+            else {
+                text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+            }
+
+            status = status + (timestamp != null ? timestamp : "") + "|" + text;
+            Application.getApp().setProperty("status", status);
         }
         else {
-    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         Background.registerForTemporalEvent(new Time.Duration(300));
 
         Ui.requestUpdate();
-    }  
-
-    (:bkgnd64kb)
-    function testAwake(status) {
-        logMessage("testAwake called");
-        var token = Application.getApp().getProperty("token");
-        Communications.makeWebRequest(
-            "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", null,
-            {
-                :method => Communications.HTTP_REQUEST_METHOD_GET,
-                :headers => {
-                   "Authorization" => "Bearer " + token,
-				   "User-Agent" => "Tesla-Link for Garmin"
-                },
-                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
-            },
-            method(:onReceiveVehicles)
-        );
-    }
-
-    (:bkgnd64kb)
-	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
-		//logMessage("onReceiveVehicles: data is " + data);
-
-        var status = Application.getApp().getProperty("status");
-
-		if (responseCode == 200) {
-			var vehicles = data.get("response");
-			var size = vehicles.size();
-			if (size > 0) {
-				// Need to retrieve the right vehicle, not just the first one!
-				var vehicle_index = 0;
-				var vehicle_name = Application.getApp().getProperty("vehicle_name");
-				if (vehicle_name != null) {
-					while (vehicle_index < size) {
-					if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
-							break;
-						}
-						vehicle_index++;
-					}
-
-					if (vehicle_index == size) {
-						vehicle_index = 0;
-					}
-				}
-
-				var vehicle_state = vehicles[vehicle_index].get("state");
-            	/*DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
-				if (vehicle_state.equals("online")) {
-                    _data._vehicle_awake = true;
-                    if (status != null) {
-                        Application.getApp().setProperty("status", status);
-                        Ui.requestUpdate();
-                        return;
-                    }
-				}
-			}
-		}
-
-        _data._vehicle_awake = false;
-        if (status != null) {
-            Application.getApp().setProperty("status", status + Application.loadResource(Rez.Strings.label_asleep));
-            Ui.requestUpdate();
-        }
-    }
-
-    // Do NOT call from a background process since we're setting registry data in onReceiveToken
-    (:bkgnd64kb)
-    function refreshAccessToken() {
-        logMessage("refreshAccessToken called");
-        var refreshToken = Application.getApp().getProperty("refreshToken");
-        if (refreshToken != null && refreshToken.length() != 0) {
-            var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
-            Communications.makeWebRequest(
-                url,
-                {
-                    "grant_type" => "refresh_token",
-                    "client_id" => "ownerapi",
-                    "refresh_token" => refreshToken,
-                    "scope" => "openid email offline_access"
-                },
-                {
-                    :method => Communications.HTTP_REQUEST_METHOD_POST,
-                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
-                },
-                method(:onReceiveToken)
-            );
-        }
-    }
-
-    // Do NOT call from a background process since we're setting registry data here
-    (:bkgnd64kb)
-    function onReceiveToken(responseCode, data) {
-        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
-
-        if (responseCode == 200) {
-            var accessToken = data["access_token"];
-            var refreshToken = data["refresh_token"];
-            var expires_in = data["expires_in"];
-            //var state = data["state"];
-            var created_at = Time.now().value();
-
-            //logMessage("onReceiveToken: state field is '" + state + "'");
-
-            Application.getApp().setProperty("token", accessToken);
-            Application.getApp().setProperty("refreshToken", refreshToken);
-            Application.getApp().setProperty("TokenExpiresIn", expires_in);
-            Application.getApp().setProperty("TokenCreatedAt", created_at);
-
-            if (_serviceDelegate == null) {
-                _serviceDelegate = new MyServiceDelegate();
-            }
-            _serviceDelegate.GetVehicleData();
-        }
     }
 }

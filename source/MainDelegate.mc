@@ -1608,7 +1608,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_climate_mode, null, :climate_mode, {}));
 				break;
 			default:
-				/*DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
+				//DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
 				break;
 		}
 	}
@@ -1948,23 +1948,21 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						var sentry = response.get("vehicle_state").get("sentry_mode");
 						var preconditioning = response.get("charge_state").get("preconditioning_enabled");
 
-						var suffix;
+						var timestamp;
 						try {
 							var clock_time = System.getClockTime();
-							suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d") + "|";
+							timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d") + "|";
 						} catch (e) {
-							suffix = "|";
+							timestamp = "|";
 						}
 						var status;
 						if (Application.getApp().getProperty("bkgnd32kb")) {
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix;
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
 						}
 						else {
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + timestamp;
 						}						 
 						Application.getApp().setProperty("status", status);
-
-						_data._vehicle_awake = true;
 
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Application.getApp().getProperty("status") + "'");
 					}
@@ -2012,17 +2010,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
-				if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
-					/*var suffix;
+				// Comemnted out. Don't mess with the glance data if we get a 408 here. Chances are we're not asleep but can't talk to the vehicle for some reason
+				/*if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
+					var timestamp;
 					try {
 						var clock_time = System.getClockTime();
-						suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+						timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
 					} catch (e) {
-						suffix = "";
-					}*/
-					// Don't mess with the glance data if we get a 408 here. Chances are we're not asleep but can't talk to the vehicle for some reason
-					//Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + suffix);
-				}
+						timestamp = "";
+					}
+					Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + timestamp);
+				}*/
 
 				var i = _408_count + 1;
 				//DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);

@@ -6,18 +6,17 @@ using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
 
 enum /* WEB REQUEST CONTEXT */ {
-	CONTEXT_BACKGROUND = 0,
-	CONTEXT_APP = 1
+	CONTEXT_TEMPORAL_EVENT = 0,
+	CONTEXT_TOKEN_REFRESH = 1
 }
 
-(:background, :can_glance)
+(:background, :can_glance, :bkgnd32kb)
 class MyServiceDelegate extends System.ServiceDelegate {
     function initialize() {
         System.ServiceDelegate.initialize();
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
-    (:bkgnd32kb)
     function onTemporalEvent() {
         var token = Application.getApp().getProperty("token");
         var vehicle = Application.getApp().getProperty("vehicle");
@@ -42,34 +41,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
     }
 
-    // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
-    (:bkgnd64kb)
-    function onTemporalEvent() {
-        var token = Application.getApp().getProperty("token");
-        var vehicle = Application.getApp().getProperty("vehicle");
-        if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("onTemporalEvent getting data");
-            Communications.makeWebRequest(
-                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
-                {
-                    :method => Communications.HTTP_REQUEST_METHOD_GET,
-                    :headers => {
-                        "Authorization" => "Bearer " + token,
-                        "User-Agent" => "Tesla-Link for Garmin"
-                    },
-                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
-                    :context => CONTEXT_BACKGROUND
-                },
-                method(:onReceiveVehicleData)
-            );
-        }
-        else {
-            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
-            Background.exit({"responseCode" => 401, "status" => "401|N/A|N/A|0|0|N/A|N/A||" + Application.loadResource(Rez.Strings.label_launch_widget)});
-        }
-    }
-
-    (:bkgnd32kb)
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
         //DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
@@ -82,6 +53,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         else {
             //DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
         }
+
         var battery_level;
         var charging_state;
         var battery_range;
@@ -103,13 +75,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
-        var suffix;
+        var timestamp;
         try {
             var clock_time = System.getClockTime();
-            suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+            timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
         }
         catch (e) {
-            suffix = "";
+            timestamp = "";
         }
 
         if (responseCode == 200 && responseData != null) {
@@ -128,136 +100,53 @@ class MyServiceDelegate extends System.ServiceDelegate {
             posEnd = str.find("\"");
             charging_state = str.substring(0, posEnd);
 
-            suffix = suffix + "|";
+            timestamp = timestamp + "|";
         }
         else if (responseCode == 401) {
-            suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_launch_widget);
+            timestamp = timestamp + "|" + Application.loadResource(Rez.Strings.label_launch_widget);
         }
         else if (responseCode == 408) {
-            suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_asleep);
+            timestamp = timestamp + "|" + Application.loadResource(Rez.Strings.label_asleep);
         }
         else {
-            suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+            timestamp = timestamp + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
         }
 
-        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + suffix;
+        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
         data.put("status", status);
 
         //DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
         Background.exit(data);
     }
+}
 
-    (:bkgnd64kb)
-    function onReceiveVehicleData(responseCode, responseData, context) {
-        // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
-        //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
+(:background, :can_glance, :bkgnd64kb)
+class MyServiceDelegate extends System.ServiceDelegate {
+    var _data;
 
-        var data;
-        if (context == CONTEXT_BACKGROUND) {
-            /*DEBUG*/ logMessage("onReceiveVehicleData called from Background");
-            data = Background.getBackgroundData();
-            if (data == null) {
-                data = {};
-            }
-            else {
-                /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
-            }
+    function initialize() {
+        _data = Background.getBackgroundData();
+        if (_data == null) {
+            /*DEBUG*/ logMessage("ServiceDelegate Initialisation fetching tokens from properties");
+            _data = {};
+            _data.put("token", Application.getApp().getProperty("token"));
+            _data.put("refreshToken", Application.getApp().getProperty("refreshToken"));
+            _data.put("TokenExpiresIn", Application.getApp().getProperty("TokenExpiresIn"));
+            _data.put("TokenCreatedAt", Application.getApp().getProperty("TokenCreatedAt"));
         }
         else {
-            /*DEBUG*/ logMessage("onReceiveVehicleData called from App");
+            /*DEBUG*/ logMessage("ServiceDelegate Initialisation with tokens already");
         }
 
-        var battery_level;
-        var charging_state;
-        var battery_range;
-        var inside_temp;
-        var sentry;
-        var preconditioning;
-
-        var status = Application.getApp().getProperty("status");
-        if (status != null && status.equals("") == false) {
-            var array = to_array(status, "|");
-            if (array.size() == 9) {
-                //responseCode = array[0].toNumber();
-                battery_level = array[1];
-                charging_state = array[2];
-                battery_range = array[3];
-                inside_temp = array[4];
-                sentry = array[5];
-                preconditioning = array[6];
-                //suffix = array[7];
-                //text = array[8];
-            }
-        }
-        if (battery_level == null) {
-            battery_level = "N/A";
-            charging_state = "N/A";
-            battery_range = "0";
-            inside_temp = "0";
-            sentry = "N/A";
-            preconditioning = "N/A";
-        }
-
-        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
-        var suffix;
-        try {
-            var clock_time = System.getClockTime();
-            suffix = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
-        }
-        catch (e) {
-            suffix = "";
-        }
-
-        if (responseCode == 200 && responseData != null) {
-			var response = responseData.get("response");
-            battery_level = response.get("charge_state").get("battery_level");
-            battery_range = response.get("charge_state").get("battery_range");
-            charging_state = response.get("charge_state").get("charging_state");
-            inside_temp = response.get("climate_state").get("inside_temp");
-            sentry = response.get("vehicle_state").get("sentry_mode");
-            preconditioning = response.get("charge_state").get("preconditioning_enabled");
-
-            suffix = suffix + "|";
-        }
-        else if (responseCode == 401) {
-            var refreshToken = Application.getApp().getProperty("refreshToken");
-            if (refreshToken != null && refreshToken.length() != 0) {
-                suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_waiting_data);
-            }
-            else {
-                suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_launch_widget);
-            }
-        }
-        else if (responseCode == 408) {
-            suffix = suffix + "|";
-        }
-        else {
-            suffix = suffix + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
-        }
-
-        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + suffix;
-
-        if (context == CONTEXT_BACKGROUND) {
-            data.put("status", status);
-            data.put("responseCode", responseCode);
-
-            /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
-            Background.exit(data);
-        }
-        else {
-            /*DEBUG*/ logMessage("onReceiveVehicleData exiting with status=" + status);
-            Application.getApp().setProperty("status", status);
-            Ui.requestUpdate();
-        }
+        System.ServiceDelegate.initialize();
     }
 
-    (:bkgnd64kb)
-    function GetVehicleData() {
-        var token = Application.getApp().getProperty("token");
+    // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
+    function onTemporalEvent() {
+        var token = _data.get("token");
         var vehicle = Application.getApp().getProperty("vehicle");
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("GetVehicleData getting data");
+            /*DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
                 "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
                 {
@@ -267,10 +156,202 @@ class MyServiceDelegate extends System.ServiceDelegate {
                         "User-Agent" => "Tesla-Link for Garmin"
                     },
                     :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
-                    :context => CONTEXT_APP
+                    :context => CONTEXT_TEMPORAL_EVENT
                 },
                 method(:onReceiveVehicleData)
             );
+        }
+        else {
+            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            _data.put("responseCode", 401);
+            Background.exit(_data);
+        }
+    }
+
+    function onReceiveVehicleData(responseCode, responseData, context) {
+        // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
+        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode + ", context is " + context);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
+
+        var timestamp;
+        try {
+            var clock_time = System.getClockTime();
+            timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+        }
+        catch (e) {
+            timestamp = "";
+        }
+        _data.put("timestamp", timestamp);
+
+        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
+        if (responseCode == 200 && responseData != null) {
+            var battery_level;
+            var charging_state;
+            var battery_range;
+            var inside_temp;
+            var sentry;
+            var preconditioning;
+
+			var response = responseData.get("response");
+            battery_level = response.get("charge_state").get("battery_level");
+            battery_range = response.get("charge_state").get("battery_range");
+            charging_state = response.get("charge_state").get("charging_state");
+            inside_temp = response.get("climate_state").get("inside_temp");
+            sentry = response.get("vehicle_state").get("sentry_mode");
+            preconditioning = response.get("charge_state").get("preconditioning_enabled");
+
+            var status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|";
+
+            _data.put("status", status);
+            _data.put("responseCode", responseCode);
+
+            /*DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+            Background.exit(_data);
+            return;
+        }
+        else if (responseCode == 401) {
+            if (context == CONTEXT_TEMPORAL_EVENT) {
+                refreshAccessToken();
+                return;
+            }
+        }
+        else if (responseCode == 408) {
+            testAwake();
+            return;
+        }
+
+        _data.put("responseCode", responseCode);
+
+        /*DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+        Background.exit(_data);
+    }
+
+    function testAwake() {
+        logMessage("testAwake called");
+        var token = _data.get("token");
+
+        Communications.makeWebRequest(
+            "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", null,
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_GET,
+                :headers => {
+                   "Authorization" => "Bearer " + token,
+				   "User-Agent" => "Tesla-Link for Garmin"
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            method(:onReceiveVehicles)
+        );
+    }
+
+	function onReceiveVehicles(responseCode, data) {
+		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
+		//logMessage("onReceiveVehicles: data is " + data);
+
+		if (responseCode == 200) {
+			var vehicles = data.get("response");
+			var size = vehicles.size();
+			if (size > 0) {
+				// Need to retrieve the right vehicle, not just the first one!
+				var vehicle_index = 0;
+				var vehicle_name = Application.getApp().getProperty("vehicle_name");
+				if (vehicle_name != null) {
+					while (vehicle_index < size) {
+                        if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
+                            break;
+                        }
+                        vehicle_index++;
+                    }
+                }
+
+                if (vehicle_index == size) {
+                    /*DEBUG*/ logMessage("onReceiveVehicles: Not found");
+                    _data.put("vehicleAwake", "Not found");
+                }
+                else {
+                    var vehicle_state = vehicles[vehicle_index].get("state");
+                    /*DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
+                    _data.put("vehicleAwake", vehicle_state);
+				}
+			}
+            else {
+                _data.put("vehicleAwake", "No vehicle");
+            }
+        }
+        else {
+            _data.put("vehicleAwake", "error");
+        }
+
+        _data.put("responseCode", 408);
+        /*DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
+        Background.exit(_data);
+    }
+
+    // Do NOT call from a background process since we're setting registry data in onReceiveToken
+    function refreshAccessToken() {
+        logMessage("refreshAccessToken called");
+        var refreshToken = _data.get("refreshToken");
+        if (refreshToken != null && refreshToken.length() != 0) {
+            var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
+            Communications.makeWebRequest(
+                url,
+                {
+                    "grant_type" => "refresh_token",
+                    "client_id" => "ownerapi",
+                    "refresh_token" => refreshToken,
+                    "scope" => "openid email offline_access"
+                },
+                {
+                    :method => Communications.HTTP_REQUEST_METHOD_POST,
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+                },
+                method(:onReceiveToken)
+            );
+            return;
+        }
+
+        _data.put("responseCode", 401);
+        /*DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
+        Background.exit(_data);
+    }
+
+    // Do NOT call from a background process since we're setting registry data here
+    function onReceiveToken(responseCode, data) {
+        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+
+        if (responseCode == 200) {
+            var token = data["access_token"];
+            var refreshToken = data["refresh_token"];
+            var expires_in = data["expires_in"];
+            //var state = data["state"];
+            var created_at = Time.now().value();
+
+            //logMessage("onReceiveToken: state field is '" + state + "'");
+
+            _data.put("token", token);
+            _data.put("refreshToken", refreshToken);
+            _data.put("TokenExpiresIn", expires_in);
+            _data.put("TokenCreatedAt", created_at);
+
+            /*DEBUG*/ logMessage("onReceiveToken getting data");
+            Communications.makeWebRequest(
+                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                {
+                    :method => Communications.HTTP_REQUEST_METHOD_GET,
+                    :headers => {
+                        "Authorization" => "Bearer " + token,
+                        "User-Agent" => "Tesla-Link for Garmin"
+                    },
+                    :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
+                    :context => CONTEXT_TOKEN_REFRESH
+                },
+                method(:onReceiveVehicleData)
+            );
+        }
+        else {
+            _data.put("responseCode", 401);
+            /*DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
+            Background.exit(_data);
         }
     }
 }

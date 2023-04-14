@@ -3,11 +3,7 @@ using Toybox.Graphics as Gfx;
 
 (:glance, :can_glance)
 class GlanceView extends Ui.GlanceView {
-  var _data;
-
-  function initialize(data) {
-    _data = data;
-
+  function initialize() {
     GlanceView.initialize();
   }
 
@@ -20,7 +16,7 @@ class GlanceView extends Ui.GlanceView {
     var battery_level;
     var charging_state;
     var battery_range;
-    var suffix;
+    var timestamp;
     var text;
 
     var status = Application.getApp().getProperty("status");
@@ -32,19 +28,19 @@ class GlanceView extends Ui.GlanceView {
         battery_level = array[1];
         charging_state = array[2];
         battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
-        suffix = array[4];
+        timestamp = array[4];
         text = array[5];
         if (text != null && text.equals("")) {
           text = null;
         }
       }
 
-      if (charging_state == null || battery_level.equals("N/A")) {
+      if (battery_level == null || battery_level.equals("N/A")) {
         if (text != null) {
-          status = text + suffix;
+          status = text + timestamp;
         }
         else {
-          status = Ui.loadResource(Rez.Strings.label_waiting_data);
+          status = Ui.loadResource(Rez.Strings.label_launch_widget);
         }
       }
       else {
@@ -58,13 +54,11 @@ class GlanceView extends Ui.GlanceView {
         else if (charging_state.equals("Charging")) {
           chargeSuffix = "+";
         }
-        status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
+        status = battery_level + "%" + chargeSuffix + " / " + battery_range + timestamp;
       }
     }
     else {
-      var token = Application.getApp().getProperty("token");
-      var vehicle = Application.getApp().getProperty("vehicle");
-      status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
+        status = Ui.loadResource(Rez.Strings.label_launch_widget);
     }
 
     // Draw the two rows of text on the glance widget
@@ -99,7 +93,7 @@ class GlanceView extends Ui.GlanceView {
     var inside_temp;
     var sentry;
     var preconditioning;
-    var suffix;
+    var timestamp;
     var text;
     var threeLines;
 
@@ -126,46 +120,52 @@ class GlanceView extends Ui.GlanceView {
         inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
         sentry = array[5];
         preconditioning = array[6];
-        suffix = array[7];
+        timestamp = array[7];
         text = array[8];
         if (text != null && text.equals("")) {
           text = null;
         }
       }
-      if (charging_state == null || battery_level.equals("N/A")) {
+
+      if (battery_level == null || battery_level.equals("N/A")) {
         if (text != null) {
-          status = text + suffix;
+          status = text + timestamp;
           text = null;
         }
         else {
-          status = Ui.loadResource(Rez.Strings.label_waiting_data);
+          var token = Application.getApp().getProperty("token");
+          var vehicle = Application.getApp().getProperty("vehicle");
+          status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
         }
       }
       else {
+        var vehicleAsleep = (text != null && text.equals(Application.loadResource(Rez.Strings.label_asleep)));
         var chargeSuffix = "";
-        if (_data._vehicle_awake == false && threeLines == false) {
-          chargeSuffix = "s";
-        }
-        else if (responseCode != 200 && threeLines == false) {
-          chargeSuffix = "?";
-        }
-        else if (charging_state.equals("Charging")) {
-          chargeSuffix = "+";
-        }
 
-        if (text == null && threeLines) {
+        if (threeLines) {
           if (responseCode == 200) {
             text = inside_temp + (sentry.equals("true") ? " S On" : " S Off") +  (preconditioning.equals("true") ? " P On" : " P Off");
           }
-          else if (_data._vehicle_awake == false) {
-            text = Application.loadResource(Rez.Strings.label_asleep);
+          else if (vehicleAsleep) {
+            text = Application.loadResource(Rez.Strings.label_asleep) + (preconditioning.equals("true") ? " P On" : " P Off");
           }
-          else {
-            text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+        }
+        else {
+          text = null;
+
+          if (vehicleAsleep) {
+            chargeSuffix = "s";
+          }
+          else if (responseCode != 200) {
+            chargeSuffix = "?";
           }
         }
 
-        status = battery_level + "%" + chargeSuffix + " / " + battery_range + suffix;
+        if (charging_state.equals("Charging")) {
+          chargeSuffix = "+";
+        }
+
+        status = battery_level + "%" + chargeSuffix + " / " + battery_range + timestamp;
       }
     }
     else {
@@ -174,9 +174,7 @@ class GlanceView extends Ui.GlanceView {
       status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
-    if (threeLines == false) {
-      text = null;  
-    }
+    //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
 
     // Draw the two rows of text on the glance widget
     dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
