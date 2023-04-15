@@ -326,6 +326,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
             //var state = data["state"];
             var created_at = Time.now().value();
 
+			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			/*DEBUG*/ logMessage("onReceiveToken: Expires at " + dateStr);
+
             //logMessage("onReceiveToken: state field is '" + state + "'");
 
             _data.put("token", token);

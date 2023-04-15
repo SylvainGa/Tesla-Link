@@ -174,7 +174,7 @@ class GlanceView extends Ui.GlanceView {
       status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
-    //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
+    /*DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
 
     // Draw the two rows of text on the glance widget
     dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);

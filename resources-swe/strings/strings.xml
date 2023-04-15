@@ -4,7 +4,6 @@
     <!--  Glance view -->
     <string id="vehicle" scope="glance">Fordon</string>
     <string id="label_asleep" scope="background">Sover</string>
-    <string id="label_status_unknown" scope="glance">Status okänd</string>
     <string id="label_launch_widget" scope="background">Starta widget</string>    
     <string id="label_waiting_data" scope="background">Väntar på data</string>   
     <string id="label_error" scope="background">Error</string>

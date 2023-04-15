@@ -4,7 +4,6 @@
     <!--  Glance view -->
     <string id="vehicle" scope="glance">Fahrzeug</string>
     <string id="label_asleep" scope="background">Schläft</string>
-    <string id="label_status_unknown" scope="glance">Status unbekannt</string>
     <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
     <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
     <string id="label_error" scope="background">Fehler: </string>
