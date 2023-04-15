@@ -144,10 +144,10 @@ class GlanceView extends Ui.GlanceView {
 
         if (threeLines) {
           if (responseCode == 200) {
-            text = inside_temp + (sentry.equals("true") ? " S On" : " S Off") +  (preconditioning.equals("true") ? " P On" : " P Off");
+              text = inside_temp + sentry + preconditioning;
           }
           else if (vehicleAsleep) {
-            text = Application.loadResource(Rez.Strings.label_asleep) + (preconditioning.equals("true") ? " P On" : " P Off");
+            text = Application.loadResource(Rez.Strings.label_asleep) + preconditioning;
           }
         }
         else {

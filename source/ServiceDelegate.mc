@@ -189,18 +189,22 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var charging_state;
             var battery_range;
             var inside_temp;
-            var sentry;
-            var preconditioning;
+            var status;
 
 			var response = responseData.get("response");
             battery_level = response.get("charge_state").get("battery_level");
             battery_range = response.get("charge_state").get("battery_range");
             charging_state = response.get("charge_state").get("charging_state");
             inside_temp = response.get("climate_state").get("inside_temp");
-            sentry = response.get("vehicle_state").get("sentry_mode");
-            preconditioning = response.get("charge_state").get("preconditioning_enabled");
-
-            var status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|";
+            var drive_state = response.get("drive_state");
+            if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
+                status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||";
+            }
+            else {
+                var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+                var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+                status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|";
+            }
 
             _data.put("status", status);
             _data.put("responseCode", responseCode);
@@ -227,7 +231,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
     function testAwake() {
-        logMessage("testAwake called");
+        /*DEBUG*/ logMessage("testAwake called");
         var token = _data.get("token");
 
         Communications.makeWebRequest(
@@ -289,7 +293,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // Do NOT call from a background process since we're setting registry data in onReceiveToken
     function refreshAccessToken() {
-        logMessage("refreshAccessToken called");
+        /*DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken != null && refreshToken.length() != 0) {
             var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
@@ -311,7 +315,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         _data.put("responseCode", 401);
-        /*DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
+        /*DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
         Background.exit(_data);
     }
 

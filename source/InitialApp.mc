@@ -13,7 +13,22 @@ class TeslaLink extends App.AppBase {
     }
 
 	function onStart(state) {
-		/*DEBUG*/ logMessage("App: starting");
+        var fomGlance = false;
+        if (state != null) {
+            var method = state.values();
+            if (method != null) {
+                fomGlance = method[0];
+            }
+    		/*DEBUG*/ logMessage("App: starting with state=" + method);
+        }
+
+   		/*DEBUG*/ logMessage("App: starting with fromGlance=" + fomGlance);
+        try {
+            Application.getApp().setProperty("fromGlance", fomGlance);
+        }
+        catch (e) {
+   	    	/*DEBUG*/ logMessage("App: starting from background");
+        }
 	}
 
 	function onStop(state) {

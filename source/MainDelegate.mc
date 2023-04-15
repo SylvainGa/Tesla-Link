@@ -1150,7 +1150,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_need_wake) { // Asked to wake up
-			if (_waitingFirstData > 0 && !_wakeWasConfirmed) { // Ask if we should wake the vehicle
+			var fromGlance = Application.getApp().getProperty("fromGlance");
+			if (_waitingFirstData > 0 && !_wakeWasConfirmed && (fromGlance == null || fromGlance == false)) { // Ask if we should wake the vehicle
 				//DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Application.getApp().getProperty("vehicle_name") + "?");
 				_stateMachineCounter = -1;
@@ -1945,8 +1946,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						var battery_range = response.get("charge_state").get("battery_range");
 						var charging_state = response.get("charge_state").get("charging_state");
 						var inside_temp = response.get("climate_state").get("inside_temp");
-						var sentry = response.get("vehicle_state").get("sentry_mode");
-						var preconditioning = response.get("charge_state").get("preconditioning_enabled");
 
 						var timestamp;
 						try {
@@ -1960,7 +1959,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
 						}
 						else {
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|" + timestamp;
+				            var drive_state = response.get("drive_state");
+							if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
+								status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
+							}
+							else {
+								var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+								var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+								status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
+							}
 						}						 
 						Application.getApp().setProperty("status", status);
 

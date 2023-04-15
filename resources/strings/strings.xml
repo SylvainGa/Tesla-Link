@@ -8,6 +8,11 @@
     <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
     <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
     <string id="label_error" scope="background">Error: </string>
+    <string id="label_driving" scope="background">Driving</string>
+    <string id="label_s_off" scope="background">S Off</string>
+    <string id="label_s_on" scope="background">S On</string>
+    <string id="label_p_off" scope="background">P Off</string>
+    <string id="label_p_on" scope="background">P On</string>
 
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>

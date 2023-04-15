@@ -7,6 +7,11 @@
     <string id="label_launch_widget" scope="background">Lancer le widget</string>
     <string id="label_waiting_data" scope="background">Attente de données</string>
     <string id="label_error" scope="background">Erreur: </string>
+    <string id="label_driving" scope="background">En route</string>
+    <string id="label_s_off" scope="background">S Off</string>
+    <string id="label_s_on" scope="background">S On</string>
+    <string id="label_p_off" scope="background">P Off</string>
+    <string id="label_p_on" scope="background">P On</string>
 
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
