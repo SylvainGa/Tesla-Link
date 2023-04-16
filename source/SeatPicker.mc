@@ -1,5 +1,6 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.Application.Storage;
 
 class SeatPicker extends WatchUi.Picker {
     function initialize (seats) {
@@ -33,7 +34,7 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function onAccept (values) {
         var selected = values[0];
-		Application.getApp().setProperty("seat_chosen", selected);
+		Storage.setValue("seat_chosen", selected);
 
         //DEBUG*/ logMessage("SeatPickerDelegate: onAccept called with selected set to " + selected);
 

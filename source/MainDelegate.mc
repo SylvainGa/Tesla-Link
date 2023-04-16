@@ -6,6 +6,8 @@ using Toybox.Communications as Communications;
 using Toybox.Cryptography;
 using Toybox.Graphics;
 using Toybox.Time.Gregorian;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
@@ -91,31 +93,31 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_settings = System.getDeviceSettings();
 		_data = data;
 		_token = Settings.getToken();
-		_vehicle_id = Application.getApp().getProperty("vehicle");
+		_vehicle_id = Storage.getValue("vehicle");
 		_vehicle_state = "online"; // Assume we're online
 		_workTimer = new Timer.Timer();
 		_handler = handler;
 		_tesla = null;
 
-		if (Application.getApp().getProperty("enhancedTouch")) {
-			Application.getApp().setProperty("spinner", "+");
+		if (Properties.getValue("enhancedTouch")) {
+			Storage.setValue("spinner", "+");
 		}
 		else {
-			Application.getApp().setProperty("spinner", "/");
+			Storage.setValue("spinner", "/");
 		}
 		
-		// _debugTimer = System.getTimer(); Application.getApp().setProperty("overrideCode", 0);
+		// _debugTimer = System.getTimer(); Storage.setValue("overrideCode", 0);
 		_debug_auth = false;
 		_debug_view = false;
 
-		var createdAt = Application.getApp().getProperty("TokenCreatedAt");
+		var createdAt = Storage.getValue("TokenCreatedAt");
 		if (createdAt == null) {
 			createdAt = 0;
 		}
 		else {
 			createdAt = createdAt.toNumber();
 		}
-		var expireIn = Application.getApp().getProperty("TokenExpiresIn");
+		var expireIn = Storage.getValue("TokenExpiresIn");
 		if (expireIn == null) {
 			expireIn = 0;
 		}
@@ -150,7 +152,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_408_count = 0;
 		_lastError = null;
-		_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+		_refreshTimeInterval = Storage.getValue("refreshTimeInterval");
 		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
 			_refreshTimeInterval = 4000;
 		}
@@ -161,7 +163,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
 
-		var useTouch = Application.getApp().getProperty("useTouch");
+		var useTouch = Properties.getValue("useTouch");
 		var hasTouch = System.getDeviceSettings().isTouchScreen;
 		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
 		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
@@ -169,10 +171,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
 		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
 			useTouch = hasTouch;
-			Application.getApp().setProperty("useTouch", useTouch);
+			Properties.setValue("useTouch", useTouch);
 		}
 
-		//DEBUG*/ logMessage("initialize: quickAccess=" + Application.getApp().getProperty("quickReturn") + " enhancedTouch=" + Application.getApp().getProperty("enhancedTouch"));
+		//DEBUG*/ logMessage("initialize: quickAccess=" + Properties.getValue("quickReturn") + " enhancedTouch=" + Properties.getValue("enhancedTouch"));
 		_workTimer.start(method(:workerTimer), 100, true);
 
 /*DEBUG	if (_debug_view) {
@@ -477,13 +479,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (error == null && code != null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
-			var codeForBearerUrl = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
+			var codeForBearerUrl = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
 			var codeForBearerParams = {
 				"grant_type" => "authorization_code",
 				"client_id" => "ownerapi",
 				"code" => code,
 				"code_verifier" => _code_verifier,
-				"redirect_uri" => "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/void/callback"
+				"redirect_uri" => "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback"
 			};
 
 			var mySettings = System.getDeviceSettings();
@@ -560,7 +562,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function GetAccessToken(token, notify) {
-		var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
+		var url = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
 		Communications.makeWebRequest(
 			url,
 			{
@@ -578,7 +580,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function SpinSpinner(responseCode) {
-		var spinner = Application.getApp().getProperty("spinner");
+		var spinner = Storage.getValue("spinner");
 
 		if (spinner == null) {
 			//DEBUG*/ logMessage("SpinSpinner: WARNING should not be null");
@@ -601,7 +603,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				spinner = "/";
 			}
 			else {
-				if (Application.getApp().getProperty("enhancedTouch")) {
+				if (Properties.getValue("enhancedTouch")) {
 					spinner = "+";
 				}
 				else {
@@ -623,7 +625,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		// 2023-03-25 logMessage("SpinSpinner: '" + spinner + "'");
-		Application.getApp().setProperty("spinner", spinner);
+		Storage.setValue("spinner", spinner);
 	}
 
 	function actionMachine() {
@@ -655,7 +657,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
 		var _handlerType;
-		if (Application.getApp().getProperty("quickReturn")) {
+		if (Properties.getValue("quickReturn")) {
 			_handlerType = 1;
 		}
 		else {
@@ -789,7 +791,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_open_frunk));
 					}
-					else if (Application.getApp().getProperty("HansshowFrunk")) {
+					else if (Properties.getValue("HansshowFrunk")) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_close_frunk));
 					}
 					else {
@@ -844,7 +846,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				//DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for genericHandler");
-				var seat_heat_chosen_label = Application.getApp().getProperty("seat_heat_chosen");
+				var seat_heat_chosen_label = Storage.getValue("seat_heat_chosen");
 				var seat_heat_chosen;
 				switch (seat_heat_chosen_label) {
 					case Rez.Strings.label_seat_auto:
@@ -992,7 +994,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_REFRESH:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				_refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+				_refreshTimeInterval = Storage.getValue("refreshTimeInterval");
 				if (_refreshTimeInterval == null) {
 					_refreshTimeInterval = 1000;
 				}
@@ -1032,9 +1034,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 
-		var resetNeeded = Application.getApp().getProperty("ResetNeeded");
+		var resetNeeded = Storage.getValue("ResetNeeded");
 		if (resetNeeded != null && resetNeeded == true) {
-			Application.getApp().setProperty("ResetNeeded", false);
+			Storage.setValue("ResetNeeded", false);
 			_vehicle_id = -1;
 			_need_auth = true;
 		}
@@ -1098,7 +1100,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	                "client_id" => "ownerapi",
 	                "code_challenge" => code_challenge_fixed,
 	                "code_challenge_method" => "S256",
-	                "redirect_uri" => "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/void/callback",
+	                "redirect_uri" => "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback",
 	                "response_type" => "code",
 	                "scope" => "openid email offline_access",
 	                "state" => "123"
@@ -1107,12 +1109,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            
 	            _handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 
-				//DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + Application.getApp().getProperty("serverAUTHLocation"));	
+				//DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + Properties.getValue("serverAUTHLocation"));	
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
+				var url_oauth = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/authorize";
+				var url_callback = "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback";
 	            Communications.makeOAuthRequest(
-	                "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/authorize",
+	                url_oauth,
 	                params,
-	                "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/void/callback",
+	                url_callback,
 	                Communications.OAUTH_RESULT_TYPE_URL,
 	                {
 	                    "code" => $.OAUTH_CODE,
@@ -1150,10 +1154,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_need_wake) { // Asked to wake up
-			var fromGlance = Application.getApp().getProperty("fromGlance");
-			if (_waitingFirstData > 0 && !_wakeWasConfirmed && (fromGlance == null || fromGlance == false)) { // Ask if we should wake the vehicle
+			if (_waitingFirstData > 0 && !_wakeWasConfirmed) { // Ask if we should wake the vehicle
 				//DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
-	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Application.getApp().getProperty("vehicle_name") + "?");
+	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
@@ -1274,26 +1277,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function openVentConfirmed() {
-		_handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
+		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 		//DEBUG*/ logMessage("actionMachine: Open vent - waiting for vehicleStateHandler");
 		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function closeVentConfirmed() {
-	    _handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
+	    _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 		//DEBUG*/ logMessage("actionMachine: Close vent - waiting for vehicleStateHandler");
 		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function frunkConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Acting on frunk - waiting for vehicleStateHandler");
-		var hansshowFrunk = Application.getApp().getProperty("HansshowFrunk");
+		var hansshowFrunk = Properties.getValue("HansshowFrunk");
 		if (hansshowFrunk) {
-	        _handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
+	        _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
 			_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
 		} else {
 			if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
-				_handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
+				_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
 				_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
 			} else {
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
@@ -1304,18 +1307,18 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function trunkConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for vehicleStateHandler");
-		_handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
+		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
 		_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "rear");
 	}
 
 	function honkHornConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Honking - waiting for genericHandler");
-		_handler.invoke([Application.getApp().getProperty("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
+		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
 		_tesla.honkHorn(_vehicle_id, method(:genericHandler));
 	}
 
 	function onSelect() {
-		if (Application.getApp().getProperty("useTouch")) {
+		if (Properties.getValue("useTouch")) {
 			return false;
 		}
 
@@ -1338,7 +1341,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onNextPage() {
-		if (Application.getApp().getProperty("useTouch")) {
+		if (Properties.getValue("useTouch")) {
 			return false;
 		}
 
@@ -1361,7 +1364,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onPreviousPage() {
-		if (Application.getApp().getProperty("useTouch")) {
+		if (Properties.getValue("useTouch")) {
 			return false;
 		}
 
@@ -1382,9 +1385,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		switch (Application.getApp().getProperty("swap_frunk_for_port")) {
+		switch (Properties.getValue("swap_frunk_for_port")) {
 			case 0:
-				var hansshowFrunk = Application.getApp().getProperty("HansshowFrunk");
+				var hansshowFrunk = Properties.getValue("HansshowFrunk");
 				if (!hansshowFrunk && _data._vehicle_data.get("vehicle_state").get("ft") == 1) {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 			 	}
@@ -1407,7 +1410,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if (Application.getApp().getProperty("HansshowFrunk")) {
+				else if (Properties.getValue("HansshowFrunk")) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1453,12 +1456,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				//DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + Application.getApp().getProperty("swap_frunk_for_port"));
+				//DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + Properties.getValue("swap_frunk_for_port"));
 		}
 	}
 
 	function onMenu() {
-		if (Application.getApp().getProperty("useTouch")) {
+		if (Properties.getValue("useTouch")) {
 			return false;
 		}
 
@@ -1528,7 +1531,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		        if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if (Application.getApp().getProperty("HansshowFrunk")) {
+				else if (Properties.getValue("HansshowFrunk")) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1622,7 +1625,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});
-		var menuItems = to_array(Application.getApp().getProperty("optionMenuOrder"), ",");
+		var menuItems = to_array(Properties.getValue("optionMenuOrder"), ",");
 		for (var i = 0; i < menuItems.size(); i++) {
 			addMenuItem(thisMenu, menuItems[i]);
 		}
@@ -1636,7 +1639,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return true;
 		}
 
-		if (!Application.getApp().getProperty("image_view")) { // Touch device on the text screen is limited to show the menu so it can swich back to the image layout
+		if (!Storage.getValue("image_view")) { // Touch device on the text screen is limited to show the menu so it can swich back to the image layout
 			doMenu();
 			return true;
 		}
@@ -1645,7 +1648,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
-		var enhancedTouch = Application.getApp().getProperty("enhancedTouch");
+		var enhancedTouch = Properties.getValue("enhancedTouch");
 		if (enhancedTouch == null) {
 			enhancedTouch = true;
 		}
@@ -1676,7 +1679,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} 
 		// Tap on bottom line on screen
 		else if (enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
-			var screenBottom = Application.getApp().getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
+			var screenBottom = Properties.getValue(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
 			switch (screenBottom) {
 				case 0:
 		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
@@ -1743,7 +1746,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (x < _settings.screenWidth/2) {
 			if (y < _settings.screenHeight/2) {
 				//DEBUG*/ logMessage("onHold: Upper Left");
-				switch (Application.getApp().getProperty("holdActionUpperLeft")) {
+				switch (Properties.getValue("holdActionUpperLeft")) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1778,7 +1781,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			} else {
 				//DEBUG*/ logMessage("onHold: Lower Left");
-				switch (Application.getApp().getProperty("holdActionLowerLeft")) {
+				switch (Properties.getValue("holdActionLowerLeft")) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1795,7 +1798,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} else {
 			if (y < _settings.screenHeight/2) {
 				//DEBUG*/ logMessage("onHold: Upper Right");
-				switch (Application.getApp().getProperty("holdActionUpperRight")) {
+				switch (Properties.getValue("holdActionUpperRight")) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1810,7 +1813,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			} else {
 				//DEBUG*/ logMessage("onHold: Lower Right");
-				switch (Application.getApp().getProperty("holdActionLowerRight")) {
+				switch (Properties.getValue("holdActionLowerRight")) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1868,7 +1871,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (size > 0) {
 				// Need to retrieve the right vehicle, not just the first one!
 				var vehicle_index = 0;
-				var vehicle_name = Application.getApp().getProperty("vehicle_name");
+				var vehicle_name = Storage.getValue("vehicle_name");
 				if (vehicle_name != null) {
 					while (vehicle_index < size) {
 					if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
@@ -1891,8 +1894,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_check_wake = false;
 
 				_vehicle_id = vehicles[vehicle_index].get("id");
-				Application.getApp().setProperty("vehicle", _vehicle_id);
-				Application.getApp().setProperty("vehicle_name", vehicles[vehicle_index].get("display_name"));
+				Storage.setValue("vehicle", _vehicle_id);
+				Storage.setValue("vehicle_name", vehicles[vehicle_index].get("display_name"));
 
 				_stateMachineCounter = 1;
 				return;
@@ -1955,7 +1958,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							timestamp = "|";
 						}
 						var status;
-						if (Application.getApp().getProperty("bkgnd32kb")) {
+						if (Storage.getValue("bkgnd32kb")) {
 							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
 						}
 						else {
@@ -1969,9 +1972,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 								status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
 							}
 						}						 
-						Application.getApp().setProperty("status", status);
+						Storage.setValue("status", status);
 
-						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Application.getApp().getProperty("status") + "'");
+						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
 					}
 
 					if (_408_count) {
@@ -2026,7 +2029,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					} catch (e) {
 						timestamp = "";
 					}
-					Application.getApp().setProperty("status", Application.loadResource(Rez.Strings.label_asleep) + timestamp);
+					Storage.setValue("status", Application.loadResource(Rez.Strings.label_asleep) + timestamp);
 				}*/
 
 				var i = _408_count + 1;
@@ -2173,7 +2176,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
-			if (Application.getApp().getProperty("quickReturn")) {
+			if (Properties.getValue("quickReturn")) {
 				//DEBUG*/ logMessage("vehicleStateHandler: " + responseCode + " skiping getVehicleState, running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
@@ -2196,7 +2199,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
-			if (Application.getApp().getProperty("quickReturn")) {
+			if (Properties.getValue("quickReturn")) {
 				//DEBUG*/ logMessage("climateStateHandler: " + responseCode + " skiping getClimateState, running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
@@ -2219,7 +2222,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
-			if (Application.getApp().getProperty("quickReturn")) {
+			if (Properties.getValue("quickReturn")) {
 				//DEBUG*/ logMessage("chargeStateHandler: " + responseCode + " skipping getChargeState, running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
@@ -2253,8 +2256,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
             Settings.setToken(null);
             Settings.setRefreshToken(null, 0, 0);
-            Application.getApp().setProperty("vehicle", null);
-			Application.getApp().setProperty("ResetNeeded", true);
+            Storage.setValue("vehicle", null);
+			Storage.setValue("ResetNeeded", true);
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);

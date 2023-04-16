@@ -1,6 +1,7 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.System;
+using Toybox.Application.Storage;
 
 class CarPicker extends WatchUi.Picker {
     function initialize (carsName) {
@@ -50,9 +51,9 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
             // 2022-10-17 logMessage("CarPickerDelegate: vehicle " + i + ": '" + _carsName[i] + "'");
             if (_selected.equals(_carsName[i])) {
                 //DEBUG*/ logMessage("CarPickerDelegate: Got a match!");
-                if (Application.getApp().getProperty("vehicle") != _carsId[i]) { // If it's a new car, start fresh
-                    Application.getApp().setProperty("vehicle", _carsId[i]);
-                    Application.getApp().setProperty("vehicle_name", _selected);
+                if (Storage.getValue("vehicle") != _carsId[i]) { // If it's a new car, start fresh
+                    Storage.setValue("vehicle", _carsId[i]);
+                    Storage.setValue("vehicle_name", _selected);
 
                     // Start fresh as if we just loaded
                     _controller._waitingFirstData = 1;

@@ -4,6 +4,8 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 enum /* WEB REQUEST CONTEXT */ {
 	CONTEXT_TEMPORAL_EVENT = 0,
@@ -18,12 +20,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
-        var token = Application.getApp().getProperty("token");
-        var vehicle = Application.getApp().getProperty("vehicle");
+        var token = Storage.getValue("token");
+        var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
-                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {
@@ -58,7 +60,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var charging_state;
         var battery_range;
 
-        var status = Application.getApp().getProperty("status");
+        var status = Storage.getValue("status");
         if (status != null && status.equals("") == false) {
             var array = to_array(status, "|");
             if (array.size() == 6) {
@@ -129,10 +131,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (_data == null) {
             /*DEBUG*/ logMessage("ServiceDelegate Initialisation fetching tokens from properties");
             _data = {};
-            _data.put("token", Application.getApp().getProperty("token"));
-            _data.put("refreshToken", Application.getApp().getProperty("refreshToken"));
-            _data.put("TokenExpiresIn", Application.getApp().getProperty("TokenExpiresIn"));
-            _data.put("TokenCreatedAt", Application.getApp().getProperty("TokenCreatedAt"));
+            _data.put("token", Storage.getValue("token"));
+            _data.put("refreshToken", Properties.getValue("refreshToken"));
+            _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
+            _data.put("TokenCreatedAt", Storage.getValue("TokenCreatedAt"));
         }
         else {
             /*DEBUG*/ logMessage("ServiceDelegate Initialisation with tokens already");
@@ -143,12 +145,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
-        var token = _data.get("token");
-        var vehicle = Application.getApp().getProperty("vehicle");
+        var token = Storage.getValue("token");
+        var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
             /*DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
-                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {
@@ -235,7 +237,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var token = _data.get("token");
 
         Communications.makeWebRequest(
-            "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", null,
+            "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles", null,
             {
                 :method => Communications.HTTP_REQUEST_METHOD_GET,
                 :headers => {
@@ -258,7 +260,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 			if (size > 0) {
 				// Need to retrieve the right vehicle, not just the first one!
 				var vehicle_index = 0;
-				var vehicle_name = Application.getApp().getProperty("vehicle_name");
+				var vehicle_name = Storage.getValue("vehicle_name");
 				if (vehicle_name != null) {
 					while (vehicle_index < size) {
                         if (vehicle_name.equals(vehicles[vehicle_index].get("display_name"))) {
@@ -296,7 +298,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken != null && refreshToken.length() != 0) {
-            var url = "https://" + Application.getApp().getProperty("serverAUTHLocation") + "/oauth2/v3/token";
+            var url = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
             Communications.makeWebRequest(
                 url,
                 {
@@ -343,8 +345,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("TokenCreatedAt", created_at);
 
             /*DEBUG*/ logMessage("onReceiveToken getting data");
+            var vehicle = Storage.getValue("vehicle");
             Communications.makeWebRequest(
-                "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + Application.getApp().getProperty("vehicle").toString() + "/vehicle_data", null,
+                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {

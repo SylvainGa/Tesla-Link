@@ -1,5 +1,6 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.Application.Storage;
 
 class SeatHeatPicker extends WatchUi.Picker {
 	// var _heat;
@@ -55,12 +56,12 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
 
     function onAccept (values) {
         var selected = values[0];
-		Application.getApp().setProperty("seat_heat_chosen", selected);
+		Storage.setValue("seat_heat_chosen", selected);
 
         //DEBUG*/ logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        switch (Application.getApp().getProperty("seat_chosen")) {
+        switch (Storage.getValue("seat_chosen")) {
             case Rez.Strings.label_seat_all:
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_DRIVER, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_SET_SEAT_HEAT, "Option" => ACTION_OPTION_SEAT_PASSENGER, "Value" => 0, "Tick" => System.getTimer()});

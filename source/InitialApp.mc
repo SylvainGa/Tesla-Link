@@ -4,6 +4,8 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.WatchUi as Ui;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 (:background)
 class TeslaLink extends App.AppBase {
@@ -13,22 +15,7 @@ class TeslaLink extends App.AppBase {
     }
 
 	function onStart(state) {
-        var fomGlance = false;
-        if (state != null) {
-            var method = state.values();
-            if (method != null) {
-                fomGlance = method[0];
-            }
-    		/*DEBUG*/ logMessage("App: starting with state=" + method);
-        }
-
-   		/*DEBUG*/ logMessage("App: starting with fromGlance=" + fomGlance);
-        try {
-            Application.getApp().setProperty("fromGlance", fomGlance);
-        }
-        catch (e) {
-   	    	/*DEBUG*/ logMessage("App: starting from background");
-        }
+   		/*DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
@@ -44,7 +31,7 @@ class TeslaLink extends App.AppBase {
     (:glance, :can_glance, :bkgnd32kb)
     function getGlanceView() {
 		/*DEBUG*/ logMessage("Glance: Starting");
-        Application.getApp().setProperty("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
+        Storage.setValue("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
@@ -52,7 +39,7 @@ class TeslaLink extends App.AppBase {
     (:glance, :can_glance, :bkgnd64kb)
     function getGlanceView() {
 		/*DEBUG*/ logMessage("Glance: Starting");
-        Application.getApp().setProperty("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
+        Storage.setValue("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
@@ -65,7 +52,7 @@ class TeslaLink extends App.AppBase {
             return [ new OfflineView() ];
         }
 
-		//Application.getApp().setProperty("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
+		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
         var data = new TeslaData();
         var view = new MainView(data);
 		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
@@ -79,7 +66,7 @@ class TeslaLink extends App.AppBase {
 
             var status = data["status"];
             if (status != null) {
-                Application.getApp().setProperty("status", status);
+                Storage.setValue("status", status);
             }
         }
         else {
@@ -99,22 +86,22 @@ class TeslaLink extends App.AppBase {
             // Refresh our tokens
             var token = data["token"];
             if (token != null) {
-                Application.getApp().setProperty("token", token);
+                Storage.setValue("token", token);
             }
 
             token = data["refreshToken"];
             if (token != null) {
-                Application.getApp().setProperty("refreshToken", token);
+                Properties.setValue("refreshToken", token);
             }
 
             token = data["TokenExpiresIn"];
             if (token != null) {
-                Application.getApp().setProperty("TokenExpiresIn", token);
+                Storage.setValue("TokenExpiresIn", token);
             }
 
             token = data["TokenCreatedAt"];
             if (token != null) {
-                Application.getApp().setProperty("TokenCreatedAt", token);
+                Storage.setValue("TokenCreatedAt", token);
             }
 
             // Fetch was passed to us to process/display
@@ -127,7 +114,7 @@ class TeslaLink extends App.AppBase {
             var status = data["status"];
             if (status == null) {
                 // No status field in our buffer, built one from our last time we got data. Unless we were down while the vehicle was being used, this data should still be somewhat accurate
-                status = Application.getApp().getProperty("status");
+                status = Storage.getValue("status");
                 numFields = 9;
                 /*DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
             }
@@ -173,7 +160,7 @@ class TeslaLink extends App.AppBase {
             }
 
             status = status + (timestamp != null ? timestamp : "") + "|" + text;
-            Application.getApp().setProperty("status", status);
+            Storage.setValue("status", status);
         }
         else {
     		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");

@@ -1,3 +1,5 @@
+using Toybox.Application.Properties;
+
 class Tesla {
     hidden var _token;
     hidden var _notify;
@@ -43,51 +45,51 @@ class Tesla {
     }
 
     function getVehicleId(notify) {
-        genericGet("https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles", notify);
+        genericGet("https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles", notify);
     }
 
     function getVehicle(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString();
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString();
         genericGet(url, notify);
     }
 
     function getVehicleData(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data";
         genericGet(url, notify);
     }
 
     function getVehicleState(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/vehicle_state";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/vehicle_state";
         genericGet(url, notify);
     }
 
     function getClimateState(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/climate_state";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/climate_state";
         genericGet(url, notify);
     }
 
     function getChargeState(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/charge_state";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/data_request/charge_state";
         genericGet(url, notify);
     }
 
     function wakeVehicle(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/wake_up";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/wake_up";
         genericPost(url, notify);
     }
 
     function climateOn(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/auto_conditioning_start";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/auto_conditioning_start";
         genericPost(url, notify);
     }
 
     function climateOff(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/auto_conditioning_stop";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/auto_conditioning_stop";
         genericPost(url, notify);
     }
 
     function climateSet(vehicle, notify, temperature) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_temps";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_temps";
         Communications.makeWebRequest(
             url,
             {
@@ -108,33 +110,33 @@ class Tesla {
     }
 
     function honkHorn(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/honk_horn";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/honk_horn";
         genericPost(url, notify);
     }
     
     //Opens vehicle charge port. Also unlocks the charge port if it is locked.
     function openPort(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_port_door_open";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_port_door_open";
         genericPost(url, notify);
     }
 
     function closePort(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_port_door_close";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_port_door_close";
         genericPost(url, notify);
     }
 
     function doorUnlock(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/door_unlock";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/door_unlock";
         genericPost(url, notify);
     }
 
     function doorLock(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/door_lock";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/door_lock";
         genericPost(url, notify);
     }
 
     function openTrunk(vehicle, notify, which) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/actuate_trunk";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/actuate_trunk";
         Communications.makeWebRequest(
             url,
             {
@@ -154,7 +156,7 @@ class Tesla {
     }
 
     function vent(vehicle, notify, which, lat, lon) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/window_control";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/window_control";
         Communications.makeWebRequest(
             url,
             {
@@ -176,7 +178,7 @@ class Tesla {
     }
 
     function climateDefrost(vehicle, notify, defrost_mode) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_preconditioning_max";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_preconditioning_max";
 
         Communications.makeWebRequest(
             url,
@@ -201,14 +203,14 @@ class Tesla {
 		var options;
 		
 		if (heat_chosen >= 0) {
-	        url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_seat_heater_request";
+	        url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_seat_heater_request";
 	        options = 
             {
                 "heater" => seat_chosen,
                 "level" => heat_chosen
             };
 		} else {
-	        url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_auto_seat_climate_request";
+	        url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_auto_seat_climate_request";
 	        options = 
             {
                 "auto_seat_position" => seat_chosen + 1,
@@ -232,7 +234,7 @@ class Tesla {
     }
     
     function climateSteeringWheel(vehicle, notify, steering_wheel_mode) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_steering_wheel_heater_request";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_steering_wheel_heater_request";
 
         Communications.makeWebRequest(
             url,
@@ -253,7 +255,7 @@ class Tesla {
     }
     
     function setChargingLimit(vehicle, notify, charging_limit) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_charge_limit";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_charge_limit";
         Communications.makeWebRequest(
             url,
             {
@@ -273,7 +275,7 @@ class Tesla {
     }
 
     function setChargingAmps(vehicle, notify, charging_amps) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_charging_amps";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_charging_amps";
         Communications.makeWebRequest(
             url,
             {
@@ -296,16 +298,16 @@ class Tesla {
         var url;
         
         if (charging) {
-        	url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_stop";
+        	url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_stop";
         }
         else {
-        	url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_start";
+        	url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/charge_start";
         }
         genericPost(url, notify);
     }
 
     function setDeparture(vehicle, notify, departureTime, enable) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_scheduled_departure";
 
         Communications.makeWebRequest(
             url,
@@ -332,7 +334,7 @@ class Tesla {
     }
 
     function SentryMode(vehicle, notify, value) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_sentry_mode";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_sentry_mode";
 
         Communications.makeWebRequest(
             url,
@@ -353,7 +355,7 @@ class Tesla {
     }
 
     function homelink(vehicle, notify, lat, lon) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/trigger_homelink";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/trigger_homelink";
         Communications.makeWebRequest(
             url,
             {
@@ -374,7 +376,7 @@ class Tesla {
     }
 
     function setClimateMode(vehicle, notify, mode) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_climate_keeper_mode";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/set_climate_keeper_mode";
         Communications.makeWebRequest(
             url,
             {
@@ -394,12 +396,12 @@ class Tesla {
     }
 
     function remoteBoombox(vehicle, notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_boombox";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/remote_boombox";
         genericPost(url, notify);
     }
 
     function revoke(notify) {
-        var url = "https://" + Application.getApp().getProperty("serverAPILocation") + "/oauth/revoke";
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/oauth/revoke";
         Communications.makeWebRequest(
             url,
             {

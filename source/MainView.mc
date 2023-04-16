@@ -4,6 +4,8 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Timer;
 using Toybox.Graphics;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 import Toybox.WatchUi;
 
@@ -54,9 +56,9 @@ class MainView extends Ui.View {
 
 		// 2023-03-20 logMessage("MainView:initialize: _display at " + _display);
 
-		Application.getApp().setProperty("spinner", "-");
-		if (Application.getApp().getProperty("refreshTimeInterval") == null) {
-			Application.getApp().setProperty("refreshTimeInterval", 4);
+		Storage.setValue("spinner", "-");
+		if (Storage.getValue("refreshTimeInterval") == null) {
+			Storage.setValue("refreshTimeInterval", 4);
 		}
 
 		Ui.requestUpdate();
@@ -69,7 +71,7 @@ class MainView extends Ui.View {
 
 	function onShow() {
 		_refreshTimer = new Timer.Timer();
-		if (Application.getApp().getProperty("titleScrolling")) {
+		if (Properties.getValue("titleScrolling")) {
 			_refreshTimer.start(method(:refreshView), 50, true);
 		}
 		else {
@@ -222,10 +224,10 @@ class MainView extends Ui.View {
 
 			// We're going to use the image layout by default if it's a touchscreen, also check the option setting to allow toggling
 			var is_touchscreen = System.getDeviceSettings().isTouchScreen;
-			var use_image_layout = Application.getApp().getProperty("image_view");
+			var use_image_layout = Storage.getValue("image_view");
 			if (use_image_layout == null) {					   /* Defaults to image_layout for all watches */
 				use_image_layout = true;
-				Application.getApp().setProperty("image_view", /* System.getDeviceSettings().isTouchScreen */ true);
+				Storage.setValue("image_view", /* System.getDeviceSettings().isTouchScreen */ true);
 				//DEBUG*/ logMessage("MainView:onUpdate: defaulting to image layout");
 			}
 
@@ -261,9 +263,9 @@ class MainView extends Ui.View {
 			// Retrieve and display the vehicle name
 			var name_drawable = View.findDrawableById("name");
 			var vehicle_name = _data._vehicle_data.get("display_name");
-			var app_vehicle_name = Application.getApp().getProperty("vehicle_name");
+			var app_vehicle_name = Storage.getValue("vehicle_name");
 			if (app_vehicle_name == null) {
-				Application.getApp().setProperty("vehicle_name", vehicle_name);
+				Storage.setValue("vehicle_name", vehicle_name);
 			}
 			else if (vehicle_name.equals(app_vehicle_name) == false) { // We switched vehicle, have it recalculate our position on screen
 				_curPosX = null;
@@ -278,7 +280,7 @@ class MainView extends Ui.View {
 				textPos = 0;
 				textMaxWidth = width;
 			}
-			else if (Application.getApp().getProperty("titleScrolling")) {
+			else if (Properties.getValue("titleScrolling")) {
 				textPos = center_x / 14;
 				var textFromCenter = center_x - textPos - fontHeight / 2;
 				var rad = Math.acos(textFromCenter.toFloat() / radius.toFloat());
@@ -325,7 +327,7 @@ class MainView extends Ui.View {
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, 315);
 
 			// Grab the data we're going to use around charge and climate
-			var swap_frunk_for_port = Application.getApp().getProperty("swap_frunk_for_port");
+			var swap_frunk_for_port = Properties.getValue("swap_frunk_for_port");
 			var battery_level = _data._vehicle_data.get("charge_state").get("battery_level");
 			var charge_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
 			var charging_state = _data._vehicle_data.get("charge_state").get("charging_state");
@@ -534,7 +536,7 @@ class MainView extends Ui.View {
 				}
 
 				// Draw our spinner
-				var _spinner = Application.getApp().getProperty("spinner");
+				var _spinner = Storage.getValue("spinner");
 				if (_spinner != null) {
 					var spinner_drawable = View.findDrawableById("spinner");
 					spinner_drawable.setText(_spinner.toString());

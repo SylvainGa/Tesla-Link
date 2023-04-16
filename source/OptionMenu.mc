@@ -1,5 +1,7 @@
 using Toybox.WatchUi as Ui;
 using Toybox.System;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 class OptionMenuDelegate extends Ui.Menu2InputDelegate {
     var _controller;
@@ -54,27 +56,27 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_TRUNK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :toggle_view) {
-            var view = Application.getApp().getProperty("image_view");
+            var view = Storage.getValue("image_view");
             if (view) {
-                Application.getApp().setProperty("image_view", false);
+                Storage.setValue("image_view", false);
             } else {
-                Application.getApp().setProperty("image_view", true);
+                Storage.setValue("image_view", true);
             }
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :swap_frunk_for_port) {
-            var swap = Application.getApp().getProperty("swap_frunk_for_port");
+            var swap = Properties.getValue("swap_frunk_for_port");
             if (swap == 0 || swap == null) {
-                Application.getApp().setProperty("swap_frunk_for_port", 1);
+                Properties.setValue("swap_frunk_for_port", 1);
 			}
 			else if (swap == 1) {
-				Application.getApp().setProperty("swap_frunk_for_port", 2);
+				Properties.setValue("swap_frunk_for_port", 2);
 			}
 			else if (swap == 2) {
-				Application.getApp().setProperty("swap_frunk_for_port", 3);
+				Properties.setValue("swap_frunk_for_port", 3);
 			}
 			else {
-                Application.getApp().setProperty("swap_frunk_for_port", 0);
+                Properties.setValue("swap_frunk_for_port", 0);
 	        }
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
@@ -156,7 +158,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :refresh) {
-            var refreshTimeInterval = Application.getApp().getProperty("refreshTimeInterval");
+            var refreshTimeInterval = Storage.getValue("refreshTimeInterval");
             Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_DATA_SCREEN, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});

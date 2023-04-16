@@ -1,30 +1,32 @@
 using Toybox.Application as Application;
 using Toybox.System as System;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
 
 //! Settings utility.
 module Settings {
 
     //! Store access token
     function setToken(token) {
-        Application.getApp().setProperty("token", token);
+        Storage.setValue("token", token);
     }
 
     //! Get access token
     function getToken() {
-        var value = Application.getApp().getProperty("token");
+        var value = Storage.getValue("token");
         return value;
     }
 
     //! Store refresh token
     function setRefreshToken(token, expires_in, created_at) {
-        Application.getApp().setProperty(REFRESH_TOKEN, token);
-        Application.getApp().setProperty("TokenExpiresIn", expires_in);
-        Application.getApp().setProperty("TokenCreatedAt", created_at);
+        Properties.setValue(REFRESH_TOKEN, token);
+        Storage.setValue("TokenExpiresIn", expires_in);
+        Storage.setValue("TokenCreatedAt", created_at);
     }
 
     //! Get auth token
     function getRefreshToken() {
-        var value = Application.getApp().getProperty(REFRESH_TOKEN);
+        var value = Properties.getValue(REFRESH_TOKEN);
         return value;
     }
 

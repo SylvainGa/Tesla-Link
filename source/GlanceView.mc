@@ -1,5 +1,6 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
+using Toybox.Application.Storage;
 
 (:glance, :can_glance)
 class GlanceView extends Ui.GlanceView {
@@ -10,7 +11,7 @@ class GlanceView extends Ui.GlanceView {
   (:bkgnd32kb)
   function onUpdate(dc) {
     // Retrieve the name of the vehicle if we have it, or the generic string otherwise
-    var vehicle_name = Application.getApp().getProperty("vehicle_name");
+    var vehicle_name = Storage.getValue("vehicle_name");
     vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
     var responseCode;
     var battery_level;
@@ -19,7 +20,7 @@ class GlanceView extends Ui.GlanceView {
     var timestamp;
     var text;
 
-    var status = Application.getApp().getProperty("status");
+    var status = Storage.getValue("status");
     if (status != null && status.equals("") == false) {
       var array = to_array(status, "|");
 
@@ -83,7 +84,7 @@ class GlanceView extends Ui.GlanceView {
   (:bkgnd64kb)
   function onUpdate(dc) {
     // Retrieve the name of the vehicle if we have it, or the generic string otherwise
-    var vehicle_name = Application.getApp().getProperty("vehicle_name");
+    var vehicle_name = Storage.getValue("vehicle_name");
     vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
 
     var responseCode;
@@ -107,7 +108,7 @@ class GlanceView extends Ui.GlanceView {
       threeLines = false;
     }
 
-    var status = Application.getApp().getProperty("status");
+    var status = Storage.getValue("status");
     if (status != null && status.equals("") == false) {
       var array = to_array(status, "|");
 
@@ -133,8 +134,8 @@ class GlanceView extends Ui.GlanceView {
           text = null;
         }
         else {
-          var token = Application.getApp().getProperty("token");
-          var vehicle = Application.getApp().getProperty("vehicle");
+          var token = Storage.getValue("token");
+          var vehicle = Storage.getValue("vehicle");
           status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
         }
       }
@@ -169,8 +170,8 @@ class GlanceView extends Ui.GlanceView {
       }
     }
     else {
-      var token = Application.getApp().getProperty("token");
-      var vehicle = Application.getApp().getProperty("vehicle");
+      var token = Storage.getValue("token");
+      var vehicle = Storage.getValue("vehicle");
       status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
