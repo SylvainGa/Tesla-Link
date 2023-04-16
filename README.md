@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.1 Fixed a crash when only two lines to display in Glance under certain conditions
+
 V7.11.0 Added the following
 - Added new devices D2 Delta, D2 Delta PX, D2 Delta S, MARQ (Gen 2) Adventure, Athlete, Aviator, Captain and Golfer.
 - New Glance code optimized for devices with just 32 KB of background memory. Although I have only ran it through the simulator (having no such device myself), it ran well. Keep in mind that this 32 KB is for all the CIQ apps with Glance activated, so you might be limited just this CIQ app in Glance mode. The main culprit is the huge 6 KB of data returned by the vehicle when awake.

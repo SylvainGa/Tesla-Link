@@ -334,7 +334,7 @@ class GlanceView extends Ui.GlanceView {
 
     var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), Graphics.FONT_TINY);
     var text2Width = dc.getTextWidthInPixels(status, Graphics.FONT_TINY);
-    var text3Width = dc.getTextWidthInPixels(text, Graphics.FONT_TINY);
+    var text3Width = (text != null ? dc.getTextWidthInPixels(text, Graphics.FONT_TINY) : 0);
 
     //var textMaxWidth = (2 * radius * Math.sin(Math.toRadians(2 * Math.toDegrees(Math.acos(1 - (15.0 / radius)))) / 2)).toNumber();
     if (_curPos1X == null || _prevText1Width != text1Width) {
