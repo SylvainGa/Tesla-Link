@@ -30,6 +30,8 @@ class MainView extends Ui.View {
 	hidden var _curPosX;
 	hidden var _startPosX;
 	hidden var _xDir;
+	hidden var _scrollEndTimer;
+	hidden var _scrollStartTimer;
 	var _data;
 	var _refreshTimer;
 	var _viewUpdated;
@@ -53,6 +55,8 @@ class MainView extends Ui.View {
 		_curPosX = null;
 		_startPosX = null;
 		_xDir = -1;
+		_scrollEndTimer = 0;
+		_scrollStartTimer = 0;
 
 		// 2023-03-20 logMessage("MainView:initialize: _display at " + _display);
 
@@ -269,6 +273,9 @@ class MainView extends Ui.View {
 			}
 			else if (vehicle_name.equals(app_vehicle_name) == false) { // We switched vehicle, have it recalculate our position on screen
 				_curPosX = null;
+				_xDir = -1;
+				_scrollEndTimer = 0;
+				_scrollStartTimer = 0;
 			}
 
 			var fontHeight = Graphics.getFontHeight(Graphics.FONT_SMALL);
@@ -303,13 +310,24 @@ class MainView extends Ui.View {
 					_startPosX = _curPosX;
 				}
 			}
-			else if (textWidth > textMaxWidth+ penWidth) {
-				_curPosX = _curPosX + _xDir;
-				if (_curPosX + textWidth < _startPosX + textMaxWidth && _xDir < 0) {
-					_xDir = 1;
+			else if (textWidth > textMaxWidth + penWidth) {
+				if (_scrollStartTimer > 20) {
+					_curPosX = _curPosX + _xDir;
+
+					if (_curPosX + textWidth < _startPosX + textMaxWidth) {
+						_xDir = 0;
+						_scrollEndTimer = _scrollEndTimer + 1;
+						if (_scrollEndTimer == 20) {
+							_curPosX = center_x - textMaxWidth / 2;
+							_startPosX = _curPosX;
+							_xDir = -1;
+							_scrollEndTimer = 0;
+							_scrollStartTimer = 0;
+						}
+					}
 				}
-				else if (_curPosX >= _startPosX && _xDir > 0) {
-					_xDir = -1;
+				else {
+					_scrollStartTimer = _scrollStartTimer + 1;
 				}
 			}
 

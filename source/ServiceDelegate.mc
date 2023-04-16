@@ -80,7 +80,21 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var timestamp;
         try {
             var clock_time = System.getClockTime();
-            timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+            var hours = clock_time.hour;
+            var minutes = clock_time.min.format("%02d");
+            var suffix = "";
+            if (System.getDeviceSettings().is24Hour == false) {
+                suffix = "am";
+                if (hours == 0) {
+                    hours = 12;
+                }
+                else if (hours > 12) {
+                    suffix = "pm";
+                    hours -= 12;
+                }
+            }
+
+            timestamp = " @ " + hours + ":" + minutes + suffix;
         }
         catch (e) {
             timestamp = "";
@@ -178,7 +192,21 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var timestamp;
         try {
             var clock_time = System.getClockTime();
-            timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
+            var hours = clock_time.hour;
+            var minutes = clock_time.min.format("%02d");
+            var suffix = "";
+            if (System.getDeviceSettings().is24Hour == false) {
+                suffix = "am";
+                if (hours == 0) {
+                    hours = 12;
+                }
+                else if (hours > 12) {
+                    suffix = "pm";
+                    hours -= 12;
+                }
+            }
+
+            timestamp = " @ " + hours + ":" + minutes + suffix;
         }
         catch (e) {
             timestamp = "";
