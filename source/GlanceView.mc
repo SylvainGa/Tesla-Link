@@ -101,14 +101,21 @@ class GlanceView extends Ui.GlanceView {
     var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), Graphics.FONT_TINY);
     var text2Width = dc.getTextWidthInPixels(status, Graphics.FONT_TINY);
 
-    //var textMaxWidth = (2 * radius * Math.sin(Math.toRadians(2 * Math.toDegrees(Math.acos(1 - (15.0 / radius)))) / 2)).toNumber();
+    var biggestTextWidthIndex;
+    if (text1Width > text2Width) {
+      biggestTextWidthIndex = 1;
+    }
+    else {
+      biggestTextWidthIndex = 2;
+    }
+
     if (_curPos1X == null || _prevText1Width != text1Width) {
         _curPos1X = 0;
         _prevText1Width = text1Width;
         _scrollEndTimer = 0;
         _scrollStartTimer = 0;
         if (text1Width > textMaxWidth) {
-          _xDir1 = -1;
+          _xDir1 = -2;
         }
         else {
           _xDir1 = 0;
@@ -120,19 +127,11 @@ class GlanceView extends Ui.GlanceView {
         _scrollEndTimer = 0;
         _scrollStartTimer = 0;
         if (text2Width > textMaxWidth) {
-          _xDir2 = -1;
+          _xDir2 = -2;
         }
         else {
           _xDir2 = 0;
         }
-    }
-
-    var biggestTextWidthIndex;
-    if (text1Width > text2Width) {
-      biggestTextWidthIndex = 1;
-    }
-    else {
-      biggestTextWidthIndex = 2;
     }
 
     if (text1Width > textMaxWidth || text2Width > textMaxWidth) {
@@ -248,6 +247,7 @@ class GlanceView extends Ui.GlanceView {
     var threeLines;
 
     //DEBUG*/ logMessage("Glance height=" + dc.getHeight());
+    //DEBUG*/ logMessage("Glance width=" + dc.getWidth());
     //DEBUG*/ logMessage("Font height=" +  Graphics.getFontHeight(Graphics.FONT_TINY));
 
     if (dc.getHeight() / Graphics.getFontHeight(Graphics.FONT_TINY) >= 3.0) {
@@ -349,7 +349,7 @@ class GlanceView extends Ui.GlanceView {
       _scrollEndTimer = 0;
       _scrollStartTimer = 0;
       if (text1Width > textMaxWidth) {
-        _xDir1 = -1;
+        _xDir1 = -2;
       }
       else {
         _xDir1 = 0;
@@ -361,7 +361,7 @@ class GlanceView extends Ui.GlanceView {
         _scrollEndTimer = 0;
         _scrollStartTimer = 0;
         if (text2Width > textMaxWidth) {
-          _xDir2 = -1;
+          _xDir2 = -2;
         }
         else {
           _xDir2 = 0;
@@ -373,7 +373,7 @@ class GlanceView extends Ui.GlanceView {
         _scrollEndTimer = 0;
         _scrollStartTimer = 0;
         if (text3Width > textMaxWidth) {
-          _xDir3 = -1;
+          _xDir3 = -2;
         }
         else {
           _xDir3 = 0;
