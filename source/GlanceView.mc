@@ -5,9 +5,45 @@ using Toybox.Application.Properties;
 
 (:glance, :can_glance, :bkgnd32kb)
 class GlanceView extends Ui.GlanceView {
+  var _curPos1X;
+  var _curPos2X;
+  var _xDir1;
+  var _xDir2;
+  var _refreshTimer;
+  var _scrollStartTimer;
+  var _scrollEndTimer;
+  var _prevText1Width;
+  var _prevText2Width;
+  
   function initialize() {
     GlanceView.initialize();
   }
+
+	function onShow() {
+		if (Properties.getValue("titleScrolling")) {
+  		_refreshTimer = new Timer.Timer();
+			_refreshTimer.start(method(:refreshView), 50, true);
+		}
+
+    _curPos1X = null;
+    _curPos2X = null;
+    _prevText1Width = 0;
+    _prevText2Width = 0;
+
+    _scrollStartTimer = 0;
+    _scrollEndTimer = 0;
+	}
+	
+	function onHide() {
+    if (_refreshTimer) {
+  		_refreshTimer.stop();
+  		_refreshTimer = null;
+    }
+	}
+
+	function refreshView() {
+    Ui.requestUpdate();
+	}
 
   function onUpdate(dc) {
     // Retrieve the name of the vehicle if we have it, or the generic string otherwise
@@ -55,17 +91,79 @@ class GlanceView extends Ui.GlanceView {
         else if (charging_state.equals("Charging")) {
           chargeSuffix = "+";
         }
-        status = battery_level + "%" + chargeSuffix + " / " + battery_range + timestamp;
+        status = battery_level + "%" + chargeSuffix + " / " + battery_range + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km") + timestamp;
       }
     }
     else {
         status = Ui.loadResource(Rez.Strings.label_launch_widget);
     }
 
+    var textMaxWidth = dc.getWidth();
+
+    var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), Graphics.FONT_TINY);
+    var text2Width = dc.getTextWidthInPixels(status, Graphics.FONT_TINY);
+
+    //var textMaxWidth = (2 * radius * Math.sin(Math.toRadians(2 * Math.toDegrees(Math.acos(1 - (15.0 / radius)))) / 2)).toNumber();
+    if (_curPos1X == null || _prevText1Width != text1Width) {
+        _curPos1X = 0;
+        _prevText1Width = text1Width;
+        _scrollEndTimer = 0;
+        _scrollStartTimer = 0;
+        if (text1Width > textMaxWidth) {
+          _xDir1 = -1;
+        }
+        else {
+          _xDir1 = 0;
+        }
+    }
+    if (_curPos2X == null || _prevText2Width != text2Width) {
+        _curPos2X = 0;
+        _prevText2Width = text2Width;
+        _scrollEndTimer = 0;
+        _scrollStartTimer = 0;
+        if (text2Width > textMaxWidth) {
+          _xDir2 = -1;
+        }
+        else {
+          _xDir2 = 0;
+        }
+    }
+
+    var biggestTextWidthIndex;
+    if (text1Width > text2Width) {
+      biggestTextWidthIndex = 1;
+    }
+    else {
+      biggestTextWidthIndex = 2;
+    }
+
+    if (text1Width > textMaxWidth || text2Width > textMaxWidth) {
+      if (_scrollStartTimer > 20) {
+        _curPos1X = _curPos1X + _xDir1;
+        _curPos2X = _curPos2X + _xDir2;
+
+        if (_curPos1X + text1Width < textMaxWidth) {
+          _xDir1 = 0;
+          if (biggestTextWidthIndex == 1) {
+            _scrollEndTimer = _scrollEndTimer + 1;              
+          }
+        }
+        if (_curPos2X + text2Width < textMaxWidth) {
+          _xDir2 = 0;
+          if (biggestTextWidthIndex == 2) {
+            _scrollEndTimer = _scrollEndTimer + 1;              
+          }
+        }
+      }
+      else {
+        _scrollStartTimer = _scrollStartTimer + 1;
+      }
+    }
+
     // Draw the two rows of text on the glance widget
     dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
     dc.drawText(
-      0,
+      _curPos1X,
       (dc.getHeight() / 8) * 2,
       Graphics.FONT_TINY,
       vehicle_name.toUpper(),
@@ -73,12 +171,20 @@ class GlanceView extends Ui.GlanceView {
     );
 
     dc.drawText(
-      0,
+      _curPos2X,
       (dc.getHeight() / 8) * 6,
       Graphics.FONT_TINY,
       status,
       Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
     );
+
+    if (_scrollEndTimer == 20) {
+      _curPos1X = null;
+      _curPos2X = null;
+
+      _scrollEndTimer = 0;
+      _scrollStartTimer = 0;
+    }
   }
 }
 
@@ -97,7 +203,6 @@ class GlanceView extends Ui.GlanceView {
   var _prevText2Width;
   var _prevText3Width;
   
-  (:bkgnd64kb)
   function initialize() {
     GlanceView.initialize();
   }
@@ -214,7 +319,7 @@ class GlanceView extends Ui.GlanceView {
           chargeSuffix = "+";
         }
 
-        status = battery_level + "%" + chargeSuffix + " / " + battery_range +  + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km") + timestamp;
+        status = battery_level + "%" + chargeSuffix + " / " + battery_range + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km") + timestamp;
       }
     }
     else {
