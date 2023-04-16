@@ -42,8 +42,7 @@ function logMessage(message) {
 function logMessage(message) {
 }
 
-
-(:debug, :background)
+(:background)
 function to_array(string, splitter) {
 	var array = new [30]; //Use maximum expected length
 	var index = 0;
