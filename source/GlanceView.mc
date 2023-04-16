@@ -20,10 +20,8 @@ class GlanceView extends Ui.GlanceView {
   }
 
 	function onShow() {
-		if (Properties.getValue("titleScrolling")) {
-  		_refreshTimer = new Timer.Timer();
-			_refreshTimer.start(method(:refreshView), 50, true);
-		}
+    _refreshTimer = new Timer.Timer();
+    _refreshTimer.start(method(:refreshView), 50, true);
 
     _curPos1X = null;
     _curPos2X = null;
@@ -208,10 +206,8 @@ class GlanceView extends Ui.GlanceView {
   }
 
 	function onShow() {
-		if (Properties.getValue("titleScrolling")) {
-  		_refreshTimer = new Timer.Timer();
-			_refreshTimer.start(method(:refreshView), 50, true);
-		}
+    _refreshTimer = new Timer.Timer();
+    _refreshTimer.start(method(:refreshView), 50, true);
 
     _curPos1X = null;
     _curPos2X = null;
@@ -328,26 +324,36 @@ class GlanceView extends Ui.GlanceView {
       status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
-    //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
-
     var textMaxWidth = dc.getWidth();
 
     var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), Graphics.FONT_TINY);
     var text2Width = dc.getTextWidthInPixels(status, Graphics.FONT_TINY);
     var text3Width = (text != null ? dc.getTextWidthInPixels(text, Graphics.FONT_TINY) : 0);
 
-    //var textMaxWidth = (2 * radius * Math.sin(Math.toRadians(2 * Math.toDegrees(Math.acos(1 - (15.0 / radius)))) / 2)).toNumber();
+    var biggestTextWidth = text1Width;
+    var biggestTextWidthIndex = 1;
+    if (biggestTextWidth < text2Width) {
+      biggestTextWidth = text2Width;
+      biggestTextWidthIndex = 2;
+    }
+    if (biggestTextWidth < text3Width) {
+      biggestTextWidthIndex = 3;
+      biggestTextWidth = text3Width;
+    }
+
     if (_curPos1X == null || _prevText1Width != text1Width) {
-        _curPos1X = 0;
-        _prevText1Width = text1Width;
-        _scrollEndTimer = 0;
-        _scrollStartTimer = 0;
-        if (text1Width > textMaxWidth) {
-          _xDir1 = -1;
-        }
-        else {
-          _xDir1 = 0;
-        }
+      /*DEBUG*/ logMessage("DC width: " + textMaxWidth + ", text width: " + biggestTextWidth + " for line " + biggestTextWidthIndex);
+      /*DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
+      _curPos1X = 0;
+      _prevText1Width = text1Width;
+      _scrollEndTimer = 0;
+      _scrollStartTimer = 0;
+      if (text1Width > textMaxWidth) {
+        _xDir1 = -1;
+      }
+      else {
+        _xDir1 = 0;
+      }
     }
     if (_curPos2X == null || _prevText2Width != text2Width) {
         _curPos2X = 0;
@@ -372,17 +378,6 @@ class GlanceView extends Ui.GlanceView {
         else {
           _xDir3 = 0;
         }
-    }
-
-    var biggestTextWidth = text1Width;
-    var biggestTextWidthIndex = 1;
-    if (biggestTextWidth < text2Width) {
-      biggestTextWidth = text2Width;
-      biggestTextWidthIndex = 2;
-    }
-    if (biggestTextWidth < text3Width) {
-      biggestTextWidthIndex = 3;
-      biggestTextWidth = text3Width;
     }
 
     if (text1Width > textMaxWidth || text2Width > textMaxWidth || text3Width > textMaxWidth) {

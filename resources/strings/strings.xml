@@ -1,6 +1,6 @@
-<strings>
+2<strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.11.0</string>
+    <string id="AppNameVersion">Tesla Link V7.11.2</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">No vehicle</string>

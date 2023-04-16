@@ -43,6 +43,10 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.2 Fixed the following
+- Removed the requirement for vehicle scrolling to scroll the glance data
+- Possible refresh token corruption while in Glance fixed
+
 V7.11.1 Fixed a crash when only two lines to display in Glance under certain conditions
 
 V7.11.0 Added the following
