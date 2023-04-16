@@ -10,27 +10,27 @@ using Toybox.Application.Properties;
 (:background)
 class TeslaLink extends App.AppBase {
     function initialize() {
-		/*DEBUG*/ logMessage("App: Initialising");
+		//DEBUG*/ logMessage("App: Initialising");
         AppBase.initialize();
     }
 
 	function onStart(state) {
-   		/*DEBUG*/ logMessage("App: starting");
+   		//DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		/*DEBUG*/ logMessage("App: stopping");
+		//DEBUG*/ logMessage("App: stopping");
 	}
 
     (:can_glance)
     function getServiceDelegate(){
-		/*DEBUG*/ logMessage("App: getServiceDelegate");
+		//DEBUG*/ logMessage("App: getServiceDelegate");
         return [ new MyServiceDelegate() ];
     }
 
     (:glance, :can_glance, :bkgnd32kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
@@ -38,14 +38,14 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance, :bkgnd64kb)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
 
     function getInitialView() {
-		/*DEBUG*/ logMessage("MainView: Starting");
+		//DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -81,7 +81,7 @@ class TeslaLink extends App.AppBase {
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
         if (data != null) {
-            /*DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
+            //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
             // Refresh our tokens
             var token = data["token"];
@@ -116,7 +116,7 @@ class TeslaLink extends App.AppBase {
                 // No status field in our buffer, built one from our last time we got data. Unless we were down while the vehicle was being used, this data should still be somewhat accurate
                 status = Storage.getValue("status");
                 numFields = 9;
-                /*DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
+                //DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
             }
             // Disect our status line into its elements
             if (status != null && status.equals("") == false) {
@@ -163,7 +163,7 @@ class TeslaLink extends App.AppBase {
             Storage.setValue("status", status);
         }
         else {
-    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         Background.registerForTemporalEvent(new Time.Duration(300));

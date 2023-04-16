@@ -532,13 +532,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken);
 
-			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
-			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
-					/*DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 				} else {
 					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
 				}
