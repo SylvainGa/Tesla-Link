@@ -59,24 +59,33 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var battery_level;
         var charging_state;
         var battery_range;
+        var inside_temp;
+        var sentry;
+        var preconditioning;
+        var shift_state;
 
         var status = Storage.getValue("status");
         if (status != null && status.equals("") == false) {
             var array = to_array(status, "|");
-            if (array.size() == 6) {
+            if (array.size() == 9) {
                 //responseCode = array[0].toNumber();
                 battery_level = array[1];
                 charging_state = array[2];
                 battery_range = array[3];
+                inside_temp = array[4];
+                sentry = array[5];
+                preconditioning = array[6];
             }
         }
         if (battery_level == null) {
             battery_level = "N/A";
             charging_state = "N/A";
             battery_range = "0";
+            inside_temp = 0;
+            sentry = "N/A";
+            preconditioning = "N/A";
         }
 
-        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
         var timestamp;
         try {
             var clock_time = System.getClockTime();
@@ -100,6 +109,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             timestamp = "";
         }
 
+        // Deal with appropriately - we care about awake (200), non authenticated (401) or asleep (408)
         if (responseCode == 200 && responseData != null) {
             var pos = responseData.find("battery_level");
             var str = responseData.substring(pos + 15, pos + 20);
@@ -116,6 +126,26 @@ class MyServiceDelegate extends System.ServiceDelegate {
             posEnd = str.find("\"");
             charging_state = str.substring(0, posEnd);
 
+            pos = responseData.find("inside_temp");
+            str = responseData.substring(pos + 13, pos + 20);
+            posEnd = str.find(",");
+            inside_temp = str.substring(0, posEnd);
+
+            pos = responseData.find("shift_state");
+            str = responseData.substring(pos + 13, pos + 20);
+            posEnd = str.find("\"");
+            shift_state = str.substring(0, posEnd);
+
+            pos = responseData.find("sentry_mode");
+            str = responseData.substring(pos + 13, pos + 20);
+            posEnd = str.find(",");
+            sentry = str.substring(0, posEnd);
+
+            pos = responseData.find("preconditioning_enabled");
+            str = responseData.substring(pos + 25, pos + 32);
+            posEnd = str.find(",");
+            preconditioning = str.substring(0, posEnd);
+
             timestamp = timestamp + "|";
         }
         else if (responseCode == 401) {
@@ -128,7 +158,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
             timestamp = timestamp + "|" + Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
         }
 
-        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
+        if (shift_state != null && shift_state.equals("D")) {
+            status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
+        }
+        else {
+            sentry = (sentry.equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+            preconditioning = (preconditioning.equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+            status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
+        }
+
         data.put("status", status);
 
         /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
