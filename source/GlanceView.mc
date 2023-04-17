@@ -250,7 +250,11 @@ class GlanceView extends Ui.GlanceView {
     //DEBUG*/ logMessage("Glance width=" + dc.getWidth());
     //DEBUG*/ logMessage("Font height=" +  Graphics.getFontHeight(Graphics.FONT_TINY));
 
-    if (dc.getHeight() / Graphics.getFontHeight(Graphics.FONT_TINY) >= 3.0) {
+    var font_used = (Properties.getValue("smallfontsize") ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
+    var height = dc.getHeight();
+    var font_height = Graphics.getFontHeight(font_used);
+    
+    if (height / font_height >= 3.0) {
       threeLines = true;
     }
     else {
@@ -324,11 +328,16 @@ class GlanceView extends Ui.GlanceView {
       status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
     }
 
+    var screenShape = System.getDeviceSettings().screenShape;
     var textMaxWidth = dc.getWidth();
+    if (screenShape == SCREEN_SHAPE_ROUND && Properties.getValue("scrollclearsedge") == true) {
+      var rad = Math.asin(height.toFloat() * (text != null ? 1.0 : 0.8) / textMaxWidth.toFloat());
+      textMaxWidth = (Math.cos(rad) * textMaxWidth.toFloat()).toNumber();
+    }
 
-    var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), Graphics.FONT_TINY);
-    var text2Width = dc.getTextWidthInPixels(status, Graphics.FONT_TINY);
-    var text3Width = (text != null ? dc.getTextWidthInPixels(text, Graphics.FONT_TINY) : 0);
+    var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), font_used);
+    var text2Width = dc.getTextWidthInPixels(status, font_used);
+    var text3Width = (text != null ? dc.getTextWidthInPixels(text, font_used) : 0);
 
     var biggestTextWidth = text1Width;
     var biggestTextWidthIndex = 1;
@@ -342,7 +351,7 @@ class GlanceView extends Ui.GlanceView {
     }
 
     if (_curPos1X == null || _prevText1Width != text1Width) {
-      /*DEBUG*/ logMessage("DC width: " + textMaxWidth + ", text width: " + biggestTextWidth + " for line " + biggestTextWidthIndex);
+      /*DEBUG*/ logMessage("DC width: " + dc.getWidth() + "max allowed: " + textMaxWidth + " text width: " + biggestTextWidth + " for line " + biggestTextWidthIndex);
       /*DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
       _curPos1X = 0;
       _prevText1Width = text1Width;
@@ -412,30 +421,39 @@ class GlanceView extends Ui.GlanceView {
 
     // Draw the two/three rows of text on the glance widget
     dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-    var y = (text != null || threeLines == false ? 0 : (Graphics.getFontHeight(Graphics.FONT_TINY) * 0.5).toNumber());
+
+    var spacing;
+    if (text != null) {
+      spacing = ((height - font_height * 3) / 4).toNumber();
+    }
+    else {
+      spacing = ((height - font_height * 2) / 3).toNumber();
+    }
+
+    var y = spacing;
     dc.drawText(
       _curPos1X,
       y,
-      Graphics.FONT_TINY,
+      font_used,
       vehicle_name.toUpper(),
       Graphics.TEXT_JUSTIFY_LEFT
     );
 
-    y = (text != null || threeLines == false ? Graphics.getFontHeight(Graphics.FONT_TINY) : (Graphics.getFontHeight(Graphics.FONT_TINY) * 1.5).toNumber());
+    y = (spacing * 2 + font_height).toNumber();
     dc.drawText(
       _curPos2X,
       y,
-      Graphics.FONT_TINY,
+      font_used,
       status,
       Graphics.TEXT_JUSTIFY_LEFT
     );
 
     if (text != null) {
-      y = Graphics.getFontHeight(Graphics.FONT_TINY) * 2;
+      y = (spacing * 3 + font_height * 2).toNumber();
       dc.drawText(
         _curPos3X,
         y,
-        Graphics.FONT_TINY,
+        font_used,
         text,
         Graphics.TEXT_JUSTIFY_LEFT
       );

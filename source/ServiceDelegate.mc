@@ -326,7 +326,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            /*DEBUG*/ logMessageAndData("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            /*DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -378,7 +378,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                /*DEBUG*/ logMessageAndData("onReceiveToken: WARNIGN refreshToken received was empty!");
+                /*DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
             /*DEBUG*/ logMessage("onReceiveToken getting data");

@@ -19,6 +19,14 @@
         <settingConfig type="boolean" required="true"/>
     </setting>
 
+    <setting propertyKey="@Properties.smallfontsize" title="@Strings.setting_smallfontsize">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
+    <setting propertyKey="@Properties.scrollclearsedge" title="@Strings.setting_scrollclearsedges">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
     <setting propertyKey="@Properties.swap_frunk_for_port" title="@Strings.setting_defaultUpperLeft">
         <settingConfig type="list">
             <listEntry value="0">@Strings.menu_label_open_frunk</listEntry>

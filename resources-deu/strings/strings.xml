@@ -84,6 +84,8 @@
     <string id="setting_titleScrolling">Enable vehicle name scrolling</string>  <!--  NEW -->
     <string id="menu_label_popUpMenu">PopUp Menu</string>  <!--  NEW -->
     <string id="setting_defaultUpperLeft">Default option for upper left quadrant</string>  <!--  NEW -->
+	<string id="setting_smallfontsize">Use a smaller font in Glance</string>  <!--  NEW -->
+	<string id="setting_scrollclearsedges">Scroll text until the edges have cleared</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Innenraum: </string>

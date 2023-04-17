@@ -43,6 +43,11 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+*V7.11.3 Added the following
+- New algorithm for Glance text vertical placement
+- Option in Settings to choose a smaller font for Glance text. Could allow a third line of text on some watch
+- Option in Settings to allow for scrolling to continue until the text would clear the top or bottom of the screen. Usefull if this App default positin in Glance is at the top or bottom
+
 V7.11.2 Fixed the following
 - Removed the requirement for vehicle scrolling to scroll the glance data
 - Possible refresh token corruption while in Glance fixed
