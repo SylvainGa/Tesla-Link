@@ -1971,20 +1971,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							timestamp = "|";
 						}
 						var status;
-						if (Storage.getValue("bkgnd32kb")) {
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + timestamp;
+						var drive_state = response.get("drive_state");
+						if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
 						}
 						else {
-				            var drive_state = response.get("drive_state");
-							if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
-								status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
-							}
-							else {
-								var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
-								var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
-								status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
-							}
-						}						 
+							var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+							var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
+						}
 						Storage.setValue("status", status);
 
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
