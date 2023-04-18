@@ -1976,8 +1976,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
 						}
 						else {
-							var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
-							var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+							var sentry = (response.get("vehicle_state").get("sentry_mode") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+							var preconditioning = (response.get("charge_state").get("preconditioning_enabled") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
 							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
 						}
 						Storage.setValue("status", status);

@@ -23,7 +23,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var token = Storage.getValue("token");
         var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("onTemporalEvent getting data");
+            //DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
                 "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
@@ -38,14 +38,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             Background.exit({"responseCode" => 401, "status" => "401|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
         }
     }
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
 
         var data = Background.getBackgroundData();
@@ -53,7 +53,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             data = {};
 		}
         else {
-            /*DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
+            //DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
         }
 
         var battery_level;
@@ -169,7 +169,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         data.put("status", status);
 
-        /*DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
+        //DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
         Background.exit(data);
     }
 }
@@ -177,11 +177,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
 (:background, :can_glance, :bkgnd64kb)
 class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
+    var _fromTokenRefresh;
 
     function initialize() {
         _data = Background.getBackgroundData();
         if (_data == null) {
-            /*DEBUG*/ logMessage("ServiceDelegate Initialisation fetching tokens from properties");
+            //DEBUG*/ logMessage("ServiceDelegate Initialisation fetching tokens from properties");
             _data = {};
             _data.put("token", Storage.getValue("token"));
             _data.put("refreshToken", Properties.getValue("refreshToken"));
@@ -189,7 +190,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("TokenCreatedAt", Storage.getValue("TokenCreatedAt"));
         }
         else {
-            /*DEBUG*/ logMessage("ServiceDelegate Initialisation with tokens already");
+            //DEBUG*/ logMessage("ServiceDelegate Initialisation with tokens already");
         }
 
         System.ServiceDelegate.initialize();
@@ -200,7 +201,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var token = Storage.getValue("token");
         var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("onTemporalEvent getting data");
+            //DEBUG*/ logMessage("onTemporalEvent getting data");
+            _fromTokenRefresh = false;
             Communications.makeWebRequest(
                 "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
@@ -210,21 +212,20 @@ class MyServiceDelegate extends System.ServiceDelegate {
                         "User-Agent" => "Tesla-Link for Garmin"
                     },
                     :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
-                    :context => CONTEXT_TEMPORAL_EVENT
                 },
                 method(:onReceiveVehicleData)
             );
         }
         else {
-            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
             Background.exit(_data);
         }
     }
 
-    function onReceiveVehicleData(responseCode, responseData, context) {
+    function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode + ", context is " + context);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode + ", context is " + context);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
 
         var timestamp;
@@ -269,20 +270,20 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||";
             }
             else {
-                var sentry = (response.get("vehicle_state").get("sentry_mode").equals("true") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
-                var preconditioning = (response.get("charge_state").get("preconditioning_enabled").equals("true") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
+                var sentry = (response.get("vehicle_state").get("sentry_mode") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
+                var preconditioning = (response.get("charge_state").get("preconditioning_enabled") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
                 status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|";
             }
 
             _data.put("status", status);
             _data.put("responseCode", responseCode);
 
-            /*DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+            //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
             Background.exit(_data);
             return;
         }
         else if (responseCode == 401) {
-            if (context == CONTEXT_TEMPORAL_EVENT) {
+            if (_fromTokenRefresh == false) {
                 refreshAccessToken();
                 return;
             }
@@ -294,12 +295,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         _data.put("responseCode", responseCode);
 
-        /*DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+        //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
         Background.exit(_data);
     }
 
     function testAwake() {
-        /*DEBUG*/ logMessage("testAwake called");
+        //DEBUG*/ logMessage("testAwake called");
         var token = _data.get("token");
 
         Communications.makeWebRequest(
@@ -317,7 +318,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
 	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
@@ -337,12 +338,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 }
 
                 if (vehicle_index == size) {
-                    /*DEBUG*/ logMessage("onReceiveVehicles: Not found");
+                    //DEBUG*/ logMessage("onReceiveVehicles: Not found");
                     _data.put("vehicleAwake", "Not found");
                 }
                 else {
                     var vehicle_state = vehicles[vehicle_index].get("state");
-                    /*DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
+                    //DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
                     _data.put("vehicleAwake", vehicle_state);
 				}
 			}
@@ -355,16 +356,16 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         _data.put("responseCode", 408);
-        /*DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
+        //DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
         Background.exit(_data);
     }
 
     // Do NOT call from a background process since we're setting registry data in onReceiveToken
     function refreshAccessToken() {
-        /*DEBUG*/ logMessage("refreshAccessToken called");
+        //DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            /*DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            //DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -387,13 +388,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         _data.put("responseCode", 401);
-        /*DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
+        //DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
         Background.exit(_data);
     }
 
     // Do NOT call from a background process since we're setting registry data here
     function onReceiveToken(responseCode, data) {
-        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
         if (responseCode == 200) {
             var token = data["access_token"];
@@ -402,10 +403,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
             //var state = data["state"];
             var created_at = Time.now().value();
 
-			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
-			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-			/*DEBUG*/ logMessage("onReceiveToken: Expires at " + dateStr);
+			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ logMessage("onReceiveToken: Expires at " + dateStr);
 
             //logMessage("onReceiveToken: state field is '" + state + "'");
 
@@ -416,11 +417,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                /*DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
+                //DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
-            /*DEBUG*/ logMessage("onReceiveToken getting data");
+            //DEBUG*/ logMessage("onReceiveToken getting data");
             var vehicle = Storage.getValue("vehicle");
+
+            _fromTokenRefresh = true;
             Communications.makeWebRequest(
                 "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
@@ -430,14 +433,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
                         "User-Agent" => "Tesla-Link for Garmin"
                     },
                     :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON,
-                    :context => CONTEXT_TOKEN_REFRESH
                 },
                 method(:onReceiveVehicleData)
             );
         }
         else {
             _data.put("responseCode", 401);
-            /*DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
+            //DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
             Background.exit(_data);
         }
     }

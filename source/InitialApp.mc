@@ -28,18 +28,9 @@ class TeslaLink extends App.AppBase {
         return [ new MyServiceDelegate() ];
     }
 
-    (:glance, :can_glance, :bkgnd32kb)
+    (:glance, :can_glance)
     function getGlanceView() {
 		//DEBUG*/ logMessage("Glance: Starting");
-        Storage.setValue("bkgnd32kb", true); // Used in MainDelegate to send the correct amount of data through status
-        Background.registerForTemporalEvent(new Time.Duration(60 * 5));
-        return [ new GlanceView() ];
-    }
-
-    (:glance, :can_glance, :bkgnd64kb)
-    function getGlanceView() {
-		//DEBUG*/ logMessage("Glance: Starting");
-        Storage.setValue("bkgnd32kb", false); // Used in MainDelegate to send the correct amount of data through status
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
@@ -81,7 +72,7 @@ class TeslaLink extends App.AppBase {
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
         if (data != null) {
-            /*DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
+            //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
             // Refresh our tokens
             var token = data["token"];
@@ -116,7 +107,7 @@ class TeslaLink extends App.AppBase {
                 // No status field in our buffer, built one from our last time we got data. Unless we were down while the vehicle was being used, this data should still be somewhat accurate
                 status = Storage.getValue("status");
                 numFields = 9;
-                /*DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
+                //DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
             }
             // Disect our status line into its elements
             if (status != null && status.equals("") == false) {
@@ -163,7 +154,7 @@ class TeslaLink extends App.AppBase {
             Storage.setValue("status", status);
         }
         else {
-    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         Background.registerForTemporalEvent(new Time.Duration(300));

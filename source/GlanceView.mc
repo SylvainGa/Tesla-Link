@@ -169,8 +169,8 @@ class GlanceView extends Ui.GlanceView {
     }
 
     if (_curPos1X == null || _prevText1Width != text1Width) {
-      /*DEBUG*/ logMessage("DC width: " + dc.getWidth() + "max allowed: " + textMaxWidth + " text width: " + biggestTextWidth + " for line " + biggestTextWidthIndex);
-      /*DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
+      //DEBUG*/ logMessage("DC width: " + dc.getWidth() + "max allowed: " + textMaxWidth + " text width: " + biggestTextWidth + " for line " + biggestTextWidthIndex);
+      //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
       _curPos1X = 0;
       _prevText1Width = text1Width;
       _scrollEndTimer = 0;
