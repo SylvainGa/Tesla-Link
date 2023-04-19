@@ -9,6 +9,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
     function initialize(controller) {
         Ui.MenuInputDelegate.initialize();
+
         _controller = controller;
         _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;

@@ -88,6 +88,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	
 	function initialize(view as MainView, data, handler) {
 		BehaviorDelegate.initialize();
+	
 		_view = view;
 
 		_settings = System.getDeviceSettings();

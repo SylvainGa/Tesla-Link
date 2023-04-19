@@ -23,12 +23,13 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 
     function initialize (carsName, carsId, controller) {
+        PickerDelegate.initialize();
+
         _carsName = carsName;
         _carsId = carsId;
         _controller = controller;
         //DEBUG*/ logMessage("CarPickerDelegate: _stateMachineCounter was " + _controller._stateMachineCounter);
         _controller._stateMachineCounter = -1;
-        PickerDelegate.initialize();
     }
 
     function onCancel () {

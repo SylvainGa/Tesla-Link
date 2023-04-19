@@ -20,9 +20,10 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 
     function initialize (controller) {
+        PickerDelegate.initialize();
+
         _controller = controller;
         //DEBUG*/ logMessage("SeatPickerDelegate: initialize");
-        PickerDelegate.initialize();
     }
 
     function onCancel () {

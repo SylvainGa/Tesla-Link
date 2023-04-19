@@ -41,6 +41,7 @@ class MainView extends Ui.View {
 	// Initial load - show the 'requesting data' string, make sure we don't process touches
 	function initialize(data) {
 		View.initialize();
+
 		_data = data;
 		_data._ready = false;
 		_errorTimer = 0;

@@ -180,6 +180,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
     var _fromTokenRefresh;
 
     function initialize() {
+        System.ServiceDelegate.initialize();
+
+        _fromTokenRefresh = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
             //DEBUG*/ logMessage("ServiceDelegate Initialisation fetching tokens from properties");
@@ -192,8 +195,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
         else {
             //DEBUG*/ logMessage("ServiceDelegate Initialisation with tokens already");
         }
-
-        System.ServiceDelegate.initialize();
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID

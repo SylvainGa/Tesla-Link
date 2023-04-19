@@ -7,11 +7,15 @@ using Toybox.WatchUi as Ui;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
+var gSettingsChanged;
+
 (:background)
 class TeslaLink extends App.AppBase {
     function initialize() {
-		//DEBUG*/ logMessage("App: Initialising");
         AppBase.initialize();
+        
+		//DEBUG*/ logMessage("App: Initialising");
+        gSettingsChanged = false;
     }
 
 	function onStart(state) {
@@ -21,6 +25,12 @@ class TeslaLink extends App.AppBase {
 	function onStop(state) {
 		//DEBUG*/ logMessage("App: stopping");
 	}
+
+	function onSettingsChanged() {
+		//DEBUG*/ logMessage("App: Settings changed");
+        gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
+        Ui.requestUpdate();
+    }
 
     (:can_glance)
     function getServiceDelegate(){
@@ -52,6 +62,7 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     (:can_glance, :bkgnd32kb)
     function onBackgroundData(data) {
+        gSettingsChanged = true;
         if (data != null) {
             //DEBUG*/ logMessage("onBackgroundData: " + data);
 
@@ -71,6 +82,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
+        gSettingsChanged = true;
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 

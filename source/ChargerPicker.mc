@@ -37,9 +37,10 @@ class ChargerPickerDelegate extends WatchUi.PickerDelegate {
 	
     //! Constructor
     function initialize(controller) {
+        PickerDelegate.initialize();
+
     	_controller = controller;
         //DEBUG*/ logMessage("ChargerPickerDelegate: initialize");
-        PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker

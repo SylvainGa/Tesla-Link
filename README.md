@@ -43,11 +43,12 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.11.4 Fixed the following *** Changes to the Settings means you'll need to reconfigure the app and reenter a refresh token if you use one.
-- A crash when a specific error is received instead of data in the Glance code. 
+V7.11.4 Fixed the following
+- A crash when systems errors are received instead of data in the Glance code
 - Fixed S On/Off P On/Off not showing 'On', just 'Off' in Glance
+- Optimized the Glance scrolling code and made the scrolling speed more consistent across watches resolution
 
-V7.11.3 Added the following
+V7.11.3 Added the following *** Changes to the Settings means you'll need to reconfigure the app and reenter a refresh token if you use one.
 - New algorithm for Glance text vertical placement
 - Option in Settings to choose a smaller font for Glance text. Could allow a third line of text on some watch
 - Option in Settings to allow for scrolling to continue until the text would clear the top or bottom of the screen. Useful if this App default position in Glance is at the top or bottom

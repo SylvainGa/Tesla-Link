@@ -12,6 +12,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
 	
     function initialize(view as ClimateView, handler) {
         BehaviorDelegate.initialize();
+
     	_view = view;
         _handler = handler;
     }

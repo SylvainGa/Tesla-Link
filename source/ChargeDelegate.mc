@@ -12,6 +12,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
 	
     function initialize(view as ChargeView, handler) {
         BehaviorDelegate.initialize();
+
     	_view = view;
         _handler = handler;
     }

@@ -40,9 +40,10 @@ class TemperaturePickerDelegate extends WatchUi.PickerDelegate {
 	
     //! Constructor
     function initialize(controller) {
+        PickerDelegate.initialize();
+
     	_controller = controller;
         //DEBUG*/ logMessage("TemperaturePickerDelegate: initialize");
-        PickerDelegate.initialize();
     }
 
     //! Handle a cancel event from the picker

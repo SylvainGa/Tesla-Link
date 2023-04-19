@@ -6,6 +6,7 @@ class SimpleConfirmDelegate extends Ui.ConfirmationDelegate {
 
     function initialize(on_confirmYes, on_confirmNo) {
         ConfirmationDelegate.initialize();
+
         _on_confirmYes = on_confirmYes;
         _on_confirmNo = on_confirmNo;
     }

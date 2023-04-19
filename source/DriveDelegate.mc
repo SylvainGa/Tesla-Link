@@ -12,6 +12,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
 	
     function initialize(view as DriveView, handler) {
         BehaviorDelegate.initialize();
+
     	_view = view;
         _handler = handler;
     }

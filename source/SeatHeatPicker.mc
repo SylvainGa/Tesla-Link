@@ -42,9 +42,10 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
     var _controller;
 
     function initialize (controller) {
+        PickerDelegate.initialize();
+
         _controller = controller;
         //DEBUG*/ logMessage("SeatHeatPickerDelegate: initialize");
-        PickerDelegate.initialize();
     }
 
     function onCancel () {
