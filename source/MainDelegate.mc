@@ -531,7 +531,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			//logMessage("onReceiveToken: state field is '" + state + "'");
 
-			_saveToken(accessToken);
+			_saveToken(accessToken, expires_in, created_at);
 
 			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
 			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
@@ -543,7 +543,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				} else {
 					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
 				}
-				Settings.setRefreshToken(refreshToken, expires_in, created_at);
+				Settings.setRefreshToken(refreshToken);
 			}
 			else {
 				//DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
@@ -554,7 +554,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_need_auth = true;
 			_auth_done = false;
 
-			Settings.setRefreshToken(null, 0, 0);
+			Settings.setRefreshToken(null);
 
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
 	    }
@@ -2263,8 +2263,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		//DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
-            Settings.setToken(null);
-            Settings.setRefreshToken(null, 0, 0);
+            _resetToken();
+            Settings.setRefreshToken(null);
             Storage.setValue("vehicle", null);
 			Storage.setValue("ResetNeeded", true);
 			_handler.invoke([0, -1, null]);
@@ -2275,17 +2275,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 1;
 	}
 
-	function _saveToken(token) {
+	function _saveToken(token, expires_in, created_at) {
 		_token = token;
 		_auth_done = true;
-		Settings.setToken(token);
+		Settings.setToken(token, expires_in, created_at);
 	}
 
 	function _resetToken() {
 		//DEBUG*/ logMessage("_resetToken: Reseting tokens");
 		_token = null;
 		_auth_done = false;
-		Settings.setToken(null);
+		Settings.setToken(null, 0, 0);
 	}
 
 	var errorsStr = {

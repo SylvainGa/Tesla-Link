@@ -14,44 +14,47 @@ class TeslaLink extends App.AppBase {
     function initialize() {
         AppBase.initialize();
 
-		//DEBUG*/ logMessage("App: Initialising");
+		/*DEBUG*/ logMessage("App: Initialising");
         gSettingsChanged = false;
     }
 
 	function onStart(state) {
-   		//DEBUG*/ logMessage("App: starting");
+   		/*DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		//DEBUG*/ logMessage("App: stopping");
+		/*DEBUG*/ logMessage("App: stopping");
 	}
 
 	function onSettingsChanged() {
-		//DEBUG*/ logMessage("App: Settings changed");
+		/*DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
         Ui.requestUpdate();
     }
 
     (:can_glance)
     function getServiceDelegate(){
-		//DEBUG*/ logMessage("App: getServiceDelegate");
+		/*DEBUG*/ logMessage("App: getServiceDelegate");
         return [ new MyServiceDelegate() ];
     }
 
     (:glance, :can_glance)
     function getGlanceView() {
-		//DEBUG*/ logMessage("Glance: Starting");
+		/*DEBUG*/ logMessage("Glance: Starting");
+        Storage.setValue("inGlance", true);
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
 
     function getInitialView() {
-		//DEBUG*/ logMessage("MainView: Starting");
+		/*DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
             return [ new OfflineView() ];
         }
+
+        Storage.setValue("inGlance", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
         var data = new TeslaData();
@@ -62,6 +65,11 @@ class TeslaLink extends App.AppBase {
     // This fires when the background service returns
     (:can_glance, :bkgnd32kb)
     function onBackgroundData(data) {
+
+        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            return;
+        }
+
         gSettingsChanged = true;
         if (data != null) {
             //DEBUG*/ logMessage("onBackgroundData: " + data);
@@ -75,13 +83,18 @@ class TeslaLink extends App.AppBase {
     		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
-        Background.registerForTemporalEvent(new Time.Duration(300));
+        // No need, it keeps going until the app stops or it's deleted
+        //Background.registerForTemporalEvent(new Time.Duration(300));
 
         Ui.requestUpdate();
     }  
 
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
+        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            return;
+        }
+        
         gSettingsChanged = true;
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
@@ -95,6 +108,9 @@ class TeslaLink extends App.AppBase {
             token = data["refreshToken"];
             if (token != null && token.equals("") == false) {
                 Properties.setValue("refreshToken", token);
+            }
+            else {
+                /*DEBUG*/ logMessage("Tried to reset the refresh token!");
             }
 
             token = data["TokenExpiresIn"];
@@ -174,7 +190,8 @@ class TeslaLink extends App.AppBase {
     		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
-        Background.registerForTemporalEvent(new Time.Duration(300));
+        // No need, it keeps going until the app stops or it's deleted
+        //Background.registerForTemporalEvent(new Time.Duration(300));
 
         Ui.requestUpdate();
     }

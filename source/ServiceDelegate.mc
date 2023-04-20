@@ -20,6 +20,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
+        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            Background.exit(null);
+            return;
+        }
+
         var token = Storage.getValue("token");
         var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
@@ -199,6 +204,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
+        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            Background.exit(null);
+            return;
+        }
+
         var token = Storage.getValue("token");
         var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {

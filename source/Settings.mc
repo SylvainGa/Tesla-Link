@@ -7,8 +7,10 @@ using Toybox.Application.Properties;
 module Settings {
 
     //! Store access token
-    function setToken(token) {
+    function setToken(token, expires_in, created_at) {
         Storage.setValue("token", token);
+        Storage.setValue("TokenExpiresIn", expires_in);
+        Storage.setValue("TokenCreatedAt", created_at);
     }
 
     //! Get access token
@@ -18,10 +20,11 @@ module Settings {
     }
 
     //! Store refresh token
-    function setRefreshToken(token, expires_in, created_at) {
+    function setRefreshToken(token) {
+        if (token == null || token.equals("")) {
+            /*DEBUG*/ logMessage("Reseting the refresh token!");
+        }
         Properties.setValue(REFRESH_TOKEN, token);
-        Storage.setValue("TokenExpiresIn", expires_in);
-        Storage.setValue("TokenCreatedAt", created_at);
     }
 
     //! Get auth token
