@@ -39,7 +39,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
         else {
             //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
-            Background.exit({"responseCode" => 401, "status" => "401|N/A|N/A|0||" + Application.loadResource(Rez.Strings.label_launch_widget)});
+            Background.exit({"responseCode" => 401, "status" => "401|N/A|N/A|0|0|N/A|N/A||" + Application.loadResource(Rez.Strings.label_launch_widget)});
         }
     }
 

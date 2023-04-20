@@ -474,22 +474,30 @@ class MainView extends Ui.View {
 					//logMessage("MainView:onUpdate: venting: " + venting + " locked: " + _data._vehicle_data.get("vehicle_state").get("locked") + " climate: " + climate_state);
 				}*/
 
-				if (climate_state == false) {
+				try {
+					if (climate_state == false) {
+						bm = Ui.loadResource(Rez.Drawables.climate_off_icon) as BitmapResource;
+						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_off) as BitmapResource;
+						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_off) as BitmapResource;
+					}
+					else if (left_temp_direction < 0 && !climate_defrost) {
+						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Cooling drv:" + driver_temp + " inside:" + inside_temp); }
+						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_blue) as BitmapResource;
+						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_blue) as BitmapResource;
+						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_blue) as BitmapResource;
+					}
+					else {
+						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Heating drv:" + driver_temp + " inside:" + inside_temp); }
+						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_red) as BitmapResource;
+						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_red) as BitmapResource;
+						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_red) as BitmapResource;
+					}
+				}
+				catch (e) {
+					//DEBUG*/ logMessage("View:onUpdate: Caught exception " + e);
 					bm = Ui.loadResource(Rez.Drawables.climate_off_icon) as BitmapResource;
 					bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_off) as BitmapResource;
 					bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_off) as BitmapResource;
-				}
-				else if (left_temp_direction < 0 && !climate_defrost) {
-					// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Cooling drv:" + driver_temp + " inside:" + inside_temp); }
-					bm = Ui.loadResource(Rez.Drawables.climate_on_icon_blue) as BitmapResource;
-					bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_blue) as BitmapResource;
-					bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_blue) as BitmapResource;
-				}
-				else {
-					// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Heating drv:" + driver_temp + " inside:" + inside_temp); }
-					bm = Ui.loadResource(Rez.Drawables.climate_on_icon_red) as BitmapResource;
-					bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_red) as BitmapResource;
-					bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_red) as BitmapResource;
 				}
 
 				// Draw the climate icon

@@ -118,8 +118,14 @@ class GlanceView extends Ui.GlanceView {
                 battery_level = array[1];
                 charging_state = array[2];
                 battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
-                inside_temp = array[4].toNumber();
-                inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
+                try {
+                  inside_temp = array[4].toNumber();
+                  inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
+                }
+                catch (e) {
+                  //DEBUG*/ logMessage("Glance:onUpdate: Caught exception " + e);
+                  inside_temp = "N/A";
+                }
                 sentry = array[5];
                 preconditioning = array[6];
                 timestamp = array[7];

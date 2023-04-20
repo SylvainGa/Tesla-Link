@@ -13,7 +13,7 @@ var gSettingsChanged;
 class TeslaLink extends App.AppBase {
     function initialize() {
         AppBase.initialize();
-        
+
 		//DEBUG*/ logMessage("App: Initialising");
         gSettingsChanged = false;
     }
@@ -109,7 +109,12 @@ class TeslaLink extends App.AppBase {
 
             // Fetch was passed to us to process/display
             var responseCode = data["responseCode"];
+            if (responseCode == null) {
+                responseCode = 401;
+            }
+
             var timestamp = data["timestamp"];
+
             var text;
 
             // If we have a status field, we got good data at least once since last time we ran so use that to display, otherwise grab the old status and break it down so we can rebuild it
@@ -155,11 +160,11 @@ class TeslaLink extends App.AppBase {
                     text = Application.loadResource(Rez.Strings.label_asleep);
                 }
                 else { // We got a 408 error while not asleep, show the error and timestap (if any)
-                    text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+                    text = Application.loadResource(Rez.Strings.label_error) + responseCode;
                 }
             }
             else {
-                text = Application.loadResource(Rez.Strings.label_error) + responseCode.toString();
+                text = Application.loadResource(Rez.Strings.label_error) + responseCode;
             }
 
             status = status + (timestamp != null ? timestamp : "") + "|" + text;

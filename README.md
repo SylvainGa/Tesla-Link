@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.5 Fixed three crashes reported through Error Reporting Application (ERA)
+
 V7.11.4 Fixed the following
 - A crash when systems errors are received instead of data in the Glance code
 - Fixed S On/Off P On/Off not showing 'On', just 'Off' in Glance
