@@ -73,6 +73,11 @@ class GlanceView extends Ui.GlanceView {
         _curPos1X = null;
         _curPos2X = null;
         _curPos3X = null;
+
+        _xDir1 = 0;
+        _xDir2 = 0;
+        _xDir3 = 0;
+
         _prevText1Width = 0;
         _prevText2Width = 0;
         _prevText3Width = 0;
@@ -93,7 +98,9 @@ class GlanceView extends Ui.GlanceView {
         }
 
         var vehicle_name = Storage.getValue("vehicle_name");
-        vehicle_name = (vehicle_name == null) ? Ui.loadResource(Rez.Strings.vehicle) : vehicle_name;
+        if (vehicle_name == null) {
+            vehicle_name = Ui.loadResource(Rez.Strings.vehicle);
+        }
 
         var responseCode;
         var battery_level;
@@ -119,12 +126,12 @@ class GlanceView extends Ui.GlanceView {
                 charging_state = array[2];
                 battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
                 try {
-                  inside_temp = array[4].toNumber();
-                  inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
+                    inside_temp = array[4].toNumber();
+                    inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
                 }
                 catch (e) {
                   //DEBUG*/ logMessage("Glance:onUpdate: Caught exception " + e);
-                  inside_temp = "N/A";
+                    inside_temp = "N/A";
                 }
                 sentry = array[5];
                 preconditioning = array[6];
@@ -197,44 +204,27 @@ class GlanceView extends Ui.GlanceView {
             longestTextWidth = text3Width;
         }
 
-        var resetPos = (_prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width);
-
-        if (_curPos1X == null || resetPos) {
+        if (_curPos1X == null || _curPos2X == null || _curPos3X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
             //DEBUG*/ logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
             //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
+            resetSavedPosition();
             _curPos1X = 0;
+            _curPos2X = 0;
+            _curPos3X = 0;
+
             _prevText1Width = text1Width;
-            _scrollEndTimer = 0;
-            _scrollStartTimer = 0;
             if (text1Width > _dcWidth) {
                 _xDir1 = _steps;
             }
-            else {
-                _xDir1 = 0;
-            }
-        }
-        if (_curPos2X == null || resetPos) {
-            _curPos2X = 0;
+
             _prevText2Width = text2Width;
-            _scrollEndTimer = 0;
-            _scrollStartTimer = 0;
             if (text2Width > _dcWidth) {
                 _xDir2 = _steps;
             }
-            else {
-                _xDir2 = 0;
-            }
-        }
-        if (_curPos3X == null || resetPos) {
-            _curPos3X = 0;
+
             _prevText3Width = text3Width;
-            _scrollEndTimer = 0;
-            _scrollStartTimer = 0;
             if (text3Width > _dcWidth) {
                 _xDir3 = _steps;
-            }
-            else {
-                _xDir3 = 0;
             }
         }
 
@@ -247,18 +237,18 @@ class GlanceView extends Ui.GlanceView {
                 if (_curPos1X + text1Width < _dcWidth) {
                     _xDir1 = 0;
                     if (longestTextWidthIndex == 1) {
-                    _scrollEndTimer = _scrollEndTimer + 1;              
+                        _scrollEndTimer = _scrollEndTimer + 1;              
                     }
                 }
                 if (_curPos2X + text2Width < _dcWidth) {
                     _xDir2 = 0;
                     if (longestTextWidthIndex == 2) {
-                    _scrollEndTimer = _scrollEndTimer + 1;              
+                        _scrollEndTimer = _scrollEndTimer + 1;              
                     }
                 }
                 if (_curPos3X + text3Width < _dcWidth) {
                     if (longestTextWidthIndex == 3) {
-                    _scrollEndTimer = _scrollEndTimer + 1;              
+                        _scrollEndTimer = _scrollEndTimer + 1;              
                     }
                     _xDir3 = 0;
                 }
@@ -309,12 +299,7 @@ class GlanceView extends Ui.GlanceView {
         }
 
         if (_scrollEndTimer == 20) {
-            _curPos1X = null;
-            _curPos2X = null;
-            _curPos3X = null;
-
-            _scrollEndTimer = 0;
-            _scrollStartTimer = 0;
+            resetSavedPosition();
         }
     }
 }

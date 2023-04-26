@@ -7,11 +7,6 @@ using Toybox.WatchUi as Ui;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
-enum /* WEB REQUEST CONTEXT */ {
-	CONTEXT_TEMPORAL_EVENT = 0,
-	CONTEXT_TOKEN_REFRESH = 1
-}
-
 (:background, :can_glance, :bkgnd32kb)
 class MyServiceDelegate extends System.ServiceDelegate {
     function initialize() {
@@ -20,7 +15,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
-        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+        if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
             Background.exit(null);
             return;
         }
@@ -208,8 +203,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
-        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
+        if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            //DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
             return;
         }
@@ -381,7 +376,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         //DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            /*DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            //DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -433,7 +428,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                /*DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
+                //DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
             //DEBUG*/ logMessage("onReceiveToken getting data");

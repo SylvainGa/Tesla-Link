@@ -1637,6 +1637,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		Ui.pushView(thisMenu, new OptionMenuDelegate(self), Ui.SLIDE_UP );
 	}
 
+	function onBack() {
+		//DEBUG*/ logMessage("onBack: called");
+        Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
+	}
+
 	function onTap(click) {
 		if (!_data._ready)
 		{

@@ -18,14 +18,22 @@ class TeslaLink extends App.AppBase {
         gSettingsChanged = false;
     }
 
+    (:can_glance, :bkgnd64kb)
 	function onStart(state) {
    		//DEBUG*/ logMessage("App: starting");
 	}
 
+    (:can_glance, :bkgnd64kb)
 	function onStop(state) {
-		//DEBUG*/ logMessage("App: stopping");
+        // if (Storage.getValue("runBG")) {
+    	// 	//DEBUG*/ logMessage("App: stopping with runBG True");
+        // }
+        // else {
+    	// 	//DEBUG*/ logMessage("App: stopping with runBG False");
+        // }
 	}
 
+    (:can_glance, :bkgnd64kb)
 	function onSettingsChanged() {
 		//DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
@@ -41,7 +49,7 @@ class TeslaLink extends App.AppBase {
     (:glance, :can_glance)
     function getGlanceView() {
 		//DEBUG*/ logMessage("Glance: Starting");
-        Storage.setValue("inGlance", true);
+        Storage.setValue("runBG", true);
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
@@ -54,7 +62,7 @@ class TeslaLink extends App.AppBase {
             return [ new OfflineView() ];
         }
 
-        Storage.setValue("inGlance", false);
+        Storage.setValue("runBG", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
         var data = new TeslaData();
@@ -66,8 +74,8 @@ class TeslaLink extends App.AppBase {
     (:can_glance, :bkgnd32kb)
     function onBackgroundData(data) {
 
-        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("onBackgroundData: In main view, skipping background sent data");
+        if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            //DEBUG*/ logMessage("onBackgroundData: In main view, skipping background sent data");
             return;
         }
 
@@ -92,7 +100,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
     function onBackgroundData(data) {
-        if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+        if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
             return;
         }
         
@@ -111,7 +119,7 @@ class TeslaLink extends App.AppBase {
                 Properties.setValue("refreshToken", token);
             }
             else {
-                /*DEBUG*/ logMessage("Tried to reset the refresh token!");
+                //DEBUG*/ logMessage("Tried to reset the refresh token!");
             }
 
             token = data["TokenExpiresIn"];

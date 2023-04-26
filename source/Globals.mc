@@ -8,6 +8,7 @@ function logMessageAndData(message, data) {
 }
 
 (:debug, :background)
+/*DEBUG
 function logMessageAndData(message, data) {
 	if (data == null) {
 		logMessage(message + "No DATA");
@@ -31,6 +32,7 @@ function logMessageAndData(message, data) {
 		logMessage(message + " responseCode=" + responseCode + " status=" + status + " timestamp=" + timestamp + " token=" + token + " refreshToken=" + refreshToken + " vehicleAwake=" + vehicleAwake);
 	}
 }
+*/
 
 function validateNumber(value) {
 	if (value == null || value instanceof Lang.Boolean) {
@@ -97,7 +99,7 @@ function validateBoolean(value) {
 		return false;
 	}
 }
-
+/*
 (:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
@@ -108,7 +110,7 @@ function logMessage(message) {
 (:release, :background)
 function logMessage(message) {
 }
-
+*/
 (:background)
 function to_array(string, splitter) {
 	var array = new [30]; //Use maximum expected length
