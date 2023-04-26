@@ -3,12 +3,12 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Lang;
 
+/*DEBUG
 (:release, :background)
 function logMessageAndData(message, data) {
 }
 
 (:debug, :background)
-/*DEBUG
 function logMessageAndData(message, data) {
 	if (data == null) {
 		logMessage(message + "No DATA");
