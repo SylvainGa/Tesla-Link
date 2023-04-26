@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.6a Forgot to update the version in Settings, no other change
+
 V7.11.6 Fixed more crashes reported through Error Reporting Application (ERA) and optimized/made more robust the Glance, Data View and error reporting code.
 
 V7.11.5 Fixed three crashes reported through Error Reporting Application (ERA)
