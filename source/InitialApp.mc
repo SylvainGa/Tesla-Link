@@ -14,40 +14,40 @@ class TeslaLink extends App.AppBase {
     function initialize() {
         AppBase.initialize();
 
-		/*DEBUG*/ logMessage("App: Initialising");
+		//DEBUG*/ logMessage("App: Initialising");
         gSettingsChanged = false;
     }
 
 	function onStart(state) {
-   		/*DEBUG*/ logMessage("App: starting");
+   		//DEBUG*/ logMessage("App: starting");
 	}
 
 	function onStop(state) {
-		/*DEBUG*/ logMessage("App: stopping");
+		//DEBUG*/ logMessage("App: stopping");
 	}
 
 	function onSettingsChanged() {
-		/*DEBUG*/ logMessage("App: Settings changed");
+		//DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
         Ui.requestUpdate();
     }
 
     (:can_glance)
     function getServiceDelegate(){
-		/*DEBUG*/ logMessage("App: getServiceDelegate");
+		//DEBUG*/ logMessage("App: getServiceDelegate");
         return [ new MyServiceDelegate() ];
     }
 
     (:glance, :can_glance)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("inGlance", true);
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
 
     function getInitialView() {
-		/*DEBUG*/ logMessage("MainView: Starting");
+		//DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -67,6 +67,7 @@ class TeslaLink extends App.AppBase {
     function onBackgroundData(data) {
 
         if (Storage.getValue("inGlance") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            /*DEBUG*/ logMessage("onBackgroundData: In main view, skipping background sent data");
             return;
         }
 
@@ -144,7 +145,7 @@ class TeslaLink extends App.AppBase {
             }
             // Disect our status line into its elements
             if (status != null && status.equals("") == false) {
-                var array = to_array(status, "|");
+                var array = $.to_array(status, "|");
                 if (array.size() == numFields) {
                     //responseCode = array[0].toNumber();
                     var battery_level = array[1];

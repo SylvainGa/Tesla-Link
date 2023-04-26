@@ -1,6 +1,7 @@
 using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
+using Toybox.Lang;
 
 (:release, :background)
 function logMessageAndData(message, data) {
@@ -28,6 +29,72 @@ function logMessageAndData(message, data) {
 		var vehicleAwake = data["vehicleAwake"];
 
 		logMessage(message + " responseCode=" + responseCode + " status=" + status + " timestamp=" + timestamp + " token=" + token + " refreshToken=" + refreshToken + " vehicleAwake=" + vehicleAwake);
+	}
+}
+
+function validateNumber(value) {
+	if (value == null || value instanceof Lang.Boolean) {
+		return 0;
+	}
+
+	try {
+		value = value.toNumber();
+		if (value == null) {
+			value = 0;
+		}
+	}
+	catch (e) {
+		value = 0;
+	}
+	return value;
+}
+
+function validateFloat(value) {
+	if (value == null || value instanceof Lang.Boolean) {
+		return 0.0;
+	}
+
+	try {
+		value = value.toFloat();
+		if (value == null) {
+			value = 0.0;
+		}
+	}
+	catch (e) {
+		value = 0.0;
+	}
+	return value;
+}
+
+function validateString(value) {
+	if (value == null || value instanceof Lang.Boolean) {
+		return "";
+	}
+
+	try {
+		value = value.toString();
+		if (value == null) {
+			value = "";
+		}
+	}
+	catch (e) {
+		value = "";
+	}
+	return value;
+}
+
+function validateBoolean(value) {
+	if (value != null && value instanceof Lang.Boolean) {
+		try {
+			value = (value == true);
+		}
+		catch (e) {
+			value = false;
+		}
+		return value;
+	}
+	else {
+		return false;
 	}
 }
 

@@ -111,7 +111,7 @@ class GlanceView extends Ui.GlanceView {
 
         var status = Storage.getValue("status");
         if (status != null && status.equals("") == false) {
-            var array = to_array(status, "|");
+            var array = $.to_array(status, "|");
 
             if (array.size() == 9) {
                 responseCode = array[0].toNumber();

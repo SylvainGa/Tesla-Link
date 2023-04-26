@@ -556,7 +556,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			Settings.setRefreshToken(null);
 
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, buildErrorString(responseCode)]);
 	    }
 
 		_stateMachineCounter = 1;
@@ -919,9 +919,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
 					_stateMachineCounter = 1;
 				}
-				else {
+				else if (_data._vehicle_data.get("climate_state").get("steering_wheel_heater") != null) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
 					_tesla.climateSteeringWheel(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+				}
+				else {
+					_stateMachineCounter = 1;
 				}
 				break;
 
@@ -1626,7 +1629,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});
-		var menuItems = to_array(Properties.getValue("optionMenuOrder"), ",");
+		var menuItems = $.to_array(Properties.getValue("optionMenuOrder"), ",");
 		for (var i = 0; i < menuItems.size(); i++) {
 			addMenuItem(thisMenu, menuItems[i]);
 		}
@@ -1856,7 +1859,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, self), Ui.SLIDE_UP);
 		} else {
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
 	}
@@ -1909,7 +1912,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_resetToken();
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
 			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+	            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 	        }
 
 		}
@@ -2058,14 +2061,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 					_vehicle_id = -2;
-		            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 				} else if (responseCode == 401) {
 	                // Unauthorized, retry
 	                _need_auth = true;
 	                _resetToken();
 		            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
 				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-		            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 		        }
 			}
 	    }
@@ -2083,13 +2086,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_wake_done = false;
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 				_vehicle_id = -2;
-				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+				_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			} else if (responseCode == 401) { // Unauthorized, retry
 				_resetToken();
 				_need_auth = true;
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
 			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+				_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			}
 		}
 		_stateMachineCounter = 1;
@@ -2121,7 +2124,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("onReceiveVehicleState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
+			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
 		}
 
 		_handler.invoke([0, -1, result]);
@@ -2145,7 +2148,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("onReceiveClimateState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
+			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
 		}
 
 		_handler.invoke([0, -1, result]);
@@ -2169,7 +2172,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("onReceiveChargeState: WARNING Out of order data or missing timestamp, ignoring");
 			}
 		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()];
+			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
 		}
 
 		_handler.invoke([0, -1, result]);
@@ -2194,7 +2197,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		} else {  // Our call failed, say the error and back to the main code
 			//DEBUG*/ logMessage("vehicleStateHandler: " + responseCode + " running StateMachine in 100msec");
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
 	}
@@ -2216,7 +2219,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_pendingPriorityRequests["getClimateState"] = 10;
 			}
 		} else { // Our call failed, say the error and back to the main code
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			//DEBUG*/ logMessage("climateStateHandler: " + responseCode + " running StateMachine in 100msec");
 			_stateMachineCounter = 1;
 		}
@@ -2240,7 +2243,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		} else { // Our call failed, say the error and back to the main code
 			//DEBUG*/ logMessage("chargeStateHandler: " + responseCode + " running StateMachine in 100msec");
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
 	}
@@ -2252,7 +2255,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 		}
 
 		_stateMachineCounter = 1;
@@ -2269,10 +2272,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Storage.setValue("ResetNeeded", true);
 			_handler.invoke([0, -1, null]);
 		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + Ui.loadResource(Rez.Strings.label_error) + responseCode.toString() + "\n" + errorsStr[responseCode.toString()]]);
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 		}
 
 		_stateMachineCounter = 1;
+	}
+
+	function buildErrorString(responseCode) {
+		if (responseCode == null || errorsStr[responseCode.toString()] == null) {
+			return(Ui.loadResource(Rez.Strings.label_error) + responseCode);
+		}
+		else {
+			return(Ui.loadResource(Rez.Strings.label_error) + responseCode + "\n" + errorsStr[responseCode.toString()]);
+		}
 	}
 
 	function _saveToken(token, expires_in, created_at) {
