@@ -9,7 +9,7 @@ Based on the work of srwalter and paulobrien and posted with their blessing. Lin
 My work includes enhancing the touch display interface, increasing the reliability of the communication, adding many features to the Option menu, adding the selection/order of the Option menu and adding data screens. I try to keep the application up to date with new features added by Tesla once they become available to the community.
 
 <p align="center">
-  <img src="https://github.com/SylvainGa/Tesla-Link/blob/develop/blob/venu2.png?raw=true" />
+  <img src="https://github.com/SylvainGa/Tesla-Link/blob/master/blob/venu2.png?raw=true" />
 </p>
 
 **Keep in mind the Tesla API that the community is using is unsupported by Tesla and can be revoked/modified by them as they see fit.**
