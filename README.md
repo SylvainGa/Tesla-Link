@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.7 Fixed more crashes reported through Error Reporting Application (ERA) and made more robust the validation of data sent by the vehicle. I wish Tesla would standardized the data it sends across all models/features/years.
+
 V7.11.6 Fixed more crashes reported through Error Reporting Application (ERA) and optimized/made more robust the Glance, Data View and error reporting code.
 
 V7.11.5 Fixed three crashes reported through Error Reporting Application (ERA)
