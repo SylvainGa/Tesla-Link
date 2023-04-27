@@ -1955,9 +1955,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 						var battery_level = response.get("charge_state").get("battery_level");
-						var battery_range = response.get("charge_state").get("battery_range");
+						var battery_range = $.validateNumber(response.get("charge_state").get("battery_range"));
 						var charging_state = response.get("charge_state").get("charging_state");
-						var inside_temp = response.get("climate_state").get("inside_temp");
+						var inside_temp = $.validateNumber(response.get("climate_state").get("inside_temp"));
 
 						var timestamp;
 						try {
@@ -1981,13 +1981,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						var status;
 						var drive_state = response.get("drive_state");
+						status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range + "|" + inside_temp + "|";
 						if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
+							status = status + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
 						}
 						else {
-							var sentry = (response.get("vehicle_state").get("sentry_mode") ? Application.loadResource(Rez.Strings.label_s_on) : Application.loadResource(Rez.Strings.label_s_off));
-							var preconditioning = (response.get("charge_state").get("preconditioning_enabled") ? Application.loadResource(Rez.Strings.label_p_on) : Application.loadResource(Rez.Strings.label_p_off));
-							status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
+							var sentry = Application.loadResource($.validateBoolean(response.get("vehicle_state").get("sentry_mode")) ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
+							var preconditioning = Application.loadResource($.validateBoolean(response.get("charge_state").get("preconditioning_enabled")) ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
+							status = status + sentry + "|" + preconditioning + "|" + timestamp;
 						}
 						Storage.setValue("status", status);
 

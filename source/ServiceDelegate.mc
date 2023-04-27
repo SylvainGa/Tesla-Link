@@ -71,8 +71,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 //responseCode = array[0].toNumber();
                 battery_level = array[1];
                 charging_state = array[2];
-                battery_range = array[3];
-                inside_temp = array[4];
+                battery_range = $.validateNumber(array[3]);
+                inside_temp = $.validateNumber(array[4]);
                 sentry = array[5];
                 preconditioning = array[6];
             }
@@ -80,7 +80,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (battery_level == null) {
             battery_level = "N/A";
             charging_state = "N/A";
-            battery_range = "0";
+            battery_range = 0;
             inside_temp = 0;
             sentry = "N/A";
             preconditioning = "N/A";
@@ -116,37 +116,37 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var pos = responseData.find("battery_level");
             var str = responseData.substring(pos + 15, pos + 20);
             var posEnd = str.find(",");
-            battery_level = str.substring(0, posEnd);
+            battery_level = $.validateNumber(str.substring(0, posEnd));
 
             pos = responseData.find("battery_range");
             str = responseData.substring(pos + 15, pos + 22);
             posEnd = str.find(",");
-            battery_range = str.substring(0, posEnd);
+            battery_range = $.validateNumber(str.substring(0, posEnd));
 
             pos = responseData.find("charging_state");
             str = responseData.substring(pos + 17, pos + 37);
             posEnd = str.find("\"");
-            charging_state = str.substring(0, posEnd);
+            charging_state = $.validateString(str.substring(0, posEnd));
 
             pos = responseData.find("inside_temp");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            inside_temp = str.substring(0, posEnd);
+            inside_temp = $.validateNumber(str.substring(0, posEnd));
 
             pos = responseData.find("shift_state");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            shift_state = str.substring(0, posEnd);
+            shift_state = $.validateString(str.substring(0, posEnd));
 
             pos = responseData.find("sentry_mode");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            sentry = str.substring(0, posEnd);
+            sentry = Application.loadResource($.validateString(str.substring(0, posEnd)).equals("true") ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
 
             pos = responseData.find("preconditioning_enabled");
             str = responseData.substring(pos + 25, pos + 32);
             posEnd = str.find(",");
-            preconditioning = str.substring(0, posEnd);
+            preconditioning = Application.loadResource($.validateString(str.substring(0, posEnd)).equals("true") ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
 
             suffix = "";
         }
@@ -161,14 +161,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         timestamp = timestamp + "|" + suffix;
+        status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range + "|" + inside_temp + "|";
 
         if (shift_state != null && shift_state.equals("\"P\"") == false && shift_state.equals("null") == false) {
-            status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
+            status = status + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
         }
         else {
-            sentry = Application.loadResource(sentry.equals("true") ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
-            preconditioning = Application.loadResource(preconditioning.equals("true") ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
-            status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|" + timestamp;
+            status = status + sentry + "|" + preconditioning + "|" + timestamp;
         }
 
         data.put("status", status);
@@ -272,18 +271,19 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var status;
 
 			var response = responseData.get("response");
-            battery_level = response.get("charge_state").get("battery_level");
-            battery_range = response.get("charge_state").get("battery_range");
-            charging_state = response.get("charge_state").get("charging_state");
-            inside_temp = response.get("climate_state").get("inside_temp");
+            battery_level = $.validateNumber(response.get("charge_state").get("battery_level"));
+            battery_range = $.validateNumber(response.get("charge_state").get("battery_range"));
+            charging_state = $.validateString(response.get("charge_state").get("charging_state"));
+            inside_temp = $.validateNumber(response.get("climate_state").get("inside_temp"));
+            status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range + "|" + inside_temp + "|";
             var drive_state = response.get("drive_state");
             if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
-                status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + Application.loadResource(Rez.Strings.label_driving) + "||";
+                status = status + Application.loadResource(Rez.Strings.label_driving) + "||";
             }
             else {
-                var sentry = Application.loadResource(response.get("vehicle_state").get("sentry_mode") ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
-                var preconditioning = Application.loadResource(response.get("charge_state").get("preconditioning_enabled") ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
-                status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "| " + sentry + "| " + preconditioning + "|";
+                var sentry = Application.loadResource($.validateBoolean(response.get("vehicle_state").get("sentry_mode")) ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
+                var preconditioning = Application.loadResource($.validateBoolean(response.get("charge_state").get("preconditioning_enabled")) ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
+                status = status + sentry + "|" + preconditioning + "|";
             }
 
             _data.put("status", status);

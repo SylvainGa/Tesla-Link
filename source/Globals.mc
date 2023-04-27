@@ -34,6 +34,7 @@ function logMessageAndData(message, data) {
 }
 */
 
+(:background)
 function validateNumber(value) {
 	if (value == null || value instanceof Lang.Boolean) {
 		return 0;
@@ -51,6 +52,7 @@ function validateNumber(value) {
 	return value;
 }
 
+(:background)
 function validateFloat(value) {
 	if (value == null || value instanceof Lang.Boolean) {
 		return 0.0;
@@ -68,6 +70,7 @@ function validateFloat(value) {
 	return value;
 }
 
+(:background)
 function validateString(value) {
 	if (value == null || value instanceof Lang.Boolean) {
 		return "";
@@ -85,6 +88,7 @@ function validateString(value) {
 	return value;
 }
 
+(:background)
 function validateBoolean(value) {
 	if (value != null && value instanceof Lang.Boolean) {
 		try {
@@ -134,4 +138,3 @@ function to_array(string, splitter) {
 	}
 	return result;
 }
-

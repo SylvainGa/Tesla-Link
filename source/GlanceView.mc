@@ -121,18 +121,11 @@ class GlanceView extends Ui.GlanceView {
             var array = $.to_array(status, "|");
 
             if (array.size() == 9) {
-                responseCode = array[0].toNumber();
+                responseCode = $.validateNumber(array[0]);
                 battery_level = array[1];
                 charging_state = array[2];
-                battery_range = (array[3].toNumber() * (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6)).toNumber();
-                try {
-                    inside_temp = array[4].toNumber();
-                    inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp * 9 / 5) + 32) + "°F" : inside_temp + "°C";
-                }
-                catch (e) {
-                  //DEBUG*/ logMessage("Glance:onUpdate: Caught exception " + e);
-                    inside_temp = "N/A";
-                }
+                battery_range = (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? array[3] + " km" : ($.validateNumber(array[3]) * 1.6).format("%d") + " miles");
+                inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? array[4] + "°C" : (($.validateNumber(array[4]) * 9) / 5 + 32).format("%d") + "°F");
                 sentry = array[5];
                 preconditioning = array[6];
                 timestamp = array[7];
@@ -159,10 +152,10 @@ class GlanceView extends Ui.GlanceView {
 
                 if (_threeLines) {
                     if (responseCode == 200) {
-                        text = inside_temp + sentry + preconditioning;
+                        text = inside_temp + " " + sentry + " " + preconditioning;
                     }
                     else if (vehicleAsleep) {
-                        text = Application.loadResource(Rez.Strings.label_asleep) + preconditioning;
+                        text = Application.loadResource(Rez.Strings.label_asleep) + " " + preconditioning;
                     }
                 }
                 else {
@@ -180,7 +173,7 @@ class GlanceView extends Ui.GlanceView {
                     chargeSuffix = "+";
                 }
 
-                status = battery_level + "%" + chargeSuffix + " / " + battery_range + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km") + timestamp;
+                status = battery_level + "%" + chargeSuffix + " / " + battery_range + timestamp;
             }
         }
         else {
@@ -204,7 +197,7 @@ class GlanceView extends Ui.GlanceView {
             longestTextWidth = text3Width;
         }
 
-        if (_curPos1X == null || _curPos2X == null || _curPos3X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
+        if (_curPos1X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
             //DEBUG*/ logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
             //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
             resetSavedPosition();
@@ -269,29 +262,26 @@ class GlanceView extends Ui.GlanceView {
             spacing = ((_dcHeight - _fontHeight * 2) / 3).toNumber();
         }
 
-        var y = spacing;
         dc.drawText(
             _curPos1X,
-            y,
+            spacing,
             _usingFont,
             vehicle_name.toUpper(),
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
-        y = (spacing * 2 + _fontHeight).toNumber();
         dc.drawText(
             _curPos2X,
-            y,
+            (spacing * 2 + _fontHeight).toNumber(),
             _usingFont,
             status,
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
         if (text != null) {
-            y = (spacing * 3 + _fontHeight * 2).toNumber();
             dc.drawText(
             _curPos3X,
-            y,
+            (spacing * 3 + _fontHeight * 2).toNumber(),
             _usingFont,
             text,
             Graphics.TEXT_JUSTIFY_LEFT
