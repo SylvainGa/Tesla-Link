@@ -533,9 +533,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken, expires_in, created_at);
 
-			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
-			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
@@ -546,10 +546,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				Settings.setRefreshToken(refreshToken);
 			}
 			else {
-				//DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+				/*DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
 		} else {
-			//DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
+			/*DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
@@ -1954,10 +1954,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
-						var battery_level = response.get("charge_state").get("battery_level");
-						var battery_range = $.validateNumber(response.get("charge_state").get("battery_range"));
-						var charging_state = response.get("charge_state").get("charging_state");
-						var inside_temp = $.validateNumber(response.get("climate_state").get("inside_temp"));
+						var status = {};
+
+						status.put("responseCode", responseCode);
 
 						var timestamp;
 						try {
@@ -1975,21 +1974,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 									hours -= 12;
 								}
 							}
-							timestamp = " @ " + hours + ":" + minutes + suffix + "|";
+							timestamp = " @ " + hours + ":" + minutes + suffix;
 						} catch (e) {
-							timestamp = "|";
+							timestamp = "";
 						}
-						var status;
-						var drive_state = response.get("drive_state");
-						status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range + "|" + inside_temp + "|";
-						if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
-							status = status + Application.loadResource(Rez.Strings.label_driving) + "||" + timestamp;
-						}
-						else {
-							var sentry = Application.loadResource($.validateBoolean(response.get("vehicle_state").get("sentry_mode")) ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
-							var preconditioning = Application.loadResource($.validateBoolean(response.get("charge_state").get("preconditioning_enabled")) ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
-							status = status + sentry + "|" + preconditioning + "|" + timestamp;
-						}
+						status.put("timestamp", timestamp);
+
+						status.put("battery_level", $.validateNumber(response.get("charge_state").get("battery_level")));
+						status.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range")));
+						status.put("charging_state", $.validateString(response.get("charge_state").get("charging_state")));
+						status.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp")));
+						status.put("shift_state", $.validateString(response.get("drive_state").get("shift_state")));
+						status.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode")));
+						status.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled")));
+
 						Storage.setValue("status", status);
 
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
@@ -2047,7 +2045,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					} catch (e) {
 						timestamp = "";
 					}
-					Storage.setValue("status", Application.loadResource(Rez.Strings.label_asleep) + timestamp);
+					Storage.setValue("status", Ui.loadResource(Rez.Strings.label_asleep) + timestamp);
 				}*/
 
 				var i = _408_count + 1;
@@ -2270,7 +2268,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function revokeHandler(responseCode, data) {
 		SpinSpinner(responseCode);
 
-		//DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
+		/*DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
             _resetToken();
             Settings.setRefreshToken(null);

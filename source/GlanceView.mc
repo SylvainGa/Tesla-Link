@@ -26,6 +26,7 @@ class GlanceView extends Ui.GlanceView {
 
     function initialize() {
         GlanceView.initialize();
+        gSettingsChanged = true;
     }
 
     function onShow() {
@@ -42,7 +43,6 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onLayout(dc) {
-        gSettingsChanged = false;
         _usingFont = (Properties.getValue("smallfontsize") ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
         _fontHeight = Graphics.getFontHeight(_usingFont);
         _dcHeight = dc.getHeight();
@@ -92,99 +92,132 @@ class GlanceView extends Ui.GlanceView {
 
     function onUpdate(dc) {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
+        /*DEBUG*/ var showLog = false;
 
         if (gSettingsChanged) {
+            /*DEBUG*/ showLog = true;
+            gSettingsChanged = false;
             onLayout(dc);
         }
 
-        var vehicle_name = Storage.getValue("vehicle_name");
-        if (vehicle_name == null) {
-            vehicle_name = Ui.loadResource(Rez.Strings.vehicle);
-        }
-
         var responseCode;
+        var timestamp;
         var battery_level;
         var charging_state;
         var battery_range;
         var inside_temp;
         var sentry;
         var preconditioning;
-        var timestamp;
-        var text;
+        var shift_state;
+        var vehicleAwake;
+
+        var line1;
+        var line2;
+        var line3;
+
+        line1 = Storage.getValue("vehicle_name");
+        if (line1 != null) {
+            line1 = line1.toUpper();
+        }
+        else {
+            line1 = Ui.loadResource(Rez.Strings.vehicle);
+        }
 
         //DEBUG*/ logMessage("Glance height=" + dc.getHeight());
         //DEBUG*/ logMessage("Glance width=" + dc.getWidth());
         //DEBUG*/ logMessage("Font height=" +  Graphics.getFontHeight(Graphics.FONT_TINY));
 
         var status = Storage.getValue("status");
-        if (status != null && status.equals("") == false) {
-            var array = $.to_array(status, "|");
+        if (status != null && status instanceof Lang.Dictionary) { // Dictionary? Yep, new format. Otherwise wait until we get one.
+            responseCode = status["responseCode"];
+            timestamp = status["timestamp"];
+            battery_level = status["battery_level"];
+            charging_state = status["charging_state"];
+            battery_range = status["battery_range"];
+            inside_temp = status["inside_temp"];
+            sentry = status["sentry"];
+            preconditioning = status["preconditioning"];
+            shift_state = status["shift_state"];
+            vehicleAwake = status["vehicleAwake"];
+        }
 
-            if (array.size() == 9) {
-                responseCode = $.validateNumber(array[0]);
-                battery_level = array[1];
-                charging_state = array[2];
-                battery_range = (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? array[3] + " km" : ($.validateNumber(array[3]) * 1.6).format("%d") + " miles");
-                inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? array[4] + "°C" : (($.validateNumber(array[4]) * 9) / 5 + 32).format("%d") + "°F");
-                sentry = array[5];
-                preconditioning = array[6];
-                timestamp = array[7];
-                text = array[8];
-                if (text != null && text.equals("")) {
-                    text = null;
-                }
+        var token = Storage.getValue("token");
+        var vehicle = Storage.getValue("vehicle");
+        var suffix = "";
+        var txt;
+
+        // Build our third line in case we need it
+        if (inside_temp != null) {
+            inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? inside_temp + "°C" : ((inside_temp * 9) / 5 + 32).format("%d") + "°F");
+        }
+        else {
+            inside_temp = "";
+        }
+        if (sentry != null) {
+            sentry = " " + Ui.loadResource(sentry ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
+        }
+        else {
+            sentry = "";
+        }
+        if (preconditioning != null) {
+            preconditioning = " " + Ui.loadResource(preconditioning ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
+        }
+        else {
+            preconditioning = "";
+        }
+
+        // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
+        if (responseCode == 200) {
+            if (charging_state != null && charging_state.equals("Charging")) {
+                suffix = "+";
             }
-
-            if (battery_level == null || battery_level.equals("N/A")) {
-                if (text != null) {
-                    status = text + timestamp;
-                    text = null;
-                }
-                else {
-                    var token = Storage.getValue("token");
-                    var vehicle = Storage.getValue("vehicle");
-                    status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
+        }
+        else if (responseCode == 408) {
+            if (vehicleAwake != null && vehicleAwake.equals("asleep")) {
+                txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
+                if (!_threeLines) {
+                    suffix = "s";
                 }
             }
             else {
-                var vehicleAsleep = (text != null && text.equals(Application.loadResource(Rez.Strings.label_asleep)));
-                var chargeSuffix = "";
-
-                if (_threeLines) {
-                    if (responseCode == 200) {
-                        text = inside_temp + " " + sentry + " " + preconditioning;
-                    }
-                    else if (vehicleAsleep) {
-                        text = Application.loadResource(Rez.Strings.label_asleep) + " " + preconditioning;
-                    }
-                }
-                else {
-                    text = null;
-
-                    if (vehicleAsleep) {
-                        chargeSuffix = "s";
-                    }
-                    else if (responseCode != 200) {
-                        chargeSuffix = "?";
-                    }
-                }
-
-                if (charging_state.equals("Charging")) {
-                    chargeSuffix = "+";
-                }
-
-                status = battery_level + "%" + chargeSuffix + " / " + battery_range + timestamp;
+                txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning;
+            }
+        }
+        else if (responseCode == 401 || responseCode == null) {
+            txt =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
+            if (!_threeLines) {
+                suffix = "?";
             }
         }
         else {
-            var token = Storage.getValue("token");
-            var vehicle = Storage.getValue("vehicle");
-            status =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
+            txt = Ui.loadResource(Rez.Strings.label_error) + responseCode;
         }
 
-        var text1Width = dc.getTextWidthInPixels(vehicle_name.toUpper(), _usingFont);
-        var text2Width = dc.getTextWidthInPixels(status, _usingFont);
-        var text3Width = (text != null ? dc.getTextWidthInPixels(text, _usingFont) : 0);
+        // Build or main glance line
+        if (battery_level != null && battery_range != null) {
+            line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? battery_range + " km" : (battery_range * 1.6).format("%d") + " miles") + timestamp;
+
+            if (txt == null && _threeLines) {
+                if (shift_state != null && shift_state.equals("P") == false) { // We're moving
+                    line3 = inside_temp + " " + Ui.loadResource(Rez.Strings.label_driving);
+                }
+                else {
+                    line3 = inside_temp + sentry + preconditioning;
+                }
+            }
+        }
+
+        // Unless we have something to display already on our third line, build one
+        if (line2 == null) {
+            line2 = txt;
+        }
+        else if (line3 == null && _threeLines) {
+            line3 = txt;
+        }
+
+        var text1Width = dc.getTextWidthInPixels(line1, _usingFont);
+        var text2Width = dc.getTextWidthInPixels(line2, _usingFont);
+        var text3Width = (line3 != null ? dc.getTextWidthInPixels(line3, _usingFont) : 0);
 
         var longestTextWidth = text1Width;
         var longestTextWidthIndex = 1;
@@ -197,9 +230,12 @@ class GlanceView extends Ui.GlanceView {
             longestTextWidth = text3Width;
         }
 
+        /*DEBUG*/ if (showLog) {
+        //DEBUG*/   logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
+        /*DEBUG*/   logMessage("Showing " + line1 + " | " +  line2 + " | " + line3);
+        /*DEBUG*/ }
+        
         if (_curPos1X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
-            //DEBUG*/ logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
-            //DEBUG*/ logMessage("Showing " + vehicle_name.toUpper() + " | " +  status + " | " + text);
             resetSavedPosition();
             _curPos1X = 0;
             _curPos2X = 0;
@@ -255,7 +291,7 @@ class GlanceView extends Ui.GlanceView {
         dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
         var spacing;
-        if (text != null) {
+        if (line3 != null) {
             spacing = ((_dcHeight - _fontHeight * 3) / 4).toNumber();
         }
         else {
@@ -266,7 +302,7 @@ class GlanceView extends Ui.GlanceView {
             _curPos1X,
             spacing,
             _usingFont,
-            vehicle_name.toUpper(),
+            line1,
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
@@ -274,16 +310,16 @@ class GlanceView extends Ui.GlanceView {
             _curPos2X,
             (spacing * 2 + _fontHeight).toNumber(),
             _usingFont,
-            status,
+            line2,
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
-        if (text != null) {
+        if (line3 != null) {
             dc.drawText(
             _curPos3X,
             (spacing * 3 + _fontHeight * 2).toNumber(),
             _usingFont,
-            text,
+            line3,
             Graphics.TEXT_JUSTIFY_LEFT
             );
         }

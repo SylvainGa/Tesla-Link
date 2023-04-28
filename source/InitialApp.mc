@@ -33,9 +33,9 @@ class TeslaLink extends App.AppBase {
         // }
 	}
 
-    (:can_glance, :bkgnd64kb)
+    (:can_glance)
 	function onSettingsChanged() {
-		//DEBUG*/ logMessage("App: Settings changed");
+		/*DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
         Ui.requestUpdate();
     }
@@ -48,14 +48,14 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance)
     function getGlanceView() {
-		//DEBUG*/ logMessage("Glance: Starting");
+		/*DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("runBG", true);
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
     }
 
     function getInitialView() {
-		//DEBUG*/ logMessage("MainView: Starting");
+		/*DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -70,37 +70,10 @@ class TeslaLink extends App.AppBase {
 		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
     }
 
-    // This fires when the background service returns
-    (:can_glance, :bkgnd32kb)
-    function onBackgroundData(data) {
-
-        if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            //DEBUG*/ logMessage("onBackgroundData: In main view, skipping background sent data");
-            return;
-        }
-
-        gSettingsChanged = true;
-        if (data != null) {
-            //DEBUG*/ logMessage("onBackgroundData: " + data);
-
-            var status = data["status"];
-            if (status != null) {
-                Storage.setValue("status", status);
-            }
-        }
-        else {
-    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
-        }
-
-        // No need, it keeps going until the app stops or it's deleted
-        //Background.registerForTemporalEvent(new Time.Duration(300));
-
-        Ui.requestUpdate();
-    }  
-
-    (:can_glance, :bkgnd64kb)
+    (:can_glance)
     function onBackgroundData(data) {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
+            /*DEBUG*/ logMessage("onBackgroundData: Main view running, skipping");
             return;
         }
         
@@ -110,7 +83,7 @@ class TeslaLink extends App.AppBase {
 
             // Refresh our tokens
             var token = data["token"];
-            if (token != null) {
+            if (token != null && token.equals("") == false) {
                 Storage.setValue("token", token);
             }
 
@@ -119,7 +92,7 @@ class TeslaLink extends App.AppBase {
                 Properties.setValue("refreshToken", token);
             }
             else {
-                //DEBUG*/ logMessage("Tried to reset the refresh token!");
+                /*DEBUG*/ logMessage("onBackgroundData: Tried to reset the refresh token!");
             }
 
             token = data["TokenExpiresIn"];
@@ -132,71 +105,59 @@ class TeslaLink extends App.AppBase {
                 Storage.setValue("TokenCreatedAt", token);
             }
 
-            // Fetch was passed to us to process/display
-            var responseCode = data["responseCode"];
-            if (responseCode == null) {
-                responseCode = 401;
+            // Read what we had before
+            var status = Storage.getValue("status");
+            if(status == null) {
+                status = {};
             }
 
-            var timestamp = data["timestamp"];
-
-            var text;
-
-            // If we have a status field, we got good data at least once since last time we ran so use that to display, otherwise grab the old status and break it down so we can rebuild it
-            var numFields = 8;
-            var status = data["status"];
-            if (status == null) {
-                // No status field in our buffer, built one from our last time we got data. Unless we were down while the vehicle was being used, this data should still be somewhat accurate
-                status = Storage.getValue("status");
-                numFields = 9;
-                //DEBUG*/ logMessage("onBackgroundData reusing previous status: " + status);
+            // Fetch was passed to us and replace the old value if we have new one
+            var value = data["responseCode"];
+            if (value != null) {
+                status.put("responseCode", value);
             }
-            // Disect our status line into its elements
-            if (status != null && status.equals("") == false) {
-                var array = $.to_array(status, "|");
-                if (array.size() == numFields) {
-                    //responseCode = array[0].toNumber();
-                    var battery_level = array[1];
-                    var charging_state = array[2];
-                    var battery_range = array[3];
-                    var inside_temp = array[4];
-                    var sentry = array[5];
-                    var preconditioning = array[6];
-                    // These two are not kept so we ignore them
-                    // var timestamp = array[7];
-                    // var label = array[8];
-
-                    status = responseCode + "|" + battery_level + "|" + charging_state + "|" + battery_range.toNumber() + "|" + inside_temp + "|" + sentry + "|" + preconditioning + "|";
-                }
-                else { // Wrong format, start fresh
-                    status = responseCode + "|N/A|N/A|0|0|N/A|N/A|";
-                }
+            value = data["timestamp"];
+            if (value != null) {
+                status.put("timestamp", value);
             }
-
-            if (responseCode == 200) { // Our last vehicle data query was successful, display our status 'as is'
-                text = "";
+            value = data["battery_level"];
+            if (value != null) {
+                status.put("battery_level", value);
             }
-            else if (responseCode == 401) { // We tried but couldn't get or vehicle data because of our token, tell the Glance view to ask the user to launch the widget
-                text = Application.loadResource(Rez.Strings.label_launch_widget);
+            value = data["charging_state"];
+            if (value != null) {
+                status.put("charging_state", value);
             }
-            else if (responseCode == 408) { // We got a vehicle not available, see what the vehicle list returned
-                var vehicleAwake = data["vehicleAwake"];
-                if (vehicleAwake != null && vehicleAwake.equals("asleep") == true) { // We're asleep, say so plus timestap (if any)
-                    text = Application.loadResource(Rez.Strings.label_asleep);
-                }
-                else { // We got a 408 error while not asleep, show the error and timestap (if any)
-                    text = Application.loadResource(Rez.Strings.label_error) + responseCode;
-                }
+            value = data["battery_range"];
+            if (value != null) {
+                status.put("battery_range", value);
             }
-            else {
-                text = Application.loadResource(Rez.Strings.label_error) + responseCode;
+            value = data["inside_temp"];
+            if (value != null) {
+                status.put("inside_temp", value);
+            }
+            value = data["sentry"];
+            if (value != null) {
+                status.put("sentry", value);
+            }
+            value = data["preconditioning"];
+            if (value != null) {
+                status.put("preconditioning", value);
+            }
+            value = data["shift_state"];
+            if (value != null) {
+                status.put("shift_state", value);
+            }
+            value = data["vehicleAwake"];
+            if (value != null) {
+                status.put("vehicleAwake", value);
             }
 
-            status = status + (timestamp != null ? timestamp : "") + "|" + text;
+    		/*DEBUG*/ logMessage("onBackgroundData status is " + status);
             Storage.setValue("status", status);
         }
         else {
-    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         // No need, it keeps going until the app stops or it's deleted
