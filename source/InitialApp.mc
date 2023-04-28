@@ -48,7 +48,7 @@ class TeslaLink extends App.AppBase {
 
     (:glance, :can_glance)
     function getGlanceView() {
-		/*DEBUG*/ logMessage("Glance: Starting");
+		//DEBUG*/ logMessage("Glance: Starting");
         Storage.setValue("runBG", true);
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
         return [ new GlanceView() ];
@@ -107,7 +107,12 @@ class TeslaLink extends App.AppBase {
 
             // Read what we had before
             var status = Storage.getValue("status");
-            if(status == null) {
+            if (status != null && !(status instanceof Lang.Dictionary)) {
+                Storage.deleteValue("status");
+                status = null;
+            }
+
+            if (status == null) {
                 status = {};
             }
 

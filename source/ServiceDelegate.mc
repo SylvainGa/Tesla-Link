@@ -44,7 +44,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         var data = Background.getBackgroundData();
@@ -145,9 +145,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
             /*DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
             _data = {};
             _data.put("token", Storage.getValue("token"));
-            _data.put("refreshToken", Properties.getValue("refreshToken"));
             _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
             _data.put("TokenCreatedAt", Storage.getValue("TokenCreatedAt"));
+            _data.put("refreshToken", Properties.getValue("refreshToken"));
         }
         else {
             /*DEBUG*/ logMessage("ServiceDelegate: have tokens");
@@ -188,8 +188,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: responseCode = " + responseCode);
-        //DEBUG*/ logMessage("onReceiveVehicleData: responseData = " + responseData);
+        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         _data.put("responseCode", responseCode);
 
@@ -236,7 +236,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 return;
             }
             else {
-                /*DEBUG*/ logMessage("onReceiveVehicleData: refreshAccessToken!");
+                /*DEBUG*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
             }
         }
         else if (responseCode == 408) {
@@ -341,7 +341,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // Do NOT call from a background process since we're setting registry data here
     function onReceiveToken(responseCode, data) {
-        //DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
         if (responseCode == 200) {
             var token = data["access_token"];

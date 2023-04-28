@@ -2,6 +2,8 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
+using Toybox.Time;
+using Toybox.Time.Gregorian;
 
 (:glance, :can_glance)
 class GlanceView extends Ui.GlanceView {
@@ -23,15 +25,51 @@ class GlanceView extends Ui.GlanceView {
     var _dcHeight;
     var _threeLines;
     var _steps;
+    var _showLaunch;
 
     function initialize() {
         GlanceView.initialize();
         gSettingsChanged = true;
     }
 
+(:bkgnd32kb)
     function onShow() {
+        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
+        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
+        var expired;
+        if (tokenCreatedAt != null && tokenExpiresIn != null) {
+    		var timeNow = Time.now().value();
+		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
+        }
+        else {
+            expired = true;
+        }
+        _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired);
+        
         _refreshTimer = new Timer.Timer();
         _refreshTimer.start(method(:refreshView), 50, true);
+
+        resetSavedPosition();
+    }
+
+(:bkgnd64kb)
+    function onShow() {
+        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
+        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
+        var expired;
+        if (tokenCreatedAt != null && tokenExpiresIn != null) {
+    		var timeNow = Time.now().value();
+		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
+        }
+        else {
+            expired = true;
+        }
+
+        _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired || Properties.getValue("RefreshToken") == null || Storage.getValue("vehicle") == null);
+
+        _refreshTimer = new Timer.Timer();
+        _refreshTimer.start(method(:refreshView), 50, true);
+
         resetSavedPosition();
     }
 
@@ -141,8 +179,6 @@ class GlanceView extends Ui.GlanceView {
             vehicleAwake = status["vehicleAwake"];
         }
 
-        var token = Storage.getValue("token");
-        var vehicle = Storage.getValue("vehicle");
         var suffix = "";
         var txt;
 
@@ -184,9 +220,9 @@ class GlanceView extends Ui.GlanceView {
             }
         }
         else if (responseCode == 401 || responseCode == null) {
-            txt =  Ui.loadResource(token != null && vehicle != null ? Rez.Strings.label_waiting_data : Rez.Strings.label_launch_widget);
+            txt =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
             if (!_threeLines) {
-                suffix = "?";
+                line2 = txt;
             }
         }
         else {
@@ -194,11 +230,11 @@ class GlanceView extends Ui.GlanceView {
         }
 
         // Build or main glance line
-        if (battery_level != null && battery_range != null) {
+        if (battery_level != null && battery_range != null && line2 == null) {
             line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? battery_range + " km" : (battery_range * 1.6).format("%d") + " miles") + timestamp;
 
             if (txt == null && _threeLines) {
-                if (shift_state != null && shift_state.equals("P") == false) { // We're moving
+                if (shift_state != null && shift_state.equals("") == false && shift_state.equals("P") == false) { // We're moving
                     line3 = inside_temp + " " + Ui.loadResource(Rez.Strings.label_driving);
                 }
                 else {
