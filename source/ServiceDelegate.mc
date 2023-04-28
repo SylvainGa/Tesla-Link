@@ -161,7 +161,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             Background.exit(null);
         }
 
-        var token = Storage.getValue("token");
+        var token = _data.get("token");
         var vehicle = Storage.getValue("vehicle");
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
