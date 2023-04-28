@@ -65,7 +65,10 @@ class GlanceView extends Ui.GlanceView {
             expired = true;
         }
 
-        _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired || Properties.getValue("RefreshToken") == null || Storage.getValue("vehicle") == null);
+        var noToken = (Storage.getValue("token") == null);
+        var noVehicle = (Storage.getValue("vehicle") == null);
+        var noRefreshToken = Properties.getValue("refreshToken") == null;
+        _showLaunch = (expired || noToken || noVehicle || noRefreshToken);
 
         _refreshTimer = new Timer.Timer();
         _refreshTimer.start(method(:refreshView), 50, true);

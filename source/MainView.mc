@@ -85,6 +85,7 @@ class MainView extends Ui.View {
 	}
 	
 	function onHide() {
+        Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 		_refreshTimer.stop();
 		_refreshTimer = null;
 	}
