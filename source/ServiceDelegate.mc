@@ -37,7 +37,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             Background.exit({"responseCode" => 401});
         }
     }
@@ -142,7 +142,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _fromTokenRefresh = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
-            /*DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
+            //DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
             _data = {};
             _data.put("token", Storage.getValue("token"));
             _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
@@ -150,14 +150,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("refreshToken", Properties.getValue("refreshToken"));
         }
         else {
-            /*DEBUG*/ logMessage("ServiceDelegate: have tokens");
+            //DEBUG*/ logMessage("ServiceDelegate: have tokens");
         }
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
+            //DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
@@ -180,7 +180,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
             Background.exit(_data);
         }
@@ -188,7 +188,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         _data.put("responseCode", responseCode);
@@ -236,7 +236,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 return;
             }
             else {
-                /*DEBUG*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
+                //DEBUG*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
             }
         }
         else if (responseCode == 408) {
@@ -312,7 +312,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         //DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            /*DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            //DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -341,7 +341,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // Do NOT call from a background process since we're setting registry data here
     function onReceiveToken(responseCode, data) {
-        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
         if (responseCode == 200) {
             var token = data["access_token"];
@@ -364,7 +364,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                /*DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
+                //DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
             //DEBUG*/ logMessage("onReceiveToken getting data");
