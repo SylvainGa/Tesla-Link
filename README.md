@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.11.9 Fixed a crashe reported through Error Reporting Application (ERA) 
+
 V7.11.8 
 - Fixed more crashes reported through Error Reporting Application (ERA) 
 - Fixed error 401 not using the new token in glance

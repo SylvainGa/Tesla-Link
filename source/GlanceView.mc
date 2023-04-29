@@ -182,9 +182,6 @@ class GlanceView extends Ui.GlanceView {
             vehicleAwake = status["vehicleAwake"];
         }
 
-        var suffix = "";
-        var txt;
-
         // Build our third line in case we need it
         if (inside_temp != null) {
             inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? inside_temp + "°C" : ((inside_temp * 9) / 5 + 32).format("%d") + "°F");
@@ -204,6 +201,9 @@ class GlanceView extends Ui.GlanceView {
         else {
             preconditioning = "";
         }
+
+        var suffix = "";
+        var txt;
 
         // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
         if (responseCode == 200) {
@@ -232,7 +232,7 @@ class GlanceView extends Ui.GlanceView {
             txt = Ui.loadResource(Rez.Strings.label_error) + responseCode;
         }
 
-        // Build or main glance line
+        // Build or main glance line unless we have already something more important to display in line2 and don't have a third line to display in
         if (battery_level != null && battery_range != null && line2 == null) {
             line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? battery_range + " km" : (battery_range * 1.6).format("%d") + " miles") + timestamp;
 
@@ -246,10 +246,16 @@ class GlanceView extends Ui.GlanceView {
             }
         }
 
-        // Unless we have something to display already on our third line, build one
+        // Last chance to build line2
         if (line2 == null) {
-            line2 = txt;
+            if (txt == null) {
+                line2 =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
+            }
+            else {
+                line2 = txt;
+            }
         }
+        // And if we have a line2, see if we should also build line3
         else if (line3 == null && _threeLines) {
             line3 = txt;
         }
