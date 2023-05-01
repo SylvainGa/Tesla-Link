@@ -55,6 +55,15 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_UNLOCK = 28
 }
 
+/* _stateMachineCounter DEFINITION
+-3 In onReceiveVehicleData, means actionMachine is running so ignore the data received
+-2 In onReceiveVehicleData, means as we're in a menu (flagged by -1), we got a SECOND vehicleData, should NOT happen
+-1 In onReceiveVehicleData, means we're in a menu and to ignore the data we just received
+0 In stateMachine, means not to run
+1 In stateMachine, it's time call getVehicleData
+2 and above, we wait until we get to 1
+*/
+
 class MainDelegate extends Ui.BehaviorDelegate {
 	var _view as MainView;
 	var _settings;
@@ -78,11 +87,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastError;
 	var _lastTimeStamp;
 	var _lastDataRun;
+	var _waitingForCommandReturn;
 	var _debug_auth;
 	var _debug_view;
 	// 2023-03-20 var _debugTimer;
 
-	var _pendingPriorityRequests;
 	var _pendingActionRequests;
 	var _stateMachineCounter;
 	
@@ -99,6 +108,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_workTimer = new Timer.Timer();
 		_handler = handler;
 		_tesla = null;
+		_waitingForCommandReturn = false;
 
 		if (Properties.getValue("enhancedTouch")) {
 			Storage.setValue("spinner", "+");
@@ -160,7 +170,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_lastTimeStamp = 0;
 
-		_pendingPriorityRequests = {};
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
 
@@ -677,31 +686,31 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_CLIMATE_ON:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Climate On - waiting for climateStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Climate On - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
-				_tesla.climateOn(_vehicle_id, method(:climateStateHandler));
+				_tesla.climateOn(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_OFF:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Climate Off - waiting for climateStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Climate Off - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
-				_tesla.climateOff(_vehicle_id, method(:climateStateHandler));
+				_tesla.climateOff(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_DEFROST:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Climate Defrost - waiting for climateStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Climate Defrost - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
-				_tesla.climateDefrost(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+				_tesla.climateDefrost(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("defrost_mode"));
 				break;
 
 			case ACTION_TYPE_CLIMATE_SET:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Climate set temperature - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Climate set temperature - waiting for onCommandReturn");
 				var temperature = value;
 				if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					temperature = temperature * 9 / 5 + 32;
@@ -709,33 +718,33 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
 				}
-				_tesla.climateSet(_vehicle_id, method(:genericHandler), temperature);
+				_tesla.climateSet(_vehicle_id, method(:onCommandReturn), temperature);
 				break;
 
 			case ACTION_TYPE_TOGGLE_CHARGE:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Toggling charging - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Toggling charging - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
-				_tesla.toggleCharging(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
+				_tesla.toggleCharging(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_LIMIT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Setting charge limit - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Setting charge limit - waiting for onCommandReturn");
 				var charging_limit = value;
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + charging_limit + "%"]);
-				_tesla.setChargingLimit(_vehicle_id, method(:genericHandler), charging_limit);
+				_tesla.setChargingLimit(_vehicle_id, method(:onCommandReturn), charging_limit);
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_AMPS:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Setting max current - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Setting max current - waiting for onCommandReturn");
 				var charging_amps = value;
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + charging_amps + "A"]);
-				_tesla.setChargingAmps(_vehicle_id, method(:genericHandler), charging_amps);
+				_tesla.setChargingAmps(_vehicle_id, method(:onCommandReturn), charging_amps);
 				break;
 
 			case ACTION_TYPE_HONK:
@@ -753,33 +762,33 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_OPEN_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for chargeStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
-				_tesla.openPort(_vehicle_id, method(:chargeStateHandler));
+				_tesla.openPort(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLOSE_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for chargeStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
-				_tesla.closePort(_vehicle_id, method(:chargeStateHandler));
+				_tesla.closePort(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_UNLOCK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Unlock - waiting for vehicleStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Unlock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
-				_tesla.doorUnlock(_vehicle_id, method(:vehicleStateHandler));
+				_tesla.doorUnlock(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_LOCK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Lock - waiting for vehicleStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Lock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
-				_tesla.doorLock(_vehicle_id, method(:vehicleStateHandler));
+				_tesla.doorLock(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_OPEN_FRUNK:
@@ -847,7 +856,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_SET_SEAT_HEAT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for onCommandReturn");
 				var seat_heat_chosen_label = Storage.getValue("seat_heat_chosen");
 				var seat_heat_chosen;
 				switch (seat_heat_chosen_label) {
@@ -909,20 +918,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_handler.invoke([_handlerType, -1, Ui.loadResource(label) + " - " + Ui.loadResource(seat_heat_chosen_label)]);
-				_tesla.climateSeatHeat(_vehicle_id, method(:genericHandler), position, seat_heat_chosen);
+				_tesla.climateSeatHeat(_vehicle_id, method(:onCommandReturn), position, seat_heat_chosen);
 				break;
 
 			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Setting steering wheel heat - waiting for climateStateHandler");
+				//DEBUG*/ logMessage("actionMachine: Setting steering wheel heat - waiting for onCommandReturn");
 				if (_data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
 					_stateMachineCounter = 1;
 				}
 				else if (_data._vehicle_data.get("climate_state").get("steering_wheel_heater") != null) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
-					_tesla.climateSteeringWheel(_vehicle_id, method(:climateStateHandler), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+					_tesla.climateSteeringWheel(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
 				}
 				else {
 					_stateMachineCounter = 1;
@@ -933,14 +942,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-					//DEBUG*/ logMessage("actionMachine: Preconditionning off - waiting for chargeStateHandler");
+					//DEBUG*/ logMessage("actionMachine: Preconditionning off - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-					_tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), value, false);
+					_tesla.setDeparture(_vehicle_id, method(:onCommandReturn), value, false);
 				}
 				else {
-					//DEBUG*/ logMessage("actionMachine: Preconditionning on - waiting for chargeStateHandler");
+					//DEBUG*/ logMessage("actionMachine: Preconditionning on - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-					_tesla.setDeparture(_vehicle_id, method(:chargeStateHandler), value, true);
+					_tesla.setDeparture(_vehicle_id, method(:onCommandReturn), value, true);
 				}
 				break;
 
@@ -949,27 +958,27 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
-					_tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), false);
+					_tesla.SentryMode(_vehicle_id, method(:onCommandReturn), false);
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
-					_tesla.SentryMode(_vehicle_id, method(:vehicleStateHandler), true);
+					_tesla.SentryMode(_vehicle_id, method(:onCommandReturn), true);
 				}
 				break;
 
 			case ACTION_TYPE_HOMELINK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Homelink - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Homelink - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
-				_tesla.homelink(_vehicle_id, method(:genericHandler), _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+				_tesla.homelink(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 				break;
 
 			case ACTION_TYPE_REMOTE_BOOMBOX:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for genericHandler");
+				//DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
-				_tesla.remoteBoombox(_vehicle_id, method(:genericHandler));
+				_tesla.remoteBoombox(_vehicle_id, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_MODE:
@@ -991,9 +1000,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						mode_chosen = 3;
 						break;
 				}
-				//DEBUG*/ logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling genericHandler");
+				//DEBUG*/ logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(value)]);
-				_tesla.setClimateMode(_vehicle_id, method(:genericHandler), mode_chosen);
+				_tesla.setClimateMode(_vehicle_id, method(:onCommandReturn), mode_chosen);
 				break;
 
 			case ACTION_TYPE_REFRESH:
@@ -1200,48 +1209,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function workerTimer() {
-		// Our priority queue (checking the state of an action performed) comes next
-		if (_pendingPriorityRequests.keys().size() > 0) { 
-			if (_pendingPriorityRequests.hasKey("getVehicleState")) {
-				var value = _pendingPriorityRequests.get("getVehicleState");
-				if (value != null && value > 0) {
-					value--;
-					_pendingPriorityRequests.put("getVehicleState", value);
-					if (value == 0) {
-						_pendingPriorityRequests.remove("getVehicleState");
-						getVehicleState();
-					}
-				}
-			}
-			else if (_pendingPriorityRequests.hasKey("getClimateState")) {
-				var value = _pendingPriorityRequests.get("getClimateState");
-				if (value != null && value > 0) {
-					value--;
-					_pendingPriorityRequests.put("getClimateState", value);
-					if (value == 0) {
-						_pendingPriorityRequests.remove("getClimateState");
-						getClimateState();
-					}
-				}
-			}
-			else if (_pendingPriorityRequests.hasKey("getChargeState")) {
-				var value = _pendingPriorityRequests.get("getChargeState");
-				if (value != null && value > 0) {
-					value--;
-					_pendingPriorityRequests.put("getChargeState", value);
-					if (value == 0) {
-						_pendingPriorityRequests.remove("getChargeState");
-						getChargeState();
-					}
-				}
-			}
-		}
-		// We're waiting for an action to be performed, we're not displaying a message on screen and the last webRequest returned responseCode 200
-		else if (_pendingActionRequests.size() > 0) { 
+		// We're not waiting for a command to return, we're waiting for an action to be performed
+		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0) {
+			// We're not displaying a message on screen and the last webRequest returned responseCode 200, do you thing actionMenu!
 			if (_view._data._ready == true && _lastError == null) {
 				actionMachine();
 			}
-			// Say actions are pending and call stateMachine as soon as you can
+			// Call stateMachine as soon as it's out of it (_stateMachineCounter will get modified in onReceiveVehicleData)
 			else if (_stateMachineCounter != 0) {
 				//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
 				//DEBUG*/ logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
@@ -1305,26 +1279,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function openVentConfirmed() {
 		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
-		//DEBUG*/ logMessage("actionMachine: Open vent - waiting for vehicleStateHandler");
-		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+		//DEBUG*/ logMessage("actionMachine: Open vent - waiting for onCommandReturn");
+		_tesla.vent(_vehicle_id, method(:onCommandReturn), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function closeVentConfirmed() {
 	    _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
-		//DEBUG*/ logMessage("actionMachine: Close vent - waiting for vehicleStateHandler");
-		_tesla.vent(_vehicle_id, method(:vehicleStateHandler), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+		//DEBUG*/ logMessage("actionMachine: Close vent - waiting for onCommandReturn");
+		_tesla.vent(_vehicle_id, method(:onCommandReturn), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function frunkConfirmed() {
-		//DEBUG*/ logMessage("actionMachine: Acting on frunk - waiting for vehicleStateHandler");
+		//DEBUG*/ logMessage("actionMachine: Acting on frunk - waiting for onCommandReturn");
 		var hansshowFrunk = Properties.getValue("HansshowFrunk");
 		if (hansshowFrunk) {
 	        _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
-			_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
+			_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
 		} else {
 			if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 				_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
-				_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "front");
+				_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
 			} else {
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 	            _stateMachineCounter = 1;
@@ -1333,15 +1307,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function trunkConfirmed() {
-		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for vehicleStateHandler");
+		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
 		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
-		_tesla.openTrunk(_vehicle_id, method(:vehicleStateHandler), "rear");
+		_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "rear");
 	}
 
 	function honkHornConfirmed() {
-		//DEBUG*/ logMessage("actionMachine: Honking - waiting for genericHandler");
+		//DEBUG*/ logMessage("actionMachine: Honking - waiting for onCommandReturn");
 		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
-		_tesla.honkHorn(_vehicle_id, method(:genericHandler));
+		_tesla.honkHorn(_vehicle_id, method(:onCommandReturn));
 	}
 
 	function onSelect() {
@@ -1988,7 +1962,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
 				// logMessage("onReceiveVehicleData: received " + _data._vehicle_data);
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-					_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
+					if (_waitingForCommandReturn) {
+						_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
+						_stateMachineCounter = 1;
+					}
+					else {
+						_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
+					}
 
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
@@ -2042,21 +2022,28 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							//DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
 							_need_wake = false;
 							_wake_done = false;
+							_waitingForCommandReturn = false;
 							_stateMachineCounter = 1; // Make sure we check on the next workerTimer
 							_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
 							return;
 						}
 					}
 
-					var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
-					// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
-					timeDelta = _refreshTimeInterval - timeDelta;
-					if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
-	                	_stateMachineCounter = (timeDelta / 100).toNumber();
-						// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
-						return;
-					} else {
-						// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
+					if (_waitingForCommandReturn) {
+						_stateMachineCounter = 1;
+						_waitingForCommandReturn = false;
+					}
+					else {
+						var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
+						// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
+						timeDelta = _refreshTimeInterval - timeDelta;
+						if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
+							_stateMachineCounter = (timeDelta / 100).toNumber();
+							// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
+							return;
+						} else {
+							// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
+						}
 					}
 				} else {
 					//DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
@@ -2140,167 +2127,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 1;
 	}
 
-   function onReceiveVehicleState(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveVehicleState: " + responseCode + " running StateMachine in 100msec");
-
-		SpinSpinner(responseCode);
-
-		var result = null;
-		if (responseCode == 200) {
-			var response = data.get("response");
-			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
-				_lastTimeStamp = response.get("timestamp");
-				_data._vehicle_data.get("vehicle_state").put("sentry_mode", response.get("sentry_mode"));
-				_data._vehicle_data.get("vehicle_state").put("locked", response.get("locked"));
-				_data._vehicle_data.get("vehicle_state").put("fd_window", response.get("fd_window"));
-				_data._vehicle_data.get("vehicle_state").put("fp_window", response.get("fp_window"));
-				_data._vehicle_data.get("vehicle_state").put("rd_window", response.get("rd_window"));
-				_data._vehicle_data.get("vehicle_state").put("rp_window", response.get("rp_window"));
-				_data._vehicle_data.get("vehicle_state").put("df", response.get("df"));
-				_data._vehicle_data.get("vehicle_state").put("pf", response.get("pf"));
-				_data._vehicle_data.get("vehicle_state").put("dr", response.get("dr"));
-				_data._vehicle_data.get("vehicle_state").put("pr", response.get("pr"));
-				_data._vehicle_data.get("vehicle_state").put("ft", response.get("ft"));
-				_data._vehicle_data.get("vehicle_state").put("rt", response.get("rt"));
-			} else {
-				//DEBUG*/ logMessage("onReceiveVehicleState: WARNING Out of order data or missing timestamp, ignoring");
-			}
-		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
-		}
-
-		_handler.invoke([0, -1, result]);
-		_stateMachineCounter = 1;
-	}
-
-   function onReceiveClimateState(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveClimateState: " + responseCode + " running StateMachine in 100msec");
-
-		SpinSpinner(responseCode);
-
-		var result = null;
-		if (responseCode == 200) {
-			var response = data.get("response");
-			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
-				_lastTimeStamp = response.get("timestamp");
-				_data._vehicle_data.get("climate_state").put("is_climate_on", response.get("is_climate_on"));
-				_data._vehicle_data.get("climate_state").put("defrost_mode", response.get("defrost_mode"));
-				_data._vehicle_data.get("climate_state").put("battery_heater", response.get("battery_heater"));
-			} else {
-				//DEBUG*/ logMessage("onReceiveClimateState: WARNING Out of order data or missing timestamp, ignoring");
-			}
-		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
-		}
-
-		_handler.invoke([0, -1, result]);
-		_stateMachineCounter = 1;
-	}
-
-   function onReceiveChargeState(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveChargeState: " + responseCode + " running StateMachine in 100msec");
-
-		SpinSpinner(responseCode);
-
-		var result = null;
-		if (responseCode == 200) {
-			var response = data.get("response");
-			if (response != null && response.hasKey("timestamp") && response.get("timestamp") > _lastTimeStamp) {
-				_lastTimeStamp = response.get("timestamp");
-				_data._vehicle_data.get("charge_state").put("preconditioning_enabled", response.get("preconditioning_enabled"));
-				_data._vehicle_data.get("charge_state").put("scheduled_departure_time_minutes", response.get("scheduled_departure_time_minutes"));
-				_data._vehicle_data.get("charge_state").put("charge_port_door_open", response.get("charge_port_door_open"));
-			} else {
-				//DEBUG*/ logMessage("onReceiveChargeState: WARNING Out of order data or missing timestamp, ignoring");
-			}
-		} else {
-			result = Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode);
-		}
-
-		_handler.invoke([0, -1, result]);
-		_stateMachineCounter = 1;
-	}
-
-	function getVehicleState() {
-		//DEBUG*/ logMessage("getVehicleState: waiting for onReceiveVehicleState");
-		_tesla.getVehicleState(_vehicle_id, method(:onReceiveVehicleState));
-	}
-
-	function vehicleStateHandler(responseCode, data) {
+	function onCommandReturn(responseCode, data) {
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
 			if (Properties.getValue("quickReturn")) {
-				//DEBUG*/ logMessage("vehicleStateHandler: " + responseCode + " skiping getVehicleState, running StateMachine in 100msec");
+				//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
-				//DEBUG*/ logMessage("vehicleStateHandler: " + responseCode + " running getVehicleState in 1 sec");
-				_pendingPriorityRequests["getVehicleState"] = 10;
-			}
-		} else {  // Our call failed, say the error and back to the main code
-			//DEBUG*/ logMessage("vehicleStateHandler: " + responseCode + " running StateMachine in 100msec");
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
-			_stateMachineCounter = 1;
-		}
-	}
-
-	function getClimateState() {
-		//DEBUG*/ logMessage("getClimateState: waiting for onReceiveClimateState");
-		_tesla.getClimateState(_vehicle_id, method(:onReceiveClimateState));
-	}
-
-	function climateStateHandler(responseCode, data) {
-		SpinSpinner(responseCode);
-
-		if (responseCode == 200) {
-			if (Properties.getValue("quickReturn")) {
-				//DEBUG*/ logMessage("climateStateHandler: " + responseCode + " skiping getClimateState, running StateMachine in 100msec");
-				_stateMachineCounter = 1;
-			} else {
-				//DEBUG*/ logMessage("climateStateHandler: " + responseCode + " running getClimateState in 1 sec");
-				_pendingPriorityRequests["getClimateState"] = 10;
+				// Wait a second to let time for the command change to be recorded on Tesla's server
+				//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
+				_stateMachineCounter = 10;
+				_waitingForCommandReturn = true;
 			}
 		} else { // Our call failed, say the error and back to the main code
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
-			//DEBUG*/ logMessage("climateStateHandler: " + responseCode + " running StateMachine in 100msec");
-			_stateMachineCounter = 1;
-		}
-	}
-
-	function getChargeState() {
-		//DEBUG*/ logMessage("getChargeState: waiting for onReceiveChargeState");
-		_tesla.getChargeState(_vehicle_id, method(:onReceiveChargeState));
-	}
-
-	function chargeStateHandler(responseCode, data) {
-		SpinSpinner(responseCode);
-
-		if (responseCode == 200) {
-			if (Properties.getValue("quickReturn")) {
-				//DEBUG*/ logMessage("chargeStateHandler: " + responseCode + " skipping getChargeState, running StateMachine in 100msec");
-				_stateMachineCounter = 1;
-			} else {
-				//DEBUG*/ logMessage("chargeStateHandler: " + responseCode + " running getChargeState in 1 sec");
-				_pendingPriorityRequests["getChargeState"] = 10;
-			}
-		} else { // Our call failed, say the error and back to the main code
-			//DEBUG*/ logMessage("chargeStateHandler: " + responseCode + " running StateMachine in 100msec");
+			//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
-	}
-
-	function genericHandler(responseCode, data) {
-		SpinSpinner(responseCode);
-
-		//DEBUG*/ logMessage("genericHandler: " + responseCode + " running StateMachine in 100msec");
-		if (responseCode == 200) {
-			_handler.invoke([0, -1, null]);
-		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
-			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
-		}
-
-		_stateMachineCounter = 1;
 	}
 
 	function revokeHandler(responseCode, data) {
