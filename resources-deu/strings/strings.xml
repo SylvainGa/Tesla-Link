@@ -1,5 +1,7 @@
 <strings>
     <string id="AppName">Tesla Link</string>
+    <string id="shortComplicationLabel">Tesla Link</string>
+    <string id="longComplicationLabel">Tesla Link</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">Fahrzeug</string>
@@ -158,6 +160,7 @@
     <string id="label_open_vent">Fensterspalt öffnen?</string>
     <string id="label_close_vent">Fensterspalt schließen?</string>
     <string id="label_should_we_wake">Aufwacken </string>
+    <string id="label_perform_complication">Peform watch action?</string>  <!--  NEW -->
 
     <!--  Menu text -->
     <string id="menu_option_title">Menü</string>
