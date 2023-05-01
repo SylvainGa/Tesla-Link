@@ -206,8 +206,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
-        var myStats = System.getSystemStats();
-        logMessage("Total memory: " + myStats.totalMemory + " Used nemory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ var myStats = System.getSystemStats();
+        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used nemory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         _data.put("responseCode", responseCode);
 

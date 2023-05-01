@@ -1,5 +1,26 @@
 project.manifest = manifest.xml
 
+d2mach1.resourcePath=resources;resources-round-416x416;resources-complications
+epix2.resourcePath=resources;resources-round-416x416;resources-complications
+fenix7.resourcePath=resources;resources-round-260x260;resources-complications
+fenix7s.resourcePath=resources;resources-round-240x240;resources-complications
+fenix7x.resourcePath=resources;resources-round-280x280;resources-complications
+fr255.resourcePath=resources;resources-round-260x260;resources-complications
+fr255m.resourcePath=resources;resources-round-260x260;resources-complications
+fr255s.resourcePath=resources;resources-round-218x218;resources-complications
+fr255sm.resourcePath=resources;resources-round-218x218;resources-complications
+fr265.resourcePath=resources;resources-round-416x416;resources-complications
+fr265s.resourcePath=resources;resources-round-360x360;resources-complications
+fr955.resourcePath=resources;resources-round-260x260;resources-complications
+fr965.resourcePath=resources;resources-round-454x454;resources-complications
+marq2.resourcePath=resources;resources-round-390x390;resources-complications
+marq2aviator.resourcePath=resources;resources-round-390x390;resources-complications
+venu2.resourcePath=resources;resources-round-416x416;resources-complications
+venu2plus.resourcePath=resources;resources-round-416x416;resources-complications
+venu2s.resourcePath=resources;resources-round-360x360;resources-complications
+venusq2.resourcePath=resources;resources-rectangle-320x360;resources-complications
+venusq2m.resourcePath=resources;resources-rectangle-320x360;resources-complications
+
 base.excludeAnnotations = can_glance;bkgnd64kb
 d2airx10.excludeAnnotations = cant_glance;bkgnd32kb
 d2mach1.excludeAnnotations = cant_glance;bkgnd32kb
