@@ -79,10 +79,10 @@ function logMessage(message) {
 	System.println(dateStr + " : " + message);
 }
 
-/*DEBUG
 (:release, :background)
 function logMessage(message) {
 }
+/*DEBUG
 (:release, :background)
 function logMessageAndData(message, data) {
 }
