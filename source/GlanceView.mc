@@ -133,10 +133,10 @@ class GlanceView extends Ui.GlanceView {
 
     function onUpdate(dc) {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
-        //DEBUG*/ var showLog = false;
+        /*DEBUG*/ var showLog = false;
 
         if (gSettingsChanged) {
-            //DEBUG*/ showLog = true;
+            /*DEBUG*/ showLog = true;
             gSettingsChanged = false;
             onLayout(dc);
         }
@@ -246,10 +246,16 @@ class GlanceView extends Ui.GlanceView {
             }
         }
 
-        // Unless we have something to display already on our third line, build one
+        // Last chance to build line2
         if (line2 == null) {
-            line2 = txt;
+            if (txt == null) {
+                line2 =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
+            }
+            else {
+                line2 = txt;
+            }
         }
+        // And if we have a line2, see if we should also build line3
         else if (line3 == null && _threeLines) {
             line3 = txt;
         }
@@ -269,10 +275,10 @@ class GlanceView extends Ui.GlanceView {
             longestTextWidth = text3Width;
         }
 
-        //DEBUG*/ if (showLog) {
+        /*DEBUG*/ if (showLog) {
         //DEBUG*/   logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
-        //DEBUG*/   logMessage("Showing " + line1 + " | " +  line2 + " | " + line3);
-        //DEBUG*/ }
+        /*DEBUG*/   logMessage("Showing " + line1 + " | " +  line2 + " | " + line3);
+        /*DEBUG*/ }
         
         if (_curPos1X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
             resetSavedPosition();

@@ -175,6 +175,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Properties.setValue("useTouch", useTouch);
 		}
 
+		// This is where the main code will start running. Don't intialise stuff after this line
 		//DEBUG*/ logMessage("initialize: quickAccess=" + Properties.getValue("quickReturn") + " enhancedTouch=" + Properties.getValue("enhancedTouch"));
 		_workTimer.start(method(:workerTimer), 100, true);
 
@@ -533,9 +534,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken, expires_in, created_at);
 
-			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
-			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
@@ -546,10 +547,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				Settings.setRefreshToken(refreshToken);
 			}
 			else {
-				//DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+				/*DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
 		} else {
-			//DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
+			/*DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
@@ -630,21 +631,21 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function actionMachine() {
-		//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is " + _pendingActionRequests.size() + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+		/*DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is " + _pendingActionRequests.size() + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 		// Sanity check
 		if (_pendingActionRequests.size() <= 0) {
-			//DEBUG*/ logMessage("actionMachine: WARNING _pendingActionSize can't be less than 1 if we're here");
+			/*DEBUG*/ logMessage("actionMachine: WARNING _pendingActionSize can't be less than 1 if we're here");
 			return;
 		}
 
 		var request = _pendingActionRequests[0];
 
-		//DEBUG*/ logMessage("actionMachine: _pendingActionRequests[0] is " + request);
+		/*DEBUG*/ logMessage("actionMachine: _pendingActionRequests[0] is " + request);
 
 		// Sanity check
 		if (request == null) {
-			//DEBUG*/ logMessage("actionMachine: WARNING the request shouldn't be null");
+			/*DEBUG*/ logMessage("actionMachine: WARNING the request shouldn't be null");
 			return;
 		}
 
@@ -820,7 +821,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			case ACTION_TYPE_VENT:
-				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+				/*DEBUG*/ logMessage("actionMachine: Venting - _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 				if (venting == 0) {
@@ -1014,7 +1015,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				//DEBUG*/ logMessage("actionMachine: WARNING Invalid action");
+				/*DEBUG*/ logMessage("actionMachine: WARNING Invalid action");
 				_stateMachineCounter = 1;
 				break;
 		}
@@ -1177,6 +1178,22 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
+		// If we've come from a watch face, simulate a upper left quandrant touch hold once we started to get data.
+		if (_view._data._ready == true && Storage.getValue("launchedFromComplication") == true) {
+			Storage.setValue("launchedFromComplication", false);
+
+			var action = Properties.getValue("holdActionUpperLeft");
+			/*DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
+
+			if (action != 0) { // 0 means disable. 
+				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_perform_complication));
+				_stateMachineCounter = -1;
+				var delegate = new SimpleConfirmDelegate(method(:complicationConfirmed), method(:operationCanceled));
+				Ui.pushView(view, delegate, Ui.SLIDE_UP);
+				return;
+			}
+		}
+
 		_lastDataRun = System.getTimer();
 		// 2023-03-25 logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
@@ -1260,6 +1277,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 1;
 	}
 
+	function complicationConfirmed() {
+		/*DEBUG*/ logMessage("complicationConfirmed:");
+		onHold(true); // Simulate a hold on the top left quadrant
+	}
+
 	function wakeConfirmed() {
 		_need_wake = false;
 		_wake_done = false;
@@ -1275,6 +1297,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function wakeCanceled() {
 		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
 		gWaitTime = System.getTimer();
+		Storage.setValue("launchedFromComplication", false); // If we came from a watchface complication and we canceled the wake, ignore the complication event
 		//DEBUG*/ logMessage("wakeCancelled:");
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 		_stateMachineCounter = 1;
@@ -1746,9 +1769,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return true;
 		}
 		
-		var coords = click.getCoordinates();
-		var x = coords[0];
-		var y = coords[1];
+		var drive_state = _data._vehicle_data.get("drive_state");
+		if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
+			/*DEBUG*/ logMessage("doPreviousPage: Moving, ignoring command");
+			return;
+		}
+
+		var x;
+		var y;
+
+		if (click instanceof Lang.Boolean) {
+			x = 0;
+			y = 0;
+		}
+		else {
+			var coords = click.getCoordinates();
+			x = coords[0];
+			y = coords[1];
+		}
 
 		var vibrate = true;
 
@@ -1780,7 +1818,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						break;
 
-					case 3:
+					case 4:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_VENT, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
@@ -2268,7 +2306,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function revokeHandler(responseCode, data) {
 		SpinSpinner(responseCode);
 
-		//DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
+		/*DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
             _resetToken();
             Settings.setRefreshToken(null);

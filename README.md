@@ -43,6 +43,10 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.12.0 Added the following
+- Now supports Complications! Through complications, the battery SoC is sent to other apps and watch faces that also supports complications. If the app was launched from a Complication (either another app or from a watch face), the action selected for the holding of the upper left quadrant will be performed. If the car is sleeping, it will ask to wake it up first. The watch face that I maintain, Crystal-Tesla has been modified to support launch from Complication. It will still build its own Tesla-Info, which is more than just the battery SoC.
+- Hardened the main view of data to be displayed in case some data received by the car is invalid or not of the expected type. 
+
 V7.11.8 
 - Fixed more crashes reported through Error Reporting Application (ERA) 
 - Fixed error 401 not using the new token in glance

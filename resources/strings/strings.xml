@@ -1,6 +1,8 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.11.8</string>
+    <string id="AppNameVersion">Tesla Link V7.12.0</string>
+    <string id="shortComplicationLabel">Tesla Link</string>
+    <string id="longComplicationLabel">Tesla Link</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">No vehicle</string>
@@ -159,6 +161,7 @@
     <string id="label_open_vent">Vent ?</string>
     <string id="label_close_vent">Close windows ?</string>
     <string id="label_should_we_wake">Wake </string>
+    <string id="label_perform_complication">Peform watch action?</string>
 
 	<!--  Menu text -->
 	<string id="menu_option_title">Menu</string>

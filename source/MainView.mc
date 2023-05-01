@@ -268,7 +268,7 @@ class MainView extends Ui.View {
 			// If we have the vehicle data back from the API, this is where the good stuff happens
 			// Retrieve and display the vehicle name
 			var name_drawable = View.findDrawableById("name");
-			var vehicle_name = _data._vehicle_data.get("display_name");
+			var vehicle_name = $.validateString(_data._vehicle_data.get("display_name"));
 			var app_vehicle_name = Storage.getValue("vehicle_name");
 			if (app_vehicle_name == null) {
 				Storage.setValue("vehicle_name", vehicle_name);
@@ -348,15 +348,11 @@ class MainView extends Ui.View {
 
 			// Grab the data we're going to use around charge and climate
 			var swap_frunk_for_port = Properties.getValue("swap_frunk_for_port");
-			var battery_level = _data._vehicle_data.get("charge_state").get("battery_level");
-			var charge_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
-			var charging_state = _data._vehicle_data.get("charge_state").get("charging_state");
-			var inside_temp = _data._vehicle_data.get("climate_state").get("inside_temp");
-			var door_open = _data._vehicle_data.get("vehicle_state").get("df").toNumber() + _data._vehicle_data.get("vehicle_state").get("dr").toNumber() + _data._vehicle_data.get("vehicle_state").get("pf").toNumber() + _data._vehicle_data.get("vehicle_state").get("pr").toNumber();
-			var inside_temp_local = "???";
-			if (inside_temp != null) {
-				inside_temp_local = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((inside_temp.toNumber()*9/5) + 32) + "°F" : inside_temp.toNumber() + "°C";
-			}
+			var battery_level = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"));
+			var charge_limit = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"));
+			var charging_state = $.validateString(_data._vehicle_data.get("charge_state").get("charging_state"));
+			var inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((($.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp")) * 9) / 5) + 32) + "°F" : $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp")) + "°C";
+			var door_open = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("df")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("dr")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pf")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pr"));
 
 			// Draw the charge status
 			dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
@@ -374,9 +370,9 @@ class MainView extends Ui.View {
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, limit_start_angle, limit_end_angle);
 
 			// Common climate data
-			var climate_state = _data._vehicle_data.get("climate_state").get("is_climate_on");
-			var climate_defrost = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
-			var defrost_mode = _data._vehicle_data.get("climate_state").get("defrost_mode");
+			var climate_state = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_climate_on"));
+			var climate_defrost = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_front_defroster_on"));
+			var defrost_mode = $.validateNumber(_data._vehicle_data.get("climate_state").get("defrost_mode"));
 
 			// Image layout is where most of the stuff is drawn
 			if (use_image_layout) {
@@ -401,8 +397,8 @@ class MainView extends Ui.View {
 				dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.vehicle));
 
 				// If we're driving, only show a moving car. No interaction possible!
-				var drive_state = _data._vehicle_data.get("drive_state");
-				if (drive_state != null && drive_state.get("shift_state") != null && drive_state.get("shift_state").equals("P") == false) {
+				var shift_state = $.validateString(_data._vehicle_data.get("drive_state").get("shift_state"));
+				if (shift_state.equals("") == false && shift_state.equals("P") == false) {
 					dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.driving));
 				}
 				else {
@@ -410,7 +406,7 @@ class MainView extends Ui.View {
 						swap_frunk_for_port = 0;
 					}
 
-					var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
+					var venting = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("fd_window")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("rd_window")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("fp_window")) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("rp_window"));
 
 					// Show what we chould interact with
 					switch (swap_frunk_for_port) {
@@ -430,13 +426,13 @@ class MainView extends Ui.View {
 							break;
 					}
 
-					if (_data._vehicle_data.get("vehicle_state").get("ft") != 0) {
+					if ($.validateNumber(_data._vehicle_data.get("vehicle_state").get("ft")) != 0) {
 						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.frunkOpened));
 					}
-					if (_data._vehicle_data.get("vehicle_state").get("rt") != 0) {
+					if ($.validateNumber(_data._vehicle_data.get("vehicle_state").get("rt")) != 0) {
 						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.trunkOpened));
 					}
-					if (_data._vehicle_data.get("charge_state").get("charge_port_door_open") == true) {
+					if ($.validateBoolean(_data._vehicle_data.get("charge_state").get("charge_port_door_open")) == true) {
 						dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.portOpened));
 					}
 					if (venting) {
@@ -445,16 +441,16 @@ class MainView extends Ui.View {
 				}
 
 				// Update the lock state indicator
-				dc.drawBitmap(image_x_left, image_y_bottom,(_data._vehicle_data.get("vehicle_state").get("locked") ? Ui.loadResource(Rez.Drawables.locked_icon) : door_open ? Ui.loadResource(Rez.Drawables.door_open_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
+				dc.drawBitmap(image_x_left, image_y_bottom,($.validateBoolean(_data._vehicle_data.get("vehicle_state").get("locked")) ? Ui.loadResource(Rez.Drawables.locked_icon) : door_open ? Ui.loadResource(Rez.Drawables.door_open_icon) : Ui.loadResource(Rez.Drawables.unlocked_icon)));
 
 				bm = Ui.loadResource(Rez.Drawables.locked_icon);
 				bm_width = bm.getWidth();
 				bm_height = bm.getHeight();
 
 				// Update the climate state indicator, note we have blue or red icons depending on heating or cooling
-				var climate_batterie_preheat = _data._vehicle_data.get("climate_state").get("battery_heater");
-				var rear_defrost = _data._vehicle_data.get("climate_state").get("is_rear_defroster_on");
-				var left_temp_direction = _data._vehicle_data.get("climate_state").get("left_temp_direction");
+				var climate_batterie_preheat = $.validateBoolean(_data._vehicle_data.get("climate_state").get("battery_heater"));
+				var rear_defrost = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_rear_defroster_on"));
+				var left_temp_direction = $.validateNumber(_data._vehicle_data.get("climate_state").get("left_temp_direction"));
 				var bm_waves;
 				var bm_blades;
 
@@ -527,17 +523,17 @@ class MainView extends Ui.View {
 				
 				// Update the text at the bottom of the screen with charge and temperature
 				var status_drawable = View.findDrawableById("status");
-				var charging_current = _data._vehicle_data.get("charge_state").get("charge_current_request");
+				var charging_current = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_current_request"));
 				if (charging_current == null) {
 					charging_current = 0;
 				}
 				
-				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A " + inside_temp_local);
+				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A " + inside_temp);
 				status_drawable.draw(dc);
 
 				// Draw the text in the middle of the screen with departure time (if set)
-				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
-					var departure_time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
+				if ($.validateBoolean(_data._vehicle_data.get("charge_state").get("preconditioning_enabled"))) {
+					var departure_time = $.validateNumber(_data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes"));
 					var departure_drawable = View.findDrawableById("departure");
 					var hours = (departure_time / 60).toLong();
 					var minutes = (((departure_time / 60.0) - hours) * 60).toLong();
@@ -573,7 +569,7 @@ class MainView extends Ui.View {
 
 				// Draw the Sentry 'eye' icon if activated
 				var sentry_y = image_y_top - height/13;
-				var bitmap = Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("sentry_mode") ? Rez.Drawables.sentry_on_icon : Rez.Drawables.sentry_off_icon) as BitmapResource;
+				var bitmap = Ui.loadResource($.validateBoolean(_data._vehicle_data.get("vehicle_state").get("sentry_mode")) ? Rez.Drawables.sentry_on_icon : Rez.Drawables.sentry_off_icon) as BitmapResource;
 				var bitmap_width = bitmap.getWidth();
 				var bitmap_height = bitmap.getHeight();
 				dc.drawBitmap(center_x - bitmap_width / 2, sentry_y + bitmap_height / 2, bitmap);
@@ -581,7 +577,7 @@ class MainView extends Ui.View {
 			else {
 				// Text layout, so update the lock status text   
 				var status_drawable = View.findDrawableById("status");
-				if (_data._vehicle_data.get("vehicle_state").get("locked")) {
+				if ($.validateBoolean(_data._vehicle_data.get("vehicle_state").get("locked"))) {
 					status_drawable.setColor(Graphics.COLOR_DK_GREEN);
 					status_drawable.setText(Rez.Strings.label_locked);
 				} else {
@@ -596,7 +592,7 @@ class MainView extends Ui.View {
 
 				// Update the temperature text
 				var inside_temp_drawable = View.findDrawableById("inside_temp");
-				inside_temp_drawable.setText(Ui.loadResource(Rez.Strings.label_cabin) + inside_temp_local.toString());
+				inside_temp_drawable.setText(Ui.loadResource(Rez.Strings.label_cabin) + inside_temp);
 
 				// Update the climate state text
 				var climate_state_drawable = View.findDrawableById("climate_state");

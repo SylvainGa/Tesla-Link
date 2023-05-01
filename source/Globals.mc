@@ -71,8 +71,7 @@ function validateBoolean(value) {
 		return false;
 	}
 }
-
-/*DEBUG
+//DEBUG
 (:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);

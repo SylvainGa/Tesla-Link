@@ -1,5 +1,6 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    <bitmap id="ComplicationIcon" filename="launcher_icon.svg" />
     <bitmap id="vehicle" filename="vehicle.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
