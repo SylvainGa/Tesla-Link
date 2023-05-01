@@ -20,12 +20,12 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
 	function onStart(state) {
-   		/*DEBUG*/ logMessage("App: starting");
+   		//DEBUG*/ logMessage("App: starting");
         if (state != null) {
-            /*System.println("full state: " + state.toString());
-            System.println("resume: " + state.get(:resume ));
-            System.println("launchedFromGlance: " + state.get(:launchedFromGlance));
-            System.println("launchedFromComplication: " + state.get(:launchedFromComplication ));*/
+            //DEBUG*/ logMessage("full state: " + state.toString());
+            //DEBUG*/ logMessage("resume: " + state.get(:resume ));
+            //DEBUG*/ logMessage("launchedFromGlance: " + state.get(:launchedFromGlance));
+            //DEBUG*/ logMessage("launchedFromComplication: " + state.get(:launchedFromComplication ));
 
             if (state.get(:launchedFromComplication) != null) {
                 Storage.setValue("launchedFromComplication", true);
@@ -45,7 +45,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance)
 	function onSettingsChanged() {
-		/*DEBUG*/ logMessage("App: Settings changed");
+		//DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
         Ui.requestUpdate();
     }
@@ -65,7 +65,7 @@ class TeslaLink extends App.AppBase {
     }
 
     function getInitialView() {
-		/*DEBUG*/ logMessage("MainView: Starting");
+		//DEBUG*/ logMessage("MainView: Starting");
 
         // No phone? This widget ain't gonna work! Show the offline view
         if (!System.getDeviceSettings().phoneConnected) {
@@ -83,7 +83,7 @@ class TeslaLink extends App.AppBase {
     (:can_glance)
     function onBackgroundData(data) {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("onBackgroundData: Main view running, skipping");
+            //DEBUG*/ logMessage("onBackgroundData: Main view running, skipping");
             return;
         }
         
@@ -102,7 +102,7 @@ class TeslaLink extends App.AppBase {
                 Properties.setValue("refreshToken", token);
             }
             else {
-                /*DEBUG*/ logMessage("onBackgroundData: Tried to reset the refresh token!");
+                //DEBUG*/ logMessage("onBackgroundData: Tried to reset the refresh token!");
             }
 
             token = data["TokenExpiresIn"];
@@ -168,11 +168,11 @@ class TeslaLink extends App.AppBase {
                 status.put("vehicleAwake", value);
             }
 
-    		/*DEBUG*/ logMessage("onBackgroundData status is " + status);
+    		//DEBUG*/ logMessage("onBackgroundData status is " + status);
             Storage.setValue("status", status);
         }
         else {
-    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         // No need, it keeps going until the app stops or it's deleted
