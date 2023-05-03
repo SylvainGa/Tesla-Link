@@ -29,6 +29,8 @@ class TeslaLink extends App.AppBase {
 
             if (state.get(:launchedFromComplication) != null) {
                 Storage.setValue("launchedFromComplication", true);
+                var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
+                Attention.vibrate(vibeData);				
             }
         }
 	}

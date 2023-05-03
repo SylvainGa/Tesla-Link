@@ -234,7 +234,7 @@ class GlanceView extends Ui.GlanceView {
 
         // Build or main glance line
         if (battery_level != null && battery_range != null && line2 == null) {
-            line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? battery_range + " km" : (battery_range * 1.6).format("%d") + " miles") + timestamp;
+            line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? (battery_range * 1.6).format("%d") + " km" : battery_range + " miles") + timestamp;
 
             if (txt == null && _threeLines) {
                 if (shift_state != null && shift_state.equals("") == false && shift_state.equals("P") == false) { // We're moving
