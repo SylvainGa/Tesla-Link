@@ -44,7 +44,7 @@ If you want to have the widget translated to your language, contact me through e
 ## Changelog since forking from srwalter:
 
 V7.12.1 Added the following
-- When launched from a Complication, vibrates the watch for 0.5 seconds to acknowledge the launch
+- When launched from a watch face that supports launching Complications, vibrates the watch for 0.5 seconds to acknowledge the launch
 - Fixed mix up of unit conversion in Glance
 
 V7.12.0 Added the following
