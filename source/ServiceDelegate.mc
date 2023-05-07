@@ -45,11 +45,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        //DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         /*DEBUG*/ var myStats = System.getSystemStats();
-        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used nemory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         var data = Background.getBackgroundData();
         if (data == null) {
@@ -93,39 +93,39 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var pos = responseData.find("battery_level");
             var str = responseData.substring(pos + 15, pos + 20);
             var posEnd = str.find(",");
-            var battery_level = $.validateNumber(str.substring(0, posEnd));
+            var battery_level = $.validateNumber(str.substring(0, posEnd), 0);
             data.put("battery_level", battery_level);
 
             pos = responseData.find("battery_range");
             str = responseData.substring(pos + 15, pos + 22);
             posEnd = str.find(",");
-            data.put("battery_range", $.validateNumber(str.substring(0, posEnd)));
+            data.put("battery_range", $.validateNumber(str.substring(0, posEnd), 0));
 
             pos = responseData.find("charging_state");
             str = responseData.substring(pos + 17, pos + 37);
             posEnd = str.find("\"");
-            data.put("charging_state", $.validateString(str.substring(0, posEnd)));
+            data.put("charging_state", $.validateString(str.substring(0, posEnd), ""));
 
             pos = responseData.find("inside_temp");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            data.put("inside_temp", $.validateNumber(str.substring(0, posEnd)));
+            data.put("inside_temp", $.validateNumber(str.substring(0, posEnd), 0));
 
             pos = responseData.find("shift_state");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            var value = $.validateString(str.substring(0, posEnd));
+            var value = $.validateString(str.substring(0, posEnd), "");
             data.put("shift_state", (value.equals("null") ? "P" : value));
 
             pos = responseData.find("sentry_mode");
             str = responseData.substring(pos + 13, pos + 20);
             posEnd = str.find(",");
-            data.put("sentry", $.validateString(str.substring(0, posEnd)).equals("true"));
+            data.put("sentry", $.validateString(str.substring(0, posEnd), "").equals("true"));
 
             pos = responseData.find("preconditioning_enabled");
             str = responseData.substring(pos + 25, pos + 32);
             posEnd = str.find(",");
-            data.put("preconditioning", $.validateString(str.substring(0, posEnd)).equals("true"));
+            data.put("preconditioning", $.validateString(str.substring(0, posEnd), "").equals("true"));
 
             if (Toybox has :Complications) {
                 var comp = {
@@ -157,7 +157,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _fromTokenRefresh = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
-            //DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
+            /*DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
             _data = {};
             _data.put("token", Storage.getValue("token"));
             _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
@@ -165,14 +165,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("refreshToken", Properties.getValue("refreshToken"));
         }
         else {
-            //DEBUG*/ logMessage("ServiceDelegate: have tokens");
+            /*DEBUG*/ logMessage("ServiceDelegate: have tokens");
         }
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            //DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
+            /*DEBUG*/ logMessage("onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
@@ -195,19 +195,22 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
+
+            sendComplication(_data);
+
             Background.exit(_data);
         }
     }
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        //DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG*/ var myStats = System.getSystemStats();
-        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used nemory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         _data.put("responseCode", responseCode);
 
@@ -239,26 +242,18 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (responseCode == 200 && responseData != null) {
 			var response = responseData.get("response");
             if (response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
-                var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"));
+                var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"), 0);
                 _data.put("battery_level", battery_level);
-                _data.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range")));
-                _data.put("charging_state", $.validateString(response.get("charge_state").get("charging_state")));
-                _data.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp")));
-                _data.put("shift_state", (response.get("drive_state").get("shift_state") == null ? "P" : $.validateString(response.get("drive_state").get("shift_state"))));
-                _data.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode")));
-                _data.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled")));
-
-                if (Toybox has :Complications) {
-                    var comp = {
-                        :value => battery_level,
-                        :shortLabel => "TESLA",
-                        :longLabel => "TESLA-LINK",
-                        :units => "%",
-                    };
-                    Complications.updateComplication(0, comp);
-                }
+                _data.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range"), 0));
+                _data.put("charging_state", $.validateString(response.get("charge_state").get("charging_state"), ""));
+                _data.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp"), 0));
+                _data.put("shift_state", (response.get("drive_state").get("shift_state") == null ? "P" : $.validateString(response.get("drive_state").get("shift_state"), "")));
+                _data.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
+                _data.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
+                _data.put("vehicleAwake", "online"); // Hard code that we're online if we get a 200
             }
             //DEBUG*/ else { _data.put("battery_level", 100); }
+
         }
         else if (responseCode == 401) {
             if (_fromTokenRefresh == false) {
@@ -266,7 +261,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 return;
             }
             else {
-                //DEBUG*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
+                /*DEBUG*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
             }
         }
         else if (responseCode == 408) {
@@ -275,6 +270,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+        sendComplication(_data);
+
         Background.exit(_data);
     }
 
@@ -317,7 +314,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 }
 
                 if (vehicle_index == size) {
-                    //DEBUG*/ logMessage("onReceiveVehicles: Not found");
+                    /*DEBUG*/ logMessage("onReceiveVehicles: Not found");
                     _data.put("vehicleAwake", "Not found");
                 }
                 else {
@@ -327,12 +324,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
 				}
 			}
             else {
+                /*DEBUG*/ logMessage("onReceiveVehicles: No vehicle");
                 _data.put("vehicleAwake", "No vehicle");
             }
         }
         else {
             _data.put("vehicleAwake", "error");
         }
+
+        sendComplication(_data);
 
         //DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
         Background.exit(_data);
@@ -342,7 +342,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         //DEBUG*/ logMessage("refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            //DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            /*DEBUG*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -365,6 +365,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         _data.put("responseCode", 401);
+
+        sendComplication(_data);
+
         //DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
         Background.exit(_data);
     }
@@ -394,7 +397,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                //DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
+                /*DEBUG*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
             //DEBUG*/ logMessage("onReceiveToken getting data");
@@ -416,7 +419,65 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
         else {
             //DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
+            sendComplication(_data);
+
             Background.exit(_data);
+        }
+    }
+
+    function sendComplication(data) {
+        if (Toybox has :Complications) {
+            var value;
+            var crystalTesla;
+            try {
+                crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"));
+            }
+            catch (e) {
+                crystalTesla = true;
+            }
+
+            var status = Storage.getValue("status");
+            if (status == null) {
+                status = {};
+            }
+
+            if (crystalTesla) {
+                var arrayStore = new [7];
+
+                // Go through the data we need from 'status' and if we have one in 'data', use that one instead of the one in 'status'. Null becomes empty string
+                var arrayData = ["responseCode", "battery_level", "charging_state", "inside_temp", "sentry", "preconditioning", "vehicleAwake"];
+                for (var i = 0; i < arrayData.size(); i++) {
+                    value = data.get(arrayData[i]);
+                    if (value != null) {
+                        arrayStore[i] = value;                        
+                    }
+                    else {
+                        arrayStore[i] = status.get(arrayData[i]);
+                        if (arrayStore[i] == null) {
+                            arrayStore[i] = "";
+                        }
+                    }
+                }
+
+                // Build the value we'll pass to the Complication
+                value = arrayStore[0] + "|" + arrayStore[1] + "|" + arrayStore[2] + "|" + arrayStore[3] + "|" + arrayStore[4] + "|" + arrayStore[5] + "|" + arrayStore[6]; 
+            }
+            else {
+                // Other than Crystal-Tesla watchface only gets the battery level
+                value = data.get("battery_level");
+                if (value == null) {
+                    value = $.validateNumber(status.get("battery_level", 0));
+                }
+            }
+
+            // Send it to whoever is listening
+            var comp = {
+                :value => value,
+                :shortLabel => "TESLA",
+                :longLabel => "TESLA-LINK",
+                :units => "%",
+            };
+            Complications.updateComplication(0, comp);
         }
     }
 }

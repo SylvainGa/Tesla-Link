@@ -88,6 +88,7 @@
     <string id="setting_defaultUpperLeft">Opération par défaut pour le cartier supérieur gauche</string>
 	<string id="setting_smallfontsize">Utiliser une police de caractères plus petite en mode aperçu rapide?</string>
 	<string id="setting_scrollclearsedges">Défilement jusqu'à ce que tout le texte est visible</string>
+	<string id="setting_CrystalTesla">Envoi de Complications avancées à Crystal-Tesla</string>
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>

@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.12.1</string>
+    <string id="AppNameVersion">Tesla Link V7.13.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -89,6 +89,7 @@
     <string id="setting_defaultUpperLeft">Default option for upper left quadrant</string>
 	<string id="setting_smallfontsize">Use a smaller font in Glance</string>
 	<string id="setting_scrollclearsedges">Scroll text until the edges have cleared</string>
+	<string id="setting_CrystalTesla">Send enhanced Complications to Crystal-Tesla</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>

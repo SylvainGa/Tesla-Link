@@ -71,7 +71,7 @@ class ClimateView extends Ui.View {
 			if (_viewOffset == 0) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_1_4));
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("driver_temp_setting"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("driver_temp_setting"), 0);
 	            lineUnit = "°C";
 		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
@@ -80,7 +80,7 @@ class ClimateView extends Ui.View {
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_driver_temp_setting));
 	            lineValue[2].setText(lineData + lineUnit);
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("passenger_temp_setting"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("passenger_temp_setting"), 0);
 	            lineUnit = "°C";
 		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData * 9.0 / 5.0 + 32.0).toNumber().format("%d");	
@@ -89,7 +89,7 @@ class ClimateView extends Ui.View {
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_passenger_temp_setting));
 	            lineValue[3].setText(lineData + lineUnit);
 	
-	            lineData = $.validateFloat(_data._vehicle_data.get("climate_state").get("inside_temp")).format("%.1f");
+	            lineData = $.validateFloat(_data._vehicle_data.get("climate_state").get("inside_temp"), 0.0).format("%.1f");
 	            lineUnit = "°C";
 		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData.toFloat() * 9.0 / 5.0 + 32.0).toNumber();	
@@ -98,7 +98,7 @@ class ClimateView extends Ui.View {
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_inside_temp));
 	            lineValue[4].setText(lineData + lineUnit);
 	
-	            lineData = $.validateFloat(_data._vehicle_data.get("climate_state").get("outside_temp")).format("%.1f");
+	            lineData = $.validateFloat(_data._vehicle_data.get("climate_state").get("outside_temp"), 0.0).format("%.1f");
 	            lineUnit = "°C";
 		        if (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE) {
 					lineData = (lineData.toFloat() * 9.0 / 5.0 + 32.0).toNumber();
@@ -110,59 +110,59 @@ class ClimateView extends Ui.View {
 			else if (_viewOffset == 4) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_2_4));
 
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_climate_on"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_climate_on"), false);
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_is_climate_on));
 	            lineValue[2].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_front_defroster_on"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_front_defroster_on"), false);
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_is_front_defroster_on));
 	            lineValue[3].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_rear_defroster_on"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_rear_defroster_on"), false);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_is_rear_defroster_on));
 	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("side_mirror_heaters"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("side_mirror_heaters"), false);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_side_mirror_heaters));
 	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 8) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_3_4));
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("seat_heater_left"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("seat_heater_left"), 0);
 				var driverAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_left") ? " (A)" : "");
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_left));
 	            lineValue[2].setText(lineData + driverAutoSeat);
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("seat_heater_right"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("seat_heater_right"), 0);
 				var passengerAutoSeat = (_data._vehicle_data.get("climate_state").get("auto_seat_climate_right") ? " (A)" : "");
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_seat_heater_right));
 	            lineValue[3].setText(lineData + passengerAutoSeat);
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("steering_wheel_heater"), false);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_steering_wheel_heater));
 	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("wiper_blade_heater"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("wiper_blade_heater"), false);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_wiper_blade_heater));
 	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}
 			else if (_viewOffset == 12) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_climate_data_4_4));
 
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("climate_keeper_mode")).toString();
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("climate_keeper_mode"), false).toString();
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_climate_keeper_mode));
 	            lineValue[2].setText(lineData);
 
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("allow_cabin_overheat_protection"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("allow_cabin_overheat_protection"), false);
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_allow_cabin_overheat_protection));
 	            lineValue[3].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("supports_fan_only_cabin_overheat_protection"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("supports_fan_only_cabin_overheat_protection"), false);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_supports_fan_only_cabin_overheat_protection));
 	            lineValue[4].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 	
-	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("cabin_overheat_protection_actively_cooling"));
+	            lineData = $.validateBoolean(_data._vehicle_data.get("climate_state").get("cabin_overheat_protection_actively_cooling"), false);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_cabin_overheat_protection_actively_cooling));
 	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}

@@ -70,20 +70,20 @@ class ChargeView extends Ui.View {
 			if (_viewOffset == 0) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_1_2));
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"), 0);
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_charge_limit_soc));
 	            lineValue[2].setText(lineData + "%");
 	
-	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_battery_level));
 	            lineValue[3].setText(lineData + "%");
 	
-	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get("charge_miles_added_rated"));
+	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get("charge_miles_added_rated"), 0.0);
 	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
 	            lineValue[4].setText(lineData.toNumber() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
 	
-	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get("battery_range"));
+	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get("battery_range"), 0.0);
 	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
 	            lineValue[5].setText(lineData.toNumber() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
@@ -91,7 +91,7 @@ class ChargeView extends Ui.View {
 			else if (_viewOffset == 4) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_charge_data_2_2));
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("minutes_to_full_charge"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("minutes_to_full_charge"), 0);
 	            var hours = lineData / 60;
 	            var minutes = lineData - hours * 60;
 	            var timeStr;
@@ -104,15 +104,15 @@ class ChargeView extends Ui.View {
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_minutes_to_full_charge));
 	            lineValue[2].setText(timeStr);
 
-	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charger_voltage"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charger_voltage"), 0);
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_charger_voltage));
 	            lineValue[3].setText(lineData + "V");
 	
-	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charger_actual_current"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("charge_state").get("charger_actual_current"), 0);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charger_actual_current));
 	            lineValue[4].setText(lineData + "A");
 	
-	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("battery_heater"));
+	            lineData = $.validateNumber(_data._vehicle_data.get("climate_state").get("battery_heater"), 0);
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_battery_heater));
 	            lineValue[5].setText((lineData ? Ui.loadResource(Rez.Strings.label_on) : Ui.loadResource(Rez.Strings.label_off)));
 			}

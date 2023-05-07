@@ -4,71 +4,71 @@ using Toybox.Time.Gregorian;
 using Toybox.Lang;
 
 (:background)
-function validateNumber(value) {
+function validateNumber(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
-		return 0;
+		return defValue;
 	}
 
 	try {
 		value = value.toNumber();
 		if (value == null) {
-			value = 0;
+			value = defValue;
 		}
 	}
 	catch (e) {
-		value = 0;
+		value = defValue;
 	}
 	return value;
 }
 
-function validateFloat(value) {
+function validateFloat(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
-		return 0.0;
+		return defValue;
 	}
 
 	try {
 		value = value.toFloat();
 		if (value == null) {
-			value = 0.0;
+			value = defValue;
 		}
 	}
 	catch (e) {
-		value = 0.0;
+		value = defValue;
 	}
 	return value;
 }
 
 (:background)
-function validateString(value) {
+function validateString(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
-		return "";
+		return defValue;
 	}
 
 	try {
 		value = value.toString();
 		if (value == null) {
-			value = "";
+			value = defValue;
 		}
 	}
 	catch (e) {
-		value = "";
+		value = defValue;
 	}
 	return value;
 }
 
 (:background)
-function validateBoolean(value) {
+function validateBoolean(value, defValue) {
 	if (value != null && value instanceof Lang.Boolean) {
 		try {
 			value = (value == true);
 		}
 		catch (e) {
-			value = false;
+			value = defValue;
 		}
 		return value;
 	}
 	else {
-		return false;
+		return defValue;
 	}
 }
 
@@ -79,10 +79,10 @@ function logMessage(message) {
 	System.println(dateStr + " : " + message);
 }
 
+/*DEBUG
 (:release, :background)
 function logMessage(message) {
 }
-/*DEBUG
 (:release, :background)
 function logMessageAndData(message, data) {
 }

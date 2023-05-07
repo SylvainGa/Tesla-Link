@@ -70,7 +70,7 @@ class DriveView extends Ui.View {
 			if (_viewOffset == 0) {
 	            lineText[0].setText(Ui.loadResource(Rez.Strings.subview_label_drive_data_1_1));
 
-	            lineData = $.validateString(_data._vehicle_data.get("drive_state").get("shift_state"));
+	            lineData = $.validateString(_data._vehicle_data.get("drive_state").get("shift_state"), "");
 	            lineText[2].setText(Ui.loadResource(Rez.Strings.subview_label_shift_state));
 	            if (lineData.equals("") == false && lineData.equals("P") == false) {
 		            lineValue[2].setText(lineData);
@@ -79,12 +79,12 @@ class DriveView extends Ui.View {
 					lineValue[2].setText("P");
 				}
 				
-	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("speed"));
+	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("speed"), 0.0);
 	            lineText[3].setText(Ui.loadResource(Rez.Strings.subview_label_speed));
 	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
 	            lineValue[3].setText(lineData.toNumber() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? " miles" : " km"));
 
-	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("heading"));
+	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("heading"), 0.0);
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_heading));
 	            if (lineData != null) {
 					var val = (lineData.toFloat() / 22.5) + .5;
@@ -94,7 +94,7 @@ class DriveView extends Ui.View {
 		            lineValue[4].setText(lineData);
 				}
 					
-	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("power")).format("%.1f");
+	            lineData = $.validateFloat(_data._vehicle_data.get("drive_state").get("power"), 0.0).format("%.1f");
 	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_power));
                 lineValue[5].setText(lineData);
 			}
