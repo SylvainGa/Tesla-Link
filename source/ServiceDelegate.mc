@@ -430,7 +430,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var value;
             var crystalTesla;
             try {
-                crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"));
+                crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"), false);
             }
             catch (e) {
                 crystalTesla = false;
