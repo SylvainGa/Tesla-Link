@@ -72,6 +72,29 @@ function validateBoolean(value, defValue) {
 	}
 }
 
+function to_array(string, splitter) {
+	var array = new [30]; //Use maximum expected length
+	var index = 0;
+	var location;
+
+	do {
+		location = string.find(splitter);
+		if (location != null) {
+			array[index] = string.substring(0, location);
+			string = string.substring(location + 1, string.length());
+			index++;
+		}
+	} while (location != null);
+
+	array[index] = string;
+
+	var result = new [index + 1];
+	for (var i = 0; i <= index; i++) {
+		result[i] = array[i];
+	}
+	return result;
+}
+
 (:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
@@ -112,26 +135,3 @@ function logMessageAndData(message, data) {
 	}
 }
 //DEBUG*/
-
-function to_array(string, splitter) {
-	var array = new [30]; //Use maximum expected length
-	var index = 0;
-	var location;
-
-	do {
-		location = string.find(splitter);
-		if (location != null) {
-			array[index] = string.substring(0, location);
-			string = string.substring(location + 1, string.length());
-			index++;
-		}
-	} while (location != null);
-
-	array[index] = string;
-
-	var result = new [index + 1];
-	for (var i = 0; i <= index; i++) {
-		result[i] = array[i];
-	}
-	return result;
-}
