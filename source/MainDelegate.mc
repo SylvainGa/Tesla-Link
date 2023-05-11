@@ -179,9 +179,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
 
 		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
-		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
-			useTouch = hasTouch;
-			Properties.setValue("useTouch", useTouch);
+		if (useTouch == null || (useTouch == true && hasTouch == false) || (hasButtons == false && hasTouch == true && useTouch == false)) {
+			Properties.setValue("useTouch", hasTouch);
 		}
 
 		// This is where the main code will start running. Don't intialise stuff after this line
