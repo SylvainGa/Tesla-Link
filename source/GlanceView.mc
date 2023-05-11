@@ -180,6 +180,9 @@ class GlanceView extends Ui.GlanceView {
             preconditioning = status["preconditioning"];
             shift_state = status["shift_state"];
             vehicleAwake = status["vehicleAwake"];
+            if (vehicleAwake == null) {
+                vehicleAwake = "";
+            }
         }
 
         var suffix = "";
@@ -212,14 +215,14 @@ class GlanceView extends Ui.GlanceView {
             }
         }
         else if (responseCode == 408) {
-            if (vehicleAwake != null && vehicleAwake.equals("asleep")) {
+            if (vehicleAwake.equals("asleep")) {
                 txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
                 if (!_threeLines) {
                     suffix = "s";
                 }
             }
             else {
-                txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning;
+                txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning + " " + vehicleAwake;
             }
         }
         else if (responseCode == 401 || responseCode == null) {
