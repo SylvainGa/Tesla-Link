@@ -2,6 +2,9 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Lang;
+using Toybox.Application.Storage;
+using Toybox.Application.Properties;
+using Toybox.Complications;
 
 (:background)
 function validateNumber(value, defValue) {
@@ -93,6 +96,68 @@ function to_array(string, splitter) {
 		result[i] = array[i];
 	}
 	return result;
+}
+
+(:background, :bkgnd32kb)
+function sendComplication(data) {
+}
+
+(:background, :bkgnd64kb)
+function sendComplication(data) {
+	if (Toybox has :Complications) {
+		var value;
+		var crystalTesla;
+		try {
+			crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"), false);
+		}
+		catch (e) {
+			crystalTesla = false;
+		}
+
+		var status = Storage.getValue("status");
+		if (status == null) {
+			status = {};
+		}
+
+		if (crystalTesla) {
+			var arrayStore = new [7];
+
+			// Go through the data we need from 'status' and if we have one in 'data', use that one instead of the one in 'status'. Null becomes empty string
+			var arrayData = ["responseCode", "battery_level", "charging_state", "inside_temp", "sentry", "preconditioning", "vehicleAwake"];
+			for (var i = 0; i < arrayData.size(); i++) {
+				value = data.get(arrayData[i]);
+				if (value != null) {
+					arrayStore[i] = value;                        
+				}
+				else {
+					arrayStore[i] = status.get(arrayData[i]);
+					if (arrayStore[i] == null) {
+						arrayStore[i] = "";
+					}
+				}
+			}
+
+			// Build the value we'll pass to the Complication
+			value = arrayStore[0] + "|" + arrayStore[1] + "|" + arrayStore[2] + "|" + arrayStore[3] + "|" + arrayStore[4] + "|" + arrayStore[5] + "|" + arrayStore[6]; 
+		}
+		else {
+			// Other than Crystal-Tesla watchface only gets the battery level
+			value = data.get("battery_level");
+			if (value == null) {
+				value = $.validateNumber(status.get("battery_level", 0));
+			}
+		}
+
+		/*DEBUG*/ logMessage("Sending Complication: " + value);
+		// Send it to whoever is listening
+		var comp = {
+			:value => value,
+			:shortLabel => "TESLA",
+			:longLabel => "TESLA-LINK",
+			:units => "%",
+		};
+		Complications.updateComplication(0, comp);
+	}
 }
 
 (:debug, :background)

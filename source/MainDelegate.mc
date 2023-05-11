@@ -2005,9 +2005,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						status.put("shift_state", $.validateString(response.get("drive_state").get("shift_state"), ""));
 						status.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
 						status.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
+						status.put("vehicleAwake", "online");
 
 						Storage.setValue("status", status);
-
+						$.sendComplication(status);
+						
 						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
 					}
 
