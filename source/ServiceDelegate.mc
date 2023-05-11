@@ -48,8 +48,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
-        /*DEBUG*/ var myStats = System.getSystemStats();
-        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ var myStats = System.getSystemStats();
+        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         var data = Background.getBackgroundData();
         if (data == null) {
@@ -157,7 +157,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _fromTokenRefresh = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
-            /*DEBUG*/ logMessage("ServiceDelegate: tokens from prop");
+            //DEBUG*/ logMessage("Init: tokens <- prop");
             _data = {};
             _data.put("token", Storage.getValue("token"));
             _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
@@ -165,7 +165,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("refreshToken", Properties.getValue("refreshToken"));
         }
         else {
-            /*DEBUG*/ logMessage("ServiceDelegate: have tokens");
+            //DEBUG*/ logMessage("Init: tokens <- buffer");
         }
     }
 
@@ -198,7 +198,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             /*DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
-            sendComplication(_data);
+            $.sendComplication(_data);
 
             Background.exit(_data);
         }
@@ -270,7 +270,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
-        sendComplication(_data);
+        $.sendComplication(_data);
 
         Background.exit(_data);
     }
@@ -294,7 +294,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
 	function onReceiveVehicles(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
+		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
@@ -332,7 +332,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("vehicleAwake", "error");
         }
 
-        sendComplication(_data);
+        $.sendComplication(_data);
 
         //DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
         Background.exit(_data);
@@ -366,7 +366,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         _data.put("responseCode", 401);
 
-        sendComplication(_data);
+        $.sendComplication(_data);
 
         //DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
         Background.exit(_data);
@@ -374,7 +374,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // Do NOT call from a background process since we're setting registry data here
     function onReceiveToken(responseCode, data) {
-        //DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+        /*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
         if (responseCode == 200) {
             var token = data["access_token"];
@@ -419,65 +419,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
         else {
             //DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
-            sendComplication(_data);
+            $.sendComplication(_data);
 
             Background.exit(_data);
-        }
-    }
-
-    function sendComplication(data) {
-        if (Toybox has :Complications) {
-            var value;
-            var crystalTesla;
-            try {
-                crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"), false);
-            }
-            catch (e) {
-                crystalTesla = false;
-            }
-
-            var status = Storage.getValue("status");
-            if (status == null) {
-                status = {};
-            }
-
-            if (crystalTesla) {
-                var arrayStore = new [7];
-
-                // Go through the data we need from 'status' and if we have one in 'data', use that one instead of the one in 'status'. Null becomes empty string
-                var arrayData = ["responseCode", "battery_level", "charging_state", "inside_temp", "sentry", "preconditioning", "vehicleAwake"];
-                for (var i = 0; i < arrayData.size(); i++) {
-                    value = data.get(arrayData[i]);
-                    if (value != null) {
-                        arrayStore[i] = value;                        
-                    }
-                    else {
-                        arrayStore[i] = status.get(arrayData[i]);
-                        if (arrayStore[i] == null) {
-                            arrayStore[i] = "";
-                        }
-                    }
-                }
-
-                // Build the value we'll pass to the Complication
-                value = arrayStore[0] + "|" + arrayStore[1] + "|" + arrayStore[2] + "|" + arrayStore[3] + "|" + arrayStore[4] + "|" + arrayStore[5] + "|" + arrayStore[6]; 
-            }
-            else {
-                // Other than Crystal-Tesla watchface only gets the battery level
-                value = data.get("battery_level");
-                if (value == null) {
-                    value = $.validateNumber(status.get("battery_level", 0));
-                }
-            }
-
-            // Send it to whoever is listening
-            var comp = {
-                :value => value,
-                :shortLabel => "TESLA",
-                :longLabel => "TESLA-LINK",
-                :units => "%",
-            };
-            Complications.updateComplication(0, comp);
         }
     }
 }
