@@ -160,14 +160,14 @@ function sendComplication(data) {
 	}
 }
 
+/*DEBUG
 (:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 	System.println(dateStr + " : " + message);
 }
-
-/*DEBUG
+*/
 (:release, :background)
 function logMessage(message) {
 }
@@ -175,6 +175,7 @@ function logMessage(message) {
 function logMessageAndData(message, data) {
 }
 
+/*DEBUG
 (:debug, :background)
 function logMessageAndData(message, data) {
 	if (data == null) {
