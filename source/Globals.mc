@@ -144,7 +144,7 @@ function sendComplication(data) {
 			// Other than Crystal-Tesla watchface only gets the battery level
 			value = data.get("battery_level");
 			if (value == null) {
-				value = $.validateNumber(status.get("battery_level", 0));
+				value = $.validateNumber(status.get("battery_level"), 0);
 			}
 		}
 
