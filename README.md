@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.13.1 Fixed a bug in sending Complication reported through ERA
+
 V7.13.0 Added the following
 - A new Property called "Send enhanced Complications to Crystal-Tesla". If your device supports Complication and 64 KB or more of Background Memory, it will send its data to the Crystal-Tesla watch face so this one doesn't have to communicate with Tesla's server (no token required!).
 
