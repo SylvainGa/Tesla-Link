@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.13.2 Fixed another bug when sending Complication to watch face other than Crystal-Tesla, reported through ERA
+
 V7.13.1 Fixed a bug in sending Complication reported through ERA
 
 V7.13.0 Added the following
