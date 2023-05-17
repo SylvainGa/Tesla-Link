@@ -238,10 +238,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
         _data.put("timestamp", timestamp);
 
-        // Read what we need from the data received (if any)
-        if (responseCode == 200 && responseData != null) {
+        // Read what we need from the data received (if any) (typecheck since ERA reported Unexpected Type Error for 'response')
+        if (responseCode == 200 && responseData != null && responseData instanceof Lang.Dictionary) {
 			var response = responseData.get("response");
-            if (response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
+            if (response != null && response instanceof Lang.Dictionary && response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
                 var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"), 0);
                 _data.put("battery_level", battery_level);
                 _data.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range"), 0));
