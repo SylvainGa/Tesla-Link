@@ -173,16 +173,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
 
-		var useTouch = Properties.getValue("useTouch");
-		var hasTouch = System.getDeviceSettings().isTouchScreen;
-		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
-		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
-
-		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
-		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
-			useTouch = hasTouch;
-			Properties.setValue("useTouch", useTouch);
-		}
+		Properties.setValue("useTouch", gUseTouch);
 
 		// This is where the main code will start running. Don't intialise stuff after this line
 		//DEBUG*/ logMessage("initialize: quickAccess=" + Properties.getValue("quickReturn") + " enhancedTouch=" + Properties.getValue("enhancedTouch"));
@@ -1319,7 +1310,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onSelect() {
-		if (Properties.getValue("useTouch")) {
+		if (gUseTouch) {
 			return false;
 		}
 
@@ -1342,7 +1333,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onNextPage() {
-		if (Properties.getValue("useTouch")) {
+		if (gUseTouch) {
 			return false;
 		}
 
@@ -1365,7 +1356,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onPreviousPage() {
-		if (Properties.getValue("useTouch")) {
+		if (gUseTouch) {
 			return false;
 		}
 
@@ -1462,7 +1453,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onMenu() {
-		if (Properties.getValue("useTouch")) {
+		if (gUseTouch) {
 			return false;
 		}
 

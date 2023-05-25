@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.13.2</string>
+    <string id="AppNameVersion">Tesla Link V7.13.3</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -16,6 +16,11 @@
     <string id="label_p_off" scope="background">P Off</string>
     <string id="label_p_on" scope="background">P On</string>
 
+    <!-- No glance view -->
+    <string id="label_touch">Touch Screen</string>
+    <string id="label_press">Press Start</string>
+    <string id="label_connect">to Connect</string>
+    
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Phone connection</string>
