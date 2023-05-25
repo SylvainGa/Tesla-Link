@@ -149,7 +149,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 			//DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
 		} else {
-			/*DEBUG*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
+			//DEBUG*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
 			_need_auth = true;
 			_auth_done = false;
 		}
@@ -534,23 +534,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken, expires_in, created_at);
 
-			/*DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
-			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
 					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 				} else {
-					/*DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
+					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
 				}
 				Settings.setRefreshToken(refreshToken);
 			}
 			else {
-				/*DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+				//DEBUG*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
 		} else {
-			/*DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
+			//DEBUG*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
@@ -635,7 +635,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		// Sanity check
 		if (_pendingActionRequests.size() <= 0) {
-			/*DEBUG*/ logMessage("actionMachine: WARNING _pendingActionSize can't be less than 1 if we're here");
+			//DEBUG*/ logMessage("actionMachine: WARNING _pendingActionSize can't be less than 1 if we're here");
 			return;
 		}
 
@@ -645,7 +645,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		// Sanity check
 		if (request == null) {
-			/*DEBUG*/ logMessage("actionMachine: WARNING the request shouldn't be null");
+			//DEBUG*/ logMessage("actionMachine: WARNING the request shouldn't be null");
 			return;
 		}
 
@@ -1015,7 +1015,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				/*DEBUG*/ logMessage("actionMachine: WARNING Invalid action");
+				//DEBUG*/ logMessage("actionMachine: WARNING Invalid action");
 				_stateMachineCounter = 1;
 				break;
 		}
@@ -1133,7 +1133,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (!_auth_done) {
-			/*DEBUG*/ logMessage("StateMachine: WARNING auth NOT done");
+			//DEBUG*/ logMessage("StateMachine: WARNING auth NOT done");
 			return;
 		}
 
@@ -1321,7 +1321,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function doSelect() {
 		//DEBUG*/ logMessage("doSelect: climate on/off");
 		if (!_data._ready) {
-			/*DEBUG*/ logMessage("doSelect: WARNING Not ready to do action");
+			//DEBUG*/ logMessage("doSelect: WARNING Not ready to do action");
 			return;
 		}
 
@@ -1344,7 +1344,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function doNextPage() {
 		//DEBUG*/ logMessage("doNextPage: lock/unlock");
 		if (!_data._ready) {
-			/*DEBUG*/ logMessage("doNextPage: WARNING Not ready to do action");
+			//DEBUG*/ logMessage("doNextPage: WARNING Not ready to do action");
 			return;
 		}
 
@@ -1367,7 +1367,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function doPreviousPage() {
 		//DEBUG*/ logMessage("doPreviousPage: trunk/frunk/port");
 		if (!_data._ready) {
-			/*DEBUG*/ logMessage("doPreviousPage: WARNING Not ready to do action");
+			//DEBUG*/ logMessage("doPreviousPage: WARNING Not ready to do action");
 			return;
 		}
 
@@ -1448,7 +1448,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				/*DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + Properties.getValue("swap_frunk_for_port"));
+				//DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + Properties.getValue("swap_frunk_for_port"));
 		}
 	}
 
@@ -1604,7 +1604,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_climate_mode, null, :climate_mode, {}));
 				break;
 			default:
-				/*DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
+				//DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
 				break;
 		}
 	}
@@ -1612,7 +1612,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function doMenu() {
 		//DEBUG*/ logMessage("doMenu: Menu");
 		if (!_data._ready) {
-			/*DEBUG*/ logMessage("doMenu: WARNING Not ready to do action");
+			//DEBUG*/ logMessage("doMenu: WARNING Not ready to do action");
 			return;
 		}
 
@@ -1788,7 +1788,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 
 					default:
-						/*DEBUG*/ logMessage("onHold: Upper Left WARNING Invalid");
+						//DEBUG*/ logMessage("onHold: Upper Left WARNING Invalid");
 						break;
 				}
 			} else {
@@ -1803,7 +1803,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 
 					default:
-						/*DEBUG*/ logMessage("onHold: Lower Left WARNING Invalid");
+						//DEBUG*/ logMessage("onHold: Lower Left WARNING Invalid");
 						break;
 				}
 			}
@@ -1820,7 +1820,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 
 					default:
-						/*DEBUG*/ logMessage("onHold: Upper Right WARNING Invalid");
+						//DEBUG*/ logMessage("onHold: Upper Right WARNING Invalid");
 						break;
 				}
 			} else {
@@ -1839,7 +1839,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 
 					default:
-						/*DEBUG*/ logMessage("onHold: Lower Right WARNING Invalid");
+						//DEBUG*/ logMessage("onHold: Lower Right WARNING Invalid");
 						break;
 				}
 			}
@@ -1933,8 +1933,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		SpinSpinner(responseCode);
 
 		if (_stateMachineCounter < 0) {
-			/*DEBUG*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
-			/*DEBUG*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
+			//DEBUG*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
+			//DEBUG*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
 			if (_stateMachineCounter == -1) { 
 				//DEBUG*/ logMessage("onReceiveVehicleData: skipping, we're in a menu");
 				 _stateMachineCounter = -2; // Let the menu blocking us know that we missed data
@@ -2039,10 +2039,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 					}
 				} else {
-					/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
+					//DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
 				}
 			} else {
-				/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
+				//DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
 			}
 			_stateMachineCounter = 5;
 			return;
@@ -2173,7 +2173,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function _resetToken() {
-		/*DEBUG*/ logMessage("_resetToken: Reseting tokens");
+		//DEBUG*/ logMessage("_resetToken: Reseting tokens");
 		_token = null;
 		_auth_done = false;
 		Settings.setToken(null, 0, 0);
