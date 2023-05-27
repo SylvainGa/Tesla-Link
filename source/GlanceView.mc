@@ -26,7 +26,7 @@ class GlanceView extends Ui.GlanceView {
     var _threeLines;
     var _steps;
     var _showLaunch;
-
+    
     function initialize() {
         GlanceView.initialize();
         gSettingsChanged = true;

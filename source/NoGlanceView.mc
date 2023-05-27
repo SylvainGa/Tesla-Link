@@ -1,4 +1,5 @@
 using Toybox.WatchUi as Ui;
+using Toybox.Application.Properties;
 
 class NoGlanceView extends Ui.View {
 
@@ -7,7 +8,7 @@ class NoGlanceView extends Ui.View {
     }
 
     function onLayout(dc) {
-        if (gUseTouch) {
+        if (Properties.getValue("useTouch")) {
             setLayout(Rez.Layouts.NoGlanceTouchLayout(dc));
         }
         else {

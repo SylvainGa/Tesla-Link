@@ -8,7 +8,6 @@ using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 
 var gSettingsChanged;
-var gUseTouch;
 
 (:background)
 class TeslaLink extends App.AppBase {
@@ -81,18 +80,19 @@ class TeslaLink extends App.AppBase {
         Storage.setValue("runBG", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
-		var gUseTouch = Properties.getValue("useTouch");
+		var useTouch = Properties.getValue("useTouch");
 		var hasTouch = System.getDeviceSettings().isTouchScreen;
 		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
 		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
 
 		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
-		if (gUseTouch == null || gUseTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && gUseTouch == false) {
-			gUseTouch = hasTouch;
+		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
+			useTouch = hasTouch;
         }
+        Properties.setValue("useTouch", useTouch);
 
         var data = new TeslaData();
-        if ($.validateBoolean(Storage.getValue("fromGlance"), false) || gUseTouch) { // Up/Down buttons work when launched from glance (or if we don't have/need buttons)
+        if ($.validateBoolean(Storage.getValue("fromGlance"), false) || useTouch) { // Up/Down buttons work when launched from glance (or if we don't have/need buttons)
             Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
             var view = new MainView(data);
             return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];

@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.13.4 Fixed the touch devices that got broken in V7.13.3.
+
 V7.13.3 Fixed the following
 - Fixed for Up/Down buttons not working when not launched from Glance on button only watches
 - Fixed a crash when there is a collision in Complication Index between CIQ apps when updating Complication
