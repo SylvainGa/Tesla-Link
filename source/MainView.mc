@@ -279,7 +279,7 @@ class MainView extends Ui.View {
 				_scrollEndTimer = 0;
 				_scrollStartTimer = 0;
 			}
-
+			//DEBUG*/ vehicle_name = "Tesla";
 			var fontHeight = Graphics.getFontHeight(Graphics.FONT_SMALL);
 			var textWidth = dc.getTextWidthInPixels(vehicle_name, Graphics.FONT_SMALL);
 			var screenShape = System.getDeviceSettings().screenShape;
@@ -573,6 +573,32 @@ class MainView extends Ui.View {
 				var bitmap_width = bitmap.getWidth();
 				var bitmap_height = bitmap.getHeight();
 				dc.drawBitmap(center_x - bitmap_width / 2, sentry_y + bitmap_height / 2, bitmap);
+
+				/*DEBUG /* Draw rectangles to show where the enhanced touch points are
+				var x, y;
+				dc.setPenWidth(1);
+				dc.setColor(Graphics.COLOR_DK_RED, Graphics.COLOR_BLACK);
+
+				// Tap on the vehicle name
+				dc.drawRectangle(0, 0, System.getDeviceSettings().screenWidth, System.getDeviceSettings().screenHeight / 7);
+				// Tap on the space used by the 'Eye'
+				x = System.getDeviceSettings().screenWidth / 2 - (System.getDeviceSettings().screenWidth / 11).toNumber();
+				y = System.getDeviceSettings().screenHeight / 7;
+				dc.drawRectangle(x, y, System.getDeviceSettings().screenWidth / 2 + (System.getDeviceSettings().screenWidth / 11).toNumber() - x, (System.getDeviceSettings().screenHeight / 3.5).toNumber() - y);
+				// Tap on the middle text line where Departure is written
+				x = 0;
+				y = (System.getDeviceSettings().screenHeight / 2.3).toNumber();
+				dc.drawRectangle(x, y, System.getDeviceSettings().screenWidth, (System.getDeviceSettings().screenHeight / 1.8).toNumber() - y);
+				// Tap on bottom line on screen
+				y = (System.getDeviceSettings().screenHeight  / 1.25).toNumber();
+				dc.drawRectangle(0, y, System.getDeviceSettings().screenWidth / 2, System.getDeviceSettings().screenHeight);
+				dc.drawRectangle(System.getDeviceSettings().screenWidth / 2, y, System.getDeviceSettings().screenWidth, System.getDeviceSettings().screenHeight);
+
+				// Quadrants
+				dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
+				dc.drawLine(System.getDeviceSettings().screenWidth/2, 0, System.getDeviceSettings().screenWidth/2, System.getDeviceSettings().screenHeight);
+				dc.drawLine(0, System.getDeviceSettings().screenHeight/2, System.getDeviceSettings().screenWidth, System.getDeviceSettings().screenHeight/2);
+				/*DEBUG*/
 			}
 			else {
 				// Text layout, so update the lock status text   

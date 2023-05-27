@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.13.5 French translation updated and the Montserrat font was missing the 'É' character.
+
 V7.13.4 Fixed the touch devices that got broken in V7.13.3.
 
 V7.13.3 Fixed the following
