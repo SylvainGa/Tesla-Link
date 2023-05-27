@@ -11,7 +11,9 @@ class NoGlanceDelegate extends Ui.BehaviorDelegate {
 
     function onSelect() {
         var view = new MainView(_data);
-        Ui.pushView(view, new MainDelegate(view, _data, view.method(:onReceive)), Ui.SLIDE_UP);
+        var delegate = new MainDelegate(view, _data, view.method(:onReceive));
+        delegate._wakeWasConfirmed = true;
+        Ui.pushView(view, delegate, Ui.SLIDE_UP);
         return true;
     }
 

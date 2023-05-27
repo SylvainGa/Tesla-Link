@@ -43,7 +43,10 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.13.5 French translation updated and the Montserrat font was missing the 'É' character.
+V7.13.5 Fixed the following
+- If asked to press Start or Touch the screen to connect, don't ask to wakeup if asleep since we already did the conscious effort to connect by pressing Start or touching the screen.
+- French translation updated
+- Montserrat font was missing the 'É' character.
 
 V7.13.4 Fixed the touch devices that got broken in V7.13.3.
 
