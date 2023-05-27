@@ -88,6 +88,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastTimeStamp;
 	var _lastDataRun;
 	var _waitingForCommandReturn;
+	var _useTouch;
 	var _debug_auth;
 	var _debug_view;
 	// 2023-03-20 var _debugTimer;
@@ -109,8 +110,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_handler = handler;
 		_tesla = null;
 		_waitingForCommandReturn = false;
+		_useTouch = $.validateBoolean(Properties.getValue("useTouch"), true);
 
-		if (Properties.getValue("enhancedTouch")) {
+		if ($.validateBoolean(Properties.getValue("enhancedTouch"), true)) {
 			Storage.setValue("spinner", "+");
 		}
 		else {
@@ -172,16 +174,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
-
-		var useTouch = Properties.getValue("useTouch");
-		var hasTouch = System.getDeviceSettings().isTouchScreen;
-		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
-		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
-
-		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
-		if (useTouch == null || (useTouch == true && hasTouch == false) || (hasButtons == false && hasTouch == true && useTouch == false)) {
-			Properties.setValue("useTouch", hasTouch);
-		}
 
 		// This is where the main code will start running. Don't intialise stuff after this line
 		//DEBUG*/ logMessage("initialize: quickAccess=" + Properties.getValue("quickReturn") + " enhancedTouch=" + Properties.getValue("enhancedTouch"));
@@ -613,7 +605,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				spinner = "/";
 			}
 			else {
-				if (Properties.getValue("enhancedTouch")) {
+				if ($.validateBoolean(Properties.getValue("enhancedTouch"), true)) {
 					spinner = "+";
 				}
 				else {
@@ -667,7 +659,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
 		var _handlerType;
-		if (Properties.getValue("quickReturn")) {
+		if ($.validateBoolean(Properties.getValue("quickReturn"), false)) {
 			_handlerType = 1;
 		}
 		else {
@@ -801,7 +793,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_open_frunk));
 					}
-					else if (Properties.getValue("HansshowFrunk")) {
+					else if ($.validateBoolean(Properties.getValue("HansshowFrunk"), false)) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_close_frunk));
 					}
 					else {
@@ -1318,7 +1310,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onSelect() {
-		if (Properties.getValue("useTouch")) {
+		if (_useTouch) {
 			return false;
 		}
 
@@ -1341,7 +1333,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onNextPage() {
-		if (Properties.getValue("useTouch")) {
+		if (_useTouch) {
 			return false;
 		}
 
@@ -1364,7 +1356,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onPreviousPage() {
-		if (Properties.getValue("useTouch")) {
+		if (_useTouch) {
 			return false;
 		}
 
@@ -1461,7 +1453,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onMenu() {
-		if (Properties.getValue("useTouch")) {
+		if (_useTouch) {
 			return false;
 		}
 
@@ -1653,10 +1645,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
-		var enhancedTouch = Properties.getValue("enhancedTouch");
-		if (enhancedTouch == null) {
-			enhancedTouch = true;
-		}
+		var enhancedTouch = $.validateBoolean(Properties.getValue("enhancedTouch"), true);
 
 		//DEBUG*/ logMessage("onTap: enhancedTouch=" + enhancedTouch + " x=" + x + " y=" + y);
 		if (System.getDeviceSettings().screenShape == System.SCREEN_SHAPE_RECTANGLE && _settings.screenWidth < _settings.screenHeight) {

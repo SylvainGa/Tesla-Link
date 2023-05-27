@@ -134,7 +134,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
                     :longLabel => "TESLA-LINK",
                     :units => "%",
                 };
-                Complications.updateComplication(0, comp);
+                try {
+                    Complications.updateComplication(0, comp);
+                }
+        		catch (e) {}
             }
         }
         else if (responseCode == 408) {

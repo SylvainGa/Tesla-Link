@@ -15,6 +15,11 @@
     <string id="label_p_off" scope="background">P Off</string>  <!--  NEW -->
     <string id="label_p_on" scope="background">P On</string>  <!--  NEW -->
 
+    <!-- No glance view -->
+    <string id="label_touch">Touch Screen</string>
+    <string id="label_press">Drücke Start</string>
+    <string id="label_connect">um zu verbinden</string>
+    
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Telefonverbindung</string>

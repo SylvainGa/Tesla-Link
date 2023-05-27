@@ -15,6 +15,11 @@
     <string id="label_p_off" scope="background">P Off</string>
     <string id="label_p_on" scope="background">P On</string>
 
+    <!-- No glance view -->
+    <string id="label_touch">Toucher l'écran</string>
+    <string id="label_press">Appuyer sur démarrer</string>
+    <string id="label_connect">pour vous connecter</string>
+
 	<!--  Offline layout -->
     <string id="prompt">Tesla</string>
     <string id="label_offline1">Une connexion téléphonique</string>
@@ -119,14 +124,14 @@
     <string id="label_open_port">Port ouvert</string>
     <string id="label_close_port">Fermeture du port</string>
     <string id="label_unlock_port">Déverrouillage du port</string>
-    <string id="label_hvac_on">Clim activée</string>
-    <string id="label_hvac_off">Clim Éteinte</string>
-    <string id="label_climate_set">Climatisation à </string>
+    <string id="label_hvac_on">Climatisation\nactivée</string>
+    <string id="label_hvac_off">Climatisation\nÉteinte</string>
+    <string id="label_climate_set">Tempétature à </string>
     <string id="label_charging_limit">Limite de charge à </string>
     <string id="label_charging_amps">Ampèrage à  </string>
-    <string id="label_lock_doors">Vér. portes</string>
-    <string id="label_unlock_doors">Déver. portes</string>
-    <string id="label_login_on_phone">Connexion sur tél.</string>
+    <string id="label_lock_doors">Vérrouillage\nportes</string>
+    <string id="label_unlock_doors">Déverrouillage\nportes</string>
+    <string id="label_login_on_phone">Connexion sur\ntéléphone.</string>
     <string id="label_oauth_error">Erreur OAuth</string>
     <string id="label_requesting_data">Récup. données</string>
     <string id="label_authenticating_with_token">Authen. par jeton</string>
@@ -136,9 +141,9 @@
     <string id="label_no_vehicles">Pas de véhicule</string>
     <string id="label_vent_opening">Ouverture fenêtres</string>
     <string id="label_vent_closing">Fermeture fenêtres</string>
-    <string id="label_steering_wheel_on">Chauffage volant activé</string>
-    <string id="label_steering_wheel_off">Chauffage volant désactivé</string>
-    <string id="label_steering_wheel_need_climate_on">Activer chauffage avant</string>
+    <string id="label_steering_wheel_on">Chauffage volant\nactivé</string>
+    <string id="label_steering_wheel_off">Chauffage volant\ndésactivé</string>
+    <string id="label_steering_wheel_need_climate_on">Activer chauffage\navant</string>
     <string id="label_defrost_on">Dégivrage activé</string>
     <string id="label_defrost_off">Dégivrage éteint</string>
     <string id="label_start_departure">départ activé</string>
@@ -160,8 +165,8 @@
     <string id="label_honk_horn">Klaxonner?</string>
     <string id="label_open_vent">Ventiler ?</string>
     <string id="label_close_vent">Fermer fenêtre ?</string>
-    <string id="label_should_we_wake">Réveil </string>
-    <string id="label_perform_complication">Faire l'action?</string>
+    <string id="label_should_we_wake">Réveiller\n</string>
+    <string id="label_perform_complication">Faire l'action ?</string>
 
     <!--  Menu text -->
     <string id="menu_option_title">Menu</string>

@@ -35,15 +35,15 @@ class TeslaLink extends App.AppBase {
         }
 	}
 
-    (:can_glance, :bkgnd64kb)
-	function onStop(state) {
-        // if (Storage.getValue("runBG")) {
-    	// 	//DEBUG*/ logMessage("App: stopping with runBG True");
-        // }
-        // else {
-    	// 	//DEBUG*/ logMessage("App: stopping with runBG False");
-        // }
-	}
+    // (:can_glance, :bkgnd64kb)
+	// function onStop(state) {
+    //     if (Storage.getValue("runBG")) {
+    // 		//DEBUG*/ logMessage("App: stopping with runBG True");
+    //     }
+    //     else {
+    // 		//DEBUG*/ logMessage("App: stopping with runBG False");
+    //     }
+	// }
 
     (:can_glance)
 	function onSettingsChanged() {
@@ -61,8 +61,11 @@ class TeslaLink extends App.AppBase {
     (:glance, :can_glance)
     function getGlanceView() {
 		//DEBUG*/ logMessage("Glance: Starting");
+        Storage.setValue("fromGlance", true);
         Storage.setValue("runBG", true);
+
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
+
         return [ new GlanceView() ];
     }
 
@@ -77,9 +80,28 @@ class TeslaLink extends App.AppBase {
         Storage.setValue("runBG", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
+		var useTouch = Properties.getValue("useTouch");
+		var hasTouch = System.getDeviceSettings().isTouchScreen;
+		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
+		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;
+
+		// Make sure the combination of having buttons and touchscreen matches what we're asking through useTouch
+		if (useTouch == null || useTouch == true && hasTouch == false || hasButtons == false && hasTouch == true && useTouch == false) {
+			useTouch = hasTouch;
+        }
+        Properties.setValue("useTouch", useTouch);
+
         var data = new TeslaData();
-        var view = new MainView(data);
-		return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
+        if ($.validateBoolean(Storage.getValue("fromGlance"), false) || useTouch) { // Up/Down buttons work when launched from glance (or if we don't have/need buttons)
+            Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
+            var view = new MainView(data);
+            return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
+        }
+        else { // Sucks, but we have to have an extra view so the Up/Down button work in our main view
+            Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
+            var view = new NoGlanceView();
+            return [ view, new NoGlanceDelegate(data) ];
+        }
     }
 
     (:can_glance)

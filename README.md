@@ -42,6 +42,15 @@ If you like the widget, please consider [leaving a positive review](https://apps
 If you want to have the widget translated to your language, contact me through email or github.
 
 ## Changelog since forking from srwalter:
+
+V7.13.5 French translation updated and the Montserrat font was missing the 'É' character.
+
+V7.13.4 Fixed the touch devices that got broken in V7.13.3.
+
+V7.13.3 Fixed the following
+- Fixed for Up/Down buttons not working when not launched from Glance on button only watches
+- Fixed a crash when there is a collision in Complication Index between CIQ apps when updating Complication
+
 V7.13.2 Fixed another bug when sending Complication to watch face other than Crystal-Tesla, reported through ERA
 
 V7.13.1 Fixed a bug in sending Complication reported through ERA
