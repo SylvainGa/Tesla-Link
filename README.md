@@ -43,8 +43,11 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.13.5 Fixed the following
+V7.13.5 Added the following by requests
 - If asked to press Start or Touch the screen to connect, don't ask to wakeup if asleep since we already did the conscious effort to connect by pressing Start or touching the screen.
+- New setting: "Warn if the phone is not connect to the watch?". If set and the phone is too far from the watch, during a background process (every five minutes) and if the watch has at least 64 KB of background memory, it will popup over the watch face "Forgot phone?". If you say 'Yes', it launches the Tesla-Link app (which will simply display "Phone connection required"). If you say "No", ir will return to the watch face. It's a "hack" to let you know that you might have forgoten your phone in your vehicle.
+
+It also fxed the following
 - French translation updated
 - Montserrat font was missing the 'É' character.
 

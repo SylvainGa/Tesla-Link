@@ -9,6 +9,7 @@
 	<property id="useTouch" type="boolean">true</property>
 	<property id="quickReturn" type="boolean">false</property>
 	<property id="titleScrolling" type="boolean">false</property>
+	<property id="WarnWhenPhoneNotConnected" type="boolean">false</property>
 	<property id="CrystalTesla" type="boolean">false</property>
 	<property id="swap_frunk_for_port" type="number">0</property>
 	<property id="HansshowFrunk" type="boolean">false</property>

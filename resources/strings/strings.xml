@@ -15,6 +15,7 @@
     <string id="label_s_on" scope="background">S On</string>
     <string id="label_p_off" scope="background">P Off</string>
     <string id="label_p_on" scope="background">P On</string>
+    <string id="label_AskIfForgotPhone" scope="background">Forgot phone?</string>
 
     <!-- No glance view -->
     <string id="label_touch">Touch Screen</string>
@@ -95,6 +96,7 @@
 	<string id="setting_smallfontsize">Use a smaller font in Glance</string>
 	<string id="setting_scrollclearsedges">Scroll text until the edges have cleared</string>
 	<string id="setting_CrystalTesla">Send enhanced Complications to Crystal-Tesla</string>
+	<string id="setting_WarnWhenPhoneNotConnected">Warn if the phone is not connect to the watch?</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>

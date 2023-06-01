@@ -27,6 +27,10 @@
         <settingConfig type="boolean" required="true"/>
     </setting>
 
+    <setting propertyKey="@Properties.WarnWhenPhoneNotConnected" title="@Strings.setting_WarnWhenPhoneNotConnected">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
     <setting propertyKey="@Properties.CrystalTesla" title="@Strings.setting_CrystalTesla">
         <settingConfig type="boolean" required="true"/>
     </setting>

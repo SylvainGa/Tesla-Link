@@ -6,6 +6,30 @@ using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 using Toybox.Complications;
 
+(:background, :bkgnd64kb)
+function getBoolProperty(key, defaultValue) {
+	var value;
+	var exception;
+
+	try {
+		exception = false;
+		value = Properties.getValue(key);
+	}
+	catch (e) {
+		exception = true;
+		value = defaultValue;
+	}
+
+	if (exception) {
+		try {
+			Properties.setValue(key, defaultValue);
+		}
+		catch (e) {
+		}
+	}
+
+	return validateBoolean(value, defaultValue);
+}
 (:background)
 function validateNumber(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {

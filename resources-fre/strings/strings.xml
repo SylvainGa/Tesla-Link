@@ -14,6 +14,7 @@
     <string id="label_s_on" scope="background">S On</string>
     <string id="label_p_off" scope="background">P Off</string>
     <string id="label_p_on" scope="background">P On</string>
+    <string id="label_AskIfForgotPhone" scope="background">Téléphone oublié ?</string>
 
     <!-- No glance view -->
     <string id="label_touch">Toucher l'écran</string>
@@ -71,11 +72,11 @@
     <!--  Items in Settings only -->
     <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>
     <string id="setting_token_prompt">Entrez votre jeton de compte Tesla</string>
-    <string id="setting_enhancedTouch">Touche améliorée?</string>
-    <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile)?</string>
+    <string id="setting_enhancedTouch">Touche améliorée ?</string>
+    <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile) ?</string>
     <string id="setting_screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="setting_screenBottomRight">Au bas de l'écran à droite</string>
-    <string id="setting_HansshowFrunk">Possède un Hansshow frunk?</string>
+    <string id="setting_HansshowFrunk">Possède un Hansshow frunk ?</string>
     <string id="setting_api_server_location_label">Location du serveur API de Tesla</string>
     <string id="setting_auth_server_location_label">Location du serveur Auth de Tesla</string>
     <string id="setting_server_location_prompt">Entrez le nom de domaine du serveur</string>
@@ -91,9 +92,10 @@
     <string id="setting_titleScrolling">Activer le défilement du nom du véhicle</string>
     <string id="menu_label_popUpMenu">Menu contextuel</string>
     <string id="setting_defaultUpperLeft">Opération par défaut pour le cartier supérieur gauche</string>
-	<string id="setting_smallfontsize">Utiliser une police de caractères plus petite en mode aperçu rapide?</string>
+	<string id="setting_smallfontsize">Utiliser une police de caractères plus petite en mode aperçu rapide ?</string>
 	<string id="setting_scrollclearsedges">Défilement jusqu'à ce que tout le texte est visible</string>
 	<string id="setting_CrystalTesla">Envoi de Complications avancées à Crystal-Tesla</string>
+	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>
@@ -162,7 +164,7 @@
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>
     <string id="label_open_trunk">Actionner la Valise ?</string>
-    <string id="label_honk_horn">Klaxonner?</string>
+    <string id="label_honk_horn">Klaxonner ?</string>
     <string id="label_open_vent">Ventiler ?</string>
     <string id="label_close_vent">Fermer fenêtre ?</string>
     <string id="label_should_we_wake">Réveiller\n</string>
@@ -171,15 +173,15 @@
     <!--  Menu text -->
     <string id="menu_option_title">Menu</string>
     <string id="label_car_chooser_title">Choisir un VIN</string>
-    <string id="label_temp_chooser_title">Température à?</string>
-    <string id="label_amps_chooser_title">Ampérage à?</string>
+    <string id="label_temp_chooser_title">Température à ?</string>
+    <string id="label_amps_chooser_title">Ampérage à ?</string>
     <string id="label_charginglimit_chooser_title">Limit à</string>
     <string id="frunk">Coffre avant</string>
     <string id="trunk">Valise</string>
     <string id="port">Port</string>
     <string id="vent">Ventiler</string>
-    <string id="label_temp_choose_seat">Quel siège?</string>
-    <string id="label_temp_choose_heat">Quelle chaleur?</string>
+    <string id="label_temp_choose_seat">Quel siège ?</string>
+    <string id="label_temp_choose_heat">Quelle chaleur ?</string>
     <string id="label_seat_driver">Conducteur</string>
     <string id="label_seat_passenger">Passager</string>
     <string id="label_seat_rear_left">Arrière gauche</string>
@@ -198,7 +200,7 @@
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
     <string id="label_refresh_chooser_title">En milisec</string>
-    <string id="label_climate_which">Quel mode?</string>
+    <string id="label_climate_which">Quel mode ?</string>
     <string id="label_climate_off">Éteint</string>
     <string id="label_climate_on">Garder allumer</string>
     <string id="label_climate_dog">Mode chien</string>

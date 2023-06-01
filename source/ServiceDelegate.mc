@@ -271,7 +271,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
             testAwake();
             return;
         }
-
+        else if (responseCode == -104 && $.getBoolProperty("WarnWhenPhoneNotConnected", false)) {
+            if (!System.getDeviceSettings().phoneConnected) {
+                /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
+            }
+        }
         //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
         $.sendComplication(_data);
 
