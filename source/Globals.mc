@@ -172,7 +172,7 @@ function sendComplication(data) {
 			}
 		}
 
-		/*DEBUG*/ logMessage("Sending Complication: " + value);
+		//DEBUG*/ logMessage("Sending Complication: " + value);
 		// Send it to whoever is listening
 		var comp = {
 			:value => value,
@@ -194,10 +194,10 @@ function logMessage(message) {
 	System.println(dateStr + " : " + message);
 }
 
-/*DEBUG
 (:release, :background)
 function logMessage(message) {
 }
+/*DEBUG
 (:release, :background)
 function logMessageAndData(message, data) {
 }
