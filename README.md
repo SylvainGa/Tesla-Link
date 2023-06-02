@@ -50,6 +50,7 @@ V7.13.5 Added the following by requests
 It also fxed the following
 - French translation updated
 - Montserrat font was missing the 'É' character.
+- Potential crash if asked to vibrate but the watch doesn't support that feature
 
 V7.13.4 Fixed the touch devices that got broken in V7.13.3.
 
