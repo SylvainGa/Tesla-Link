@@ -59,7 +59,7 @@ class MainView extends Ui.View {
 		_scrollEndTimer = 0;
 		_scrollStartTimer = 0;
 
-		/*DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
+		//DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
 		_refreshTimer = new Timer.Timer();
 
 		Storage.setValue("spinner", "-");
@@ -76,7 +76,7 @@ class MainView extends Ui.View {
 	}
 
 	function onShow() {
-		/*DEBUG*/ logMessage("MainView:onShow");
+		//DEBUG*/ logMessage("MainView:onShow");
 		if (Properties.getValue("titleScrolling")) {
 			_refreshTimer.start(method(:refreshView), 50, true);
 		}
@@ -86,7 +86,7 @@ class MainView extends Ui.View {
 	}
 	
 	function onHide() {
-		/*DEBUG*/ logMessage("MainView:onHide");
+		//DEBUG*/ logMessage("MainView:onHide");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 		_refreshTimer.stop();
 		//_refreshTimer = null;
