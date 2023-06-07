@@ -1948,7 +1948,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			if (response != null && response.hasKey("charge_state") && response.get("charge_state").hasKey("timestamp") && response.get("charge_state").get("timestamp") > _lastTimeStamp) {
 				_data._vehicle_data = response;
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
-				// logMessage("onReceiveVehicleData: received " + _data._vehicle_data);
+				//DEBUG*/ logMessage("onReceiveVehicleData: received " + response);
 				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
 					if (_waitingForCommandReturn) {
 						_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away

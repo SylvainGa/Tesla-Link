@@ -30,10 +30,14 @@ class GlanceView extends Ui.GlanceView {
     function initialize() {
         GlanceView.initialize();
         gSettingsChanged = true;
+
+		/*DEBUG*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
+        _refreshTimer = new Timer.Timer();
     }
 
 (:bkgnd32kb)
     function onShow() {
+		/*DEBUG*/ logMessage("GlanceView:onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -46,7 +50,6 @@ class GlanceView extends Ui.GlanceView {
         }
         _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired);
         
-        _refreshTimer = new Timer.Timer();
         _refreshTimer.start(method(:refreshView), 50, true);
 
         resetSavedPosition();
@@ -54,6 +57,7 @@ class GlanceView extends Ui.GlanceView {
 
 (:bkgnd64kb)
     function onShow() {
+		/*DEBUG*/ logMessage("GlanceView:onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -70,16 +74,16 @@ class GlanceView extends Ui.GlanceView {
         var noRefreshToken = (Properties.getValue("refreshToken") == null);
         _showLaunch = (expired || noToken || noVehicle || noRefreshToken);
 
-        _refreshTimer = new Timer.Timer();
         _refreshTimer.start(method(:refreshView), 50, true);
 
         resetSavedPosition();
     }
 
     function onHide() {
+		/*DEBUG*/ logMessage("GlanceView:onHide");
         if (_refreshTimer) {
             _refreshTimer.stop();
-            _refreshTimer = null;
+            //_refreshTimer = null;
         }
     }
 

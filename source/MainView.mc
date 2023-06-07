@@ -59,7 +59,8 @@ class MainView extends Ui.View {
 		_scrollEndTimer = 0;
 		_scrollStartTimer = 0;
 
-		// 2023-03-20 logMessage("MainView:initialize: _display at " + _display);
+		/*DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
+		_refreshTimer = new Timer.Timer();
 
 		Storage.setValue("spinner", "-");
 		if (Storage.getValue("refreshTimeInterval") == null) {
@@ -75,7 +76,7 @@ class MainView extends Ui.View {
 	}
 
 	function onShow() {
-		_refreshTimer = new Timer.Timer();
+		/*DEBUG*/ logMessage("MainView:onShow");
 		if (Properties.getValue("titleScrolling")) {
 			_refreshTimer.start(method(:refreshView), 50, true);
 		}
@@ -85,9 +86,10 @@ class MainView extends Ui.View {
 	}
 	
 	function onHide() {
+		/*DEBUG*/ logMessage("MainView:onHide");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 		_refreshTimer.stop();
-		_refreshTimer = null;
+		//_refreshTimer = null;
 	}
 
 	function refreshView() {
@@ -268,7 +270,7 @@ class MainView extends Ui.View {
 			// If we have the vehicle data back from the API, this is where the good stuff happens
 			// Retrieve and display the vehicle name
 			var name_drawable = View.findDrawableById("name");
-			var vehicle_name = $.validateString(_data._vehicle_data.get("display_name"), "");
+			var vehicle_name = $.validateString(_data._vehicle_data.get("vehicle_state").get("vehicle_name"), "");
 			var app_vehicle_name = Storage.getValue("vehicle_name");
 			if (app_vehicle_name == null) {
 				Storage.setValue("vehicle_name", vehicle_name);
