@@ -722,34 +722,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			case ACTION_TYPE_MEDIA_CONTROL:
-				var i;
-				i = 0;
-				break;
-				/*DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
-
-				/*DEBUG*/ logMessage("actionMachine: Media control - waiting for onCommandReturn");
-				switch (option) {
-					case ACTION_OPTION_MEDIA_PLAY_TOGGLE:
-						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_play_toggle)]);
-						_tesla.mediaTogglePlayback(_vehicle_id, method(:onCommandReturn));
-						break;
-					case ACTION_OPTION_MEDIA_PREV_SONG:
-						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_prev_song)]);
-						_tesla.mediaPrevTrack(_vehicle_id, method(:onCommandReturn));
-						break;
-					case ACTION_OPTION_MEDIA_NEXT_SONG:
-						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_next_song)]);
-						_tesla.mediaNextTrack(_vehicle_id, method(:onCommandReturn));
-						break;
-					case ACTION_OPTION_MEDIA_VOLUME_DOWN:
-						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_volume_down)]);
-						_tesla.mediaVolumeDown(_vehicle_id, method(:onCommandReturn));
-						break;
-					case ACTION_OPTION_MEDIA_VOLUME_UP:
-						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_volume_up)]);
-						_tesla.mediaVolumeUp(_vehicle_id, method(:onCommandReturn));
-						break;
-				}
+				/*DEBUG*/ logMessage("actionMachine: Media control - Shouldn't get there!");
 				break;
 
 			case ACTION_TYPE_TOGGLE_CHARGE:
@@ -2002,6 +1975,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 					// get the media state for the MediControlView
 					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
+					Storage.setValue("now_playing_title", _data._vehicle_data.get("vehicle_state").get("media_info").get("now_playing_title"));
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 						var status = {};

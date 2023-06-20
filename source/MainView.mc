@@ -35,6 +35,7 @@ class MainView extends Ui.View {
 	var _data;
 	var _refreshTimer;
 	var _viewUpdated;
+	var _font_montserrat;
 	// DEBUG variables
 	//DEBUG*/ var _showLogMessage, old_climate_state; var old_left_temp_direction; var old_right_temp_direction; var old_climate_defrost; var old_climate_batterie_preheat; var old_rear_defrost; var old_defrost_mode;
 
@@ -73,6 +74,13 @@ class MainView extends Ui.View {
 
 	function onLayout(dc) {
 		setLayout(Rez.Layouts.ImageLayout(dc));
+
+		// Load our custom font if it's there, generally only for high res, high mem devices
+		if (Rez.Fonts has :montserrat) {
+			_font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
+		} else {
+			_font_montserrat=Graphics.FONT_TINY;
+		}
 	}
 
 	function onShow() {
@@ -201,14 +209,6 @@ class MainView extends Ui.View {
 
 		_viewUpdated = true; // Tell refreshScreen that we updated our view
 
-		// Load our custom font if it's there, generally only for high res, high mem devices
-		var font_montserrat;
-		if (Rez.Fonts has :montserrat) {
-			font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
-		} else {
-			font_montserrat=Graphics.FONT_TINY;
-		}
-
 		// Redraw the layout and wipe the canvas
 		if (_display != null) { // We have a message to dislay instead of our canvas
 			// We're showing a message, so set 'ready' false to prevent touches
@@ -217,7 +217,7 @@ class MainView extends Ui.View {
 			//DEBUG*/ if (_showLogMessage) { logMessage("MainView:onUpdate: Msg '" + _display + (_displayTimer != null ? _displayTimer : "") + "'"); }
 			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.clear();
-			dc.drawText(center_x, center_y, font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+			dc.drawText(center_x, center_y, _font_montserrat, _display + (_displayTimer != null ? _displayTimer : ""), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
 			if (System.getTimer() > _errorTimer && _errorTimer != 0 && _data._vehicle_data != null) { // Have we timed out our text display and we have something to display
 				//DEBUG*/ logMessage("MainView:onUpdate: Clearing timer/display");

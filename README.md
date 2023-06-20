@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.14 Added media controls through Menu option 25. Usefull when the phone is in the car and you're not :-)
+
 V7.13.6 Fixed the following
 - Vehicle name was no longer being displayed on the main view because Tesla modified the data returned by the API
 - Fixed a crash reported by the ERA regarding too many timers.

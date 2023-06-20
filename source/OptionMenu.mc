@@ -182,8 +182,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :media_control) {
-            var view = new MediaControlView();
             var delegate = new MediaControlDelegate(_controller, _previous_stateMachineCounter);
+            var view = new MediaControlView(delegate);
             Ui.switchToView(view, delegate, Ui.SLIDE_UP);
         }
 

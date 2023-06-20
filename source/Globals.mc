@@ -6,7 +6,7 @@ using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 using Toybox.Complications;
 
-(:background, :bkgnd64kb)
+(:background)
 function getBoolProperty(key, defaultValue) {
 	var value;
 	var exception;

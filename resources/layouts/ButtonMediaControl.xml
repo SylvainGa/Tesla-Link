@@ -1,22 +1,2 @@
 <layout id="ButtonMediaControlLayout">
-    <drawable id="prev_song" class="WatchUi.Bitmap">
-        <param name="locX">25</param>
-        <param name="locY">25</param>
-        <param name="rezId">@Drawables.prev_song_icon</param>
-    </drawable>
-    <drawable id="next_song" class="WatchUi.Bitmap">
-        <param name="locX">75</param>
-        <param name="locY">25</param>
-        <param name="rezId">@Drawables.next_song_icon</param>
-    </drawable>
-    <drawable id="volume_down" class="WatchUi.Bitmap">
-        <param name="locX">25</param>
-        <param name="locY">75</param>
-        <param name="rezId">@Drawables.volume_down_icon</param>
-    </drawable>
-    <drawable id="volume_up" class="WatchUi.Bitmap">
-        <param name="locX">75</param>
-        <param name="locY">75</param>
-        <param name="rezId">@Drawables.volume_up_icon</param>
-    </drawable>
 </layout>
