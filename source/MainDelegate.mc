@@ -19,7 +19,12 @@ enum /* ACTION_OPTIONS */ {
 	ACTION_OPTION_SEAT_PASSENGER = 3,
 	ACTION_OPTION_SEAT_REAR_DRIVER = 4,
 	ACTION_OPTION_SEAT_REAR_CENTER = 5,
-	ACTION_OPTION_SEAT_REAR_PASSENGER = 6
+	ACTION_OPTION_SEAT_REAR_PASSENGER = 6,
+	ACTION_OPTION_MEDIA_PLAY_TOGGLE = 7,
+	ACTION_OPTION_MEDIA_PREV_SONG = 8,
+	ACTION_OPTION_MEDIA_NEXT_SONG = 9,
+	ACTION_OPTION_MEDIA_VOLUME_DOWN = 10,
+	ACTION_OPTION_MEDIA_VOLUME_UP = 11
 }
 
 enum /* ACTION_TYPES */ {
@@ -48,11 +53,12 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_CLIMATE_MODE = 22,
 	ACTION_TYPE_CLIMATE_DEFROST = 23,
 	ACTION_TYPE_CLIMATE_SET = 24,
+	ACTION_TYPE_MEDIA_CONTROL = 25,
 	// Following are through buttons or touch screen input
-	ACTION_TYPE_CLIMATE_ON = 25,
-	ACTION_TYPE_CLIMATE_OFF = 26,
-	ACTION_TYPE_LOCK = 27,
-	ACTION_TYPE_UNLOCK = 28
+	ACTION_TYPE_CLIMATE_ON = 26,
+	ACTION_TYPE_CLIMATE_OFF = 27,
+	ACTION_TYPE_LOCK = 28,
+	ACTION_TYPE_UNLOCK = 29
 }
 
 /* _stateMachineCounter DEFINITION
@@ -666,6 +672,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_handlerType = 2;
 		}
 
+		var view;
+		var delegate;
+
 		switch (action) {
 			case ACTION_TYPE_RESET:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
@@ -712,6 +721,37 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_tesla.climateSet(_vehicle_id, method(:onCommandReturn), temperature);
 				break;
 
+			case ACTION_TYPE_MEDIA_CONTROL:
+				var i;
+				i = 0;
+				break;
+				/*DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
+
+				/*DEBUG*/ logMessage("actionMachine: Media control - waiting for onCommandReturn");
+				switch (option) {
+					case ACTION_OPTION_MEDIA_PLAY_TOGGLE:
+						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_play_toggle)]);
+						_tesla.mediaTogglePlayback(_vehicle_id, method(:onCommandReturn));
+						break;
+					case ACTION_OPTION_MEDIA_PREV_SONG:
+						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_prev_song)]);
+						_tesla.mediaPrevTrack(_vehicle_id, method(:onCommandReturn));
+						break;
+					case ACTION_OPTION_MEDIA_NEXT_SONG:
+						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_next_song)]);
+						_tesla.mediaNextTrack(_vehicle_id, method(:onCommandReturn));
+						break;
+					case ACTION_OPTION_MEDIA_VOLUME_DOWN:
+						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_volume_down)]);
+						_tesla.mediaVolumeDown(_vehicle_id, method(:onCommandReturn));
+						break;
+					case ACTION_OPTION_MEDIA_VOLUME_UP:
+						// _handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_media_volume_up)]);
+						_tesla.mediaVolumeUp(_vehicle_id, method(:onCommandReturn));
+						break;
+				}
+				break;
+
 			case ACTION_TYPE_TOGGLE_CHARGE:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
@@ -744,8 +784,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
 					honkHornConfirmed();
 				} else {
-					var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
-					var delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), method(:operationCanceled));
+					view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_honk_horn));
+					delegate = new SimpleConfirmDelegate(method(:honkHornConfirmed), method(:operationCanceled));
 					Ui.pushView(view, delegate, Ui.SLIDE_UP);
 				}
 				break;
@@ -789,7 +829,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					frunkConfirmed();
 				}
 				else {
-					var view;
 					if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_open_frunk));
 					}
@@ -802,7 +841,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 
 					}
-					var delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), method(:operationCanceled));
+					delegate = new SimpleConfirmDelegate(method(:frunkConfirmed), method(:operationCanceled));
 					Ui.pushView(view, delegate, Ui.SLIDE_UP);
 				}
 				break;
@@ -814,8 +853,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					trunkConfirmed();
 				}
 				else {
-					var view = new Ui.Confirmation(Ui.loadResource((_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.menu_label_open_trunk : Rez.Strings.menu_label_close_trunk)));
-					var delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), method(:operationCanceled));
+					view = new Ui.Confirmation(Ui.loadResource((_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.menu_label_open_trunk : Rez.Strings.menu_label_close_trunk)));
+					delegate = new SimpleConfirmDelegate(method(:trunkConfirmed), method(:operationCanceled));
 					Ui.pushView(view, delegate, Ui.SLIDE_UP);
 				}
 				break;
@@ -828,8 +867,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
 						openVentConfirmed();
 					} else {
-						var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
-						var delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), method(:operationCanceled));
+						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_open_vent));
+						delegate = new SimpleConfirmDelegate(method(:openVentConfirmed), method(:operationCanceled));
 						Ui.pushView(view, delegate, Ui.SLIDE_UP);
 					}
 				}
@@ -837,8 +876,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (option == ACTION_OPTION_BYPASS_CONFIRMATION) {
 						closeVentConfirmed();
 					} else {
-						var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
-						var delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), method(:operationCanceled));
+						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_close_vent));
+						delegate = new SimpleConfirmDelegate(method(:closeVentConfirmed), method(:operationCanceled));
 						Ui.pushView(view, delegate, Ui.SLIDE_UP);
 					}
 				}
@@ -1603,6 +1642,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case 24:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_climate_mode, null, :climate_mode, {}));
 				break;
+			case 25:
+				menu.addItem(new MenuItem(Rez.Strings.menu_label_media_control, null, :media_control, {}));
+				break;
 			default:
 				/*DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
 				break;
@@ -1958,6 +2000,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 					}
 
+					// get the media state for the MediControlView
+					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 						var status = {};
@@ -2122,16 +2166,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200) {
 			if (Properties.getValue("quickReturn")) {
-				//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+				/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
 				// Wait a second to let time for the command change to be recorded on Tesla's server
-				//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
+				/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
 				_stateMachineCounter = 10;
 				_waitingForCommandReturn = true;
 			}
 		} else { // Our call failed, say the error and back to the main code
-			//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+			/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}

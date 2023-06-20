@@ -69,6 +69,7 @@
     <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
     <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
     <string id="menu_label_select">Select</string>
+    <string id="menu_label_media_control">Media control</string>  <!--  NEW -->
 
 	<!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (optional) </string>

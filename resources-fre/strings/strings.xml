@@ -68,6 +68,7 @@
     <string id="menu_label_remote_boombox">Boombox à distance</string>
     <string id="menu_label_climate_mode">Mode de la climatisation</string>
     <string id="menu_label_select">Sélectionner</string>
+    <string id="menu_label_media_control">Contrôle média</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>

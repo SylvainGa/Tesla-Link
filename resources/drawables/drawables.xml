@@ -174,7 +174,42 @@
     <bitmap id="sentry_on_icon" filename="sentry_on.png" dithering="none" scaleX="10%" scaleY="10%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>AAAAAA</color>
-            <color>FF5555</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="pause_song_icon" filename="pause_song.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="play_song_icon" filename="play_song.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="prev_song_icon" filename="prev_song.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="next_song_icon" filename="next_song.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="volume_down_icon" filename="volume_down.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="volume_up_icon" filename="volume_up.png" dithering="none" scaleX="20%" scaleY="20%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
             <color>000000</color>
         </palette>
     </bitmap>

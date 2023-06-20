@@ -400,6 +400,31 @@ class Tesla {
         genericPost(url, notify);
     }
 
+    function mediaTogglePlayback(vehicle, notify) {
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/media_toggle_playback";
+        genericPost(url, notify);
+    }
+
+    function mediaPrevTrack(vehicle, notify) {
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/media_prev_track";
+        genericPost(url, notify);
+    }
+
+    function mediaNextTrack(vehicle, notify) {
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/media_next_track";
+        genericPost(url, notify);
+    }
+
+    function mediaVolumeDown(vehicle, notify) {
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_down";
+        genericPost(url, notify);
+    }
+
+    function mediaVolumeUp(vehicle, notify) {
+        var url = "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_up";
+        genericPost(url, notify);
+    }
+
     function revoke(notify) {
         var url = "https://" + Properties.getValue("serverAPILocation") + "/oauth/revoke";
         Communications.makeWebRequest(

@@ -13,6 +13,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         _controller = controller;
         _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
+        _controller._waitingForCommandReturn = false;
+
         //DEBUG*/ logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
     }
@@ -179,6 +181,10 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 	        modes[3] = Rez.Strings.label_climate_camp;
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
+        } else if (item == :media_control) {
+            var view = new MediaControlView();
+            var delegate = new MediaControlDelegate(_controller, _previous_stateMachineCounter);
+            Ui.switchToView(view, delegate, Ui.SLIDE_UP);
         }
 
         return true;
