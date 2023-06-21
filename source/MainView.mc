@@ -88,7 +88,7 @@ class MainView extends Ui.View {
 		if (_refreshTimer == null) {
 			_refreshTimer = new Timer.Timer();
 		}
-		if (Properties.getValue("titleScrolling")) {
+		if ($.getProperty("titleScrolling", false, method(:validateBoolean))) {
 			_refreshTimer.start(method(:refreshView), 50, true);
 		}
 		else {
@@ -294,7 +294,7 @@ class MainView extends Ui.View {
 				textPos = 0;
 				textMaxWidth = width;
 			}
-			else if (Properties.getValue("titleScrolling")) {
+			else if ($.getProperty("titleScrolling", false, method(:validateBoolean))) {
 				textPos = center_x / 14;
 				var textFromCenter = center_x - textPos - fontHeight / 2;
 				var rad = Math.acos(textFromCenter.toFloat() / radius.toFloat());
@@ -352,7 +352,7 @@ class MainView extends Ui.View {
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, 315);
 
 			// Grab the data we're going to use around charge and climate
-			var swap_frunk_for_port = Properties.getValue("swap_frunk_for_port");
+			var swap_frunk_for_port = $.getProperty("swap_frunk_for_port", 0, method(:validateNumber));
 			var battery_level = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
 			var charge_limit = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"), 0);
 			var charging_state = $.validateString(_data._vehicle_data.get("charge_state").get("charging_state"), "");

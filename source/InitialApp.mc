@@ -83,7 +83,7 @@ class TeslaLink extends App.AppBase {
         Storage.setValue("runBG", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);
-		var useTouch = Properties.getValue("useTouch");
+		var useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
 		var hasTouch = System.getDeviceSettings().isTouchScreen;
 		var neededButtons = System.BUTTON_INPUT_SELECT + System.BUTTON_INPUT_UP + System.BUTTON_INPUT_DOWN + System.BUTTON_INPUT_MENU;
 		var hasButtons = (System.getDeviceSettings().inputButtons & neededButtons) == neededButtons;

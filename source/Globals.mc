@@ -7,7 +7,7 @@ using Toybox.Application.Properties;
 using Toybox.Complications;
 
 (:background)
-function getBoolProperty(key, defaultValue) {
+function getProperty(key, defaultValue, type) {
 	var value;
 	var exception;
 
@@ -28,8 +28,9 @@ function getBoolProperty(key, defaultValue) {
 		}
 	}
 
-	return validateBoolean(value, defaultValue);
+	return type.invoke(value, defaultValue);
 }
+
 (:background)
 function validateNumber(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
@@ -132,7 +133,8 @@ function sendComplication(data) {
 		var value;
 		var crystalTesla;
 		try {
-			crystalTesla = $.validateBoolean(Properties.getValue("CrystalTesla"), false);
+			var callable = new Lang.Method($, :validateBoolean);
+			crystalTesla = getProperty("CrystalTesla", false, callable);
 		}
 		catch (e) {
 			crystalTesla = false;

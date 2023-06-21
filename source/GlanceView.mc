@@ -88,7 +88,7 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onLayout(dc) {
-        _usingFont = (Properties.getValue("smallfontsize") ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
+        _usingFont = ($.getProperty("smallfontsize", false, method(:validateBoolean)) ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
         _fontHeight = Graphics.getFontHeight(_usingFont);
         _dcHeight = dc.getHeight();
 
@@ -101,7 +101,7 @@ class GlanceView extends Ui.GlanceView {
 
         var screenShape = System.getDeviceSettings().screenShape;
         _dcWidth = dc.getWidth();
-        if (screenShape == System.SCREEN_SHAPE_ROUND && Properties.getValue("scrollclearsedge") == true) {
+        if (screenShape == System.SCREEN_SHAPE_ROUND && $.getProperty("scrollclearsedge", false, method(:validateBoolean)) == true) {
             var ratio = 1.0 + (System.getDeviceSettings().screenWidth < 454 ? Math.sqrt((454 - System.getDeviceSettings().screenWidth).toFloat() / 2800.0) : 0.0); // Convoluted way to adjust the width based on the screen width relative to a 454 watch, which shows ok with just the formula below 
             var rad = Math.asin(_dcHeight.toFloat() * (_threeLines ? ratio : 1.0) / _dcWidth.toFloat());
             _dcWidth = (Math.cos(rad) * _dcWidth.toFloat()).toNumber();

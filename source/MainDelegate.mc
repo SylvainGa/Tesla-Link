@@ -101,12 +101,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	var _pendingActionRequests;
 	var _stateMachineCounter;
+	var _serverAUTHLocation;
 	
 	function initialize(view as MainView, data, handler) {
 		BehaviorDelegate.initialize();
 	
 		_view = view;
 
+		_serverAUTHLocation = $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString));
 		_settings = System.getDeviceSettings();
 		_data = data;
 		_token = Settings.getToken();
@@ -116,9 +118,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_handler = handler;
 		_tesla = null;
 		_waitingForCommandReturn = false;
-		_useTouch = $.validateBoolean(Properties.getValue("useTouch"), true);
+		_useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
 
-		if ($.validateBoolean(Properties.getValue("enhancedTouch"), true)) {
+		if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
 			Storage.setValue("spinner", "+");
 		}
 		else {
@@ -182,7 +184,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 0;
 
 		// This is where the main code will start running. Don't intialise stuff after this line
-		//DEBUG*/ logMessage("initialize: quickAccess=" + Properties.getValue("quickReturn") + " enhancedTouch=" + Properties.getValue("enhancedTouch"));
+		//DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
 		_workTimer.start(method(:workerTimer), 100, true);
 
 /*DEBUG	if (_debug_view) {
@@ -487,13 +489,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (error == null && code != null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
-			var codeForBearerUrl = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
+			var codeForBearerUrl = "https://" + _serverAUTHLocation + "/oauth2/v3/token";
 			var codeForBearerParams = {
 				"grant_type" => "authorization_code",
 				"client_id" => "ownerapi",
 				"code" => code,
 				"code_verifier" => _code_verifier,
-				"redirect_uri" => "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback"
+				"redirect_uri" => "https://" + _serverAUTHLocation + "/void/callback"
 			};
 
 			var mySettings = System.getDeviceSettings();
@@ -570,7 +572,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function GetAccessToken(token, notify) {
-		var url = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
+		var url = "https://" + _serverAUTHLocation + "/oauth2/v3/token";
 		Communications.makeWebRequest(
 			url,
 			{
@@ -611,7 +613,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				spinner = "/";
 			}
 			else {
-				if ($.validateBoolean(Properties.getValue("enhancedTouch"), true)) {
+				if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
 					spinner = "+";
 				}
 				else {
@@ -665,7 +667,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
 		var _handlerType;
-		if ($.validateBoolean(Properties.getValue("quickReturn"), false)) {
+		if ($.getProperty("quickReturn", false, method(:validateBoolean))) {
 			_handlerType = 1;
 		}
 		else {
@@ -805,7 +807,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_open_frunk));
 					}
-					else if ($.validateBoolean(Properties.getValue("HansshowFrunk"), false)) {
+					else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_close_frunk));
 					}
 					else {
@@ -1117,7 +1119,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	                "client_id" => "ownerapi",
 	                "code_challenge" => code_challenge_fixed,
 	                "code_challenge_method" => "S256",
-	                "redirect_uri" => "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback",
+	                "redirect_uri" => "https://" + _serverAUTHLocation + "/void/callback",
 	                "response_type" => "code",
 	                "scope" => "openid email offline_access",
 	                "state" => "123"
@@ -1126,10 +1128,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            
 	            _handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 
-				//DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + Properties.getValue("serverAUTHLocation"));	
+				//DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + _serverAUTHLocation);	
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
-				var url_oauth = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/authorize";
-				var url_callback = "https://" + Properties.getValue("serverAUTHLocation") + "/void/callback";
+				var url_oauth = "https://" + _serverAUTHLocation + "/oauth2/v3/authorize";
+				var url_callback = "https://" + _serverAUTHLocation + "/void/callback";
 	            Communications.makeOAuthRequest(
 	                url_oauth,
 	                params,
@@ -1194,7 +1196,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_view._data._ready == true && Storage.getValue("launchedFromComplication") == true) {
 			Storage.setValue("launchedFromComplication", false);
 
-			var action = Properties.getValue("holdActionUpperLeft");
+			var action = $.getProperty("holdActionUpperLeft", 0, method(:validateNumber));
 			//DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
 
 			if (action != 0) { // 0 means disable. 
@@ -1281,26 +1283,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function openVentConfirmed() {
-		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
+		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 		//DEBUG*/ logMessage("actionMachine: Open vent - waiting for onCommandReturn");
 		_tesla.vent(_vehicle_id, method(:onCommandReturn), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function closeVentConfirmed() {
-	    _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
+	    _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 		//DEBUG*/ logMessage("actionMachine: Close vent - waiting for onCommandReturn");
 		_tesla.vent(_vehicle_id, method(:onCommandReturn), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function frunkConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Acting on frunk - waiting for onCommandReturn");
-		var hansshowFrunk = Properties.getValue("HansshowFrunk");
+		var hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
 		if (hansshowFrunk) {
-	        _handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
+	        _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
 			_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
 		} else {
 			if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
-				_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
+				_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
 				_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
 			} else {
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
@@ -1311,13 +1313,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function trunkConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
-		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
+		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
 		_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "rear");
 	}
 
 	function honkHornConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Honking - waiting for onCommandReturn");
-		_handler.invoke([Properties.getValue("quickReturn") ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
+		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
 		_tesla.honkHorn(_vehicle_id, method(:onCommandReturn));
 	}
 
@@ -1389,9 +1391,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		switch (Properties.getValue("swap_frunk_for_port")) {
+		switch ($.getProperty("swap_frunk_for_port", 0, method(:validateNumber))) {
 			case 0:
-				var hansshowFrunk = Properties.getValue("HansshowFrunk");
+				var hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
 				if (!hansshowFrunk && _data._vehicle_data.get("vehicle_state").get("ft") == 1) {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 			 	}
@@ -1414,7 +1416,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if (Properties.getValue("HansshowFrunk")) {
+				else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1460,7 +1462,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				/*DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + Properties.getValue("swap_frunk_for_port"));
+				/*DEBUG*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + $.getProperty("swap_frunk_for_port", 0, method(:validateNumber)));
 		}
 	}
 
@@ -1535,7 +1537,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		        if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if (Properties.getValue("HansshowFrunk")) {
+				else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1632,7 +1634,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		var thisMenu = new Ui.Menu2({:title=>Rez.Strings.menu_option_title});
-		var menuItems = $.to_array(Properties.getValue("optionMenuOrder"), ",");
+		var menuItems = $.to_array($.getProperty("optionMenuOrder", "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25", method(:validateString)),",");
 		for (var i = 0; i < menuItems.size(); i++) {
 			addMenuItem(thisMenu, menuItems[i]);
 		}
@@ -1660,7 +1662,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
-		var enhancedTouch = $.validateBoolean(Properties.getValue("enhancedTouch"), true);
+		var enhancedTouch = $.getProperty("enhancedTouch", true, method(:validateBoolean));
 
 		//DEBUG*/ logMessage("onTap: enhancedTouch=" + enhancedTouch + " x=" + x + " y=" + y);
 		if (System.getDeviceSettings().screenShape == System.SCREEN_SHAPE_RECTANGLE && _settings.screenWidth < _settings.screenHeight) {
@@ -1688,7 +1690,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} 
 		// Tap on bottom line on screen
 		else if (enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
-			var screenBottom = Properties.getValue(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight");
+			var screenBottom = $.getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight", 0, method(:validateNumber));
 			switch (screenBottom) {
 				case 0:
 		        	var charging_limit = _data._vehicle_data.get("charge_state").get("charge_limit_soc");
@@ -1770,7 +1772,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (x < _settings.screenWidth/2) {
 			if (y < _settings.screenHeight/2) {
 				//DEBUG*/ logMessage("onHold: Upper Left");
-				switch (Properties.getValue("holdActionUpperLeft")) {
+				switch ($.getProperty("holdActionUpperLeft", 0, method(:validateNumber))) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1805,7 +1807,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			} else {
 				//DEBUG*/ logMessage("onHold: Lower Left");
-				switch (Properties.getValue("holdActionLowerLeft")) {
+				switch ($.getProperty("holdActionLowerLeft", 0, method(:validateNumber))) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1822,7 +1824,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		} else {
 			if (y < _settings.screenHeight/2) {
 				//DEBUG*/ logMessage("onHold: Upper Right");
-				switch (Properties.getValue("holdActionUpperRight")) {
+				switch ($.getProperty("holdActionUpperRight", 0, method(:validateNumber))) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1837,7 +1839,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 			} else {
 				//DEBUG*/ logMessage("onHold: Lower Right");
-				switch (Properties.getValue("holdActionLowerRight")) {
+				switch ($.getProperty("holdActionLowerRight", 0, method(:validateNumber))) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1973,9 +1975,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 					}
 
-					// get the media state for the MediControlView
+					// get the media state for the MediaControl View
 					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
 					Storage.setValue("now_playing_title", _data._vehicle_data.get("vehicle_state").get("media_info").get("now_playing_title"));
+
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
 						var status = {};
@@ -2139,7 +2142,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		SpinSpinner(responseCode);
 
 		if (responseCode == 200) {
-			if (Properties.getValue("quickReturn")) {
+			if ($.getProperty("quickReturn", false, method(:validateBoolean))) {
 				/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {

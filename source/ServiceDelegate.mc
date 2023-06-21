@@ -10,8 +10,11 @@ using Toybox.Complications;
 
 (:background, :can_glance, :bkgnd32kb)
 class MyServiceDelegate extends System.ServiceDelegate {
+    hidden var _serverAPILocation;
+
     function initialize() {
         System.ServiceDelegate.initialize();
+        _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
@@ -25,7 +28,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
-                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
+                "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {
@@ -48,8 +51,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
-        //DEBUG*/ var myStats = System.getSystemStats();
-        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        /*DEBUG*/ var myStats = System.getSystemStats();
+        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         var data = Background.getBackgroundData();
         if (data == null) {
@@ -153,10 +156,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
     var _fromTokenRefresh;
+    hidden var _serverAPILocation;
 
     function initialize() {
         System.ServiceDelegate.initialize();
-
+        _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
         _fromTokenRefresh = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
@@ -185,7 +189,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
             _fromTokenRefresh = false;
             Communications.makeWebRequest(
-                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
+                "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {
@@ -271,7 +275,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             testAwake();
             return;
         }
-        else if (responseCode == -104 && $.getBoolProperty("WarnWhenPhoneNotConnected", false)) {
+        else if (responseCode == -104 && $.getProperty("WarnWhenPhoneNotConnected", false, method(:validateBoolean))) {
             if (!System.getDeviceSettings().phoneConnected) {
                 /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
                 Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
@@ -288,7 +292,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         var token = _data.get("token");
 
         Communications.makeWebRequest(
-            "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles", null,
+            "https://" + _serverAPILocation + "/api/1/vehicles", null,
             {
                 :method => Communications.HTTP_REQUEST_METHOD_GET,
                 :headers => {
@@ -354,7 +358,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
-            var url = "https://" + Properties.getValue("serverAUTHLocation") + "/oauth2/v3/token";
+            var url = "https://" + $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString)) + "/oauth2/v3/token";
             Communications.makeWebRequest(
                 url,
                 {
@@ -413,7 +417,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
             _fromTokenRefresh = true;
             Communications.makeWebRequest(
-                "https://" + Properties.getValue("serverAPILocation") + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
+                "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
                     :method => Communications.HTTP_REQUEST_METHOD_GET,
                     :headers => {

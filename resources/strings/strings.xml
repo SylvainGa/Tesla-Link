@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.13.6</string>
+    <string id="AppNameVersion">Tesla Link V7.14.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -78,7 +78,7 @@
     <string id="setting_useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
     <string id="setting_screenBottomLeft">For screen bottom left</string>
     <string id="setting_screenBottomRight">For screen bottom right</string>
-    <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
+    <string id="setting_HansshowFrunk">Has a powered frunk?</string>
     <string id="setting_api_server_location_label">Location of Tesla's API servers?</string>
     <string id="setting_auth_server_location_label">Location of Tesla's Auth servers?</string>
     <string id="setting_server_location_prompt">Enter the server domain name</string>

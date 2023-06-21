@@ -2,20 +2,23 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics;
 
 class MediaControlDelegate extends Ui.BehaviorDelegate {
-
+    var _view;
     var _controller;
     var _useTouch;
     var _previous_stateMachineCounter;
-    var _showVolume;
     var _fontHeight;
+    var _handler;
 
-    function initialize(controller, previous_stateMachineCounter) {
+    function initialize(view, controller, previous_stateMachineCounter, handler) {
         BehaviorDelegate.initialize();
+        _view = view;
         _controller = controller;
+        _previous_stateMachineCounter = previous_stateMachineCounter;
+        _handler = handler;
+
         _controller._stateMachineCounter = 1; // Make sure our vehicle data is fresh
-         _previous_stateMachineCounter = previous_stateMachineCounter;
-		_useTouch = controller._useTouch;
-        _showVolume = true;
+        _useTouch = controller._useTouch;
+
         _fontHeight = Graphics.getFontHeight(Graphics.FONT_TINY);
     }
 
@@ -24,7 +27,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 			return false;
 		}
 
-        if (_showVolume) {
+        if (_view._showVolume) {
             /*DEBUG*/ logMessage("MediaControlDelegate:onSelect volume up");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_UP, "Value" => 0, "Tick" => System.getTimer()});
             _controller._tesla.mediaVolumeUp(_controller._vehicle_id, method(:onCommandReturn));
@@ -53,7 +56,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 			return false;
 		}
 
-        if (_showVolume) {
+        if (_view._showVolume) {
             /*DEBUG*/ logMessage("MediaControlDelegate:onNextPage volume down");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_DOWN, "Value" => 0, "Tick" => System.getTimer()});
             _controller._tesla.mediaVolumeDown(_controller._vehicle_id, method(:onCommandReturn));
@@ -71,7 +74,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 			return false;
 		}
 
-        _showVolume = (_showVolume == false);
+        _view._showVolume = (_view._showVolume == false);
         Ui.requestUpdate();
         return true;
     }
@@ -96,7 +99,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 		var y = coords[1];
 
         // Center of screen where play button is
-        if (x > width / 2 - bm_width / 2 && x < width / 2 + bm_width / 2 && y > height / 2 - bm_height / 2 + _fontHeight && y < height / 2 + bm_height / 2 + _fontHeight) {
+        if (x > width / 2 - bm_width / 2 && x < width / 2 + bm_width / 2 && y > height / 2 - bm_height / 2 + _fontHeight - height / 20 && y < height / 2 + bm_height / 2 + _fontHeight - height / 20) {
             /*DEBUG*/ logMessage("MediaControlDelegate:onTap Play toggle");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_PLAY_TOGGLE, "Value" => 0, "Tick" => System.getTimer()});
             _controller._tesla.mediaTogglePlayback(_controller._vehicle_id, method(:onCommandReturn));
@@ -104,7 +107,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         // Left size
         else if (x < width / 2) {
             // Top left
-            if (y < height / 2 + _fontHeight) {
+            if (y < height / 2 + _fontHeight - height / 20) {
                 /*DEBUG*/ logMessage("MediaControlDelegate:onTap previous song");
                 //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_PREV_SONG, "Value" => 0, "Tick" => System.getTimer()});
                 _controller._tesla.mediaPrevTrack(_controller._vehicle_id, method(:onCommandReturn));
@@ -117,7 +120,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
             }
         }
         // Top right
-        else if (y < height / 2 + _fontHeight) {
+        else if (y < height / 2 + _fontHeight - height / 20) {
             /*DEBUG*/ logMessage("MediaControlDelegate:onTap next song");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_NEXT_SONG, "Value" => 0, "Tick" => System.getTimer()});
             _controller._tesla.mediaNextTrack(_controller._vehicle_id, method(:onCommandReturn));
@@ -135,12 +138,18 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 
 	function onCommandReturn(responseCode, data) {
         /*DEBUG*/ logMessage("onCommandReturn: " + responseCode);
+        // Feedback for the user
+		if (Attention has :vibrate) {
+			var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
+			Attention.vibrate(vibeData);				
+		}
+
 		if (responseCode == 200) {
-            _controller._stateMachineCounter = 1; // Get new vehicle data right now
+            _controller._stateMachineCounter = 5; // Get new vehicle data after 0.5sec so it has time to process it
         }
         else {
-			_controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + _controller.buildErrorString(responseCode)]);
+            _controller._stateMachineCounter = 20; // Next query event in two seconds
+			_handler.invoke(responseCode);
 		}
 	}
-
 }

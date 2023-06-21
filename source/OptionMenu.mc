@@ -68,7 +68,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
         } else if (item == :swap_frunk_for_port) {
-            var swap = Properties.getValue("swap_frunk_for_port");
+            var swap = $.getProperty("swap_frunk_for_port", 0, method(:validateNumber));
             if (swap == 0 || swap == null) {
                 Properties.setValue("swap_frunk_for_port", 1);
 			}
@@ -182,8 +182,8 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :media_control) {
-            var delegate = new MediaControlDelegate(_controller, _previous_stateMachineCounter);
-            var view = new MediaControlView(delegate);
+            var view = new MediaControlView();
+            var delegate = new MediaControlDelegate(view, _controller, _previous_stateMachineCounter, view.method(:onReceive));
             Ui.switchToView(view, delegate, Ui.SLIDE_UP);
         }
 

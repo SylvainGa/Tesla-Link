@@ -8,7 +8,7 @@ class NoGlanceView extends Ui.View {
     }
 
     function onLayout(dc) {
-        if (Properties.getValue("useTouch")) {
+        if ($.getProperty("useTouch", true, method(:validateBoolean))) {
             setLayout(Rez.Layouts.NoGlanceTouchLayout(dc));
         }
         else {
