@@ -174,7 +174,7 @@ function sendComplication(data) {
 			}
 		}
 
-		/*DEBUG*/ logMessage("Sending Complication: " + value);
+		//DEBUG*/ logMessage("Sending Complication: " + value);
 		// Send it to whoever is listening
 		var comp = {
 			:value => value,
