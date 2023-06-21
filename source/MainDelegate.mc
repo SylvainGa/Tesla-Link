@@ -1648,9 +1648,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onBack() {
-		if (_useTouch) {
-			return false;
-		}
+		// if (_useTouch) {
+		// 	return false;
+		// }
 
 		//DEBUG*/ logMessage("onBack: called");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
