@@ -99,8 +99,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
             var battery_level = $.validateNumber(str.substring(0, posEnd), 0);
             data.put("battery_level", battery_level);
 
-            pos = responseData.find("battery_range");
-            str = responseData.substring(pos + 15, pos + 22);
+            var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+            var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+            var bat_range_pos = [ 15, 19, 21];
+            pos = responseData.find(bat_range_str[which_battery_type]) + bat_range_pos[which_battery_type];
+            str = responseData.substring(pos, pos + 8);
+
             posEnd = str.find(",");
             data.put("battery_range", $.validateNumber(str.substring(0, posEnd), 0));
 
@@ -250,8 +254,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 			var response = responseData.get("response");
             if (response != null && response instanceof Lang.Dictionary && response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
                 var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"), 0);
+                var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+                var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+
                 _data.put("battery_level", battery_level);
-                _data.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range"), 0));
+                _data.put("battery_range", $.validateNumber(response.get("charge_state").get(bat_range_str[which_battery_type]), 0));
                 _data.put("charging_state", $.validateString(response.get("charge_state").get("charging_state"), ""));
                 _data.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp"), 0));
                 _data.put("shift_state", (response.get("drive_state").get("shift_state") == null ? "P" : $.validateString(response.get("drive_state").get("shift_state"), "")));

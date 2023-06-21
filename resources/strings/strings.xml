@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.14.0</string>
+    <string id="AppNameVersion">Tesla Link V7.13.6</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -66,10 +66,13 @@
     <string id="menu_label_select_car">Select Vehicle</string>
     <string id="menu_label_wake">Force Wake</string>
     <string id="menu_label_refresh">Set refresh time</string>
-    <string id="menu_label_remote_boombox">Remote Boombox</string>  <!--  NEW -->
-    <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
+    <string id="menu_label_remote_boombox">Remote Boombox</string>
+    <string id="menu_label_climate_mode">Climate mode</string>
     <string id="menu_label_select">Select</string>
-    <string id="menu_label_media_control">Media control</string>  <!--  NEW -->
+    <string id="menu_label_media_control">Media control</string>
+    <string id="menu_label_battery_range">Rated</string>
+    <string id="menu_label_est_battery_range">Estimated</string>
+    <string id="menu_label_ideal_battery_range">Ideal</string>
 
 	<!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (optional) </string>
@@ -78,7 +81,7 @@
     <string id="setting_useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
     <string id="setting_screenBottomLeft">For screen bottom left</string>
     <string id="setting_screenBottomRight">For screen bottom right</string>
-    <string id="setting_HansshowFrunk">Has a powered frunk?</string>
+    <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
     <string id="setting_api_server_location_label">Location of Tesla's API servers?</string>
     <string id="setting_auth_server_location_label">Location of Tesla's Auth servers?</string>
     <string id="setting_server_location_prompt">Enter the server domain name</string>
@@ -98,6 +101,7 @@
 	<string id="setting_scrollclearsedges">Scroll text until the edges have cleared</string>
 	<string id="setting_CrystalTesla">Send enhanced Complications to Crystal-Tesla</string>
 	<string id="setting_WarnWhenPhoneNotConnected">Warn if the phone is not connected to the watch?</string>
+	<string id="setting_batteryRangeType">Battery range to show</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>
@@ -212,7 +216,7 @@
     <string id="subview_label_charge_limit_soc">Charge limit</string>
     <string id="subview_label_battery_level">Battery Level</string>
     <string id="subview_label_charge_miles_added_rated">Range added</string>
-    <string id="subview_label_est_battery_range">Estimated Range</string>
+    <string id="subview_label_battery_range">Range</string>
     <string id="subview_label_minutes_to_full_charge">Time left</string>
     <string id="subview_label_charger_voltage">Charger voltage</string>
     <string id="subview_label_charger_actual_current">Charger current</string>

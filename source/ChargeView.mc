@@ -83,9 +83,11 @@ class ChargeView extends Ui.View {
 	            lineText[4].setText(Ui.loadResource(Rez.Strings.subview_label_charge_miles_added_rated));
 	            lineValue[4].setText(lineData.toNumber() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
 	
-	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get("battery_range"), 0.0);
+                var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+                var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+	            lineData = $.validateFloat(_data._vehicle_data.get("charge_state").get(bat_range_str[which_battery_type]), 0.0);
 	            lineData *=  (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? 1.0 : 1.6);
-	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_est_battery_range));
+	            lineText[5].setText(Ui.loadResource(Rez.Strings.subview_label_battery_range));
 	            lineValue[5].setText(lineData.toNumber() + (System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? "miles" : "km"));
 			}
 			else if (_viewOffset == 4) {

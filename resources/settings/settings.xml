@@ -35,6 +35,14 @@
         <settingConfig type="boolean" required="true"/>
     </setting>
 
+    <setting propertyKey="@Properties.batteryRangeType" title="@Strings.setting_batteryRangeType">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.menu_label_battery_range</listEntry>
+            <listEntry value="1">@Strings.menu_label_est_battery_range</listEntry>
+            <listEntry value="2">@Strings.menu_label_ideal_battery_range</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.swap_frunk_for_port" title="@Strings.setting_defaultUpperLeft">
         <settingConfig type="list">
             <listEntry value="0">@Strings.menu_label_open_frunk</listEntry>

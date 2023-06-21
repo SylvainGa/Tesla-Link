@@ -43,7 +43,22 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
-V7.14 Added media controls through Menu option 25. Usefull when the phone is in the car and you're not :-)
+V7.14.0 Added the following
+- Media controls through new Menu option 25. Usefull when the phone is in the car and you're not :-)
+    For touch watches, you can skip back/forward, increase/decrease volume and toggle Play/Pause
+
+    For button operated watch, you toggle between Skip control and Volume control by pressing Menu. You decrease volume/skip back with Page Down, increase volume/skip forward with Select and toggle Play/Pause with Page Up.
+
+    Back button/gesture takes you out of the Media Control view
+
+    The title of the song currently playing is shown at the top of the screen. Because of the shear size of data returned by the vehicle, it can be several seconds before a title change appears.
+
+    If your watch supports Vibrate, once the command is sent to the vehicle, the watch will vibrate. It takes a few seconds for the command to be sent so wait, otherwise a red -101 will show up on the bottom on the screen saying the Bluetooth queue is full. 
+
+    If an error is received, it will show in red on the bottom of the screen
+
+- Glance and Charge sub view can dislay the rated, estimated and ideal range. Settable in Settings
+- Hardened the reading of the Settings value.
 
 V7.13.6 Fixed the following
 - Vehicle name was no longer being displayed on the main view because Tesla modified the data returned by the API

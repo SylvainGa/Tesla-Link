@@ -34,41 +34,44 @@
     <!--  Option menu -->
     <string id="menu_label_reset">Remise à zéro</string>
     <string id="menu_label_honk">Klaxonner</string>
-    <string id="menu_label_open_port">Ouvrir le port</string>
-    <string id="menu_label_close_port">Fermer le port</string>
-    <string id="menu_label_unlock_port">Débarrer le port</string>
-    <string id="menu_label_open_frunk">Ouvrir le frunk</string>
-    <string id="menu_label_close_frunk">Fermer le frunk</string>
+    <string id="menu_label_open_port">Ouvrir Port</string>
+    <string id="menu_label_close_port">Fermer Port</string>
+    <string id="menu_label_unlock_port">Débarrer Port</string>
+    <string id="menu_label_open_frunk">Ouvrir Frunk</string>
+    <string id="menu_label_close_frunk">Fermer Frunk</string>
     <string id="menu_label_open_frunk_opened">Frunk déjà ouvert</string>
     <string id="menu_label_toggle_view">Change de vue</string>
     <string id="menu_label_swap_frunk_for_port">Valise arrière/Avant/Port</string>
-    <string id="menu_label_defrost_on">Activer le dégivrage</string>
-    <string id="menu_label_defrost_off">Désactiver le dégivrage</string>
-    <string id="menu_label_set_seat_heat">Chaleur des sièges</string>
-    <string id="menu_label_set_steering_wheel_heat_on">Activer le volant chauffant</string>
-    <string id="menu_label_set_steering_wheel_heat_off">Désactiver le volant chauffant</string>
+    <string id="menu_label_defrost_on">Activer Dégivrage</string>
+    <string id="menu_label_defrost_off">Désactiver Dégivrage</string>
+    <string id="menu_label_set_seat_heat">Chaleur siège</string>
+    <string id="menu_label_set_steering_wheel_heat_on">Activer Volant chauffant</string>
+    <string id="menu_label_set_steering_wheel_heat_off">Désactiver Volant chauffant</string>
     <string id="menu_label_set_charging_limit">Ajuster la limite de charge</string>
-    <string id="menu_label_set_charging_amps">Ajuster l'ampérage</string>
+    <string id="menu_label_set_charging_amps">Ajuster Ampérage</string>
     <string id="menu_label_start_charging">Démarrer la charge</string>
     <string id="menu_label_stop_charging">Arrêter la charge</string>
     <string id="menu_label_set_temp">Température à</string>
-    <string id="menu_label_start_departure">Activer départ</string>
-    <string id="menu_label_stop_departure">Désactiver départ</string>
-    <string id="menu_label_sentry_on">Activer Sentinelle</string>
-    <string id="menu_label_sentry_off">Désactiver Sentinelle</string>
-    <string id="menu_label_open_trunk">Ouvrir la valise</string>
-    <string id="menu_label_close_trunk">Fermer la valise</string>
+    <string id="menu_label_start_departure">Act. départ</string>
+    <string id="menu_label_stop_departure">Dés. départ</string>
+    <string id="menu_label_sentry_on">Act. Sentinelle</string>
+    <string id="menu_label_sentry_off">Dés. Sentinelle</string>
+    <string id="menu_label_open_trunk">Ouvrir Valise</string>
+    <string id="menu_label_close_trunk">Fermer Valise</string>
     <string id="menu_label_open_vent">Ventiler</string>
-    <string id="menu_label_close_vent">Fermer les fenêtres</string>
+    <string id="menu_label_close_vent">Fermer fenêtres</string>
     <string id="menu_label_homelink">Homelink</string>
-    <string id="menu_label_datascreen">Voir écrans de données</string>
+    <string id="menu_label_datascreen">Voir écran de données</string>
     <string id="menu_label_select_car">Sélectionnez le véhicule</string>
     <string id="menu_label_wake">Forcer un réveil</string>
     <string id="menu_label_refresh">temps de rafraichissement</string>
     <string id="menu_label_remote_boombox">Boombox à distance</string>
     <string id="menu_label_climate_mode">Mode de la climatisation</string>
     <string id="menu_label_select">Sélectionner</string>
-    <string id="menu_label_media_control">Contrôle média</string>
+    <string id="menu_label_media_control">Contrôle média</string>  <!--  NEW -->
+    <string id="menu_label_battery_range">Nominale</string>  <!--  NEW -->
+    <string id="menu_label_est_battery_range">Estimée</string>  <!--  NEW -->
+    <string id="menu_label_ideal_battery_range">Idéale</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>
@@ -77,13 +80,13 @@
     <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile) ?</string>
     <string id="setting_screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="setting_screenBottomRight">Au bas de l'écran à droite</string>
-    <string id="setting_HansshowFrunk">Possède un frunk actionnable?</string>
+    <string id="setting_HansshowFrunk">Possède un Hansshow frunk ?</string>
     <string id="setting_api_server_location_label">Location du serveur API de Tesla</string>
     <string id="setting_auth_server_location_label">Location du serveur Auth de Tesla</string>
     <string id="setting_server_location_prompt">Entrez le nom de domaine du serveur</string>
 	<string id="setting_menu_order">Ordre du menu (voir guide d'opération pour aide)</string>
     <string id="menu_label_vent">Ventilé</string>
-    <string id="menu_label_defrost">Actionner le dégivrage</string>
+    <string id="menu_label_defrost">Actionner Dégivrage</string>
     <string id="setting_holdActionUpperLeft">Action pour un appui prolongé sur le cartier supérieur gauche</string>
     <string id="setting_holdActionUpperRight">Action pour un appui prolongé sur le cartier supérieur droit</string>
     <string id="setting_holdActionLowerLeft">Action pour un appui prolongé sur le cartier inférieur gauche</string>
@@ -97,6 +100,7 @@
 	<string id="setting_scrollclearsedges">Défilement jusqu'à ce que tout le texte est visible</string>
 	<string id="setting_CrystalTesla">Envoi de Complications avancées à Crystal-Tesla</string>
 	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>  <!--  NEW -->
+	<string id="setting_batteryRangeType">Distance à utiliser</string>
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>
@@ -121,8 +125,8 @@
     <string id="label_frunk_opening">Ouveture du frunk</string>
     <string id="label_frunk_closing">Fermeture du frunk</string>
     <string id="label_frunk_opened">Frunk déjà ouvert</string>
-    <string id="label_trunk_opening">Ouverture de la valise</string>
-    <string id="label_trunk_closing">fermeture de la valise</string>
+    <string id="label_trunk_opening">Ouverture valise</string>
+    <string id="label_trunk_closing">fermeture valise</string>
     <string id="label_honk">Klaxon</string>
     <string id="label_open_port">Port ouvert</string>
     <string id="label_close_port">Fermeture du port</string>
@@ -132,8 +136,8 @@
     <string id="label_climate_set">Tempétature à </string>
     <string id="label_charging_limit">Limite de charge à </string>
     <string id="label_charging_amps">Ampèrage à  </string>
-    <string id="label_lock_doors">Vérrouillage\ndes portes</string>
-    <string id="label_unlock_doors">Déverrouillage\ndes portes</string>
+    <string id="label_lock_doors">Vérrouillage\nportes</string>
+    <string id="label_unlock_doors">Déverrouillage\nportes</string>
     <string id="label_login_on_phone">Connexion sur\ntéléphone.</string>
     <string id="label_oauth_error">Erreur OAuth</string>
     <string id="label_requesting_data">Récup. données</string>
@@ -142,10 +146,10 @@
     <string id="label_got_token">Jeton reçu</string>
     <string id="label_waking_vehicle">Réveil du vehicule</string>
     <string id="label_no_vehicles">Pas de véhicule</string>
-    <string id="label_vent_opening">Ouverture des fenêtres</string>
-    <string id="label_vent_closing">Fermeture des fenêtres</string>
-    <string id="label_steering_wheel_on">Chauffage du volant\nactivé</string>
-    <string id="label_steering_wheel_off">Chauffage du volant\ndésactivé</string>
+    <string id="label_vent_opening">Ouverture fenêtres</string>
+    <string id="label_vent_closing">Fermeture fenêtres</string>
+    <string id="label_steering_wheel_on">Chauffage volant\nactivé</string>
+    <string id="label_steering_wheel_off">Chauffage volant\ndésactivé</string>
     <string id="label_steering_wheel_need_climate_on">Activer chauffage\navant</string>
     <string id="label_defrost_on">Dégivrage activé</string>
     <string id="label_defrost_off">Dégivrage éteint</string>
@@ -163,11 +167,11 @@
     <string id="label_still_waiting_data">Toujours en attente</string>
 
     <!--  Popup text -->
-    <string id="label_open_frunk">Ouvrir le frunk ?</string>
-    <string id="label_open_trunk">Actionner la valise ?</string>
+    <string id="label_open_frunk">Ouvrir le coffre ?</string>
+    <string id="label_open_trunk">Actionner la Valise ?</string>
     <string id="label_honk_horn">Klaxonner ?</string>
     <string id="label_open_vent">Ventiler ?</string>
-    <string id="label_close_vent">Fermer les fenêtre ?</string>
+    <string id="label_close_vent">Fermer fenêtre ?</string>
     <string id="label_should_we_wake">Réveiller </string>
     <string id="label_perform_complication">Faire l'action ?</string>
 
@@ -177,7 +181,7 @@
     <string id="label_temp_chooser_title">Température à ?</string>
     <string id="label_amps_chooser_title">Ampérage à ?</string>
     <string id="label_charginglimit_chooser_title">Limit à</string>
-    <string id="frunk">Frunk</string>
+    <string id="frunk">Coffre avant</string>
     <string id="trunk">Valise</string>
     <string id="port">Port</string>
     <string id="vent">Ventiler</string>
@@ -205,13 +209,13 @@
     <string id="label_climate_off">Éteint</string>
     <string id="label_climate_on">Garder allumer</string>
     <string id="label_climate_dog">Mode chien</string>
-    <string id="label_climate_camp">Mode camping</string>
+    <string id="label_climate_camp">Mod camping</string>
 
     <!--  Subview text -->
     <string id="subview_label_charge_limit_soc">Charge limite</string>
     <string id="subview_label_battery_level">Niveau pile</string>
-    <string id="subview_label_charge_miles_added_rated">Disance ajout.</string>
-    <string id="subview_label_est_battery_range">Distance est.</string>
+    <string id="subview_label_charge_miles_added_rated">Distance ajout.</string>
+    <string id="subview_label_battery_range">Distance</string>
     <string id="subview_label_minutes_to_full_charge">Temps restant</string>
     <string id="subview_label_charger_voltage">Voltage charge</string>
     <string id="subview_label_charger_actual_current">Courant charge</string>
@@ -232,7 +236,7 @@
     <string id="subview_label_allow_cabin_overheat_protection">Protection surchauffe</string>
     <string id="subview_label_supports_fan_only_cabin_overheat_protection">Pas protect. A/C</string>
     <string id="subview_label_cabin_overheat_protection_actively_cooling">Surchauffe active</string>
-    <string id="subview_label_shift_state">Embrayage</string>
+    <string id="subview_label_shift_state">Embraiyage</string>
     <string id="subview_label_speed">Vitesse</string>
     <string id="subview_label_heading">Direction</string>
     <string id="subview_label_power">Puissance</string>

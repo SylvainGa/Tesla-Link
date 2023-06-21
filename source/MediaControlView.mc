@@ -46,7 +46,6 @@ class MediaControlView extends Ui.View {
 		var width = dc.getWidth();
 		var height = dc.getHeight();
 
-        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
         dc.clear();
         View.onUpdate(dc);
 
@@ -54,9 +53,9 @@ class MediaControlView extends Ui.View {
         var bm_height = _bm_prev_song.getHeight();
 
         var now_playing_title = Storage.getValue("now_playing_title");
-        
         var player_state = Storage.getValue("media_playback_status");
         var bm_player = (player_state == null || player_state.equals("Stopped")) ? _bm_play_song : _bm_pause_song;
+        var media_volume = Storage.getValue("media_volume");
 
         if (_useTouch) {
             var image_x_left = width / 4 - bm_width / 2;
@@ -69,6 +68,9 @@ class MediaControlView extends Ui.View {
             dc.drawBitmap(image_x_left, image_y_bottom, _bm_volume_down);
             dc.drawBitmap(image_x_right, image_y_bottom, _bm_volume_up);
             dc.drawBitmap(width / 2 - bm_width / 2, height / 2 - bm_height / 2 + _fontHeight - height / 20, bm_player);
+
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+			dc.drawText(width / 2, image_y_bottom + bm_height / 2, Graphics.FONT_TINY, media_volume, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
         else {
             var image_x_left = width / 4 - bm_width / 2;
@@ -78,6 +80,9 @@ class MediaControlView extends Ui.View {
             if (_showVolume) {
                 dc.drawBitmap(image_x_left, image_y_top, _bm_volume_down);
                 dc.drawBitmap(image_x_right, image_y_top, _bm_volume_up);
+
+                dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+                dc.drawText(width / 2, image_y_top + bm_height / 2, Graphics.FONT_TINY, media_volume, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             }
             else {
                 dc.drawBitmap(image_x_left, image_y_top, _bm_prev_song);
@@ -88,6 +93,7 @@ class MediaControlView extends Ui.View {
         }
 
         if (now_playing_title != null) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 			dc.drawText(width / 2, height / 10, Graphics.FONT_TINY, now_playing_title, Graphics.TEXT_JUSTIFY_CENTER);
         }
 

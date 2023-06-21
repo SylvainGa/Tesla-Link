@@ -69,6 +69,9 @@
     <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
     <string id="menu_label_select">Select</string>  <!--  NEW -->
     <string id="menu_label_media_control">Media control</string>  <!--  NEW -->
+    <string id="menu_label_battery_range">Rated</string>  <!--  NEW -->
+    <string id="menu_label_est_battery_range">Estimated</string>  <!--  NEW -->
+    <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API REFRESH Token (frivillig)</string>
@@ -97,6 +100,7 @@
 	<string id="setting_scrollclearsedges">Scroll text until the edges have cleared</string>  <!--  NEW -->
   	<string id="setting_CrystalTesla">Send enhanced Complications to Crystal-Tesla</string>  <!--  NEW -->
 	<string id="setting_WarnWhenPhoneNotConnected">Warn if the phone is not connected to the watch?</string>  <!--  NEW -->
+	<string id="setting_batteryRangeType">Battery range to show</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Kupé</string>
@@ -211,7 +215,7 @@
     <string id="subview_label_charge_limit_soc">Laddgräns</string>
     <string id="subview_label_battery_level">Batteri-nivå</string>
     <string id="subview_label_charge_miles_added_rated">Laddad räckvidd</string>
-    <string id="subview_label_est_battery_range">Uppskattad räckvidd</string>
+    <string id="subview_label_battery_range">Räckvidd</string>
     <string id="subview_label_minutes_to_full_charge">Minuter till fulladdad</string>
     <string id="subview_label_charger_voltage">Laddspänning</string>
     <string id="subview_label_charger_actual_current">Laddström</string>

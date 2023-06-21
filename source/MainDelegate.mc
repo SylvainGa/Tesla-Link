@@ -464,8 +464,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 	function onSwipe(swipeEvent) {
 		if (_view._data._ready) { // Don't handle swipe if where not showing the data screen
-	    	if (swipeEvent.getDirection() == 3) {
+	    	if (swipeEvent.getDirection() == WatchUi.SWIPE_LEFT) {
 				onReceive(1); // Show the first submenu
+		    }
+	    	if (swipeEvent.getDirection() == WatchUi.SWIPE_UP) {
+				var view = new MediaControlView();
+				var delegate = new MediaControlDelegate(view, self, _stateMachineCounter, view.method(:onReceive));
+				Ui.pushView(view, delegate, Ui.SLIDE_UP);
 		    }
 		}
 		return true;
@@ -1643,6 +1648,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onBack() {
+		if (_useTouch) {
+			return false;
+		}
+
 		//DEBUG*/ logMessage("onBack: called");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 	}
@@ -1978,6 +1987,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					// get the media state for the MediaControl View
 					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
 					Storage.setValue("now_playing_title", _data._vehicle_data.get("vehicle_state").get("media_info").get("now_playing_title"));
+					Storage.setValue("media_volume", ($.validateFloat(_data._vehicle_data.get("vehicle_state").get("media_info").get("audio_volume"), 0.0) * 10).toNumber());
 
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
@@ -2007,8 +2017,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						status.put("timestamp", timestamp);
 
+						var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+						var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+
 						status.put("battery_level", $.validateNumber(response.get("charge_state").get("battery_level"), 0));
-						status.put("battery_range", $.validateNumber(response.get("charge_state").get("battery_range"), 0));
+						status.put("battery_range", $.validateNumber(response.get("charge_state").get(bat_range_str[which_battery_type]), 0));
 						status.put("charging_state", $.validateString(response.get("charge_state").get("charging_state"), ""));
 						status.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp"), 0));
 						status.put("shift_state", $.validateString(response.get("drive_state").get("shift_state"), ""));
