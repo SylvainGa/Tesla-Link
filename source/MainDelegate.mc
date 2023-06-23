@@ -1975,7 +1975,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_data._vehicle_data = response;
 				_lastTimeStamp = response.get("charge_state").get("timestamp");
 				//DEBUG*/ logMessage("onReceiveVehicleData: received " + response);
-				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
+				if (response.get("climate_state") != null && response.get("charge_state") != null && response.get("vehicle_state") != null && response.get("drive_state") != null) {
 					if (_waitingForCommandReturn) {
 						_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
 						_stateMachineCounter = 1;
@@ -1985,9 +1985,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 
 					// get the media state for the MediaControl View
-					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
-					Storage.setValue("now_playing_title", _data._vehicle_data.get("vehicle_state").get("media_info").get("now_playing_title"));
-					Storage.setValue("media_volume", ($.validateFloat(_data._vehicle_data.get("vehicle_state").get("media_info").get("audio_volume"), 0.0) * 10).toNumber());
+					if (response.get("vehicle_state").get("media_info") != null) {
+						var media_info = response.get("vehicle_state").get("media_info");
+						Storage.setValue("media_playback_status", media_info.get("media_playback_status"));
+						Storage.setValue("now_playing_title", media_info.get("now_playing_title"));
+						Storage.setValue("media_volume", ($.validateFloat(media_info.get("audio_volume"), 0.0) * 10).toNumber());
+					}
 
 					// Update the glance data
 					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status

@@ -43,6 +43,8 @@ If you want to have the widget translated to your language, contact me through e
 
 ## Changelog since forking from srwalter:
 
+V7.14.1 Fixed a crash in reading media control reported through ERA. Apparently, not all car have "media_info" available all the time. So need to accomodate for that.
+
 V7.14.0 Added the following
 - Media controls through new Menu option 25. Usefull when the phone is in the car and you're not :-)
     For touch watches, you can skip back/forward, increase/decrease volume and toggle Play/Pause
