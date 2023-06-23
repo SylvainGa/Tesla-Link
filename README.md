@@ -44,6 +44,7 @@ If you want to have the widget translated to your language, contact me through e
 ## Changelog since forking from srwalter:
 
 V7.14.1 Fixed a crash in reading media control reported through ERA. Apparently, not all car have "media_info" available all the time. So need to accomodate for that.
+- Made some changes to the function receiving the vehicle data to harden it against bad data and added a timeout in case we never receive our request data back.
 
 V7.14.0 Added the following
 - Media controls through new Menu option 25. Usefull when the phone is in the car and you're not :-)
