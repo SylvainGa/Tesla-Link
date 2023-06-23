@@ -49,6 +49,23 @@ function validateNumber(value, defValue) {
 	return value;
 }
 
+function validateLong(value, defValue) {
+	if (value == null || value instanceof Lang.Boolean) {
+		return defValue;
+	}
+
+	try {
+		value = value.toLong();
+		if (value == null) {
+			value = defValue;
+		}
+	}
+	catch (e) {
+		value = defValue;
+	}
+	return value;
+}
+
 function validateFloat(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
 		return defValue;

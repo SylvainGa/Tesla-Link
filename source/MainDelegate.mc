@@ -182,6 +182,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
+		_lastDataRun = System.getTimer();
 
 		// This is where the main code will start running. Don't intialise stuff after this line
 		//DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
@@ -1243,6 +1244,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					//logMessage("workerTimer: " + _stateMachineCounter);
 				}
 			} else {
+				var timeDelta = System.getTimer() - _lastDataRun;
+				if (timeDelta > 15000) {
+					/*DEBUG*/ logMessage("workerTimer: We've been waiting for data for " + timeDelta + "ms. Assume we lost this packet and try again");
+					_lastDataRun = System.getTimer();
+					_stateMachineCounter = 1;
+				}				
 				//logMessage("workerTimer: " + _stateMachineCounter);
 			}
 		}
@@ -1951,7 +1958,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicleData(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+		/*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
 
 		SpinSpinner(responseCode);
 
@@ -1970,110 +1977,117 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_vehicle_state = "online"; // We got data so we got to be online
 
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
-			var response = data.get("response");
-			if (response != null && response.hasKey("charge_state") && response.get("charge_state").hasKey("timestamp") && response.get("charge_state").get("timestamp") > _lastTimeStamp) {
-				_data._vehicle_data = response;
-				_lastTimeStamp = response.get("charge_state").get("timestamp");
+			if (data != null && data instanceof Lang.Dictionary) {
+				var response = data.get("response");
 				//DEBUG*/ logMessage("onReceiveVehicleData: received " + response);
-				if (_data._vehicle_data.get("climate_state").hasKey("inside_temp") && _data._vehicle_data.get("charge_state").hasKey("battery_level")) {
-					if (_waitingForCommandReturn) {
-						_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
-						_stateMachineCounter = 1;
-					}
-					else {
-						_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
-					}
+				if (response != null && response instanceof Lang.Dictionary && response.get("climate_state") != null && response.get("charge_state") != null && response.get("vehicle_state") != null && response.get("drive_state") != null) {
+					if ($.validateLong(response.get("charge_state").get("timestamp"), 0) > _lastTimeStamp) {
+						_lastTimeStamp = response.get("charge_state").get("timestamp");
+						_data._vehicle_data = response;
+						if (_waitingForCommandReturn) {
+							_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
+							_stateMachineCounter = 1;
+						}
+						else {
+							_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
+						}
 
-					// get the media state for the MediaControl View
-					Storage.setValue("media_playback_status", _data._vehicle_data.get("vehicle_state").get("media_info").get("media_playback_status"));
-					Storage.setValue("now_playing_title", _data._vehicle_data.get("vehicle_state").get("media_info").get("now_playing_title"));
-					Storage.setValue("media_volume", ($.validateFloat(_data._vehicle_data.get("vehicle_state").get("media_info").get("audio_volume"), 0.0) * 10).toNumber());
+						// get the media state for the MediaControl View
+						if (response.get("vehicle_state").get("media_info") != null) {
+							var media_info = response.get("vehicle_state").get("media_info");
+							Storage.setValue("media_playback_status", media_info.get("media_playback_status"));
+							Storage.setValue("now_playing_title", media_info.get("now_playing_title"));
+							Storage.setValue("media_volume", ($.validateFloat(media_info.get("audio_volume"), 0.0) * 10).toNumber());
+						}
 
-					// Update the glance data
-					if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
-						var status = {};
+						// Update the glance data
+						if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
+							var status = {};
 
-						status.put("responseCode", responseCode);
+							status.put("responseCode", responseCode);
 
-						var timestamp;
-						try {
-							var clock_time = System.getClockTime();
-							var hours = clock_time.hour;
-							var minutes = clock_time.min.format("%02d");
-							var suffix = "";
-							if (System.getDeviceSettings().is24Hour == false) {
-								suffix = "am";
-								if (hours == 0) {
-									hours = 12;
+							var timestamp;
+							try {
+								var clock_time = System.getClockTime();
+								var hours = clock_time.hour;
+								var minutes = clock_time.min.format("%02d");
+								var suffix = "";
+								if (System.getDeviceSettings().is24Hour == false) {
+									suffix = "am";
+									if (hours == 0) {
+										hours = 12;
+									}
+									else if (hours > 12) {
+										suffix = "pm";
+										hours -= 12;
+									}
 								}
-								else if (hours > 12) {
-									suffix = "pm";
-									hours -= 12;
-								}
+								timestamp = " @ " + hours + ":" + minutes + suffix;
+							} catch (e) {
+								timestamp = "";
 							}
-							timestamp = " @ " + hours + ":" + minutes + suffix;
-						} catch (e) {
-							timestamp = "";
+							status.put("timestamp", timestamp);
+
+							var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+							var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+
+							status.put("battery_level", $.validateNumber(response.get("charge_state").get("battery_level"), 0));
+							status.put("battery_range", $.validateNumber(response.get("charge_state").get(bat_range_str[which_battery_type]), 0));
+							status.put("charging_state", $.validateString(response.get("charge_state").get("charging_state"), ""));
+							status.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp"), 0));
+							status.put("shift_state", $.validateString(response.get("drive_state").get("shift_state"), ""));
+							status.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
+							status.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
+							status.put("vehicleAwake", "online");
+
+							Storage.setValue("status", status);
+							$.sendComplication(status);
+							
+							//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
 						}
-						status.put("timestamp", timestamp);
 
-						var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
-						var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+						if (_408_count) {
+							//DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
+							_408_count = 0; // Reset the count of timeouts since we got our data
+						}
 
-						status.put("battery_level", $.validateNumber(response.get("charge_state").get("battery_level"), 0));
-						status.put("battery_range", $.validateNumber(response.get("charge_state").get(bat_range_str[which_battery_type]), 0));
-						status.put("charging_state", $.validateString(response.get("charge_state").get("charging_state"), ""));
-						status.put("inside_temp", $.validateNumber(response.get("climate_state").get("inside_temp"), 0));
-						status.put("shift_state", $.validateString(response.get("drive_state").get("shift_state"), ""));
-						status.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
-						status.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
-						status.put("vehicleAwake", "online");
+						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
+							_waitingFirstData = 0;
+							if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
+								//DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
+								_need_wake = false;
+								_wake_done = false;
+								_waitingForCommandReturn = false;
+								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
+								_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
+								return;
+							}
+						}
 
-						Storage.setValue("status", status);
-						$.sendComplication(status);
-						
-						//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");
-					}
-
-					if (_408_count) {
-						 //DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
-						_408_count = 0; // Reset the count of timeouts since we got our data
-					}
-
-					if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
-						_waitingFirstData = 0;
-						if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
-							//DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
-							_need_wake = false;
-							_wake_done = false;
+						if (_waitingForCommandReturn) {
+							_stateMachineCounter = 1;
 							_waitingForCommandReturn = false;
-							_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-							_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
-							return;
 						}
-					}
-
-					if (_waitingForCommandReturn) {
-						_stateMachineCounter = 1;
-						_waitingForCommandReturn = false;
-					}
-					else {
-						var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
-						// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
-						timeDelta = _refreshTimeInterval - timeDelta;
-						if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
-							_stateMachineCounter = (timeDelta / 100).toNumber();
-							// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
-							return;
-						} else {
-							// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
+						else {
+							var timeDelta = System.getTimer() - _lastDataRun; // Substract the time we spent waiting from the time interval we should run
+							// 2022-05-21 logMessage("onReceiveVehicleData: timeDelta is " + timeDelta);
+							timeDelta = _refreshTimeInterval - timeDelta;
+							if (timeDelta > 500) { // Make sure we leave at least 0.5 sec between calls
+								_stateMachineCounter = (timeDelta / 100).toNumber();
+								// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine in " + _stateMachineCounter + " 100msec cycles");
+								return;
+							} else {
+								// 2023-03-25 logMessage("onReceiveVehicleData: Next StateMachine min is 500 msec");
+							}
 						}
+					} else {
+						/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
 					}
 				} else {
 					/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
 				}
 			} else {
-				/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
+				/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received NO data or data is NOT a dictionary, ignoring");
 			}
 			_stateMachineCounter = 5;
 			return;
@@ -2085,18 +2099,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
-				// Comemnted out. Don't mess with the glance data if we get a 408 here. Chances are we're not asleep but can't talk to the vehicle for some reason
-				/*if (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) { // If we have a glance view, update its status
-					var timestamp;
-					try {
-						var clock_time = System.getClockTime();
-						timestamp = " @ " + clock_time.hour.format("%d")+ ":" + clock_time.min.format("%02d");
-					} catch (e) {
-						timestamp = "";
-					}
-					Storage.setValue("status", Ui.loadResource(Rez.Strings.label_asleep) + timestamp);
-				}*/
-
 				var i = _408_count + 1;
 				//DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
 				if (_waitingFirstData > 0 && _view._data._ready == false) { // We haven't received any data yet and we have already a message displayed
