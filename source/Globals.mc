@@ -64,7 +64,7 @@ function validateLong(value, defValue) {
 		value = defValue;
 	}
 	return value;
-}
+} 
 
 function validateFloat(value, defValue) {
 	if (value == null || value instanceof Lang.Boolean) {
