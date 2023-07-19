@@ -41,7 +41,7 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 If you want to have the widget translated to your language, contact me through email or github.
 
-You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link%20-%20Operating%20Guide.pdf).
+You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
 
