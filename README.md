@@ -41,6 +41,8 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 If you want to have the widget translated to your language, contact me through email or github.
 
+You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link%20-%20Operating%20Guide.pdf).
+
 ## Changelog since forking from srwalter:
 
 V7.14.1 Fixed a crash in reading media control reported through ERA. Apparently, not all car have "media_info" available all the time. So need to accommodate for that.
