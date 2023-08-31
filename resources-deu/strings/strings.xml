@@ -87,6 +87,8 @@
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
     <string id="menu_label_vent">Fensterspalt</string>
     <string id="menu_label_defrost">Enteisung</string>
+	<string id="menu_label_climate">Climate On</string>  <!--  NEW -->
+    <string id="setting_complicationAction">Launch from Complication action</string>  <!--  NEW -->
     <string id="setting_holdActionUpperLeft">Touch hold action for upper left quadrant</string>  <!--  NEW -->
     <string id="setting_holdActionUpperRight">Touch hold action for upper right quadrant</string>  <!--  NEW -->
     <string id="setting_holdActionLowerLeft">Touch hold action for lower left quadrant</string>  <!--  NEW -->

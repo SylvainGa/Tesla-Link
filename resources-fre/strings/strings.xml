@@ -87,6 +87,8 @@
 	<string id="setting_menu_order">Ordre du menu (voir guide d'opération pour aide)</string>
     <string id="menu_label_vent">Ventilé</string>
     <string id="menu_label_defrost">Actionner Dégivrage</string>
+	<string id="menu_label_climate">Actionner la climatisation</string>
+    <string id="setting_complicationAction">Action lors du lancement de la Complication</string>
     <string id="setting_holdActionUpperLeft">Action pour un appui prolongé sur le cartier supérieur gauche</string>
     <string id="setting_holdActionUpperRight">Action pour un appui prolongé sur le cartier supérieur droit</string>
     <string id="setting_holdActionLowerLeft">Action pour un appui prolongé sur le cartier inférieur gauche</string>

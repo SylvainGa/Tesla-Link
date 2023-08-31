@@ -15,6 +15,7 @@
 	<property id="HansshowFrunk" type="boolean">false</property>
 	<property id="screenBottomLeft" type="number">0</property>
 	<property id="screenBottomRight" type="number">0</property>
+	<property id="complicationAction" type="number">0</property>
 	<property id="holdActionUpperLeft" type="number">0</property>
 	<property id="holdActionUpperRight" type="number">0</property>
 	<property id="holdActionLowerLeft" type="number">0</property>

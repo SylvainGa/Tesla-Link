@@ -284,8 +284,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
         else if (responseCode == -104 && $.getProperty("WarnWhenPhoneNotConnected", false, method(:validateBoolean))) {
             if (!System.getDeviceSettings().phoneConnected) {
-                /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
-                Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
+                // var ignore = Storage.getValue("PhoneLostDontAsk");
+                // if (ignore == null) {
+                    /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                    Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
+                // }
             }
         }
         //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);

@@ -72,6 +72,17 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.complicationAction" title="@Strings.setting_complicationAction">
+        <settingConfig type="list">
+            <listEntry value="1">@Strings.menu_label_open_frunk</listEntry>
+            <listEntry value="2">@Strings.menu_label_open_trunk</listEntry>
+            <listEntry value="3">@Strings.menu_label_open_port</listEntry>
+            <listEntry value="4">@Strings.menu_label_vent</listEntry>
+            <listEntry value="5">@Strings.menu_label_climate</listEntry>
+            <listEntry value="0">@Strings.menu_label_none</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.holdActionUpperLeft" title="@Strings.setting_holdActionUpperLeft">
         <settingConfig type="list">
             <listEntry value="1">@Strings.menu_label_open_frunk</listEntry>

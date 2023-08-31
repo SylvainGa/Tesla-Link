@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.14.1</string>
+    <string id="AppNameVersion">Tesla Link V7.15.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -88,6 +88,8 @@
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>
 	<string id="menu_label_vent">Vent</string>
 	<string id="menu_label_defrost">Defrost toggle</string>
+	<string id="menu_label_climate">Climate On</string>
+    <string id="setting_complicationAction">Launch from Complication action</string>
     <string id="setting_holdActionUpperLeft">Touch hold action for upper left quadrant</string>
     <string id="setting_holdActionUpperRight">Touch hold action for upper right quadrant</string>
     <string id="setting_holdActionLowerLeft">Touch hold action for lower left quadrant</string>

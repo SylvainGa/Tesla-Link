@@ -157,6 +157,14 @@ class TeslaLink extends App.AppBase {
             var value = data["responseCode"];
             if (value != null) {
                 status.put("responseCode", value);
+
+                // // Deal with -104 (phone not connected)
+                // if (responseCode == -104) {
+                //     Storage.setValue("PhoneLostDontAsk", true);
+                // }
+                // else { // We have connection so it will be ok to ask again
+                //     Storage.deleteValue("PhoneLost");
+                // }
             }
             value = data["timestamp"];
             if (value != null) {

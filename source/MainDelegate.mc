@@ -1202,7 +1202,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_view._data._ready == true && Storage.getValue("launchedFromComplication") == true) {
 			Storage.setValue("launchedFromComplication", false);
 
-			var action = $.getProperty("holdActionUpperLeft", 0, method(:validateNumber));
+			var action = $.getProperty("complicationAction", 0, method(:validateNumber));
 			//DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
 
 			if (action != 0) { // 0 means disable. 
@@ -1772,15 +1772,18 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		var x;
 		var y;
+		var action;
 
 		if (click instanceof Lang.Boolean) {
 			x = 0;
 			y = 0;
+			action = $.getProperty("complicationAction", 0, method(:validateNumber));
 		}
 		else {
 			var coords = click.getCoordinates();
 			x = coords[0];
 			y = coords[1];
+			action = $.getProperty("holdActionUpperLeft", 0, method(:validateNumber));
 		}
 
 		var vibrate = true;
@@ -1788,7 +1791,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (x < _settings.screenWidth/2) {
 			if (y < _settings.screenHeight/2) {
 				//DEBUG*/ logMessage("onHold: Upper Left");
-				switch ($.getProperty("holdActionUpperLeft", 0, method(:validateNumber))) {
+				switch (action) {
 					case 0:
 						vibrate = false;
 						break;
@@ -1815,6 +1818,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 					case 4:
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_VENT, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
+						break;
+
+					case 5:
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_ON, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
 					default:
