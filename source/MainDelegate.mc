@@ -128,8 +128,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		
 		// _debugTimer = System.getTimer(); Storage.setValue("overrideCode", 0);
-		_debug_auth = false;
-		_debug_view = false;
 
 		var createdAt = Storage.getValue("TokenCreatedAt");
 		if (createdAt == null) {
@@ -151,6 +149,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var interval = 5 * 60;
 		var expired = (timeNow + interval < createdAt + expireIn);
 		
+		_debug_auth = false;
 		if (_debug_auth == false && _token != null && _token.length() > 0 && expired == true ) {
 			_need_auth = false;
 			_auth_done = true;
@@ -188,7 +187,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
 		_workTimer.start(method(:workerTimer), 100, true);
 
-/*DEBUG	if (_debug_view) {
+/*DEBUG
+		_debug_view = true;
+		if (_debug_view) {
 			if (_tesla == null) {
 				_tesla = new Tesla(_token);
 			}
@@ -432,7 +433,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					"webcam_available" => true
 				}
 			};
-		}*/
+		}//*/
 
 		stateMachine(); // Launch getting the states right away.
 	}
@@ -1055,7 +1056,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_stateMachineCounter = 1;
 			_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 			return;
-		}*/
+		}//*/
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
 

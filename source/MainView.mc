@@ -272,7 +272,6 @@ class MainView extends Ui.View {
 
 			// If we have the vehicle data back from the API, this is where the good stuff happens
 			// Retrieve and display the vehicle name
-			var name_drawable = View.findDrawableById("name");
 			var vehicle_name = $.validateString(_data._vehicle_data.get("vehicle_state").get("vehicle_name"), "");
 			var app_vehicle_name = Storage.getValue("vehicle_name");
 			if (app_vehicle_name == null) {
@@ -284,7 +283,7 @@ class MainView extends Ui.View {
 				_scrollEndTimer = 0;
 				_scrollStartTimer = 0;
 			}
-			//DEBUG*/ vehicle_name = "Tesla";
+			//DEBUG*/ vehicle_name = "VeryLongTeslaName";
 			var fontHeight = Graphics.getFontHeight(Graphics.FONT_SMALL);
 			var textWidth = dc.getTextWidthInPixels(vehicle_name, Graphics.FONT_SMALL);
 			var screenShape = System.getDeviceSettings().screenShape;
@@ -338,15 +337,6 @@ class MainView extends Ui.View {
 				}
 			}
 
-			//name_drawable.setText(vehicle_name);
-			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-			if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width == height) {
-				dc.setClip(center_x - textMaxWidth / 2, 0, textMaxWidth, height);
-			}
-			dc.drawText(_curPosX, textPos, Graphics.FONT_SMALL, vehicle_name, Graphics.TEXT_JUSTIFY_LEFT);
-			name_drawable.draw(dc);
-			dc.clearClip();
-
 			// Draw the grey arc in an appropriate size for the display
 			dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, 315);
@@ -373,6 +363,14 @@ class MainView extends Ui.View {
 			var limit_end_angle = limit_angle - 2;
 			limit_end_angle = limit_end_angle < 0 ? 360 + limit_end_angle : limit_end_angle;
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, limit_start_angle, limit_end_angle);
+
+			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+			if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width == height) {
+				dc.setClip(center_x - textMaxWidth / 2, 0, textMaxWidth, height);
+			}
+			dc.drawText(_curPosX, textPos, Graphics.FONT_SMALL, vehicle_name, Graphics.TEXT_JUSTIFY_LEFT);
+			dc.clearClip();
+			dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 
 			// Common climate data
 			var climate_state = $.validateBoolean(_data._vehicle_data.get("climate_state").get("is_climate_on"), false);

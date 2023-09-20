@@ -45,6 +45,10 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 
+V7.15.1 Added the following
+- Support for the VivoActive 5
+- Long vehicle name displays over the SoC bar
+
 V7.15.0 Added the following
 - Separated the launch from complications from the upper left quadrant and added Turning on climate as an option when launched from a watch face (like Crystal Tesla) that supports launching Complications
 - Venu3 and Venu3S as supported devices
