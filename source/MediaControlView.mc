@@ -35,13 +35,13 @@ class MediaControlView extends Ui.View {
     }
 
 	function onReceive(args) {
-        /*DEBUG*/ logMessage("MediaControlView:onReceive with args=" + args);
+        //DEBUG*/ logMessage("MediaControlView:onReceive with args=" + args);
         _text = args;
         WatchUi.requestUpdate();
     }
 
     function onUpdate(dc) {
-        /*DEBUG*/ logMessage("MediaControlView:onUpdate");
+        //DEBUG*/ logMessage("MediaControlView:onUpdate");
 
 		var width = dc.getWidth();
 		var height = dc.getHeight();

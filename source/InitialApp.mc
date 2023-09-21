@@ -21,12 +21,12 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
 	function onStart(state) {
-   		/*DEBUG*/ logMessage("App: starting");
+   		//DEBUG*/ logMessage("App: starting");
         if (state != null) {
-            /*DEBUG*/ logMessage("full state: " + state.toString());
-            /*DEBUG*/ logMessage("resume: " + state.get(:resume ));
-            /*DEBUG*/ logMessage("launchedFromGlance: " + state.get(:launchedFromGlance));
-            /*DEBUG*/ logMessage("launchedFromComplication: " + state.get(:launchedFromComplication ));
+            //DEBUG*/ logMessage("full state: " + state.toString());
+            //DEBUG*/ logMessage("resume: " + state.get(:resume ));
+            //DEBUG*/ logMessage("launchedFromGlance: " + state.get(:launchedFromGlance));
+            //DEBUG*/ logMessage("launchedFromComplication: " + state.get(:launchedFromComplication ));
 
             if (state.get(:launchedFromComplication) != null) {
                 Storage.setValue("launchedFromComplication", true);
