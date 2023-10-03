@@ -22,7 +22,7 @@ module Settings {
     //! Store refresh token
     function setRefreshToken(token) {
         if (token == null || token.equals("")) {
-            /*DEBUG*/ logMessage("Reseting the refresh token!");
+            //DEBUG 2023-10-02*/ logMessage("Reseting the refresh token!");
         }
         Properties.setValue(REFRESH_TOKEN, token);
     }

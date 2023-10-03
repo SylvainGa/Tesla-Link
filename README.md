@@ -45,6 +45,8 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 
+V7.16.0 Add "Ask to wake vehicle when launched" for those that want the vehicle to be awaken as the app launch instead of asking to wake. Defaults to True
+
 V7.15.1 Added the following
 - Support for the VivoActive 5
 - Long vehicle name displays over the SoC bar

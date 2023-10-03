@@ -103,6 +103,7 @@
 	<string id="setting_CrystalTesla">Envoi de Complications avancées à Crystal-Tesla</string>
 	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>  <!--  NEW -->
 	<string id="setting_batteryRangeType">Distance à utiliser</string>
+	<string id="setting_askWakeVehicle">Demande de réveiller le véhicule au lancement?</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>

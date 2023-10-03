@@ -60,7 +60,7 @@ class MainView extends Ui.View {
 		_scrollEndTimer = 0;
 		_scrollStartTimer = 0;
 
-		/*DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
+		//DEBUG 2023-10-02*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
 		//_refreshTimer = new Timer.Timer();
 
 		Storage.setValue("spinner", "-");
@@ -84,7 +84,7 @@ class MainView extends Ui.View {
 	}
 
 	function onShow() {
-		/*DEBUG*/ logMessage("MainView:onShow");
+		//DEBUG 2023-10-02*/ logMessage("MainView:onShow");
 		if (_refreshTimer == null) {
 			_refreshTimer = new Timer.Timer();
 		}
@@ -97,7 +97,7 @@ class MainView extends Ui.View {
 	}
 	
 	function onHide() {
-		/*DEBUG*/ logMessage("MainView:onHide");
+		//DEBUG 2023-10-02*/ logMessage("MainView:onHide");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 		_refreshTimer.stop();
 		_refreshTimer = null;
@@ -457,14 +457,14 @@ class MainView extends Ui.View {
 				var bm_waves;
 				var bm_blades;
 
-				/*DEBUG climate_state = false;
+				/* DEBUG climate_state = false;
 				climate_batterie_preheat = true;
 				defrost_mode = 1;
 				climate_defrost = false;
 				rear_defrost = true;
 				left_temp_direction = -1;*/ 
 
-				/*DEBUG var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
+				/* DEBUG var driver_temp = _data._vehicle_data.get("climate_state").get("driver_temp_setting");
 				var right_temp_direction = _data._vehicle_data.get("climate_state").get("right_temp_direction");
 				var venting = _data._vehicle_data.get("vehicle_state").get("fd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rd_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("fp_window").toNumber() + _data._vehicle_data.get("vehicle_state").get("rp_window").toNumber();
 				 if (climate_state != old_climate_state || left_temp_direction != old_left_temp_direction || right_temp_direction != old_right_temp_direction || climate_defrost != old_climate_defrost || climate_batterie_preheat != old_climate_batterie_preheat || rear_defrost != old_rear_defrost || defrost_mode != old_defrost_mode) {
@@ -577,7 +577,7 @@ class MainView extends Ui.View {
 				var bitmap_height = bitmap.getHeight();
 				dc.drawBitmap(center_x - bitmap_width / 2, sentry_y + bitmap_height / 2, bitmap);
 
-				/*DEBUG /* Draw rectangles to show where the enhanced touch points are
+				/* DEBUG /* Draw rectangles to show where the enhanced touch points are
 				var x, y;
 				dc.setPenWidth(1);
 				dc.setColor(Graphics.COLOR_DK_RED, Graphics.COLOR_BLACK);
@@ -601,7 +601,7 @@ class MainView extends Ui.View {
 				dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
 				dc.drawLine(System.getDeviceSettings().screenWidth/2, 0, System.getDeviceSettings().screenWidth/2, System.getDeviceSettings().screenHeight);
 				dc.drawLine(0, System.getDeviceSettings().screenHeight/2, System.getDeviceSettings().screenWidth, System.getDeviceSettings().screenHeight/2);
-				/*DEBUG*/
+				/* DEBUG*/
 			}
 			else {
 				// Text layout, so update the lock status text   

@@ -15,6 +15,10 @@
         <settingConfig type="boolean" required="true"/>
     </setting>
 
+    <setting propertyKey="@Properties.askWakeVehicle" title="@Strings.setting_askWakeVehicle">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
     <setting propertyKey="@Properties.titleScrolling" title="@Strings.setting_titleScrolling">
         <settingConfig type="boolean" required="true"/>
     </setting>
