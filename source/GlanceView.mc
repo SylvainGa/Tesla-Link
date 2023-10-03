@@ -31,13 +31,13 @@ class GlanceView extends Ui.GlanceView {
         GlanceView.initialize();
         gSettingsChanged = true;
 
-		/*DEBUG*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
+		//DEBUG 2023-10-02*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
         _refreshTimer = new Timer.Timer();
     }
 
 (:bkgnd32kb)
     function onShow() {
-		/*DEBUG*/ logMessage("GlanceView:onShow");
+		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -57,7 +57,7 @@ class GlanceView extends Ui.GlanceView {
 
 (:bkgnd64kb)
     function onShow() {
-		/*DEBUG*/ logMessage("GlanceView:onShow");
+		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -80,7 +80,7 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onHide() {
-		/*DEBUG*/ logMessage("GlanceView:onHide");
+		//DEBUG 2023-10-02*/ logMessage("GlanceView:onHide");
         if (_refreshTimer) {
             _refreshTimer.stop();
             //_refreshTimer = null;
@@ -137,10 +137,10 @@ class GlanceView extends Ui.GlanceView {
 
     function onUpdate(dc) {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
-        /*DEBUG*/ var showLog = false;
+        //DEBUG 2023-10-02*/ var showLog = false;
 
         if (gSettingsChanged) {
-            /*DEBUG*/ showLog = true;
+            //DEBUG 2023-10-02*/ showLog = true;
             gSettingsChanged = false;
             onLayout(dc);
         }
@@ -282,10 +282,10 @@ class GlanceView extends Ui.GlanceView {
             longestTextWidth = text3Width;
         }
 
-        /*DEBUG*/ if (showLog) {
+        //DEBUG 2023-10-02*/ if (showLog) {
         //DEBUG*/   logMessage("DC width/height: " + _dcWidth + "/" + _dcHeight + " resetPos: " + resetPos + " longest text width: " + longestTextWidth + " for line #" + longestTextWidthIndex);
-        /*DEBUG*/   logMessage("Showing " + line1 + " | " +  line2 + " | " + line3);
-        /*DEBUG*/ }
+        //DEBUG 2023-10-02*/   logMessage("Showing " + line1 + " | " +  line2 + " | " + line3);
+        //DEBUG 2023-10-02*/ }
         
         if (_curPos1X == null || _prevText1Width != text1Width || _prevText2Width != text2Width || _prevText3Width != text3Width) {
             resetSavedPosition();
