@@ -564,13 +564,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			else {
 				/*DEBUG 2023-10-02*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
-		} else {
+		}
+		else {
 			/*DEBUG 2023-10-02*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
 
 			Settings.setRefreshToken(null);
+
+			if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+				_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+				return;
+			}
 
 			_handler.invoke([0, -1, buildErrorString(responseCode)]);
 	    }
@@ -1171,16 +1178,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
-			// 2023-03025 logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
+			/*DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
 			_tesla.getVehicleId(method(:onReceiveVehicles));
+			_stateMachineCounter = 50; // Wait five second before running again so we don't start flooding the communication
 			return;
 		}
 
 		if (_need_wake) { // Asked to wake up
-			if (_waitingFirstData > 0 && !_wakeWasConfirmed && $.getProperty("askWakeVehicle", true, method(:validateBoolean))) { // Ask if we should wake the vehicle
+			if (_waitingFirstData > 0 && !_wakeWasConfirmed && false /*TODO REINSTATE $.getProperty("askWakeVehicle", true, method(:validateBoolean))*/) { // Ask if we should wake the vehicle
 				/*DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
@@ -1190,7 +1198,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+				onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
 			return;
 		}
@@ -1283,7 +1291,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
-		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+		onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 	}
 
 	function wakeCanceled() {
@@ -1904,7 +1912,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				vinsId[i] = vehicles[i].get("id");
 			}
 			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, self), Ui.SLIDE_UP);
-		} else {
+		}
+		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+		}
+		else {
 			_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
@@ -1915,7 +1928,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//logMessage("onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
-
 			var vehicles = data.get("response");
 			var size = vehicles.size();
 			if (size > 0) {
@@ -1952,15 +1964,21 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
 			}
-		} else {
+		}
+		else {
 			if (responseCode == 401) {
 				// Unauthorized
 				_resetToken();
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+			}
+			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+				_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+				return;
+			}
+			else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 	            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 	        }
-
 		}
 		_stateMachineCounter = 1;
 	}
@@ -2067,7 +2085,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 								_wake_done = false;
 								_waitingForCommandReturn = false;
 								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-								_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
+								onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
 								return;
 							}
 						}
@@ -2099,7 +2117,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 			_stateMachineCounter = 5;
 			return;
-		} else {
+		}
+		else {
 			_lastError = responseCode;
 
 			if (_waitingFirstData > 0) { // Reset that counter if what we got was an error packet. We're interested in gap between packets received.
@@ -2125,12 +2144,19 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 					_vehicle_id = -2;
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
-				} else if (responseCode == 401) {
+				}
+				else if (responseCode == 401) {
 	                // Unauthorized, retry
 	                _need_auth = true;
 	                _resetToken();
 		            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-				} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+				}
+				else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+					_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+					return;
+				}
+				else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 		        }
 			}
@@ -2143,18 +2169,32 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200 || (responseCode == 403 && _vehicle_state != null && _vehicle_state.equals("online") == true)) { // If we get 403, check to see if we saw it online since some country do not accept waking remotely
 			_wake_done = true;
-	   } else {
+		}
+		else {
 		   // We were unable to wake, try again
 			_need_wake = true;
 			_wake_done = false;
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 				_vehicle_id = -2;
 				_handler.invoke([0, -1, buildErrorString(responseCode)]);
-			} else if (responseCode == 401) { // Unauthorized, retry
+			}
+			else if (responseCode == 403) { // Forbiden, ask to manually wake the vehicle and test its state through the vehicle states returned by onReceiveVehicles
+				_stateMachineCounter = 50; // Wait a second so we don't flood the communication
+				_vehicle_id = -1;
+				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_ask_manual_wake)]);
+				return;
+			}
+			else if (responseCode == 401) { // Unauthorized, retry
 				_resetToken();
 				_need_auth = true;
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
-			} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+			}
+			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+				_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+				return;
+			}
+			else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 				_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			}
 		}
@@ -2174,7 +2214,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_stateMachineCounter = 10;
 				_waitingForCommandReturn = true;
 			}
-		} else { // Our call failed, say the error and back to the main code
+		}
+		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+		}
+		else { // Our call failed, say the error and back to the main code
 			/*DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
@@ -2191,7 +2236,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
             Storage.setValue("vehicle", null);
 			Storage.setValue("ResetNeeded", true);
 			_handler.invoke([0, -1, null]);
-		} else if (responseCode != -5  && responseCode != -101) { // These are silent errors
+		}
+		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
+			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
+			return;
+		}
+		else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 		}
 
