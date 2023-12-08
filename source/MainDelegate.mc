@@ -1198,7 +1198,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-				onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 			}
 			return;
 		}
@@ -1291,7 +1291,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
-		onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
 	}
 
 	function wakeCanceled() {
@@ -2085,7 +2085,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 								_wake_done = false;
 								_waitingForCommandReturn = false;
 								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-								onReceiveAwake(403, null); //TODO REINSTATE _tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
+								_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
 								return;
 							}
 						}
