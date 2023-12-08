@@ -4,7 +4,7 @@
     <string id="longComplicationLabel">Tesla-Link</string>
 
     <!--  Glance view -->
-    <string id="vehicle" scope="glance">Aucn Véhicule</string>
+    <string id="vehicle" scope="glance">Aucun Véhicule</string>
     <string id="label_asleep" scope="background">En veille</string>
     <string id="label_launch_widget" scope="background">Lancer le widget</string>
     <string id="label_waiting_data" scope="background">Attente de données</string>
@@ -104,6 +104,7 @@
 	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>  <!--  NEW -->
 	<string id="setting_batteryRangeType">Distance à utiliser</string>
 	<string id="setting_askWakeVehicle">Demande de réveiller le véhicule au lancement?</string>  <!--  NEW -->
+	<string id="setting_showVehicleNameInGlance">Afficher le nom du véhicule en mode Glance?</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>

@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.16.0</string>
+    <string id="AppNameVersion">Tesla Link V7.17.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -105,6 +105,7 @@
 	<string id="setting_WarnWhenPhoneNotConnected">Warn if the phone is not connected to the watch?</string>
 	<string id="setting_batteryRangeType">Battery range to show</string>
 	<string id="setting_askWakeVehicle">Ask to wake vehicle when launched?</string>
+	<string id="setting_showVehicleNameInGlance">Show the vehicle name in Glance mode?</string>
 
 	<!--  Text view -->
     <string id="label_cabin">Cabin: </string>

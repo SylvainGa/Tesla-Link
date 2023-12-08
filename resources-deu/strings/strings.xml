@@ -104,6 +104,7 @@
 	<string id="setting_WarnWhenPhoneNotConnected">Warn if the phone is not connected to the watch?</string>  <!--  NEW -->
 	<string id="setting_batteryRangeType">Battery range to show</string>  <!--  NEW -->
 	<string id="setting_askWakeVehicle">Ask to wake vehicle when launched?</string>  <!--  NEW -->
+	<string id="setting_showVehicleNameInGlance">Show the vehicle name in Glance mode?</string>  <!--  NEW -->
 
     <!--  Text view -->
     <string id="label_cabin">Innenraum: </string>

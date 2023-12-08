@@ -26,7 +26,8 @@ class GlanceView extends Ui.GlanceView {
     var _threeLines;
     var _steps;
     var _showLaunch;
-    
+    var _showVehicleName;
+
     function initialize() {
         GlanceView.initialize();
         gSettingsChanged = true;
@@ -91,8 +92,9 @@ class GlanceView extends Ui.GlanceView {
         _usingFont = ($.getProperty("smallfontsize", false, method(:validateBoolean)) ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
         _fontHeight = Graphics.getFontHeight(_usingFont);
         _dcHeight = dc.getHeight();
+        _showVehicleName = $.getProperty("vehicleNameGlance", true, method(:validateBoolean));
 
-        if (_dcHeight / _fontHeight >= 3.0) {
+        if (_dcHeight / _fontHeight >= 3.0 || _showVehicleName == false) {
             _threeLines = true;
         }
         else {
@@ -267,8 +269,14 @@ class GlanceView extends Ui.GlanceView {
             line3 = txt;
         }
 
+        if (_showVehicleName == false && line3 != null) {
+            line1 = line2;
+            line2 = line3;
+            line3 = null;
+        }
+
         var text1Width = dc.getTextWidthInPixels(line1, _usingFont);
-        var text2Width = dc.getTextWidthInPixels(line2, _usingFont);
+        var text2Width = (line2 != null ? dc.getTextWidthInPixels(line2, _usingFont) : 0);
         var text3Width = (line3 != null ? dc.getTextWidthInPixels(line3, _usingFont) : 0);
 
         var longestTextWidth = text1Width;
@@ -342,37 +350,42 @@ class GlanceView extends Ui.GlanceView {
         // Draw the two/three rows of text on the glance widget
         dc.setColor(Gfx.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 
-        var spacing;
+        var y1, y2, y3;
         if (line3 != null) {
-            spacing = ((_dcHeight - _fontHeight * 3) / 4).toNumber();
+            y1 = _dcHeight / 4 - _fontHeight / 8;
+            y2 = _dcHeight / 2;
+            y3 = y2 + _dcHeight / 4 + _fontHeight / 8;
         }
         else {
-            spacing = ((_dcHeight - _fontHeight * 2) / 3).toNumber();
+            y1 = _dcHeight / 3 - _fontHeight / 8; //  - _fontHeight / 8 is to leave some room between both lines
+            y2 = (_dcHeight * 2) / 3 + _fontHeight / 8;
         }
 
         dc.drawText(
             _curPos1X,
-            spacing,
+            y1,
             _usingFont,
             line1,
-            Graphics.TEXT_JUSTIFY_LEFT
+            Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
         );
 
-        dc.drawText(
-            _curPos2X,
-            (spacing * 2 + _fontHeight).toNumber(),
-            _usingFont,
-            line2,
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+        if (line2 != null) {
+            dc.drawText(
+                _curPos2X,
+                y2,
+                _usingFont,
+                line2,
+                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+            );
+        }
 
         if (line3 != null) {
             dc.drawText(
             _curPos3X,
-            (spacing * 3 + _fontHeight * 2).toNumber(),
+            y3,
             _usingFont,
             line3,
-            Graphics.TEXT_JUSTIFY_LEFT
+            Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
             );
         }
 

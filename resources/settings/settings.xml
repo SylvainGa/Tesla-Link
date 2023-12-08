@@ -35,6 +35,10 @@
         <settingConfig type="boolean" required="true"/>
     </setting>
 
+    <setting propertyKey="@Properties.vehicleNameGlance" title="@Strings.setting_showVehicleNameInGlance">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
     <setting propertyKey="@Properties.CrystalTesla" title="@Strings.setting_CrystalTesla">
         <settingConfig type="boolean" required="true"/>
     </setting>
