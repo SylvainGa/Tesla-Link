@@ -1936,7 +1936,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_vehicle_state = vehicles[vehicle_index].get("state");
-				// 2022-10-17 logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
+				/*DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
 				if (_vehicle_state.equals("online") == false && _vehicle_id != null && _vehicle_id > 0) { // We're not awake and we have a vehicle ID, next iteration of StateMachine will call the wake function
 					_need_wake = true;
 					_wake_done = false;
@@ -2141,7 +2141,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function onReceiveAwake(responseCode, data) {
 		/*DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
 
-		if (responseCode == 200) {
+		if (responseCode == 200 || (responseCode == 403 && _vehicle_state != null && _vehicle_state.equals("online") == true)) { // If we get 403, check to see if we saw it online since some country do not accept waking remotely
 			_wake_done = true;
 	   } else {
 		   // We were unable to wake, try again

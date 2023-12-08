@@ -53,7 +53,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         /*DEBUG 2023-10-02*/ var myStats = System.getSystemStats();
         /*DEBUG 2023-10-02*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
-
+    
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
