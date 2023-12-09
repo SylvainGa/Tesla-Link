@@ -153,12 +153,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_debug_auth == false && _token != null && _token.length() > 0 && expired == true ) {
 			_need_auth = false;
 			_auth_done = true;
-			/*DEBUG*/ var expireAt = new Time.Moment(createdAt + expireIn);
-			/*DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			/*DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-			/*DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
+			//DEBUG*/ var expireAt = new Time.Moment(createdAt + expireIn);
+			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
 		} else {
-			/*DEBUG 2023-10-02*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
+			//DEBUG 2023-10-02*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
 			_need_auth = true;
 			_auth_done = false;
 		}
@@ -184,7 +184,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastDataRun = System.getTimer();
 
 		// This is where the main code will start running. Don't intialise stuff after this line
-		/*DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
+		//DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
 		_workTimer.start(method(:workerTimer), 100, true);
 
 /* DEBUG
@@ -479,12 +479,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onOAuthMessage(message) {
-		/*DEBUG*/ var responseCode = null;
+		//DEBUG*/ var responseCode = null;
 		var error = null;
 		var code = null;
 
 		if (message != null) {
-			/*DEBUG*/ responseCode = message.responseCode; // I don't think this is being used, but log it just in case if logging is compiled
+			//DEBUG*/ responseCode = message.responseCode; // I don't think this is being used, but log it just in case if logging is compiled
 
 			if (message.data != null) {
 				error = message.data[$.OAUTH_ERROR];
@@ -492,7 +492,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		}
 
-		/*DEBUG*/ logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
+		//DEBUG*/ logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
 
 		if (error == null && code != null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
@@ -518,7 +518,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			};
 
 			//logMessage("onOAuthMessage makeWebRequest codeForBearerUrl: '" + codeForBearerUrl + "' codeForBearerParams: '" + codeForBearerParams + "' codeForBearerOptions: '" + codeForBearerOptions + "'");
-			/*DEBUG*/ logMessage("onOAuthMessage: Asking through an OAUTH2");
+			//DEBUG*/ logMessage("onOAuthMessage: Asking through an OAUTH2");
 			Communications.makeWebRequest(codeForBearerUrl, codeForBearerParams, codeForBearerOptions, method(:onReceiveToken));
 		} else {
 			_need_auth = true;
@@ -532,7 +532,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveToken(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
 		if (responseCode == 200) {
 			_auth_done = true;
@@ -549,24 +549,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			_saveToken(accessToken, expires_in, created_at);
 
-			/*DEBUG 2023-10-02*/ var expireAt = new Time.Moment(created_at + expires_in);
-			/*DEBUG 2023-10-02*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			/*DEBUG 2023-10-02*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+			//DEBUG 2023-10-02*/ var expireAt = new Time.Moment(created_at + expires_in);
+			//DEBUG 2023-10-02*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+			//DEBUG 2023-10-02*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 
 			if (refreshToken != null && refreshToken.equals("") == false) { // Only if we received a refresh tokem
 				if (accessToken != null) {
-					/*DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+					//DEBUG*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + " access token=" + accessToken.substring(0,10) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 				} else {
-					/*DEBUG 2023-10-02*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
+					//DEBUG 2023-10-02*/ logMessage("onReceiveToken: refresh token=" + refreshToken.substring(0,10) + "... lenght=" + refreshToken.length() + "+ NO ACCESS TOKEN");
 				}
 				Settings.setRefreshToken(refreshToken);
 			}
 			else {
-				/*DEBUG 2023-10-02*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
+				//DEBUG 2023-10-02*/ logMessage("onReceiveToken: WARNING - NO REFRESH TOKEN but got an access token: " + accessToken.substring(0,20) + "... lenght=" + accessToken.length() + " which expires at " + dateStr);
 			}
 		}
 		else {
-			/*DEBUG 2023-10-02*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
+			//DEBUG 2023-10-02*/ logMessage("onReceiveToken: couldn't get tokens, clearing refresh token");
 			// Couldn't refresh our access token through the refresh token, invalide it and try again (through username and password instead since our refresh token is now empty
 			_need_auth = true;
 			_auth_done = false;
@@ -1050,7 +1050,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		/*DEBUG*/ logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+		//DEBUG*/ logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 /* DEBUG
 		if (_debug_view) {
@@ -1080,12 +1080,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_debug_auth == false && _refreshToken != null && _refreshToken.length() != 0) {
-				/*DEBUG*/ logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
+				//DEBUG*/ logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
-				/*DEBUG*/ logMessage("stateMachine: Building an OAUTH2 request");
+				//DEBUG*/ logMessage("stateMachine: Building an OAUTH2 request");
 	        	_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_login)]);
 
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
@@ -1142,7 +1142,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            
 	            _handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 
-				/*DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + _serverAUTHLocation);	
+				//DEBUG*/ logMessage("stateMachine: serverAUTHLocation: " + _serverAUTHLocation);	
 	            Communications.registerForOAuthMessages(method(:onOAuthMessage));
 				var url_oauth = "https://" + _serverAUTHLocation + "/oauth2/v3/authorize";
 				var url_callback = "https://" + _serverAUTHLocation + "/void/callback";
@@ -1161,7 +1161,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (!_auth_done) {
-			/*DEBUG 2023-10-02*/ logMessage("StateMachine: WARNING auth NOT done");
+			//DEBUG 2023-10-02*/ logMessage("StateMachine: WARNING auth NOT done");
 			return;
 		}
 
@@ -1178,7 +1178,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
-			/*DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
+			//DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
@@ -1188,14 +1188,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_need_wake) { // Asked to wake up
-			if (_waitingFirstData > 0 && !_wakeWasConfirmed && false /*TODO REINSTATE $.getProperty("askWakeVehicle", true, method(:validateBoolean))*/) { // Ask if we should wake the vehicle
-				/*DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
+			if (_waitingFirstData > 0 && !_wakeWasConfirmed && $.getProperty("askWakeVehicle", true, method(:validateBoolean))) { // Ask if we should wake the vehicle
+				//DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
-				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
+				//DEBUG*/ logMessage("stateMachine: Waking vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
 				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
@@ -1212,7 +1212,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Storage.setValue("launchedFromComplication", false);
 
 			var action = $.getProperty("complicationAction", 0, method(:validateNumber));
-			/*DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
+			//DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
 
 			if (action != 0) { // 0 means disable. 
 				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_perform_complication));
@@ -1287,7 +1287,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_wake_done = false;
 		_wakeWasConfirmed = true;
 		gWaitTime = System.getTimer();
-		/*DEBUG*/ logMessage("wakeConfirmed: Waking the vehicle");
+		//DEBUG*/ logMessage("wakeConfirmed: Waking the vehicle");
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
@@ -1298,7 +1298,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
 		gWaitTime = System.getTimer();
 		Storage.setValue("launchedFromComplication", false); // If we came from a watchface complication and we canceled the wake, ignore the complication event
-		/*DEBUG*/ logMessage("wakeCancelled:");
+		//DEBUG*/ logMessage("wakeCancelled:");
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 		_stateMachineCounter = 1;
 	}
@@ -1900,7 +1900,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onSelectVehicle(responseCode, data) {
-		/*DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
+		//DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
 
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
@@ -1924,7 +1924,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
@@ -1948,7 +1948,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_vehicle_state = vehicles[vehicle_index].get("state");
-				/*DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
+				//DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
 				if (_vehicle_state.equals("online") == false && _vehicle_id != null && _vehicle_id > 0) { // We're not awake and we have a vehicle ID, next iteration of StateMachine will call the wake function
 					_need_wake = true;
 					_wake_done = false;
@@ -1984,15 +1984,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicleData(responseCode, data) {
-		/*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
+		//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
 
 		SpinSpinner(responseCode);
 
 		if (_stateMachineCounter < 0) {
-			/*DEBUG 2023-10-02*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
-			/*DEBUG 2023-10-02*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
+			//DEBUG 2023-10-02*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
+			//DEBUG 2023-10-02*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
 			if (_stateMachineCounter == -1) { 
-				/*DEBUG*/ logMessage("onReceiveVehicleData: skipping, we're in a menu");
+				//DEBUG*/ logMessage("onReceiveVehicleData: skipping, we're in a menu");
 				 _stateMachineCounter = -2; // Let the menu blocking us know that we missed data
 			}
 			return;
@@ -2073,14 +2073,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 
 						if (_408_count) {
-							/*DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
+							//DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
 							_408_count = 0; // Reset the count of timeouts since we got our data
 						}
 
 						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
 							_waitingFirstData = 0;
 							if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
-								/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
+								//DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
 								_need_wake = false;
 								_wake_done = false;
 								_waitingForCommandReturn = false;
@@ -2107,13 +2107,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							}
 						}
 					} else {
-						/*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
+						//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received an out or order data or missing timestamp, ignoring");
 					}
 				} else {
-					/*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
+					//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
 				}
 			} else {
-				/*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received NO data or data is NOT a dictionary, ignoring");
+				//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received NO data or data is NOT a dictionary, ignoring");
 			}
 			_stateMachineCounter = 5;
 			return;
@@ -2127,7 +2127,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
 				var i = _408_count + 1;
-				/*DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
+				//DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
 				if (_waitingFirstData > 0 && _view._data._ready == false) { // We haven't received any data yet and we have already a message displayed
 					_handler.invoke([3, i, Ui.loadResource(_vehicle_state.equals("online") == true ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
 				}
@@ -2165,7 +2165,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveAwake(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
 
 		if (responseCode == 200 || (responseCode == 403 && _vehicle_state != null && _vehicle_state.equals("online") == true)) { // If we get 403, check to see if we saw it online since some country do not accept waking remotely
 			_wake_done = true;
@@ -2206,11 +2206,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200) {
 			if ($.getProperty("quickReturn", false, method(:validateBoolean))) {
-				/*DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+				//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 				_stateMachineCounter = 1;
 			} else {
 				// Wait a second to let time for the command change to be recorded on Tesla's server
-				/*DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
+				//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
 				_stateMachineCounter = 10;
 				_waitingForCommandReturn = true;
 			}
@@ -2220,7 +2220,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
 		}
 		else { // Our call failed, say the error and back to the main code
-			/*DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+			//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1;
 		}
@@ -2229,7 +2229,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function revokeHandler(responseCode, data) {
 		SpinSpinner(responseCode);
 
-		/*DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
+		//DEBUG*/ logMessage("revokeHandler: " + responseCode + " running StateMachine in 100msec");
 		if (responseCode == 200) {
             _resetToken();
             Settings.setRefreshToken(null);
@@ -2265,7 +2265,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function _resetToken() {
-		/*DEBUG 2023-10-02*/ logMessage("_resetToken: Reseting tokens");
+		//DEBUG 2023-10-02*/ logMessage("_resetToken: Reseting tokens");
 		_token = null;
 		_auth_done = false;
 		Settings.setToken(null, 0, 0);
