@@ -45,6 +45,8 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 
+V7.17.1 Added the Descent Mk3 43mm and 51mm watches
+
 V7.17.0 Added the following
 - Option to hide the vehicle name to show more info in Glance view
 - Fixed an issue with some country that do not allow the vehicle to be waken up by the API (require sending an SMS to the vehicle to wake it up). Now the vehicle will display to manually wake the vehicle. It's best to disable "Ask to wake vehicle when launched" in such a case. It's detected by receiving an error 403 (Forbidden) when the app tries to wake the vehicle.
