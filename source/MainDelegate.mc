@@ -735,7 +735,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_lastDataRun = System.getTimer();
 
-		//DEBUG*/ logMessage("StateMachine: getVehicleData");
+		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
 	}
 
@@ -753,7 +753,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Call stateMachine as soon as it's out of it (_stateMachineCounter will get modified in onReceiveVehicleData)
 			else if (_stateMachineCounter != 0) {
 				//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
-				//DEBUG*/ logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
+				/*DEBUG*/ logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
 				stateMachine();
 			}
 		}
@@ -1421,15 +1421,39 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			var vehicles = data.get("results");
 			var size = vehicles.size();
-			var vehicleNames = new [size];
-			var vehicleVins = new [size];
-			for (var i = 0; i < size; i++) {
-				vehicleNames[i] = vehicles[i].get("last_state").get("display_name");
-				vehicleVins[i] = vehicles[i].get("vin");
+			if (size == 0) {
+				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
+				_vehicle_vin = null;
+				_stateMachineCounter = 100;
+				return;
 			}
 
-			_in_menu = true;
-			Ui.pushView(new CarPicker(vehicleNames), new CarPickerDelegate(vehicleNames, vehicleVins, self), Ui.SLIDE_UP);
+			var vehiclesName = new [size];
+			var vehiclesVin = new [size];
+			for (var i = 0; i < size; i++) {
+				vehiclesName[i] = vehicles[i].get("last_state").get("display_name");
+				vehiclesVin[i] = vehicles[i].get("vin");
+			}
+
+			if (size == 1) {
+				Storage.setValue("vehicle_vin", vehiclesVin[0]);
+				Storage.setValue("vehicle_name", vehiclesName[0]);
+
+				// Start fresh as if we just loaded
+				_waitingFirstData = 1;
+				_408_count = 0;
+				_check_wake = false;
+				_need_wake = false;
+				_wake_done = true;
+				_wakeWasConfirmed = false;
+				_data._vehicle_state = null;
+				_vehicle_vin = vehiclesVin[0];
+				_stateMachineCounter = 1;
+			}
+			else {
+				_in_menu = true;
+				Ui.pushView(new CarPicker(vehiclesName), new CarPickerDelegate(vehiclesName, vehiclesVin, self), Ui.SLIDE_UP);
+			}
 		}
 		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
@@ -1437,7 +1461,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		else {
 			_handler.invoke([0, -1, buildErrorString(responseCode)]);
-			_stateMachineCounter = 50;
+			_stateMachineCounter = 100;
 		}
 	}
 
@@ -1474,7 +1498,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_check_wake = true;
 				_stateMachineCounter = 1;
 				return;
-			} else {
+			}
+			else {
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
 				_stateMachineCounter = 50;
 			}
