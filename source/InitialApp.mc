@@ -118,30 +118,6 @@ class TeslaLink extends App.AppBase {
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
-            // Refresh our tokens
-            var token = data["token"];
-            if (token != null && token.equals("") == false) {
-                Storage.setValue("token", token);
-            }
-
-            token = data["refreshToken"];
-            if (token != null && token.equals("") == false) {
-                Properties.setValue("refreshToken", token);
-            }
-            else {
-                //DEBUG*/ logMessage("onBackgroundData: Tried to reset the refresh token!");
-            }
-
-            token = data["TokenExpiresIn"];
-            if (token != null) {
-                Storage.setValue("TokenExpiresIn", token);
-            }
-
-            token = data["TokenCreatedAt"];
-            if (token != null) {
-                Storage.setValue("TokenCreatedAt", token);
-            }
-
             // Read what we had before
             var status = Storage.getValue("status");
             if (status != null && !(status instanceof Lang.Dictionary)) {

@@ -227,16 +227,6 @@ function logMessageAndData(message, data) {
 		logMessage(message + "No DATA");
 	}
 	else {
-		var token = data["token"];
-		if (token != null) {
-			token = token.substring(0, 10);
-		}
-		var refreshToken = data["refreshToken"];
-		if (refreshToken != null) {
-			refreshToken = refreshToken.substring(0, 10);
-		}
-		// var TokenExpiresIn = data["TokenExpiresIn"];
-		// var TokenCreatedAt = data["TokenCreatedAt"];
 		var responseCode = data["responseCode"];
 		var status = data["status"];
 		var timestamp = data["timestamp"];

@@ -36,44 +36,11 @@ class GlanceView extends Ui.GlanceView {
         _refreshTimer = new Timer.Timer();
     }
 
-(:bkgnd32kb)
     function onShow() {
 		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
-        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
-        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
-        var expired;
-        if (tokenCreatedAt != null && tokenExpiresIn != null) {
-    		var timeNow = Time.now().value();
-		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
-        }
-        else {
-            expired = true;
-        }
-        _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired);
-        
-        _refreshTimer.start(method(:refreshView), 50, true);
-
-        resetSavedPosition();
-    }
-
-(:bkgnd64kb)
-    function onShow() {
-		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
-        var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
-        var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
-        var expired;
-        if (tokenCreatedAt != null && tokenExpiresIn != null) {
-    		var timeNow = Time.now().value();
-		    expired = (timeNow > tokenCreatedAt + tokenExpiresIn);
-        }
-        else {
-            expired = true;
-        }
-
-        var noToken = (Storage.getValue("token") == null);
-        var noVehicle = (Storage.getValue("vehicle") == null);
-        var noRefreshToken = (Properties.getValue("refreshToken") == null);
-        _showLaunch = (expired || noToken || noVehicle || noRefreshToken);
+        var noVehicle = (Storage.getValue("vehicle_vin") == null);
+        var noTessieToken = ($.getProperty("tessieToken", "", method(:validateString))).equals("");
+        _showLaunch = (noVehicle || noTessieToken);
 
         _refreshTimer.start(method(:refreshView), 50, true);
 
@@ -214,10 +181,16 @@ class GlanceView extends Ui.GlanceView {
             preconditioning = "";
         }
 
-        // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
+        // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have a token)
         if (responseCode == 200) {
             if (charging_state != null && charging_state.equals("Charging")) {
                 suffix = "+";
+            }
+            else if (vehicleAwake != null && vehicleAwake.equals("asleep")) {
+                txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
+                if (!_threeLines) {
+                    suffix = "s";
+                }
             }
         }
         else if (responseCode == 408) {

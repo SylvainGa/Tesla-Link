@@ -32,7 +32,6 @@
     <string id="button_frunk">Coffre</string>
 
     <!--  Option menu -->
-    <string id="menu_label_reset">Remise à zéro</string>
     <string id="menu_label_honk">Klaxonner</string>
     <string id="menu_label_open_port">Ouvrir Port</string>
     <string id="menu_label_close_port">Fermer Port</string>
@@ -64,7 +63,6 @@
     <string id="menu_label_datascreen">Voir écran de données</string>
     <string id="menu_label_select_car">Sélectionnez le véhicule</string>
     <string id="menu_label_wake">Forcer un réveil</string>
-    <string id="menu_label_refresh">temps de rafraichissement</string>
     <string id="menu_label_remote_boombox">Boombox à distance</string>
     <string id="menu_label_climate_mode">Mode de la climatisation</string>
     <string id="menu_label_select">Sélectionner</string>
@@ -74,8 +72,8 @@
     <string id="menu_label_ideal_battery_range">Idéale</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>
-    <string id="setting_token_prompt">Entrez votre jeton de compte Tesla</string>
+    <string id="setting_token_label">Jeton d'API Tessie</string>
+    <string id="setting_token_prompt">Entrez votre jeton de compte Tessie</string>
     <string id="setting_enhancedTouch">Touche améliorée ?</string>
     <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile) ?</string>
     <string id="setting_screenBottomLeft">Au bas de l'écran à gauche</string>
@@ -142,12 +140,7 @@
     <string id="label_charging_amps">Ampèrage à  </string>
     <string id="label_lock_doors">Vérrouillage\nportes</string>
     <string id="label_unlock_doors">Déverrouillage\nportes</string>
-    <string id="label_login_on_phone">Connexion sur\ntéléphone.</string>
-    <string id="label_oauth_error">Erreur OAuth</string>
     <string id="label_requesting_data">Récup. données</string>
-    <string id="label_authenticating_with_token">Authen. par jeton</string>
-    <string id="label_authenticating_with_login">Authen. par connexion</string>
-    <string id="label_got_token">Jeton reçu</string>
     <string id="label_waking_vehicle">Réveil du vehicule</string>
     <string id="label_no_vehicles">Pas de véhicule</string>
     <string id="label_vent_opening">Ouverture fenêtres</string>
@@ -159,8 +152,8 @@
     <string id="label_defrost_off">Dégivrage éteint</string>
     <string id="label_start_departure">départ activé</string>
     <string id="label_stop_departure">départ désactivé</string>
-    <string id="label_sentry_on">Sentinelle allumé</string>
-    <string id="label_sentry_off">Sentinelle éteint</string>
+    <string id="label_sentry_on">Sentinelle allumée</string>
+    <string id="label_sentry_off">Sentinelle éteinte</string>
     <string id="label_homelink">Homelink activé</string>
     <string id="label_unauthorized">Non autorisé</string>
     <string id="label_no_phone_internet">Mobile non raccordé\nà l'Internet</string>
@@ -170,7 +163,9 @@
     <string id="label_climate_mode">Mode climat à </string>
     <string id="label_still_waiting_data">Toujours en attente</string>
     <string id="label_ask_manual_wake">SVP réveiller le\nvéhicule manuellement</string>
-    <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>  <!--  NEW -->
+    <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>
+    <string id="label_vehicleStatus">Acquisition du statut\ndu véhicule</string>
+    <string id="label_need_token">Jeton de Tessie manquant</string>
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>
@@ -210,7 +205,6 @@
     <string id="label_timeSeparator">:</string>
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
-    <string id="label_refresh_chooser_title">En milisec</string>
     <string id="label_climate_which">Quel mode ?</string>
     <string id="label_climate_off">Éteint</string>
     <string id="label_climate_on">Garder allumer</string>

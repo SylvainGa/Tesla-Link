@@ -174,6 +174,7 @@
     <bitmap id="sentry_on_icon" filename="sentry_on.png" dithering="none" scaleX="10%" scaleY="10%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>AAAAAA</color>
+            <color>FF0000</color>
             <color>000000</color>
         </palette>
     </bitmap>

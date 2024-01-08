@@ -2,9 +2,8 @@
 	<property id="AppVersion" type="string"></property>
 	<property id="smallfontsize" type="boolean">false</property>
 	<property id="scrollclearsedge" type="boolean">false</property>
-	<property id="refreshToken" type="string"></property>
-	<property id="serverAPILocation" type="string">owner-api.teslamotors.com</property>
-	<property id="serverAUTHLocation" type="string">auth.tesla.com</property>
+	<property id="tessieToken" type="string"></property>
+	<property id="serverAPILocation" type="string">api.tessie.com</property>
 	<property id="enhancedTouch" type="boolean">true</property>
 	<property id="useTouch" type="boolean">true</property>
 	<property id="quickReturn" type="boolean">false</property>
@@ -20,7 +19,7 @@
 	<property id="holdActionUpperRight" type="number">0</property>
 	<property id="holdActionLowerLeft" type="number">0</property>
 	<property id="holdActionLowerRight" type="number">0</property>
-	<property id="optionMenuOrder" type="string">1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25</property>
+	<property id="optionMenuOrder" type="string">1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22</property>
 	<property id="batteryRangeType" type="number">0</property>
 	<property id="askWakeVehicle" type="boolean">true</property>
 	<property id="vehicleNameGlance" type="boolean">true</property>

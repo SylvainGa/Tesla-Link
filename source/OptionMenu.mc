@@ -13,7 +13,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         _controller = controller;
         _previous_stateMachineCounter = (_controller._stateMachineCounter > 1 ? 1 : _controller._stateMachineCounter); // Drop the wait to 0.1 second is it's over, otherwise keep the value already there
         _controller._stateMachineCounter = -1;
-        _controller._waitingForCommandReturn = false;
+        _controller._waitingForCommandReturn = null;
 
         //DEBUG*/ logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
@@ -33,11 +33,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         var item = selected_item.getId();
 
         //DEBUG*/ logMessage("OptionMenuDelegate:onSelect for " + selected_item.getLabel());
-        if (item == :reset) {
-            _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_RESET, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
-        } else if (item == :honk) {
+        if (item == :honk) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_HONK, "Option" => ACTION_OPTION_BYPASS_CONFIRMATION, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :select_car) {
@@ -48,7 +44,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             vinsName[1] = "Tesla Model 3";
             vinsId[1] = 654321;
             Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
-            //*/_controller._tesla.getVehicleId(method(:onReceiveVehicles));
+            //*/_controller._tesla.getVehicles(method(:onReceiveVehicles));
         } else if (item == :open_port) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_OPEN_PORT, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
@@ -160,9 +156,6 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._wake_done = false;
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-        } else if (item == :refresh) {
-            var refreshTimeInterval = Storage.getValue("refreshTimeInterval");
-            Ui.switchToView(new RefreshPicker(refreshTimeInterval), new RefreshPickerDelegate(_controller), Ui.SLIDE_UP);
         } else if (item == :data_screen) {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_DATA_SCREEN, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
@@ -192,15 +185,16 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 
     function onReceiveVehicles(responseCode, data) {
         if (responseCode == 200) {
-            var vehicles = data.get("response");
-            var size = vehicles.size();
-            var vinsName = new [size];
-            var vinsId = new [size];
-            for (var i = 0; i < size; i++) {
-                vinsName[i] = vehicles[i].get("display_name");
-                vinsId[i] = vehicles[i].get("id");
-            }
-            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
+			var vehicles = data.get("results");
+			var size = vehicles.size();
+			var vehicleNames = new [size];
+			var vehicleVins = new [size];
+			for (var i = 0; i < size; i++) {
+				vehicleNames[i] = vehicles[i].get("last_state").get("display_name");
+				vehicleVins[i] = vehicles[i].get("vin");
+			}
+            _controller._in_menu = true;
+            Ui.switchToView(new CarPicker(vehicleNames), new CarPickerDelegate(vehicleNames, vehicleVins, _controller), Ui.SLIDE_UP);
         } else {
             _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode]);
         }

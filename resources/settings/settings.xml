@@ -124,18 +124,15 @@
     </setting>
 
     <setting propertyKey="@Properties.optionMenuOrder" title="@Strings.setting_menu_order">
-        <settingConfig type="alphaNumeric" />
+        <settingConfig type="alphaNumeric" required="true" />
     </setting>
 
-    <setting propertyKey="@Properties.refreshToken" title="@Strings.setting_token_label" prompt="@Strings.setting_token_prompt">
-        <settingConfig type="alphaNumeric" />
+    <setting propertyKey="@Properties.tessieToken" title="@Strings.setting_token_label" prompt="@Strings.setting_token_prompt">
+        <settingConfig type="alphaNumeric" required="true" />
     </setting>
 
     <setting propertyKey="@Properties.serverAPILocation" title="@Strings.setting_api_server_location_label" prompt="@Strings.setting_server_location_prompt">
-        <settingConfig type="alphaNumeric" />
+        <settingConfig type="alphaNumeric" required="true" />
     </setting>
 
-    <setting propertyKey="@Properties.serverAUTHLocation" title="@Strings.setting_auth_server_location_label" prompt="@Strings.setting_server_location_prompt">
-        <settingConfig type="alphaNumeric" />
-    </setting>
 </settings>

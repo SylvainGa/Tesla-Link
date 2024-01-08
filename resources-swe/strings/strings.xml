@@ -32,7 +32,6 @@
     <string id="button_frunk">Frunk</string>
 
     <!--  Option menu -->
-    <string id="menu_label_reset">Reset</string>
     <string id="menu_label_honk">Tuta</string>
     <string id="menu_label_open_port">Öppna laddlucka</string>
     <string id="menu_label_close_port">Stäng laddlucka</string>   
@@ -64,7 +63,6 @@
     <string id="menu_label_datascreen">Dataskärm</string>
     <string id="menu_label_select_car">Välj Fordon</string>
     <string id="menu_label_wake">Väck bilen</string>
-    <string id="menu_label_refresh">Uppdatera</string>
     <string id="menu_label_remote_boombox">Fjärt</string> 
     <string id="menu_label_climate_mode">Climate mode</string>  <!--  NEW -->
     <string id="menu_label_select">Select</string>  <!--  NEW -->
@@ -74,8 +72,8 @@
     <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">API REFRESH Token (frivillig)</string>
-    <string id="setting_token_prompt">Skriv in ditt Teslakontos token</string>
+    <string id="setting_token_label">API Tessie Token</string>
+    <string id="setting_token_prompt">Skriv in ditt Tessie-kontotoken</string>
     <string id="setting_enhancedTouch">Förbättrad touch</string>
     <string id="setting_useTouch">Använd pekskärm (om du har både pekskärm och knappar)</string>
     <string id="setting_screenBottomLeft">Skärm nere till vänster</string>
@@ -142,12 +140,7 @@
     <string id="label_charging_amps">Current set to </string>  <!--  NEW -->
     <string id="label_lock_doors">Lås dörrar</string>
     <string id="label_unlock_doors">Lås upp dörrar</string>
-    <string id="label_login_on_phone">Logga in på telefonen!</string>
-    <string id="label_oauth_error">OAuth error</string>
     <string id="label_requesting_data">Hämtar data</string>
-    <string id="label_authenticating_with_token">Authenticating with token</string>  <!--  NEW -->
-    <string id="label_authenticating_with_login">Authenticating with login</string>  <!--  NEW -->
-    <string id="label_got_token">Got our token</string>  <!--  NEW -->
     <string id="label_waking_vehicle">Väcker fordon</string>
     <string id="label_no_vehicles">Inga fordon</string>
     <string id="label_vent_opening">Fönster öppnas</string>
@@ -171,6 +164,8 @@
     <string id="label_still_waiting_data">Still waiting for data</string>  <!--  NEW -->
     <string id="label_ask_manual_wake">Please manually wake\nthe vehicle</string>  <!--  NEW -->
     <string id="label_too_many_request">Too many requests\nslowing down</string>  <!--  NEW -->
+    <string id="label_vehicleStatus">Getting vehicle status</string>  <!--  NEW -->
+    <string id="label_need_token">Tessie Token missing</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Öppna frunk</string>
@@ -210,7 +205,6 @@
     <string id="label_timeSeparator">:</string>
     <string id="label_morning">AM</string>
     <string id="label_afternoon">PM</string>
-    <string id="label_refresh_chooser_title">Uppdateringsfrekvens msec</string>
     <string id="label_climate_which">Which mode?</string>  <!--  NEW -->
     <string id="label_climate_off">Off</string>  <!--  NEW -->
     <string id="label_climate_on">On</string>  <!--  NEW -->

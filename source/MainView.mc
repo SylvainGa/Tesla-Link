@@ -64,9 +64,6 @@ class MainView extends Ui.View {
 		//_refreshTimer = new Timer.Timer();
 
 		Storage.setValue("spinner", "-");
-		if (Storage.getValue("refreshTimeInterval") == null) {
-			Storage.setValue("refreshTimeInterval", 4);
-		}
 
 		Ui.requestUpdate();
 		_viewUpdated = false;
@@ -348,6 +345,7 @@ class MainView extends Ui.View {
 			var charging_state = $.validateString(_data._vehicle_data.get("charge_state").get("charging_state"), "");
 			var inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((($.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) * 9) / 5) + 32) + "°F" : $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) + "°C";
 			var door_open = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("df"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("dr"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pf"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pr"), 0);
+			var vehicle_state = $.validateString(_data._vehicle_state, "");
 
 			// Draw the charge status
 			dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
@@ -531,7 +529,7 @@ class MainView extends Ui.View {
 					charging_current = 0;
 				}
 				
-				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : "% ") + charging_current + "A " + inside_temp);
+				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : (vehicle_state.equals("asleep") ? "%s " : "% ")) + charging_current + "A " + inside_temp);
 				status_drawable.draw(dc);
 
 				// Draw the text in the middle of the screen with departure time (if set)
@@ -572,7 +570,8 @@ class MainView extends Ui.View {
 
 				// Draw the Sentry 'eye' icon if activated
 				var sentry_y = image_y_top - height/13;
-				var bitmap = Ui.loadResource($.validateBoolean(_data._vehicle_data.get("vehicle_state").get("sentry_mode"), false) ? Rez.Drawables.sentry_on_icon : Rez.Drawables.sentry_off_icon) as BitmapResource;
+				var sentryMode = $.validateBoolean(_data._vehicle_data.get("vehicle_state").get("sentry_mode"), false);
+				var bitmap = Ui.loadResource(sentryMode ? Rez.Drawables.sentry_on_icon : Rez.Drawables.sentry_off_icon) as BitmapResource;
 				var bitmap_width = bitmap.getWidth();
 				var bitmap_height = bitmap.getHeight();
 				dc.drawBitmap(center_x - bitmap_width / 2, sentry_y + bitmap_height / 2, bitmap);
