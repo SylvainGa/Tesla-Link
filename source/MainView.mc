@@ -629,7 +629,7 @@ class MainView extends Ui.View {
 
 				// Update the battery level text
 				var battery_level_drawable = View.findDrawableById("battery_level");  
-				battery_level_drawable.setColor((charging_state.equals("Charging")) ? Graphics.COLOR_RED : Graphics.COLOR_WHITE);
+				battery_level_drawable.setColor((charging_state.equals("Charging")) ? Graphics.COLOR_RED : (vehicle_state.equals("asleep") ? Graphics.COLOR_LT_GRAY : Graphics.COLOR_WHITE));
 				battery_level_drawable.setText(Ui.loadResource(Rez.Strings.label_charge) + battery_level.toString() + "%");
 				
 				// Do the draws

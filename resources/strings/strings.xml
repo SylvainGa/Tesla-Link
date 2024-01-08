@@ -80,8 +80,7 @@
     <string id="setting_screenBottomLeft">For screen bottom left</string>
     <string id="setting_screenBottomRight">For screen bottom right</string>
     <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
-    <string id="setting_api_server_location_label">Location of Tesla's API servers?</string>
-    <string id="setting_auth_server_location_label">Location of Tesla's Auth servers?</string>
+    <string id="setting_api_server_location_label">Location of Tessie's API servers?</string>
     <string id="setting_server_location_prompt">Enter the server domain name</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>
 	<string id="menu_label_vent">Vent</string>

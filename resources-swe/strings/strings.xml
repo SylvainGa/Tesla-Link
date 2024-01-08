@@ -79,8 +79,7 @@
     <string id="setting_screenBottomLeft">Skärm nere till vänster</string>
     <string id="setting_screenBottomRight">Skärm nere till höger</string>
     <string id="setting_HansshowFrunk">För Hansshow elektrisk frunk</string>
-    <string id="setting_api_server_location_label">Lokalisering av Tesla's API servers</string>
-    <string id="setting_auth_server_location_label">Lokalisering av Tesla's Auth servers</string>
+    <string id="setting_api_server_location_label">Lokalisering av Tessie's API servers</string>
     <string id="setting_server_location_prompt">Serverns domännamn</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
     <string id="menu_label_vent">Ventilation</string>  <!--  NEW -->

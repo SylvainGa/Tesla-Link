@@ -80,8 +80,7 @@
     <string id="setting_screenBottomLeft">Für Bildschirmbereich unten links</string>
     <string id="setting_screenBottomRight">Für Bildschirmbereich unten rechts</string>
     <string id="setting_HansshowFrunk">Fahrzeug hat elektr. Frunk von Hansshow?</string>
-    <string id="setting_api_server_location_label">Standort des Tesla API servers?</string>
-    <string id="setting_auth_server_location_label">Standort des Tesla Auth servers?</string>
+    <string id="setting_api_server_location_label">Standort des Tessie API servers?</string>
     <string id="setting_server_location_prompt">Gib den Server domain name ein</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
     <string id="menu_label_vent">Fensterspalt</string>
