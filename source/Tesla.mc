@@ -5,12 +5,15 @@ class Tesla {
     hidden var _serverAPILocation;
 
     function initialize(token) {
-        if (token != null) {
-            _token = "Bearer " + token;
-        }
+        setToken(token);
         _serverAPILocation = "https://" + $.getProperty("tessieAPILocation", "api.tessie.com", method(:validateString)) + "/";
     }
 
+    function setToken(token) {
+        if (token != null) {
+            _token = "Bearer " + token;
+        }
+    }
     hidden function genericGet(url, notify) {
         Communications.makeWebRequest(
             url, null,

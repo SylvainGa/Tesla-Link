@@ -95,6 +95,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _debug_auth;
 	var _debug_view;
 	var _waitingForCommandValue;
+	var _quickReturn;
+	var _enhancedTouch;
+	var _hansshowFrunk;
+	var _askWakeVehicle;
+	var _complicationAction;
+	var _swap_frunk_for_port;
+	var _batteryRangeType;
+
 	// 2023-03-20 var _debugTimer;
 
 	var _pendingActionRequests;
@@ -107,8 +115,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_settings = System.getDeviceSettings();
 		_data = data;
-		_token = $.getProperty("tessieToken", null, method(:validateString));
-
+		
 		//Storage.deleteValue("vehicle_vin");
 		_vehicle_vin = Storage.getValue("vehicle_vin");
 		_data._vehicle_state = null; // We'll need to get the state of the vehicle
@@ -116,15 +123,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_handler = handler;
 		_tesla = null;
 		_waitingForCommandReturn = null;
-		_useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
-
-		if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
-			Storage.setValue("spinner", "+");
-		}
-		else {
-			Storage.setValue("spinner", "/");
-		}
-		
 		// _debugTimer = System.getTimer(); Storage.setValue("overrideCode", 0);
 
 		_check_wake = false; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
@@ -144,11 +142,35 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = 0;
 		_lastDataRun = System.getTimer();
 
+		onSettingsChanged();
+
 		// This is where the main code will start running. Don't intialise stuff after this line
-		/*DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
+		/*DEBUG*/ logMessage("initialize: quickAccess=" + _quickReturn + " enhancedTouch=" + _enhancedTouch);
 		_workTimer.start(method(:workerTimer), 100, true);
 
 		stateMachine(); // Launch getting the states right away.
+	}
+
+	function onSettingsChanged() {
+		_token = $.getProperty("tessieToken", null, method(:validateString));
+		if (_tesla) {
+			_tesla.setToken(_token);
+		}
+
+		_quickReturn = $.getProperty("quickReturn", false, method(:validateBoolean));
+		_useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
+		_enhancedTouch = $.getProperty("enhancedTouch", true, method(:validateBoolean));
+		if (_enhancedTouch) {
+			Storage.setValue("spinner", "+");
+		}
+		else {
+			Storage.setValue("spinner", "/");
+		}
+		_hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
+		_askWakeVehicle = $.getProperty("askWakeVehicle", true, method(:validateBoolean));
+		_complicationAction = $.getProperty("complicationAction", 0, method(:validateNumber));
+		_swap_frunk_for_port = $.getProperty("swap_frunk_for_port", 0, method(:validateNumber));
+		_batteryRangeType = $.getProperty("batteryRangeType", 0, method(:validateNumber));
 	}
 
 	function onReceive(args) {
@@ -215,7 +237,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				spinner = "/";
 			}
 			else {
-				if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
+				if (_enhancedTouch) {
 					spinner = "+";
 				}
 				else {
@@ -269,7 +291,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_stateMachineCounter = -3; // Don't bother us with getting states when we do our things
 
 		var _handlerType;
-		if ($.getProperty("quickReturn", false, method(:validateBoolean))) {
+		if (_quickReturn) {
 			_handlerType = 1;
 		}
 		else {
@@ -286,7 +308,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Climate On - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_ON;
-				_tesla.climateOn(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.climateOn(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_OFF:
@@ -295,7 +317,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Climate Off - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_OFF;
-				_tesla.climateOff(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.climateOff(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_DEFROST:
@@ -307,7 +329,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Climate Defrost is currently " + isDefrostOn + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(isDefrostOn ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_DEFROST;
-				_tesla.climateDefrost(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), isDefrostOn, method(:onCommandReturn));
+				_tesla.climateDefrost(_vehicle_vin, 40, !_quickReturn, isDefrostOn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_SET:
@@ -321,7 +343,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
 				}
 				/*DEBUG*/ logMessage("actionMachine: Climate set temperature to " + temperature + " - waiting for onCommandReturn");
-				_tesla.climateSet(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), temperature, method(:onCommandReturn));
+				_tesla.climateSet(_vehicle_vin, 40, !_quickReturn, temperature, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_MEDIA_CONTROL:
@@ -334,7 +356,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				var chargingState = _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging");
 				/*DEBUG*/ logMessage("actionMachine: Toggling charging, currently " + chargingState + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(chargingState ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
-				_tesla.toggleCharging(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), chargingState, method(:onCommandReturn));
+				_tesla.toggleCharging(_vehicle_vin, 40, !_quickReturn, chargingState, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_LIMIT:
@@ -344,7 +366,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Setting charge limit to " + _waitingForCommandValue + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + _waitingForCommandValue + "%"]);
 				_waitingForCommandReturn = ACTION_TYPE_SET_CHARGING_LIMIT;
-				_tesla.setChargingLimit(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), _waitingForCommandValue, method(:onCommandReturn));
+				_tesla.setChargingLimit(_vehicle_vin, 40, !_quickReturn, _waitingForCommandValue, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_AMPS:
@@ -354,7 +376,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Setting max current to " + _waitingForCommandValue + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + _waitingForCommandValue + "A"]);
 				_waitingForCommandReturn = ACTION_TYPE_SET_CHARGING_AMPS;
-				_tesla.setChargingAmps(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), _waitingForCommandValue, method(:onCommandReturn));
+				_tesla.setChargingAmps(_vehicle_vin, 40, !_quickReturn, _waitingForCommandValue, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_HONK:
@@ -375,7 +397,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_OPEN_PORT;
-				_tesla.openPort(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.openPort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLOSE_PORT:
@@ -384,7 +406,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLOSE_PORT;
-				_tesla.closePort(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.closePort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_UNLOCK:
@@ -393,7 +415,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Unlock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
 				_waitingForCommandReturn = ACTION_TYPE_UNLOCK;
-				_tesla.doorUnlock(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.doorUnlock(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_LOCK:
@@ -402,7 +424,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				/*DEBUG*/ logMessage("actionMachine: Lock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
 				_waitingForCommandReturn = ACTION_TYPE_LOCK;
-				_tesla.doorLock(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.doorLock(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_OPEN_FRUNK:
@@ -415,7 +437,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_open_frunk));
 					}
-					else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
+					else if (_hansshowFrunk) {
 						view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.menu_label_close_frunk));
 					}
 					else {
@@ -533,7 +555,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_handler.invoke([_handlerType, -1, Ui.loadResource(label) + " - " + Ui.loadResource(seat_heat_chosen_label)]);
-				_tesla.climateSeatHeat(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), position, seat_heat_chosen, method(:onCommandReturn));
+				_tesla.climateSeatHeat(_vehicle_vin, 40, !_quickReturn, position, seat_heat_chosen, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
@@ -546,7 +568,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				else if (_data._vehicle_data.get("climate_state").get("steering_wheel_heater") != null) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
-					_tesla.climateSteeringWheel(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"), method(:onCommandReturn));
+					_tesla.climateSteeringWheel(_vehicle_vin, 40, !_quickReturn, _data._vehicle_data.get("climate_state").get("steering_wheel_heater"), method(:onCommandReturn));
 				}
 				else {
 					_stateMachineCounter = 1;
@@ -562,12 +584,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_waitingForCommandValue) {
 					//DEBUG*/ logMessage("actionMachine: Preconditionning off - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-					_tesla.setDeparture(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), value, false, method(:onCommandReturn));
+					_tesla.setDeparture(_vehicle_vin, 40, !_quickReturn, value, false, method(:onCommandReturn));
 				}
 				else {
 					//DEBUG*/ logMessage("actionMachine: Preconditionning on - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-					_tesla.setDeparture(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), value, true, method(:onCommandReturn));
+					_tesla.setDeparture(_vehicle_vin, 40, !_quickReturn, value, true, method(:onCommandReturn));
 				}
 				break;
 
@@ -579,10 +601,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				if (_waitingForCommandValue) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
-					_tesla.SentryMode(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), false, method(:onCommandReturn));
+					_tesla.SentryMode(_vehicle_vin, 40, !_quickReturn, false, method(:onCommandReturn));
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
-					_tesla.SentryMode(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), true, method(:onCommandReturn));
+					_tesla.SentryMode(_vehicle_vin, 40, !_quickReturn, true, method(:onCommandReturn));
 				}
 				break;
 
@@ -591,7 +613,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				/*DEBUG*/ logMessage("actionMachine: Homelink - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
-				_tesla.homelink(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.homelink(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_REMOTE_BOOMBOX:
@@ -599,7 +621,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				/*DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
-				_tesla.remoteBoombox(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+				_tesla.remoteBoombox(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_MODE:
@@ -623,7 +645,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				//DEBUG*/ logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(value)]);
-				_tesla.setClimateMode(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), mode_chosen, method(:onCommandReturn));
+				_tesla.setClimateMode(_vehicle_vin, 40, !_quickReturn, mode_chosen, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_DATA_SCREEN:
@@ -644,12 +666,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		/*DEBUG*/ logMessage("stateMachine:" + " vehicle_vin " + _vehicle_vin + " vehicle_state " + _data._vehicle_state + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 		if (_token == null || _token.equals("")) {
-			_token = $.getProperty("tessieToken", null, method(:validateString));
-			if (_token == null || _token.equals("")) {
-				_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_need_token)]);
-				_stateMachineCounter = 100; // No need to pound here, we don't habe a token, so wait 10 seconds
-				return;
-			}
+			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_need_token)]);
+			_stateMachineCounter = 100; // No need to pound here, we don't habe a token, so wait 10 seconds
+			return;
+		}
+
+		if (_tesla == null) {
+			_tesla = new Tesla(_token);
 		}
 
 		_stateMachineCounter = 0; // So we don't get in if we're alreay in
@@ -658,10 +681,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (resetNeeded != null && resetNeeded == true) {
 			Storage.setValue("ResetNeeded", false);
 			_vehicle_vin = null;
-		}
-
-		if (_tesla == null) {
-			_tesla = new Tesla(_token);
 		}
 
 		if (_vehicle_vin == null) {
@@ -697,7 +716,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_need_wake) { // Asked to wake up
-			if (_waitingFirstData > 0 && !_wakeWasConfirmed && $.getProperty("askWakeVehicle", true, method(:validateBoolean))) { // Ask if we should wake the vehicle
+			if (_waitingFirstData > 0 && !_wakeWasConfirmed && _askWakeVehicle) { // Ask if we should wake the vehicle
 				/*DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
@@ -713,7 +732,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		if (!_wake_done) { // If wake_done is true, we got our 200 in the onReceiveAwake, now it's time to ask for data, otherwise get out and check again
+		if (!_wake_done && _quickReturn == false) { // If wake_done is true, we got our 200 in the onReceiveAwake, now it's time to ask for data, otherwise get out and check again
 			return;
 		}
 
@@ -721,7 +740,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_view._data._ready == true && Storage.getValue("launchedFromComplication") == true) {
 			Storage.setValue("launchedFromComplication", false);
 
-			var action = $.getProperty("complicationAction", 0, method(:validateNumber));
+			var action = _complicationAction;
 			/*DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
 
 			if (action != 0) { // 0 means disable. 
@@ -819,15 +838,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function openVentConfirmed() {
-		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
+		_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 		/*DEBUG*/ logMessage("actionMachine: Open vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
-		_tesla.vent(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), true, method(:onCommandReturn));
+		_tesla.vent(_vehicle_vin, 40, !_quickReturn, true, method(:onCommandReturn));
 	}
 
 	function closeVentConfirmed() {
-	    _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
+	    _handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 		/*DEBUG*/ logMessage("actionMachine: Close vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
-		_tesla.vent(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), false, method(:onCommandReturn));
+		_tesla.vent(_vehicle_vin, 40, !_quickReturn, false, method(:onCommandReturn));
 	}
 
 	function frunkConfirmed() {
@@ -835,16 +854,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_waitingForCommandValue = _data._vehicle_data.get("vehicle_state").get("ft");
 
-		var hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
-		if (hansshowFrunk) {
-	        _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_waitingForCommandValue == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
+		if (_hansshowFrunk) {
+	        _handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(_waitingForCommandValue == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
 			_waitingForCommandReturn = ACTION_TYPE_OPEN_FRUNK;
-			_tesla.openTrunk(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), false, method(:onCommandReturn));
+			_tesla.openTrunk(_vehicle_vin, 40, !_quickReturn, false, method(:onCommandReturn));
 		} else {
 			if (_waitingForCommandValue == 0) {
-				_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
+				_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
 				_waitingForCommandReturn = ACTION_TYPE_OPEN_FRUNK;
-				_tesla.openTrunk(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), false, method(:onCommandReturn));
+				_tesla.openTrunk(_vehicle_vin, 40, !_quickReturn, false, method(:onCommandReturn));
 			} else {
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 	            _stateMachineCounter = 1;
@@ -855,15 +873,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function trunkConfirmed() {
 		/*DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
 		_waitingForCommandValue = _data._vehicle_data.get("vehicle_state").get("rt");
-		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_waitingForCommandValue == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
+		_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(_waitingForCommandValue == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
 		_waitingForCommandReturn = ACTION_TYPE_OPEN_TRUNK;
-		_tesla.openTrunk(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), true, method(:onCommandReturn));
+		_tesla.openTrunk(_vehicle_vin, 40, !_quickReturn, true, method(:onCommandReturn));
 	}
 
 	function honkHornConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Honking - waiting for onCommandReturn");
-		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
-		_tesla.honkHorn(_vehicle_vin, 40, !$.getProperty("quickReturn", false, method(:validateBoolean)), method(:onCommandReturn));
+		_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
+		_tesla.honkHorn(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 	}
 
 	function onSelect() {
@@ -934,10 +952,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		switch ($.getProperty("swap_frunk_for_port", 0, method(:validateNumber))) {
+		switch (_swap_frunk_for_port) {
 			case 0:
-				var hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
-				if (!hansshowFrunk && _data._vehicle_data.get("vehicle_state").get("ft") == 1) {
+				if (!_hansshowFrunk && _data._vehicle_data.get("vehicle_state").get("ft") == 1) {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 			 	}
 				else {
@@ -959,7 +976,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
+				else if (_hansshowFrunk) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1005,7 +1022,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 
 			default:
-				//DEBUG 2023-10-02*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + $.getProperty("swap_frunk_for_port", 0, method(:validateNumber)));
+				//DEBUG 2023-10-02*/ logMessage("doPreviousPage: WARNING swap_frunk_for_port is " + _swap_frunk_for_port);
 		}
 	}
 
@@ -1080,7 +1097,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		        if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_open_frunk, null, :open_frunk, {}));
 				}
-				else if ($.getProperty("HansshowFrunk", false, method(:validateBoolean))) {
+				else if (_hansshowFrunk) {
 					menu.addItem(new MenuItem(Rez.Strings.menu_label_close_frunk, null, :open_frunk, {}));
 				}
 				else {
@@ -1203,24 +1220,22 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
-		var enhancedTouch = $.getProperty("enhancedTouch", true, method(:validateBoolean));
-
-		//DEBUG*/ logMessage("onTap: enhancedTouch=" + enhancedTouch + " x=" + x + " y=" + y);
+		//DEBUG*/ logMessage("onTap: enhancedTouch=" + _enhancedTouch + " x=" + x + " y=" + y);
 		if (System.getDeviceSettings().screenShape == System.SCREEN_SHAPE_RECTANGLE && _settings.screenWidth < _settings.screenHeight) {
 			y = y - ((_settings.screenHeight - _settings.screenWidth) / 2.7).toNumber();
 		}
 
 		// Tap on vehicle name
-		if (enhancedTouch && y < _settings.screenHeight / 7 && _tesla != null) {
+		if (_enhancedTouch && y < _settings.screenHeight / 7 && _tesla != null) {
 			_stateMachineCounter = -1;
 			_tesla.getVehicles(method(:onSelectVehicle));
 		}
 		// Tap on the space used by the 'Eye'
-		else if (enhancedTouch && y > _settings.screenHeight / 7 && y < (_settings.screenHeight / 3.5).toNumber() && x > _settings.screenWidth / 2 - (_settings.screenWidth / 11).toNumber() && x < _settings.screenWidth / 2 + (_settings.screenWidth / 11).toNumber()) {
+		else if (_enhancedTouch && y > _settings.screenHeight / 7 && y < (_settings.screenHeight / 3.5).toNumber() && x > _settings.screenWidth / 2 - (_settings.screenWidth / 11).toNumber() && x < _settings.screenWidth / 2 + (_settings.screenWidth / 11).toNumber()) {
 			_pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 		// Tap on the middle text line where Departure is written
-		else if (enhancedTouch && y > (_settings.screenHeight / 2.3).toNumber() && y < (_settings.screenHeight / 1.8).toNumber()) {
+		else if (_enhancedTouch && y > (_settings.screenHeight / 2.3).toNumber() && y < (_settings.screenHeight / 1.8).toNumber()) {
 			var time = _data._vehicle_data.get("charge_state").get("scheduled_departure_time_minutes");
 			if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 				_pendingActionRequests.add({"Action" => ACTION_TYPE_ADJUST_DEPARTURE, "Option" => ACTION_OPTION_NONE, "Value" => time, "Tick" => System.getTimer()});
@@ -1230,7 +1245,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		} 
 		// Tap on bottom line on screen
-		else if (enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
+		else if (_enhancedTouch && y > (_settings.screenHeight  / 1.25).toNumber() && _tesla != null) {
 			var screenBottom = $.getProperty(x < _settings.screenWidth / 2 ? "screenBottomLeft" : "screenBottomRight", 0, method(:validateNumber));
 			switch (screenBottom) {
 				case 0:
@@ -1302,7 +1317,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (click instanceof Lang.Boolean) {
 			x = 0;
 			y = 0;
-			action = $.getProperty("complicationAction", 0, method(:validateNumber));
+			action = _complicationAction;
 		}
 		else {
 			var coords = click.getCoordinates();
@@ -1532,7 +1547,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_data._vehicle_state = "asleep";
 			}
 			if (_data._vehicle_state.equals("asleep")) {
-				if (_waitingFirstData > 0 && !_wakeWasConfirmed && $.getProperty("askWakeVehicle", true, method(:validateBoolean))) {
+				if (_waitingFirstData > 0 && !_wakeWasConfirmed && _askWakeVehicle) {
 					_need_wake = true;
 					_stateMachineCounter = 1; // We're asleep, but we're going to ask if ok to wake up so no wait
 				}
@@ -1591,7 +1606,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
 						_stateMachineCounter = 1;
 					}
-					else if ($.getProperty("quickReturn", false, method(:validateBoolean))) { // We're not waiting for the command completion to show the main screen
+					else if (_quickReturn) { // We're not waiting for the command completion to show the main screen
 						_handler.invoke([1, -1, null]); // Refresh the screen only if we're not displaying something already that hasn't timed out
 					}
 					else { // For the command to show completed before showing the main screen
@@ -1716,7 +1731,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						status.put("timestamp", timestamp);
 
-						var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+						var which_battery_type = _batteryRangeType;
 						var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
 
 						status.put("battery_level", $.validateNumber(data.get("charge_state").get("battery_level"), 0));
@@ -1893,7 +1908,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function onCommandReturn(responseCode, data) {
 		SpinSpinner(responseCode);
 
-		if ($.getProperty("quickReturn", false, method(:validateBoolean))) { // If we're not waiting for the command to return, null out it here so we're ready for the next one
+		if (_quickReturn) { // If we're not waiting for the command to return, null out it here so we're ready for the next one
 			_waitingForCommandReturn = null;
 		}
 

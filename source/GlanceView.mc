@@ -26,20 +26,36 @@ class GlanceView extends Ui.GlanceView {
     var _threeLines;
     var _steps;
     var _showLaunch;
-    var _showVehicleName;
+    var _settingsChanged;
+    hidden var _smallfontsize;
+    hidden var _tessieToken;
+    hidden var _vehicleNameGlance;
+    hidden var _scrollclearsedge;
 
     function initialize() {
         GlanceView.initialize();
-        gSettingsChanged = true;
 
 		//DEBUG 2023-10-02*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
+
+        onSettingsChanged();
+        _settingsChanged = false;
+
         _refreshTimer = new Timer.Timer();
+    }
+
+    function onSettingsChanged() {
+        _settingsChanged = true;
+
+        _smallfontsize = $.getProperty("smallfontsize", false, method(:validateBoolean));
+        _tessieToken = $.getProperty("tessieToken", "", method(:validateString));
+        _vehicleNameGlance = $.getProperty("vehicleNameGlance", true, method(:validateBoolean));
+        _scrollclearsedge = $.getProperty("scrollclearsedge", false, method(:validateBoolean));
     }
 
     function onShow() {
 		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
         var noVehicle = (Storage.getValue("vehicle_vin") == null);
-        var noTessieToken = ($.getProperty("tessieToken", "", method(:validateString))).equals("");
+        var noTessieToken = _tessieToken.equals("");
         _showLaunch = (noVehicle || noTessieToken);
 
         _refreshTimer.start(method(:refreshView), 50, true);
@@ -56,12 +72,11 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onLayout(dc) {
-        _usingFont = ($.getProperty("smallfontsize", false, method(:validateBoolean)) ? Graphics.FONT_XTINY : Graphics.FONT_TINY);
+        _usingFont = _smallfontsize ? Graphics.FONT_XTINY : Graphics.FONT_TINY;
         _fontHeight = Graphics.getFontHeight(_usingFont);
         _dcHeight = dc.getHeight();
-        _showVehicleName = $.getProperty("vehicleNameGlance", true, method(:validateBoolean));
 
-        if (_dcHeight / _fontHeight >= 3.0 || _showVehicleName == false) {
+        if (_dcHeight / _fontHeight >= 3.0 || _vehicleNameGlance == false) {
             _threeLines = true;
         }
         else {
@@ -70,7 +85,7 @@ class GlanceView extends Ui.GlanceView {
 
         var screenShape = System.getDeviceSettings().screenShape;
         _dcWidth = dc.getWidth();
-        if (screenShape == System.SCREEN_SHAPE_ROUND && $.getProperty("scrollclearsedge", false, method(:validateBoolean)) == true) {
+        if (screenShape == System.SCREEN_SHAPE_ROUND && _scrollclearsedge == true) {
             var ratio = 1.0 + (System.getDeviceSettings().screenWidth < 454 ? Math.sqrt((454 - System.getDeviceSettings().screenWidth).toFloat() / 2800.0) : 0.0); // Convoluted way to adjust the width based on the screen width relative to a 454 watch, which shows ok with just the formula below 
             var rad = Math.asin(_dcHeight.toFloat() * (_threeLines ? ratio : 1.0) / _dcWidth.toFloat());
             _dcWidth = (Math.cos(rad) * _dcWidth.toFloat()).toNumber();
@@ -108,9 +123,9 @@ class GlanceView extends Ui.GlanceView {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
         //DEBUG 2023-10-02*/ var showLog = false;
 
-        if (gSettingsChanged) {
+        if (_settingsChanged) {
             //DEBUG 2023-10-02*/ showLog = true;
-            gSettingsChanged = false;
+            _settingsChanged = false;
             onLayout(dc);
         }
 
@@ -242,7 +257,7 @@ class GlanceView extends Ui.GlanceView {
             line3 = txt;
         }
 
-        if (_showVehicleName == false && line3 != null) {
+        if (_vehicleNameGlance == false && line3 != null) {
             line1 = line2;
             line2 = line3;
             line3 = null;

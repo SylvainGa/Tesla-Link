@@ -32,6 +32,9 @@ class MainView extends Ui.View {
 	hidden var _xDir;
 	hidden var _scrollEndTimer;
 	hidden var _scrollStartTimer;
+	hidden var _titleScrolling;
+	hidden var _swap_frunk_for_port;
+
 	var _data;
 	var _refreshTimer;
 	var _viewUpdated;
@@ -65,8 +68,15 @@ class MainView extends Ui.View {
 
 		Storage.setValue("spinner", "-");
 
+		onSettingsChanged();
+
 		Ui.requestUpdate();
 		_viewUpdated = false;
+	}
+
+	function onSettingsChanged() {
+		_titleScrolling = $.getProperty("titleScrolling", false, method(:validateBoolean));
+		_swap_frunk_for_port = $.getProperty("swap_frunk_for_port", 0, method(:validateNumber));
 	}
 
 	function onLayout(dc) {
@@ -85,7 +95,7 @@ class MainView extends Ui.View {
 		if (_refreshTimer == null) {
 			_refreshTimer = new Timer.Timer();
 		}
-		if ($.getProperty("titleScrolling", false, method(:validateBoolean))) {
+		if (_titleScrolling) {
 			_refreshTimer.start(method(:refreshView), 50, true);
 		}
 		else {
@@ -290,7 +300,7 @@ class MainView extends Ui.View {
 				textPos = 0;
 				textMaxWidth = width;
 			}
-			else if ($.getProperty("titleScrolling", false, method(:validateBoolean))) {
+			else if (_titleScrolling) {
 				textPos = center_x / 14;
 				var textFromCenter = center_x - textPos - fontHeight / 2;
 				var rad = Math.acos(textFromCenter.toFloat() / radius.toFloat());
@@ -339,7 +349,6 @@ class MainView extends Ui.View {
 			dc.drawArc(center_x, center_y , radius, Graphics.ARC_CLOCKWISE, 225, 315);
 
 			// Grab the data we're going to use around charge and climate
-			var swap_frunk_for_port = $.getProperty("swap_frunk_for_port", 0, method(:validateNumber));
 			var battery_level = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
 			var charge_limit = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"), 0);
 			var charging_state = $.validateString(_data._vehicle_data.get("charge_state").get("charging_state"), "");
@@ -403,14 +412,14 @@ class MainView extends Ui.View {
 					dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.driving));
 				}
 				else {
-					if (swap_frunk_for_port == null) {
-						swap_frunk_for_port = 0;
+					if (_swap_frunk_for_port == null) {
+						_swap_frunk_for_port = 0;
 					}
 
 					var venting = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("fd_window"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("rd_window"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("fp_window"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("rp_window"), 0);
 
 					// Show what we chould interact with
-					switch (swap_frunk_for_port) {
+					switch (_swap_frunk_for_port) {
 						case 0:
 							dc.drawBitmap(image_x_left, image_y_top, Ui.loadResource(Rez.Drawables.frunkAction));
 							break;
@@ -616,7 +625,7 @@ class MainView extends Ui.View {
 
 				// Update frunk/trunk/port text
 				var frunk_drawable = View.findDrawableById("frunk");
-				frunk_drawable.setText(swap_frunk_for_port == 0 ?  Rez.Strings.label_frunk : swap_frunk_for_port == 1 ?  Rez.Strings.label_trunk : swap_frunk_for_port == 2 ?  Rez.Strings.label_port : Rez.Strings.label_frunktrunkport);
+				frunk_drawable.setText(_swap_frunk_for_port == 0 ?  Rez.Strings.label_frunk : _swap_frunk_for_port == 1 ?  Rez.Strings.label_trunk : _swap_frunk_for_port == 2 ?  Rez.Strings.label_port : Rez.Strings.label_frunktrunkport);
 
 				// Update the temperature text
 				var inside_temp_drawable = View.findDrawableById("inside_temp");

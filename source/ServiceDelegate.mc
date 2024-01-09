@@ -13,25 +13,29 @@ class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
     hidden var _serverAPILocation;
     hidden var _tessieToken;
+    hidden var _batteryRangeType;
+    hidden var _warnWhenPhoneNotConnected;
 
     function initialize() {
         System.ServiceDelegate.initialize();
 
         _data = {};
 
+        onSettingsChanged();
+    }
+
+	function onSettingsChanged() {
         _serverAPILocation = $.getProperty("tessieAPILocation", "api.tessie.com", method(:validateString));
         _tessieToken = $.getProperty("tessieToken", "", method(:validateString));
-    }
+        _batteryRangeType = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+        _warnWhenPhoneNotConnected = $.getProperty("WarnWhenPhoneNotConnected", false, method(:validateBoolean));
+	}
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
             //DEBUG 2023-10-02*/ logMessage("onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
-        }
-
-        if (_tessieToken.equals("")) {
-            _tessieToken = $.getProperty("tessieToken", "", method(:validateString));
         }
 
         var vehicle = Storage.getValue("vehicle_vin");
@@ -98,7 +102,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (responseCode == 200 && responseData != null && responseData instanceof Lang.Dictionary) {
             if (responseData.get("charge_state") != null && responseData.get("climate_state") != null && responseData.get("drive_state") != null) {
                 var battery_level = $.validateNumber(responseData.get("charge_state").get("battery_level"), 0);
-                var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+                var which_battery_type = _batteryRangeType;
                 var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
 
                 _data.put("battery_level", battery_level);
@@ -117,7 +121,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 }
             }
         }
-        else if (responseCode == -104 && $.getProperty("WarnWhenPhoneNotConnected", false, method(:validateBoolean))) {
+        else if (responseCode == -104 && _warnWhenPhoneNotConnected) {
             if (!System.getDeviceSettings().phoneConnected) {
                 // var ignore = Storage.getValue("PhoneLostDontAsk");
                 // if (ignore == null) {

@@ -8,15 +8,18 @@ using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 using Toybox.Attention;
 
-var gSettingsChanged;
-
 (:background)
 class TeslaLink extends App.AppBase {
+    var _glanceView;
+    var _serviceDelegate;
+    var _mainView;
+    var _mainDelegate;
+
     function initialize() {
+
         AppBase.initialize();
 
 		//DEBUG*/ logMessage("App: Initialising");
-        gSettingsChanged = false;
     }
 
     (:can_glance, :bkgnd64kb)
@@ -51,7 +54,19 @@ class TeslaLink extends App.AppBase {
     (:can_glance)
 	function onSettingsChanged() {
 		//DEBUG*/ logMessage("App: Settings changed");
-        gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
+        if (_glanceView) {
+            _glanceView.onSettingsChanged();
+        }
+        if (_serviceDelegate) {
+            _serviceDelegate.onSettingsChanged();
+        }
+        if (_mainView) {
+            _mainView.onSettingsChanged();
+        }
+        if (_mainDelegate) {
+            _mainDelegate.onSettingsChanged();
+        }
+
         Ui.requestUpdate();
     }
 
@@ -68,8 +83,8 @@ class TeslaLink extends App.AppBase {
         Storage.setValue("runBG", true);
 
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
-
-        return [ new GlanceView() ];
+        _glanceView = new GlanceView();
+        return [ _glanceView ];
     }
 
     function getInitialView() {
@@ -97,8 +112,9 @@ class TeslaLink extends App.AppBase {
         var data = new TeslaData();
         if ($.validateBoolean(Storage.getValue("fromGlance"), false) || useTouch) { // Up/Down buttons work when launched from glance (or if we don't have/need buttons)
             Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
-            var view = new MainView(data);
-            return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
+            _mainView = new MainView(data);
+            _mainDelegate = new MainDelegate(_mainView, data, _mainView.method(:onReceive)); 
+            return [ _mainView, _mainDelegate ];
         }
         else { // Sucks, but we have to have an extra view so the Up/Down button work in our main view
             Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
@@ -114,7 +130,6 @@ class TeslaLink extends App.AppBase {
             return;
         }
         
-        gSettingsChanged = true;
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
