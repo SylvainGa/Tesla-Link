@@ -394,7 +394,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_OPEN_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
+				/*DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_OPEN_PORT;
 				_tesla.openPort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -403,7 +403,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_CLOSE_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
+				/*DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLOSE_PORT;
 				_tesla.closePort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -1692,6 +1692,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						if (showNow) {
 							_waitingForCommandReturn = null;
 							_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
+							/*DEBUG*/ logMessage("onReceiveVehicleData: action has completed");
+						}
+						else {
+							/*DEBUG*/ logMessage("onReceiveVehicleData: waiting for action to complete");
 						}
 					}
 
@@ -1778,8 +1782,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						else {
 							_stateMachineCounter = (10000L - diff) / 100;
-							if (_stateMachineCounter < 90) {
-								_stateMachineCounter = 90; // We're close to the last update, check soon
+							if (_stateMachineCounter < 50) {
+								_stateMachineCounter = 50; // We're close to the last update, check soon
 							}
 						}
 					}
@@ -1795,8 +1799,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 					else {
 						_stateMachineCounter = (10000L - diff) / 100;
-						if (_stateMachineCounter < 90) {
-							_stateMachineCounter = 90; // We're close to the last update, check soon
+						if (_stateMachineCounter < 50) {
+							_stateMachineCounter = 50; // We're close to the last update, check soon
 						}
 					}
 				}
