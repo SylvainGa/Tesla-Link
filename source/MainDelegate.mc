@@ -1920,8 +1920,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//DEBUG*/ logMessage("onCommandReturn: " + responseCode);
 		if (responseCode == 200) {
 			var result = data.get("result");
-			var woke = data.get("woke");
-			//DEBUG*/ logMessage("onCommandReturn: result is " + result + " woke is " + woke);
+			
+			//DEBUG*/ var woke = data.get("woke"); logMessage("onCommandReturn: result is " + result + " woke is " + woke);
 			if (result == true) {
 				_data._vehicle_state = "awake"; // Since we succeeded, say we're awake
 			}
