@@ -18,6 +18,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
     }
 
     function onPreviousPage() {
+		/*DEBUG*/ logMessage("ClimateDelegate: onPreviousPage");
     	_view._viewOffset -= 4;
     	if (_view._viewOffset < 0) {
 			_view._viewOffset = 0;
@@ -27,6 +28,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
     }
 
     function onNextPage() {
+		/*DEBUG*/ logMessage("ClimateDelegate: onNextPage");
     	_view._viewOffset += 4;
     	if (_view._viewOffset > 12) {
 			_view._viewOffset = 12;
@@ -36,6 +38,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
     }
 
 	function onMenu() {
+		/*DEBUG*/ logMessage("ClimateDelegate: onMenu invoking next view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(3); // Tell MainDelegate to show next subview
 
@@ -44,6 +47,7 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
 	}
 	
     function onSwipe(swipeEvent) {
+		/*DEBUG*/ logMessage("ClimateDelegate: onSwipe got a " + swipeEvent.getDirection());
     	if (swipeEvent.getDirection() == 3) {
 	    	onMenu();
     	}
@@ -51,14 +55,15 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
 	}
 
     function onBack() {
+		/*DEBUG*/ logMessage("ClimateDelegate: onBack invoking main view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
         return true;
     }
 
     function onTap(click) {
-		Ui.popView(Ui.SLIDE_IMMEDIATE);
-		_handler.invoke(1);
+		/*DEBUG*/ logMessage("ClimateDelegate: onTap calling onMenu");
+		onMenu();
         return true;
     }
 }

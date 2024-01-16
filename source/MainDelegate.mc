@@ -174,27 +174,28 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceive(args) {
-		/*DEBUG*/ logMessage("StateMachine: onReceive");
+		/*DEBUG*/ logMessage("StateMachine: onReceive with args=" + args);
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, display our main view
+			/*DEBUG*/ logMessage("StateMachine: onReceive returning to main view");
 			_stateMachineCounter = 1;
 		}
-		else if (args == 1) { // Swiped left from main screen, show subview 1
+		else if (args == 1 || args > 3) { // Swiped left from main screen or out of data views, show subview 1
+			/*DEBUG*/ logMessage("StateMachine: onReceive pushing charge view");
 			var view = new ChargeView(_view._data);
 			var delegate = new ChargeDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 2) { // Swiped left on subview 1, show subview 2
+			/*DEBUG*/ logMessage("StateMachine: onReceive pushing climate view");
 			var view = new ClimateView(_view._data);
 			var delegate = new ClimateDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 3) { // Swiped left on subview 2, show subview 3
+			/*DEBUG*/ logMessage("StateMachine: onReceive pushing drive view");
 			var view = new DriveView(_view._data);
 			var delegate = new DriveDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
-		}
-		else { // Swiped left on subview 3, we're back at the main display
-			_stateMachineCounter = 1;
 		}
 	    Ui.requestUpdate();
 	}

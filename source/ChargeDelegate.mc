@@ -18,6 +18,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
     }
 
     function onPreviousPage() {
+		/*DEBUG*/ logMessage("ChargeDelegate: onPreviousPage");
     	_view._viewOffset -= 4;
     	if (_view._viewOffset < 0) {
 			_view._viewOffset = 0;
@@ -27,6 +28,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
     }
 
     function onNextPage() {
+		/*DEBUG*/ logMessage("ChargeDelegate: onNextPage");
     	_view._viewOffset += 4;
     	if (_view._viewOffset > 4) {
 			_view._viewOffset = 4;
@@ -36,6 +38,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
     }
 
 	function onMenu() {
+		/*DEBUG*/ logMessage("ChargeDelegate: onMenu invoking next view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(2); // Tell MainDelegate to show next subview
 
@@ -44,21 +47,33 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
 	}
 	
     function onSwipe(swipeEvent) {
+		/*DEBUG*/ logMessage("ChargeDelegate: onSwipe got a " + swipeEvent.getDirection());
     	if (swipeEvent.getDirection() == 3) {
 	    	onMenu();
     	}
         return true;
 	}
 	
+    function onFlick(flickEvent) {
+		/*DEBUG*/ logMessage("ChargeDelegate: onFlick got a " + flickEvent.getDirection());
+        return false;
+	}
+	
+    function onDrag(dragEvent) {
+		/*DEBUG*/ logMessage("ChargeDelegate: onDrag got a " + dragEvent.getType());
+        return false;
+	}
+	
     function onBack() {
+		/*DEBUG*/ logMessage("ChargeDelegate: onBack invoking main view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
         return true;
     }
 
     function onTap(click) {
-		Ui.popView(Ui.SLIDE_IMMEDIATE);
-		_handler.invoke(0);
+		/*DEBUG*/ logMessage("ChargeDelegate: onTap calling onMenu");
+		onMenu();
         return true;
     }
 }
