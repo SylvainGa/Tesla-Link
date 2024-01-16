@@ -145,7 +145,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		onSettingsChanged();
 
 		// This is where the main code will start running. Don't intialise stuff after this line
-		/*DEBUG*/ logMessage("initialize: quickAccess=" + _quickReturn + " enhancedTouch=" + _enhancedTouch);
+		//DEBUG*/ logMessage("initialize: quickAccess=" + _quickReturn + " enhancedTouch=" + _enhancedTouch);
 		_workTimer.start(method(:workerTimer), 100, true);
 
 		stateMachine(); // Launch getting the states right away.
@@ -174,25 +174,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceive(args) {
-		/*DEBUG*/ logMessage("StateMachine: onReceive with args=" + args);
+		//DEBUG*/ logMessage("StateMachine: onReceive with args=" + args);
 		if (args == 0) { // The sub page ended and sent us a _handler.invoke(0) call, display our main view
-			/*DEBUG*/ logMessage("StateMachine: onReceive returning to main view");
+			//DEBUG*/ logMessage("StateMachine: onReceive returning to main view");
 			_stateMachineCounter = 1;
 		}
 		else if (args == 1 || args > 3) { // Swiped left from main screen or out of data views, show subview 1
-			/*DEBUG*/ logMessage("StateMachine: onReceive pushing charge view");
+			//DEBUG*/ logMessage("StateMachine: onReceive pushing charge view");
 			var view = new ChargeView(_view._data);
 			var delegate = new ChargeDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 2) { // Swiped left on subview 1, show subview 2
-			/*DEBUG*/ logMessage("StateMachine: onReceive pushing climate view");
+			//DEBUG*/ logMessage("StateMachine: onReceive pushing climate view");
 			var view = new ClimateView(_view._data);
 			var delegate = new ClimateDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 3) { // Swiped left on subview 2, show subview 3
-			/*DEBUG*/ logMessage("StateMachine: onReceive pushing drive view");
+			//DEBUG*/ logMessage("StateMachine: onReceive pushing drive view");
 			var view = new DriveView(_view._data);
 			var delegate = new DriveDelegate(view, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
@@ -306,7 +306,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_CLIMATE_ON:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Climate On - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Climate On - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_ON;
 				_tesla.climateOn(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -315,7 +315,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_CLIMATE_OFF:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Climate Off - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Climate Off - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_OFF;
 				_tesla.climateOff(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -327,7 +327,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				var isDefrostOn = _data._vehicle_data.get("climate_state").get("is_front_defroster_on");
 				_waitingForCommandValue = !isDefrostOn;
 
-				/*DEBUG*/ logMessage("actionMachine: Climate Defrost is currently " + isDefrostOn + " - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Climate Defrost is currently " + isDefrostOn + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(isDefrostOn ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLIMATE_DEFROST;
 				_tesla.climateDefrost(_vehicle_vin, 40, !_quickReturn, isDefrostOn, method(:onCommandReturn));
@@ -343,7 +343,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
 				}
-				/*DEBUG*/ logMessage("actionMachine: Climate set temperature to " + temperature + " - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Climate set temperature to " + temperature + " - waiting for onCommandReturn");
 				_tesla.climateSet(_vehicle_vin, 40, !_quickReturn, temperature, method(:onCommandReturn));
 				break;
 
@@ -355,7 +355,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				var chargingState = _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging");
-				/*DEBUG*/ logMessage("actionMachine: Toggling charging, currently " + chargingState + " - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Toggling charging, currently " + chargingState + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(chargingState ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
 				_tesla.toggleCharging(_vehicle_vin, 40, !_quickReturn, chargingState, method(:onCommandReturn));
 				break;
@@ -364,7 +364,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				_waitingForCommandValue = value;
-				/*DEBUG*/ logMessage("actionMachine: Setting charge limit to " + _waitingForCommandValue + " - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Setting charge limit to " + _waitingForCommandValue + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + _waitingForCommandValue + "%"]);
 				_waitingForCommandReturn = ACTION_TYPE_SET_CHARGING_LIMIT;
 				_tesla.setChargingLimit(_vehicle_vin, 40, !_quickReturn, _waitingForCommandValue, method(:onCommandReturn));
@@ -374,7 +374,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				_waitingForCommandValue = value;
-				/*DEBUG*/ logMessage("actionMachine: Setting max current to " + _waitingForCommandValue + " - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Setting max current to " + _waitingForCommandValue + " - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + _waitingForCommandValue + "A"]);
 				_waitingForCommandReturn = ACTION_TYPE_SET_CHARGING_AMPS;
 				_tesla.setChargingAmps(_vehicle_vin, 40, !_quickReturn, _waitingForCommandValue, method(:onCommandReturn));
@@ -395,7 +395,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_OPEN_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_OPEN_PORT;
 				_tesla.openPort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -404,7 +404,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_CLOSE_PORT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
 				_waitingForCommandReturn = ACTION_TYPE_CLOSE_PORT;
 				_tesla.closePort(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -413,7 +413,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_UNLOCK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Unlock - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Unlock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
 				_waitingForCommandReturn = ACTION_TYPE_UNLOCK;
 				_tesla.doorUnlock(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -422,7 +422,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_LOCK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Lock - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Lock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
 				_waitingForCommandReturn = ACTION_TYPE_LOCK;
 				_tesla.doorLock(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
@@ -494,7 +494,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_SET_SEAT_HEAT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for onCommandReturn");
 				var seat_heat_chosen_label = Storage.getValue("seat_heat_chosen");
 				var seat_heat_chosen;
 				switch (seat_heat_chosen_label) {
@@ -562,7 +562,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Setting steering wheel heat - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Setting steering wheel heat - waiting for onCommandReturn");
 				if (_data._vehicle_data.get("climate_state").get("is_climate_on") == false) {
 					_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_steering_wheel_need_climate_on)]);
 					_stateMachineCounter = 1;
@@ -612,7 +612,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_HOMELINK:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Homelink - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Homelink - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
 				_tesla.homelink(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
@@ -620,7 +620,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			case ACTION_TYPE_REMOTE_BOOMBOX:
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
-				/*DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for onCommandReturn");
+				//DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
 				_tesla.remoteBoombox(_vehicle_vin, 40, !_quickReturn, method(:onCommandReturn));
 				break;
@@ -664,7 +664,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		/*DEBUG*/ logMessage("stateMachine:" + " vehicle_vin " + _vehicle_vin + " vehicle_state " + _data._vehicle_state + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+		//DEBUG*/ logMessage("stateMachine:" + " vehicle_vin " + _vehicle_vin + " vehicle_state " + _data._vehicle_state + (_check_wake ? " _check_wake true" : "") + (_need_wake ? " _need_wake true" : "") + (!_wake_done ? " _wake_done false" : "") + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 		if (_token == null || _token.equals("")) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_need_token)]);
@@ -693,7 +693,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (_vehicle_vin.equals("N/A")) {
-			/*DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_vin is " +  _vehicle_vin + " _check_wake=" + _check_wake);
+			//DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_vin is " +  _vehicle_vin + " _check_wake=" + _check_wake);
 			if (_vehicle_vin == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
@@ -718,14 +718,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (_need_wake) { // Asked to wake up
 			if (_waitingFirstData > 0 && !_wakeWasConfirmed && _askWakeVehicle) { // Ask if we should wake the vehicle
-				/*DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
+				//DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 				_in_menu = true;
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
-				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
+				//DEBUG*/ logMessage("stateMachine: Waking vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
 				_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
@@ -742,7 +742,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			Storage.setValue("launchedFromComplication", false);
 
 			var action = _complicationAction;
-			/*DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
+			//DEBUG*/ logMessage("stateMachine: Launched from Complication with holdActionUpperLeft at " + action);
 
 			if (action != 0) { // 0 means disable. 
 				var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_perform_complication));
@@ -755,7 +755,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_lastDataRun = System.getTimer();
 
-		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
+		//DEBUG*/ logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
 	}
 
@@ -773,7 +773,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Call stateMachine as soon as it's out of it (_stateMachineCounter will get modified in onReceiveVehicleData)
 			else if (_stateMachineCounter != 0) {
 				//_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waiting_online)]);
-				/*DEBUG*/ logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
+				//DEBUG*/ logMessage("actionMachine: Differing, _pendingActionRequests size at " + _pendingActionRequests.size() + " DataViewReady is " + _view._data._ready + " lastError is " + _lastError + " _stateMachineCounter is " + _stateMachineCounter);
 				stateMachine();
 			}
 		}
@@ -790,7 +790,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			} else {
 				var timeDelta = System.getTimer() - _lastDataRun;
 				if (timeDelta > 45000) {
-					/*DEBUG*/ logMessage("workerTimer: We've been waiting for data for " + timeDelta + "ms. Assume we lost this packet and try again");
+					//DEBUG*/ logMessage("workerTimer: We've been waiting for data for " + timeDelta + "ms. Assume we lost this packet and try again");
 					_lastDataRun = System.getTimer();
 					_stateMachineCounter = 1;
 				}				
@@ -808,7 +808,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function operationCanceled() {
-		/*DEBUG*/ logMessage("operationCanceled:");
+		//DEBUG*/ logMessage("operationCanceled:");
 		_stateMachineCounter = 1;
 	}
 
@@ -822,7 +822,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_wake_done = false;
 		_wakeWasConfirmed = true;
 		gWaitTime = System.getTimer();
-		/*DEBUG*/ logMessage("wakeConfirmed: Waking the vehicle");
+		//DEBUG*/ logMessage("wakeConfirmed: Waking the vehicle");
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 		_in_menu = false;
@@ -833,20 +833,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_need_wake = false;
 		gWaitTime = System.getTimer();
 		Storage.setValue("launchedFromComplication", false); // If we came from a watchface complication and we canceled the wake, ignore the complication event
-		/*DEBUG*/ logMessage("wakeCancelled:");
+		//DEBUG*/ logMessage("wakeCancelled:");
 		_stateMachineCounter = 1;
 		_in_menu = false;
 	}
 
 	function openVentConfirmed() {
 		_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
-		/*DEBUG*/ logMessage("actionMachine: Open vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
+		//DEBUG*/ logMessage("actionMachine: Open vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
 		_tesla.vent(_vehicle_vin, 40, !_quickReturn, true, method(:onCommandReturn));
 	}
 
 	function closeVentConfirmed() {
 	    _handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
-		/*DEBUG*/ logMessage("actionMachine: Close vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
+		//DEBUG*/ logMessage("actionMachine: Close vent with venting= " + _waitingForCommandValue + " - waiting for onCommandReturn");
 		_tesla.vent(_vehicle_vin, 40, !_quickReturn, false, method(:onCommandReturn));
 	}
 
@@ -872,7 +872,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function trunkConfirmed() {
-		/*DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
+		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
 		_waitingForCommandValue = _data._vehicle_data.get("vehicle_state").get("rt");
 		_handler.invoke([_quickReturn ? 1 : 2, -1, Ui.loadResource(_waitingForCommandValue == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
 		_waitingForCommandReturn = ACTION_TYPE_OPEN_TRUNK;
@@ -1176,7 +1176,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_media_control, null, :media_control, {}));
 				break;
 			default:
-				/*DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
+				//DEBUG*/ logMessage("addMenuItem: Index " + index + " out of range");
 				break;
 		}
 	}
@@ -1432,7 +1432,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onSelectVehicle(responseCode, data) {
-		/*DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
+		//DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
 
 		if (responseCode == 200) {
 			var vehicles = data.get("results");
@@ -1482,7 +1482,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
@@ -1505,7 +1505,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 				}
 
-				/*DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_vin + ")");
+				//DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_vin + ")");
 
 				_vehicle_vin = vehicles[vehicle_index].get("vin");
 				Storage.setValue("vehicle", _vehicle_vin);
@@ -1542,7 +1542,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200) {
 			_data._vehicle_state = data.get("status");
-			/*DEBUG*/ logMessage("onReceiveVehicleStatus: " + responseCode + " status is " + _data._vehicle_state);
+			//DEBUG*/ logMessage("onReceiveVehicleStatus: " + responseCode + " status is " + _data._vehicle_state);
 
 			if (_data._vehicle_state == null) { // Fail safe in case we read nothing
 				_data._vehicle_state = "asleep";
@@ -1563,7 +1563,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_check_wake = false;
 		}
 		else {
-			/*DEBUG*/ logMessage("onReceiveVehicleStatus: " + responseCode);
+			//DEBUG*/ logMessage("onReceiveVehicleStatus: " + responseCode);
 			if (responseCode == 401) {
 				// Unauthorized
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
@@ -1582,13 +1582,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveVehicleData(responseCode, data) {
-		/*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
+		//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
 
 		if (_stateMachineCounter < 0) {
-			/*DEBUG 2023-10-02*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
-			/*DEBUG 2023-10-02*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
+			//DEBUG 2023-10-02*/ if (_stateMachineCounter == -3) { logMessage("onReceiveVehicleData: skipping, actionMachine running"); }
+			//DEBUG 2023-10-02*/ if (_stateMachineCounter == -2) { logMessage("onReceiveVehicleData: WARNING skipping again because of the menu?"); }
 			if (_stateMachineCounter == -1) { 
-				/*DEBUG*/ logMessage("onReceiveVehicleData: skipping, we're in a menu");
+				//DEBUG*/ logMessage("onReceiveVehicleData: skipping, we're in a menu");
 				 _stateMachineCounter = -2; // Let the menu blocking us know that we missed data
 			}
 			return;
@@ -1693,10 +1693,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						if (showNow) {
 							_waitingForCommandReturn = null;
 							_handler.invoke([0, -1, null]); // We received the status of our command, show the main screen right away
-							/*DEBUG*/ logMessage("onReceiveVehicleData: action has completed");
+							//DEBUG*/ logMessage("onReceiveVehicleData: action has completed");
 						}
 						else {
-							/*DEBUG*/ logMessage("onReceiveVehicleData: waiting for action to complete");
+							//DEBUG*/ logMessage("onReceiveVehicleData: waiting for action to complete");
 						}
 					}
 
@@ -1755,7 +1755,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 
 					if (_408_count) {
-						/*DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
+						//DEBUG*/ logMessage("onReceiveVehicleData: clearing _408_count");
 						_408_count = 0; // Reset the count of timeouts since we got our data
 					}
 
@@ -1808,12 +1808,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				else { // Not newer or equal to previous, ignore it and try again in 500 msec
 					_stateMachineCounter = 5;
 				}
-				/*DEBUG*/ logMessage("onReceiveVehicleData: timestamp previous " + _lastTimeStamp + " current " + currentTimeStamp + " diff of " + (currentTimeStamp - _lastTimeStamp).toString() + " _stateMachineCounter is " + _stateMachineCounter);
+				//DEBUG*/ logMessage("onReceiveVehicleData: timestamp previous " + _lastTimeStamp + " current " + currentTimeStamp + " diff of " + (currentTimeStamp - _lastTimeStamp).toString() + " _stateMachineCounter is " + _stateMachineCounter);
 
 				_lastTimeStamp = currentTimeStamp;
 			}
 			else {
-				/*DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
+				//DEBUG*/ logMessage("onReceiveVehicleData: WARNING Received incomplete data, ignoring");
 				_stateMachineCounter = 1;
 			}
 			return;
@@ -1829,7 +1829,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 			if (responseCode == 408) { // We got a timeout, check if we're still awake
 				var i = _408_count + 1;
-				/*DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
+				//DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
 				if (_waitingFirstData > 0 && _view._data._ready == false) { // We haven't received any data yet and we have already a message displayed
 					_handler.invoke([3, i, Ui.loadResource(_data._vehicle_state.equals("asleep") == false ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
 				}
@@ -1865,7 +1865,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveAwake(responseCode, data) {
-		/*DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
+		//DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
 
 		if (responseCode == 200 || (responseCode == 403 && _data._vehicle_state != null && _data._vehicle_state.equals("asleep") == false)) { // If we get 403, check to see if we saw it awake since some country do not accept waking remotely
 			var result = data.get("result");
@@ -1917,11 +1917,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_waitingForCommandReturn = null;
 		}
 
-		/*DEBUG*/ logMessage("onCommandReturn: " + responseCode);
+		//DEBUG*/ logMessage("onCommandReturn: " + responseCode);
 		if (responseCode == 200) {
 			var result = data.get("result");
 			var woke = data.get("woke");
-			/*DEBUG*/ logMessage("onCommandReturn: result is " + result + " woke is " + woke);
+			//DEBUG*/ logMessage("onCommandReturn: result is " + result + " woke is " + woke);
 			if (result == true) {
 				_data._vehicle_state = "awake"; // Since we succeeded, say we're awake
 			}

@@ -69,8 +69,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
-        /*DEBUG*/ var myStats = System.getSystemStats();
-        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ var myStats = System.getSystemStats();
+        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         _data.put("responseCode", responseCode);
 
@@ -125,7 +125,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             if (!System.getDeviceSettings().phoneConnected) {
                 // var ignore = Storage.getValue("PhoneLostDontAsk");
                 // if (ignore == null) {
-                    /*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                    //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: Not connected to phone?");
                     Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
                 // }
             }
