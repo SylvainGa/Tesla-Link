@@ -44,6 +44,7 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
+V7.18.0 Fixed the 412 error message thanks to a post I saw in the teslamate GitHub
 
 V7.17.1 Added the Descent Mk3 43mm and 51mm watches
 

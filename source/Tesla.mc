@@ -47,7 +47,7 @@ class Tesla {
     }
 
     function getVehicleId(notify) {
-        genericGet("https://" + _serverAPILocation + "/api/1/vehicles", notify);
+        genericGet("https://" + _serverAPILocation + "/api/1/products?orders=true", notify);
     }
 
     function getVehicle(vehicle, notify) {
