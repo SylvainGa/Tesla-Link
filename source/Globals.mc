@@ -213,7 +213,7 @@ function logMessage(message) {
 	System.println(dateStr + " : " + message);
 }
 
-/* DEBUG
+/*DEBUG
 (:release, :background)
 function logMessage(message) {
 }

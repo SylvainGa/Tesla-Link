@@ -18,7 +18,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
     }
 
     function onPreviousPage() {
-		/*DEBUG*/ logMessage("DriveDelegate: onPreviousPage");
+		//DEBUG*/ logMessage("DriveDelegate: onPreviousPage");
     	_view._viewOffset -= 4;
     	if (_view._viewOffset < 0) {
 			_view._viewOffset = 0;
@@ -28,7 +28,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
     }
 
     function onNextPage() {
-		/*DEBUG*/ logMessage("DriveDelegate: onNextPage");
+		//DEBUG*/ logMessage("DriveDelegate: onNextPage");
     	_view._viewOffset += 4;
     	if (_view._viewOffset > 0) { // One page but coded to accept more if required
 			_view._viewOffset = 0;
@@ -38,7 +38,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
     }
 
 	function onMenu() {
-		/*DEBUG*/ logMessage("DriveDelegate: onMenu invoking next view");
+		//DEBUG*/ logMessage("DriveDelegate: onMenu invoking next view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(4); // Tell MainDelegate to show next subview
 
@@ -47,7 +47,7 @@ class DriveDelegate extends Ui.BehaviorDelegate {
 	}
 	
     function onSwipe(swipeEvent) {
-		/*DEBUG*/ logMessage("DriveDelegate: onSwipe got a " + swipeEvent.getDirection());
+		//DEBUG*/ logMessage("DriveDelegate: onSwipe got a " + swipeEvent.getDirection());
     	if (swipeEvent.getDirection() == 3) {
 	    	onMenu();
     	}
@@ -55,14 +55,14 @@ class DriveDelegate extends Ui.BehaviorDelegate {
 	}
 	
     function onBack() {
-		/*DEBUG*/ logMessage("DriveDelegate: onBack invoking main view");
+		//DEBUG*/ logMessage("DriveDelegate: onBack invoking main view");
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
         return true;
     }
 
     function onTap(click) {
-		/*DEBUG*/ logMessage("DriveDelegate: onTap calling onMenu");
+		//DEBUG*/ logMessage("DriveDelegate: onTap calling onMenu");
 		onMenu();
         return true;
     }
