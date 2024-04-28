@@ -45,7 +45,9 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 
-V8.1.0 Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
+V8.1.0
+- Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
+- Fixed a crash in the preconditioning code and discrepencies between the SoC when running as a glance
 
 V8.0.0 Replaced Tesla's Owners unsupported API for Tessie's Dev API. See documentation on how to use
 

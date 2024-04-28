@@ -126,23 +126,27 @@ class TeslaLink extends App.AppBase {
     (:can_glance)
     function onBackgroundData(data) {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            //DEBUG*/ logMessage("onBackgroundData: Main view running, skipping");
+            /*DEBUG*/ logMessage("onBackgroundData: Main view running, skipping");
             return;
         }
         
         if (data != null) {
-            //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
+            /*DEBUG*/ logMessage("onBackgroundData data=" + data);
 
             // Read what we had before
             var status = Storage.getValue("status");
             if (status != null && !(status instanceof Lang.Dictionary)) {
+        		/*DEBUG*/ logMessage("onBackgroundData status has wrong format, reseting");
                 Storage.deleteValue("status");
                 status = null;
             }
 
             if (status == null) {
+        		/*DEBUG*/ logMessage("onBackgroundData empty status, initializing");
                 status = {};
             }
+
+    		/*DEBUG*/ logMessage("onBackgroundData status=" + status);
 
             // Fetch was passed to us and replace the old value if we have new one
             var value = data["responseCode"];
@@ -194,11 +198,11 @@ class TeslaLink extends App.AppBase {
                 status.put("vehicleAwake", value);
             }
 
-    		//DEBUG*/ logMessage("onBackgroundData status is " + status);
+    		/*DEBUG*/ logMessage("onBackgroundData status=" + status);
             Storage.setValue("status", status);
         }
         else {
-    		//DEBUG*/ logMessage("onBackgroundData WITHOUT data");
+    		/*DEBUG*/ logMessage("onBackgroundData WITHOUT data");
         }
 
         // No need, it keeps going until the app stops or it's deleted

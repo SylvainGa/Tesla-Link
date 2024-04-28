@@ -19,7 +19,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
     function initialize() {
         System.ServiceDelegate.initialize();
 
-        _data = {};
+        _data = Background.getBackgroundData();
+        if (_data == null) {
+            /*DEBUG*/ logMessage("Init: No background data");
+            _data = {};
+        }
+        else {
+            /*DEBUG*/ logMessage("Init: bg data is " + _data);
+        }
 
         onSettingsChanged();
     }
@@ -66,11 +73,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
+        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
-        /*DEBUG*/ var myStats = System.getSystemStats();
-        /*DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ var myStats = System.getSystemStats(); logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         _data.put("responseCode", responseCode);
 
@@ -125,12 +131,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
             if (!System.getDeviceSettings().phoneConnected) {
                 // var ignore = Storage.getValue("PhoneLostDontAsk");
                 // if (ignore == null) {
-                    /*DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                    /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
                     Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
                 // }
             }
         }
-        //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+        /*DEBUG*/ logMessage("onReceiveVehicleData data=" + _data);
         $.sendComplication(_data);
 
         Background.exit(_data);
