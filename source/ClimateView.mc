@@ -32,7 +32,7 @@ class ClimateView extends Ui.View {
         
         // Load our custom font if it's there, generally only for high res, high mem devices
         var font_montserrat;
-        if (Rez.Fonts has :montserrat) {
+        if (Rez has :Fonts && Rez.Fonts has :montserrat) {
             font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
         } else {
             font_montserrat=Graphics.FONT_TINY;

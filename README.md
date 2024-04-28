@@ -45,6 +45,8 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 
+V8.1.0 Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
+
 V8.0.0 Replaced Tesla's Owners unsupported API for Tessie's Dev API. See documentation on how to use
 
 V7.17.1 Added the Descent Mk3 43mm and 51mm watches

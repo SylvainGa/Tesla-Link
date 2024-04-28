@@ -83,7 +83,7 @@ class MainView extends Ui.View {
 		setLayout(Rez.Layouts.ImageLayout(dc));
 
 		// Load our custom font if it's there, generally only for high res, high mem devices
-		if (Rez.Fonts has :montserrat) {
+        if (Rez has :Fonts && Rez.Fonts has :montserrat) {
 			_font_montserrat=Ui.loadResource(Rez.Fonts.montserrat);
 		} else {
 			_font_montserrat=Graphics.FONT_TINY;
