@@ -132,7 +132,7 @@ class Tesla {
     }
 
     function setDeparture(vehicle, delay, wait, departureTime, enable, notify) {
-        genericGet(_serverAPILocation + vehicle + "/command/set_scheduled_departure" + "_charging?retry_duration=" + delay + "&wait_for_completion=" + wait + "&enable=" + enable + "&departure_time=" + departureTime + "&preconditioning_enabled=true&preconditioning_weekdays_only=false&off_peak_charging_enabled=false&off_peak_charging_weekdays_only=false");
+        genericGet(_serverAPILocation + vehicle + "/command/set_scheduled_departure?retry_duration=" + delay + "&wait_for_completion=" + wait + "&enable=" + enable + "&departure_time=" + departureTime + "&preconditioning_enabled=true&preconditioning_weekdays_only=false&off_peak_charging_enabled=false&off_peak_charging_weekdays_only=false", notify);
     }
 
     function SentryMode(vehicle, delay, wait, value, notify) {
