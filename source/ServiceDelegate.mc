@@ -21,11 +21,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         _data = Background.getBackgroundData();
         if (_data == null) {
-            /*DEBUG*/ logMessage("Init: No background data");
+            //DEBUG*/ logMessage("Init: No background data");
             _data = {};
         }
         else {
-            /*DEBUG*/ logMessage("Init: bg data is " + _data);
+            //DEBUG*/ logMessage("Init: bg data is " + _data);
         }
 
         onSettingsChanged();
@@ -73,7 +73,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG*/ var myStats = System.getSystemStats(); logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
@@ -131,12 +131,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
             if (!System.getDeviceSettings().phoneConnected) {
                 // var ignore = Storage.getValue("PhoneLostDontAsk");
                 // if (ignore == null) {
-                    /*DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                    //DEBUG*/ logMessage("onReceiveVehicleData: Not connected to phone?");
                     Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
                 // }
             }
         }
-        /*DEBUG*/ logMessage("onReceiveVehicleData data=" + _data);
+        //DEBUG*/ logMessage("onReceiveVehicleData data=" + _data);
         $.sendComplication(_data);
 
         Background.exit(_data);
