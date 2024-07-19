@@ -74,15 +74,16 @@
     <string id="menu_label_ideal_battery_range">Idéale</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">Jeton REFRESH d'API (optionnel) </string>
-    <string id="setting_token_prompt">Entrez votre jeton de compte Tesla</string>
+    <string id="setting_token_label">Jeton d'API</string>
+    <string id="setting_token_prompt">Jeton Tesla (optionnel) ou Teslemetry (requis)</string>
+    <string id="setting_teslemetry">Utilisez l'API de Teslemetry ?</string>
     <string id="setting_enhancedTouch">Touche améliorée ?</string>
     <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile) ?</string>
     <string id="setting_screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="setting_screenBottomRight">Au bas de l'écran à droite</string>
     <string id="setting_HansshowFrunk">Possède un Hansshow frunk ?</string>
-    <string id="setting_api_server_location_label">Location du serveur API de Tesla</string>
-    <string id="setting_auth_server_location_label">Location du serveur Auth de Tesla</string>
+    <string id="setting_api_server_location_label">Location du serveur API de Tesla ou Teslemetry</string>
+    <string id="setting_auth_server_location_label">Location du serveur Auth de Tesla (non requis pour Teslemetry)</string>
     <string id="setting_server_location_prompt">Entrez le nom de domaine du serveur</string>
 	<string id="setting_menu_order">Ordre du menu (voir guide d'opération pour aide)</string>
     <string id="menu_label_vent">Ventilé</string>
@@ -171,6 +172,7 @@
     <string id="label_still_waiting_data">Toujours en attente</string>
     <string id="label_ask_manual_wake">SVP réveiller le\nvéhicule manuellement</string>
     <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>  <!--  NEW -->
+    <string id="label_no_token">Jeton manquant</string>
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>

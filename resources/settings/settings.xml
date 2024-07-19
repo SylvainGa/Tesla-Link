@@ -131,6 +131,10 @@
         <settingConfig type="alphaNumeric" />
     </setting>
 
+    <setting propertyKey="@Properties.useTeslemetry" title="@Strings.setting_teslemetry">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
     <setting propertyKey="@Properties.serverAPILocation" title="@Strings.setting_api_server_location_label" prompt="@Strings.setting_server_location_prompt">
         <settingConfig type="alphaNumeric" />
     </setting>

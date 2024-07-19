@@ -77,9 +77,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _tesla;
 	var _data;
 	var _token;
+	var _useTeslemetry;
 	var _code_verifier;
 	var _workTimer;
 	var _vehicle_id;
+	var _vehicle_vin;
 	var _vehicle_state;
 	var _need_auth;
 	var _auth_done;
@@ -107,61 +109,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		BehaviorDelegate.initialize();
 	
 		_view = view;
-
-		_serverAUTHLocation = $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString));
-		_settings = System.getDeviceSettings();
+		_handler = handler;
 		_data = data;
-		_token = Settings.getToken();
-		_vehicle_id = Storage.getValue("vehicle");
+
+		settingsChanged(true);
+
 		_vehicle_state = "online"; // Assume we're online
 		_workTimer = new Timer.Timer();
-		_handler = handler;
-		_tesla = null;
 		_waitingForCommandReturn = false;
-		_useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
 
-		if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
-			Storage.setValue("spinner", "+");
-		}
-		else {
-			Storage.setValue("spinner", "/");
-		}
-		
 		// _debugTimer = System.getTimer(); Storage.setValue("overrideCode", 0);
-
-		var createdAt = Storage.getValue("TokenCreatedAt");
-		if (createdAt == null) {
-			createdAt = 0;
-		}
-		else {
-			createdAt = createdAt.toNumber();
-		}
-		var expireIn = Storage.getValue("TokenExpiresIn");
-		if (expireIn == null) {
-			expireIn = 0;
-		}
-		else {
-			expireIn = expireIn.toNumber();
-		}
-
-		// Check if we need to refresh our access token
-		var timeNow = Time.now().value();
-		var interval = 5 * 60;
-		var expired = (timeNow + interval < createdAt + expireIn);
-		
-		_debug_auth = false;
-		if (_debug_auth == false && _token != null && _token.length() > 0 && expired == true ) {
-			_need_auth = false;
-			_auth_done = true;
-			//DEBUG*/ var expireAt = new Time.Moment(createdAt + expireIn);
-			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
-			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-			//DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
-		} else {
-			//DEBUG 2023-10-02*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
-			_need_auth = true;
-			_auth_done = false;
-		}
 
 		_check_wake = false; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
 		_need_wake = false; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
@@ -172,11 +129,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_408_count = 0;
 		_lastError = null;
-		_refreshTimeInterval = Storage.getValue("refreshTimeInterval");
-		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
-			_refreshTimeInterval = 4000;
-		}
-
 		_lastTimeStamp = 0;
 
 		_pendingActionRequests = [];
@@ -187,255 +139,84 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//DEBUG*/ logMessage("initialize: quickAccess=" + $.getProperty("quickReturn", false, method(:validateBoolean)) + " enhancedTouch=" + $.getProperty("enhancedTouch", true, method(:validateBoolean)));
 		_workTimer.start(method(:workerTimer), 100, true);
 
-/* DEBUG
-		_debug_view = true;
-		if (_debug_view) {
-			if (_tesla == null) {
-				_tesla = new Tesla(_token);
-			}
-			_data._vehicle_data = 
-			{
-				"id" => "1234567890123456",
-				"vehicle_id" => "123456789012",
-				"vin" => "5YJ3E1EA3MF000001",
-				"display_name" => "Tesla",
-				"option_codes" => "AD15,MDL3,PBSB,RENA,BT37,ID3W,RF3G,S3PB,DRLH,DV2W,W39B,APF0,COUS,BC3B,CH07,PC30,FC3P,FG31,GLFR,HL31,HM31,IL31,LTPB,MR31,FM3B,RS3H,SA3P,STCP,SC04,SU3C,T3CA,TW00,TM00,UT3P,WR00,AU3P,APH3,AF00,ZCST,MI00,CDM0",
-				"color" => null,
-				"access_type" => "OWNER",
-				"tokens" => [
-					"1111111111111111",
-					"2222222222222222"
-				],
-				"state" => "asleep",
-				"in_service" => false,
-				"id_s" => "1234567890123456",
-				"calendar_enabled" => true,
-				"api_version" => 36,
-				"backseat_token" => null,
-				"backseat_token_updated_at" => null,
-				"user_id" => "123456789012",
-				"charge_state" => {
-					"battery_heater_on" => false,
-					"battery_level" => 80,
-					"battery_range" => 200.05,
-					"charge_amps" => 32,
-					"charge_current_request" => 32,
-					"charge_current_request_max" => 32,
-					"charge_enable_request" => true,
-					"charge_energy_added" => 1.99,
-					"charge_limit_soc" => 80,
-					"charge_limit_soc_max" => 100,
-					"charge_limit_soc_min" => 50,
-					"charge_limit_soc_std" => 90,
-					"charge_miles_added_ideal" => 9.5,
-					"charge_miles_added_rated" => 9.5,
-					"charge_port_cold_weather_mode" => false,
-					"charge_port_color" => "<invalid>",
-					"charge_port_door_open" => true,
-					"charge_port_latch" => "Engaged",
-					"charge_rate" => 0.0,
-					"charge_to_max_range" => false,
-					"charger_actual_current" => 0,
-					"charger_phases" => 1,
-					"charger_pilot_current" => 32,
-					"charger_power" => 0,
-					"charger_voltage" => 2,
-					"charging_state" => "Complete",
-					"conn_charge_cable" => "SAE",
-					"est_battery_range" => 165.67,
-					"fast_charger_brand" => "<invalid>",
-					"fast_charger_present" => false,
-					"fast_charger_type" => "ACSingleWireCAN",
-					"ideal_battery_range" => 200.05,
-					"managed_charging_active" => false,
-					"managed_charging_start_time" => null,
-					"managed_charging_user_canceled" => false,
-					"max_range_charge_counter" => 0,
-					"minutes_to_full_charge" => 0,
-					"not_enough_power_to_heat" => null,
-					"off_peak_charging_enabled" => false,
-					"off_peak_charging_times" => "all_week",
-					"off_peak_hours_end_time" => 0,
-					"preconditioning_enabled" => false,
-					"preconditioning_times" => "all_week",
-					"scheduled_charging_mode" => "Off",
-					"scheduled_charging_pending" => false,
-					"scheduled_charging_start_time" => null,
-					"scheduled_charging_start_time_app" => 0,
-					"scheduled_departure_time" => "1649079000",
-					"scheduled_departure_time_minutes" => 570,
-					"supercharger_session_trip_planner" => false,
-					"time_to_full_charge" => 0.0,
-					"timestamp" => "1649373163710",
-					"trip_charging" => false,
-					"usable_battery_level" => 79,
-					"user_charge_enable_request" => null
-				},
-				"climate_state" => {
-					"allow_cabin_overheat_protection" => true,
-					"auto_seat_climate_left" => false,
-					"auto_seat_climate_right" => false,
-					"battery_heater" => false,
-					"battery_heater_no_power" => null,
-					"cabin_overheat_protection" => "FanOnly",
-					"cabin_overheat_protection_actively_cooling" => false,
-					"climate_keeper_mode" => "off",
-					"defrost_mode" => 0,
-					"driver_temp_setting" => 21.0,
-					"fan_status" => 0,
-					"hvac_auto_request" => "On",
-					"inside_temp" => 7.4,
-					"is_auto_conditioning_on" => false,
-					"is_climate_on" => false,
-					"is_front_defroster_on" => false,
-					"is_preconditioning" => false,
-					"is_rear_defroster_on" => false,
-					"left_temp_direction" => 0,
-					"max_avail_temp" => 28.0,
-					"min_avail_temp" => 15.0,
-					"outside_temp" => 6.0,
-					"passenger_temp_setting" => 21.0,
-					"remote_heater_control_enabled" => false,
-					"right_temp_direction" => 0,
-					"seat_heater_left" => 0,
-					"seat_heater_rear_center" => 0,
-					"seat_heater_rear_left" => 0,
-					"seat_heater_rear_right" => 0,
-					"seat_heater_right" => 0,
-					"side_mirror_heaters" => false,
-					"steering_wheel_heater" => false,
-					"supports_fan_only_cabin_overheat_protection" => true,
-					"timestamp" => "1649373163710",
-					"wiper_blade_heater" => false
-				},
-				"drive_state" => {
-					"gps_as_of" => "1649371875",
-					"heading" => 170,
-					"latitude" => 40.0,
-					"longitude" => -70.0,
-					"native_latitude" => 4.0,
-					"native_location_supported" => 1,
-					"native_longitude" => -70.0,
-					"native_type" => "wgs",
-					"power" => 0,
-					"shift_state" => null,
-					"speed" => null,
-					"timestamp" => "1649373163710"
-				},
-				"gui_settings" => {
-					"gui_24_hour_time" => true,
-					"gui_charge_rate_units" => "kW",
-					"gui_distance_units" => "km/hr",
-					"gui_range_display" => "Rated",
-					"gui_temperature_units" => "C",
-					"show_range_units" => false,
-					"timestamp" => "1649373163710"
-				},
-				"vehicle_config" => {
-					"badge_version" => 0,
-					"can_accept_navigation_requests" => true,
-					"can_actuate_trunks" => true,
-					"car_special_type" => "base",
-					"car_type" => "model3",
-					"charge_port_type" => "US",
-					"dashcam_clip_save_supported" => true,
-					"default_charge_to_max" => false,
-					"driver_assist" => "TeslaAP3",
-					"ece_restrictions" => false,
-					"efficiency_package" => "M32021",
-					"eu_vehicle" => false,
-					"exterior_color" => "RedMulticoat",
-					"exterior_trim" => "Black",
-					"exterior_trim_override" => "",
-					"has_air_suspension" => false,
-					"has_ludicrous_mode" => false,
-					"has_seat_cooling" => false,
-					"headlamp_type" => "Global",
-					"interior_trim_type" => "Black2",
-					"key_version" => 2,
-					"motorized_charge_port" => true,
-					"paint_color_override" => "10,1,1,0.1,0.04",
-					"performance_package" => "BasePlus",
-					"plg" => true,
-					"pws" => true,
-					"rear_drive_unit" => "PM216MOSFET",
-					"rear_seat_heaters" => 1,
-					"rear_seat_type" => 0,
-					"rhd" => false,
-					"roof_color" => "RoofColorGlass",
-					"seat_type" => null,
-					"spoiler_type" => "None",
-					"sun_roof_installed" => null,
-					"third_row_seats" => "None",
-					"timestamp" => "1649373163710",
-					"trim_badging" => "50",
-					"use_range_badging" => true,
-					"utc_offset" => -14400,
-					"webcam_supported" => true,
-					"wheel_type" => "PinwheelRefresh18"
-				},
-				"vehicle_state" => {
-					"api_version" => 36,
-					"autopark_state_v2" => "unavailable",
-					"calendar_supported" => true,
-					"car_version" => "2022.8.3 e4797d240c70",
-					"center_display_state" => 0,
-					"dashcam_clip_save_available" => true,
-					"dashcam_state" => "Recording",
-					"df" => 0,
-					"dr" => 0,
-					"fd_window" => 0,
-					"feature_bitmask" => "5,0",
-					"fp_window" => 0,
-					"ft" => 0,
-					"is_user_present" => false,
-					"locked" => true,
-					"media_state" => {
-						"remote_control_enabled" => true
-					},
-					"notifications_supported" => true,
-					"odometer" => 8775.268476,
-					"parsed_calendar_supported" => true,
-					"pf" => 0,
-					"pr" => 0,
-					"rd_window" => 0,
-					"remote_start" => false,
-					"remote_start_enabled" => true,
-					"remote_start_supported" => true,
-					"rp_window" => 0,
-					"rt" => 0,
-					"santa_mode" => 0,
-					"sentry_mode" => false,
-					"sentry_mode_available" => true,
-					"software_update" => {
-						"download_perc" => 0,
-						"expected_duration_sec" => 2700,
-						"install_perc" => 1,
-						"status" => "",
-						"version" => " "
-					},
-					"speed_limit_mode" => {
-						"active" => false,
-						"current_limit_mph" => 85.0,
-						"max_limit_mph" => 90,
-						"min_limit_mph" => 50.0,
-						"pin_code_set" => false
-					},
-					"timestamp" => "1649373163710",
-					"tpms_pressure_fl" => 0.0,
-					"tpms_pressure_fr" => 0.0,
-					"tpms_pressure_rl" => 0.0,
-					"tpms_pressure_rr" => 0.0,
-					"valet_mode" => false,
-					"vehicle_name" => "Christine",
-					"vehicle_self_test_progress" => 0,
-					"vehicle_self_test_requested" => false,
-					"webcam_available" => true
-				}
-			};
-		}//*/
-
 		stateMachine(); // Launch getting the states right away.
+	}
+
+	function settingsChanged(fromInit) {
+		_serverAUTHLocation = $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString));
+		_settings = System.getDeviceSettings();
+		if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
+			_useTeslemetry = true;
+			_vehicle_id = Storage.getValue("vehicle");
+			_vehicle_vin = Storage.getValue("vehicleVIN");
+			_token = Settings.getRefreshToken();
+			if (_token == null || _token.length() == 0) {
+				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_token)]);
+			}
+			Settings.setToken(_token, 0, 0);
+			
+			_need_auth = false;
+			_auth_done = true;
+
+			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using teslemetry"); } { logMessage("settingsChanged:Using teslemetry"); }
+		}
+		else {
+			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using Tesla API"); } { logMessage("settingsChanged:Using Tesla API"); }
+			_useTeslemetry = false;
+			_vehicle_id = Storage.getValue("vehicle");
+			_vehicle_vin = _vehicle_id; // Teslemetry needs a VIN to talk to cars, but Tesla's API need the vehicle_id. 
+			_token = Settings.getToken();
+
+			var createdAt = Storage.getValue("TokenCreatedAt");
+			if (createdAt == null) {
+				createdAt = 0;
+			}
+			else {
+				createdAt = createdAt.toNumber();
+			}
+			var expireIn = Storage.getValue("TokenExpiresIn");
+			if (expireIn == null) {
+				expireIn = 0;
+			}
+			else {
+				expireIn = expireIn.toNumber();
+			}
+
+			// Check if we need to refresh our access token
+			var timeNow = Time.now().value();
+			var interval = 5 * 60;
+			var not_expired = (timeNow + interval < createdAt + expireIn);
+
+			_debug_auth = false;
+			if (_debug_auth == false && _token != null && _token.length() > 0 && not_expired == true ) {
+				_need_auth = false;
+				_auth_done = true;
+				//DEBUG*/ var expireAt = new Time.Moment(createdAt + expireIn);
+				//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
+				//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
+				//DEBUG*/ logMessage("initialize:Using access token '" + _token.substring(0,10) + "...' lenght=" + _token.length() + " which expires at " + dateStr);
+			} else {
+				/*DEBUG*/ logMessage("initialize:No token or expired, will need to get one through a refresh token or authentication");
+				_need_auth = true;
+				_auth_done = false;
+			}
+		}
+
+		_useTouch = $.getProperty("useTouch", true, method(:validateBoolean));
+
+		if ($.getProperty("enhancedTouch", true, method(:validateBoolean))) {
+			Storage.setValue("spinner", "+");
+		}
+		else {
+			Storage.setValue("spinner", "/");
+		}
+		
+		_refreshTimeInterval = Storage.getValue("refreshTimeInterval");
+		if (_refreshTimeInterval == null || _refreshTimeInterval.toNumber() < 500) {
+			_refreshTimeInterval = 4000;
+		}
+
+		_tesla = null;
 	}
 
 	function onReceive(args) {
@@ -704,7 +485,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Climate On - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_on)]);
-				_tesla.climateOn(_vehicle_id, method(:onCommandReturn));
+				_tesla.climateOn(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_OFF:
@@ -712,7 +493,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Climate Off - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_hvac_off)]);
-				_tesla.climateOff(_vehicle_id, method(:onCommandReturn));
+				_tesla.climateOff(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_DEFROST:
@@ -720,7 +501,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Climate Defrost - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
-				_tesla.climateDefrost(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+				_tesla.climateDefrost(_vehicle_vin, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("defrost_mode"));
 				break;
 
 			case ACTION_TYPE_CLIMATE_SET:
@@ -734,7 +515,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_set) + temperature.format("%.1f") + "°C"]);
 				}
-				_tesla.climateSet(_vehicle_id, method(:onCommandReturn), temperature);
+				_tesla.climateSet(_vehicle_vin, method(:onCommandReturn), temperature);
 				break;
 
 			case ACTION_TYPE_MEDIA_CONTROL:
@@ -746,7 +527,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Toggling charging - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charging_state").equals("Charging") ? Rez.Strings.label_stop_charging : Rez.Strings.label_start_charging)]);
-				_tesla.toggleCharging(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
+				_tesla.toggleCharging(_vehicle_vin, method(:onCommandReturn), _data._vehicle_data.get("charge_state").get("charging_state").equals("Charging"));
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_LIMIT:
@@ -755,7 +536,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: Setting charge limit - waiting for onCommandReturn");
 				var charging_limit = value;
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_limit) + charging_limit + "%"]);
-				_tesla.setChargingLimit(_vehicle_id, method(:onCommandReturn), charging_limit);
+				_tesla.setChargingLimit(_vehicle_vin, method(:onCommandReturn), charging_limit);
 				break;
 
 			case ACTION_TYPE_SET_CHARGING_AMPS:
@@ -764,7 +545,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: Setting max current - waiting for onCommandReturn");
 				var charging_amps = value;
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_charging_amps) + charging_amps + "A"]);
-				_tesla.setChargingAmps(_vehicle_id, method(:onCommandReturn), charging_amps);
+				_tesla.setChargingAmps(_vehicle_vin, method(:onCommandReturn), charging_amps);
 				break;
 
 			case ACTION_TYPE_HONK:
@@ -784,7 +565,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Opening on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("charge_state").get("charge_port_door_open") ? Rez.Strings.label_unlock_port : Rez.Strings.label_open_port)]);
-				_tesla.openPort(_vehicle_id, method(:onCommandReturn));
+				_tesla.openPort(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLOSE_PORT:
@@ -792,7 +573,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Closing on charge port - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_close_port)]);
-				_tesla.closePort(_vehicle_id, method(:onCommandReturn));
+				_tesla.closePort(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_UNLOCK:
@@ -800,7 +581,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Unlock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_unlock_doors)]);
-				_tesla.doorUnlock(_vehicle_id, method(:onCommandReturn));
+				_tesla.doorUnlock(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_LOCK:
@@ -808,7 +589,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Lock - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_lock_doors)]);
-				_tesla.doorLock(_vehicle_id, method(:onCommandReturn));
+				_tesla.doorLock(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_OPEN_FRUNK:
@@ -937,7 +718,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_handler.invoke([_handlerType, -1, Ui.loadResource(label) + " - " + Ui.loadResource(seat_heat_chosen_label)]);
-				_tesla.climateSeatHeat(_vehicle_id, method(:onCommandReturn), position, seat_heat_chosen);
+				_tesla.climateSeatHeat(_vehicle_vin, method(:onCommandReturn), position, seat_heat_chosen);
 				break;
 
 			case ACTION_TYPE_SET_STEERING_WHEEL_HEAT:
@@ -950,7 +731,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				else if (_data._vehicle_data.get("climate_state").get("steering_wheel_heater") != null) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("steering_wheel_heater") == true ? Rez.Strings.label_steering_wheel_off : Rez.Strings.label_steering_wheel_on)]);
-					_tesla.climateSteeringWheel(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
+					_tesla.climateSteeringWheel(_vehicle_vin, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("steering_wheel_heater"));
 				}
 				else {
 					_stateMachineCounter = 1;
@@ -963,12 +744,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				if (_data._vehicle_data.get("charge_state").get("preconditioning_enabled")) {
 					//DEBUG*/ logMessage("actionMachine: Preconditionning off - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_stop_departure)]);
-					_tesla.setDeparture(_vehicle_id, method(:onCommandReturn), value, false);
+					_tesla.setDeparture(_vehicle_vin, method(:onCommandReturn), value, false);
 				}
 				else {
 					//DEBUG*/ logMessage("actionMachine: Preconditionning on - waiting for onCommandReturn");
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_start_departure)]);
-					_tesla.setDeparture(_vehicle_id, method(:onCommandReturn), value, true);
+					_tesla.setDeparture(_vehicle_vin, method(:onCommandReturn), value, true);
 				}
 				break;
 
@@ -977,10 +758,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				if (_data._vehicle_data.get("vehicle_state").get("sentry_mode")) {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_off)]);
-					_tesla.SentryMode(_vehicle_id, method(:onCommandReturn), false);
+					_tesla.SentryMode(_vehicle_vin, method(:onCommandReturn), false);
 				} else {
 					_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_sentry_on)]);
-					_tesla.SentryMode(_vehicle_id, method(:onCommandReturn), true);
+					_tesla.SentryMode(_vehicle_vin, method(:onCommandReturn), true);
 				}
 				break;
 
@@ -989,7 +770,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Homelink - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_homelink)]);
-				_tesla.homelink(_vehicle_id, method(:onCommandReturn), _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+				_tesla.homelink(_vehicle_vin, method(:onCommandReturn), _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 				break;
 
 			case ACTION_TYPE_REMOTE_BOOMBOX:
@@ -997,7 +778,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				//DEBUG*/ logMessage("actionMachine: Remote Boombox - waiting for onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_remote_boombox)]);
-				_tesla.remoteBoombox(_vehicle_id, method(:onCommandReturn));
+				_tesla.remoteBoombox(_vehicle_vin, method(:onCommandReturn));
 				break;
 
 			case ACTION_TYPE_CLIMATE_MODE:
@@ -1021,7 +802,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				//DEBUG*/ logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling onCommandReturn");
 				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(value)]);
-				_tesla.setClimateMode(_vehicle_id, method(:onCommandReturn), mode_chosen);
+				_tesla.setClimateMode(_vehicle_vin, method(:onCommandReturn), mode_chosen);
 				break;
 
 			case ACTION_TYPE_REFRESH:
@@ -1177,7 +958,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		if (_vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
+		if (_vehicle_vin == null || _vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
 			//DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
@@ -1195,10 +976,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
-				//DEBUG*/ logMessage("stateMachine: Waking vehicle");
+				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
 				_need_wake = false; // Do it only once
 				_wake_done = false;
-				_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+				_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
 			}
 			return;
 		}
@@ -1225,10 +1006,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_lastDataRun = System.getTimer();
 		// 2023-03-25 logMessage("StateMachine: getVehicleData");
-		_tesla.getVehicleData(_vehicle_id, method(:onReceiveVehicleData));
+		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
 	}
 
 	function workerTimer() {
+		// If we have changed our settings, update
+		if (gSettingsChanged) {
+			gSettingsChanged = false;
+			settingsChanged(false);
+		}
 		// We're not waiting for a command to return, we're waiting for an action to be performed
 		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0) {
 			// We're not displaying a message on screen and the last webRequest returned responseCode 200, do you thing actionMenu!
@@ -1291,7 +1077,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
 
-		_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake));
+		_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
 	}
 
 	function wakeCanceled() {
@@ -1306,13 +1092,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function openVentConfirmed() {
 		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_opening)]);
 		//DEBUG*/ logMessage("actionMachine: Open vent - waiting for onCommandReturn");
-		_tesla.vent(_vehicle_id, method(:onCommandReturn), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+		_tesla.vent(_vehicle_vin, method(:onCommandReturn), "vent", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function closeVentConfirmed() {
 	    _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_vent_closing)]);
 		//DEBUG*/ logMessage("actionMachine: Close vent - waiting for onCommandReturn");
-		_tesla.vent(_vehicle_id, method(:onCommandReturn), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
+		_tesla.vent(_vehicle_vin, method(:onCommandReturn), "close", _data._vehicle_data.get("drive_state").get("latitude"), _data._vehicle_data.get("drive_state").get("longitude"));
 	}
 
 	function frunkConfirmed() {
@@ -1320,11 +1106,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var hansshowFrunk = $.getProperty("HansshowFrunk", false, method(:validateBoolean));
 		if (hansshowFrunk) {
 	        _handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("ft") == 0 ? Rez.Strings.label_frunk_opening : Rez.Strings.label_frunk_closing)]);
-			_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
+			_tesla.openTrunk(_vehicle_vin, method(:onCommandReturn), "front");
 		} else {
 			if (_data._vehicle_data.get("vehicle_state").get("ft") == 0) {
 				_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_frunk_opening)]);
-				_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "front");
+				_tesla.openTrunk(_vehicle_vin, method(:onCommandReturn), "front");
 			} else {
 				_handler.invoke([1, -1, Ui.loadResource(Rez.Strings.label_frunk_opened)]);
 	            _stateMachineCounter = 1;
@@ -1335,13 +1121,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function trunkConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Acting on trunk - waiting for onCommandReturn");
 		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(_data._vehicle_data.get("vehicle_state").get("rt") == 0 ? Rez.Strings.label_trunk_opening : Rez.Strings.label_trunk_closing)]);
-		_tesla.openTrunk(_vehicle_id, method(:onCommandReturn), "rear");
+		_tesla.openTrunk(_vehicle_vin, method(:onCommandReturn), "rear");
 	}
 
 	function honkHornConfirmed() {
 		//DEBUG*/ logMessage("actionMachine: Honking - waiting for onCommandReturn");
 		_handler.invoke([$.getProperty("quickReturn", false, method(:validateBoolean)) ? 1 : 2, -1, Ui.loadResource(Rez.Strings.label_honk)]);
-		_tesla.honkHorn(_vehicle_id, method(:onCommandReturn));
+		_tesla.honkHorn(_vehicle_vin, method(:onCommandReturn));
 	}
 
 	function onSelect() {
@@ -1907,11 +1693,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			var size = vehicles.size();
 			var vinsName = new [size];
 			var vinsId = new [size];
+			var vinsVIN = new [size];
+
 			for (var i = 0; i < size; i++) {
 				vinsName[i] = vehicles[i].get("display_name");
 				vinsId[i] = vehicles[i].get("id");
+				vinsVIN[i] = vehicles[i].get("vin");
 			}
-			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, self), Ui.SLIDE_UP);
+			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, vinsVIN, self), Ui.SLIDE_UP);
 		}
 		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
@@ -1956,20 +1745,35 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_check_wake = false;
 
 				_vehicle_id = vehicles[vehicle_index].get("id");
+				if (_useTeslemetry) {
+					_vehicle_vin = vehicles[vehicle_index].get("vin");
+				}
+				else {
+					_vehicle_vin = _vehicle_id;
+				}
 				Storage.setValue("vehicle", _vehicle_id);
+				Storage.setValue("vehicleVIN", _vehicle_vin);
 				Storage.setValue("vehicle_name", vehicles[vehicle_index].get("display_name"));
 
 				_stateMachineCounter = 1;
 				return;
 			} else {
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
+				_stateMachineCounter = 100;
 			}
 		}
 		else {
+			_stateMachineCounter = 50;
 			if (responseCode == 401) {
-				// Unauthorized
-				_resetToken();
-	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				if (_useTeslemetry) {
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+				}
+				else {
+					// Unauthorized
+					_stateMachineCounter = 1;
+					_resetToken();
+					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
@@ -1980,7 +1784,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 	        }
 		}
-		_stateMachineCounter = 1;
 	}
 
 	function onReceiveVehicleData(responseCode, data) {
@@ -2080,12 +1883,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
 							_waitingFirstData = 0;
 							if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
-								//DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
+								/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
 								_need_wake = false;
 								_wake_done = false;
 								_waitingForCommandReturn = false;
 								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-								_tesla.wakeVehicle(_vehicle_id, method(:onReceiveAwake)); // 
+								_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
 								return;
 							}
 						}
@@ -2116,9 +1919,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: WARNING Received NO data or data is NOT a dictionary, ignoring");
 			}
 			_stateMachineCounter = 5;
-			return;
 		}
 		else {
+			_stateMachineCounter = 5;
 			_lastError = responseCode;
 
 			if (_waitingFirstData > 0) { // Reset that counter if what we got was an error packet. We're interested in gap between packets received.
@@ -2146,26 +1949,32 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 				}
 				else if (responseCode == 401) {
-	                // Unauthorized, retry
-	                _need_auth = true;
-	                _resetToken();
-		            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+					if (_useTeslemetry) {
+						_stateMachineCounter = 50;
+						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+					}
+					else {
+						// Unauthorized, retry
+						_need_auth = true;
+						_resetToken();
+						_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+					}
 				}
 				else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
 					_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down!
-					return;
 				}
 				else if (responseCode != -5  && responseCode != -101) { // These are silent errors
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 		        }
 			}
 	    }
-		_stateMachineCounter = 5;
 	}
 
 	function onReceiveAwake(responseCode, data) {
 		//DEBUG*/ logMessage("onReceiveAwake: " + responseCode);
+
+		_stateMachineCounter = 1;
 
 		if (responseCode == 200 || (responseCode == 403 && _vehicle_state != null && _vehicle_state.equals("online") == true)) { // If we get 403, check to see if we saw it online since some country do not accept waking remotely
 			_wake_done = true;
@@ -2185,9 +1994,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				return;
 			}
 			else if (responseCode == 401) { // Unauthorized, retry
-				_resetToken();
-				_need_auth = true;
-				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				if (_useTeslemetry) {
+					_stateMachineCounter = 50;
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+				}
+				else {
+					_resetToken();
+					_need_auth = true;
+					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
 	            _handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
@@ -2198,7 +2013,6 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			}
 		}
-		_stateMachineCounter = 1;
 	}
 
 	function onCommandReturn(responseCode, data) {

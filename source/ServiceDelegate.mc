@@ -24,7 +24,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         var token = Storage.getValue("token");
-        var vehicle = Storage.getValue("vehicle");
+        var vehicle;
+        if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
+            vehicle = Storage.getValue("vehicleVIN");
+        }
+        else {
+            vehicle = Storage.getValue("vehicle");
+        }
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
             Communications.makeWebRequest(
@@ -160,12 +166,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
 class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
     var _fromTokenRefresh;
+    var _fromTeslemetry;
     hidden var _serverAPILocation;
 
     function initialize() {
         System.ServiceDelegate.initialize();
         _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
         _fromTokenRefresh = false;
+        _fromTeslemetry = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
             //DEBUG*/ logMessage("Init: tokens <- prop");
@@ -188,7 +196,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
         }
 
         var token = _data.get("token");
-        var vehicle = Storage.getValue("vehicle");
+        var vehicle;
+        if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
+            _fromTeslemetry = true;
+            vehicle = Storage.getValue("vehicleVIN");
+        }
+        else {
+            _fromTeslemetry = false;
+            vehicle = Storage.getValue("vehicle");
+        }
         if (token != null && vehicle != null) {
             //DEBUG*/ logMessage("onTemporalEvent getting data");
             _fromTokenRefresh = false;
@@ -270,7 +286,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         }
         else if (responseCode == 401) {
-            if (_fromTokenRefresh == false) {
+            if (_fromTokenRefresh == false && _fromTeslemetry == false) {
                 refreshAccessToken();
                 return;
             }

@@ -196,11 +196,13 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             var size = vehicles.size();
             var vinsName = new [size];
             var vinsId = new [size];
+            var vinsVIN = new [size];
             for (var i = 0; i < size; i++) {
                 vinsName[i] = vehicles[i].get("display_name");
                 vinsId[i] = vehicles[i].get("id");
+                vinsVIN[i] = vehicles[i].get("vin");
             }
-            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, _controller), Ui.SLIDE_UP);
+            Ui.switchToView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, vinsVIN, _controller), Ui.SLIDE_UP);
         } else {
             _controller._handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_error) + responseCode]);
         }

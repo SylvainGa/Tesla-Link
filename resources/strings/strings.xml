@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V7.17.1</string>
+    <string id="AppNameVersion">Tesla Link V7.19.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -75,15 +75,16 @@
     <string id="menu_label_ideal_battery_range">Ideal</string>
 
 	<!--  Items in Settings only -->
-    <string id="setting_token_label">API REFRESH Token (optional) </string>
-    <string id="setting_token_prompt">Enter your Tesla Account token</string>
+    <string id="setting_token_label">API Token</string>
+    <string id="setting_token_prompt">Tesla Refresh token (optional) or Teslemetry Token (required)</string>
+    <string id="setting_teslemetry">Use Teslemetry API?</string>
     <string id="setting_enhancedTouch">Enhanced touch experience?</string>
     <string id="setting_useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
     <string id="setting_screenBottomLeft">For screen bottom left</string>
     <string id="setting_screenBottomRight">For screen bottom right</string>
     <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
-    <string id="setting_api_server_location_label">Location of Tesla's API servers?</string>
-    <string id="setting_auth_server_location_label">Location of Tesla's Auth servers?</string>
+    <string id="setting_api_server_location_label">Location of Tesla's or Teslemetry API servers?</string>
+    <string id="setting_auth_server_location_label">Location of Tesla's Auth servers (not used by Teslemetry)?</string>
     <string id="setting_server_location_prompt">Enter the server domain name</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>
 	<string id="menu_label_vent">Vent</string>
@@ -172,6 +173,7 @@
     <string id="label_still_waiting_data">Still waiting for data</string>
     <string id="label_ask_manual_wake">Please manually wake\nthe vehicle</string>
     <string id="label_too_many_request">Too many requests\nslowing down</string>
+    <string id="label_no_token">Token missing</string>
 
 	<!--  Popup text -->
     <string id="label_open_frunk">Open Frunk?</string>

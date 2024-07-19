@@ -74,15 +74,16 @@
     <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">API REFRESH Token (optional) </string>
-    <string id="setting_token_prompt">Gib deinen Tesla Account token ein</string>
+    <string id="setting_token_label">API Token</string>
+    <string id="setting_token_prompt">Tesla Refresh-token (optioneel) of Teslemetry-token (vereist)</string>
+    <string id="setting_teslemetry">Gebruik de Telemetry-API?</string>
     <string id="setting_enhancedTouch">Verbesserte Touch-Funktionen?</string>
     <string id="setting_useTouch">Nutze Touch (für Geräte mit Knöpfen und Touchscreen)?</string>
     <string id="setting_screenBottomLeft">Für Bildschirmbereich unten links</string>
     <string id="setting_screenBottomRight">Für Bildschirmbereich unten rechts</string>
     <string id="setting_HansshowFrunk">Fahrzeug hat elektr. Frunk von Hansshow?</string>
-    <string id="setting_api_server_location_label">Standort des Tesla API servers?</string>
-    <string id="setting_auth_server_location_label">Standort des Tesla Auth servers?</string>
+    <string id="setting_api_server_location_label">Locatie van Tesla's of Telemetry API-servers?</string>
+    <string id="setting_auth_server_location_label">Standort des Tesla Auth servers (niet gebruikt door Telemetrie)?</string>
     <string id="setting_server_location_prompt">Gib den Server domain name ein</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
     <string id="menu_label_vent">Fensterspalt</string>
@@ -171,6 +172,7 @@
     <string id="label_still_waiting_data">Still waiting for data</string>  <!--  NEW -->
     <string id="label_ask_manual_wake">Please manually wake\nthe vehicle</string>  <!--  NEW -->
     <string id="label_too_many_request">Too many requests\nslowing down</string>  <!--  NEW -->
+    <string id="label_no_token">Token ontbreekt</string>
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>

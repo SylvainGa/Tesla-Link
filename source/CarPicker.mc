@@ -20,13 +20,15 @@ class CarPicker extends WatchUi.Picker {
 class CarPickerDelegate extends WatchUi.PickerDelegate {
     var _carsName;
     var _carsId;
+    var _carsVIN;
     var _controller;
 
-    function initialize (carsName, carsId, controller) {
+    function initialize (carsName, carsId, carsVIN, controller) {
         PickerDelegate.initialize();
 
         _carsName = carsName;
         _carsId = carsId;
+        _carsVIN = carsVIN;
         _controller = controller;
         //DEBUG*/ logMessage("CarPickerDelegate: _stateMachineCounter was " + _controller._stateMachineCounter);
         _controller._stateMachineCounter = -1;
@@ -54,6 +56,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                 //DEBUG*/ logMessage("CarPickerDelegate: Got a match!");
                 if (Storage.getValue("vehicle") != _carsId[i]) { // If it's a new car, start fresh
                     Storage.setValue("vehicle", _carsId[i]);
+                    Storage.setValue("vehicleVIN", _carsVIN[i]);
                     Storage.setValue("vehicle_name", _selected);
 
                     // Start fresh as if we just loaded
@@ -65,6 +68,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     _controller._wakeWasConfirmed = false;
             		_controller._vehicle_state = "online";
                     _controller._vehicle_id = _carsId[i];
+                    _controller._vehicle_vin = _carsVIN[i];
                 }
                 break;
             }

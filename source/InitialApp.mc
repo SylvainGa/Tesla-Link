@@ -51,7 +51,7 @@ class TeslaLink extends App.AppBase {
     (:can_glance)
 	function onSettingsChanged() {
 		//DEBUG*/ logMessage("App: Settings changed");
-        gSettingsChanged = true; // Only relevant in Glance as it will recalculate some class variables
+        gSettingsChanged = true; 
         Ui.requestUpdate();
     }
 
