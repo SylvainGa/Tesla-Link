@@ -417,10 +417,10 @@ class Tesla {
         genericPost(url, notify);
     }
 
-    function mediaVolumeDown(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_down?use_command_protocol=1";
-        genericPost(url, notify);
-    }
+    // function mediaVolumeDown(vehicle, notify) {
+    //     var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_down?use_command_protocol=1";
+    //     genericPost(url, notify);
+    // }
 
     function adjustVolume(vehicle, volume, notify) {
         var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/adjust_volume?use_command_protocol=1";

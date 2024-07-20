@@ -1624,6 +1624,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						} else {
 							_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+						}
 						break;
 
 					default:

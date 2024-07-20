@@ -40,9 +40,9 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_UP, "Value" => 0, "Tick" => System.getTimer()});
             //_controller._tesla.mediaVolumeUp(_vehicle, method(:onCommandReturn));
             var media_volume = Storage.getValue("media_volume");
-            var media_volume_inc = Storage.getValue("media_volume_inc");
+            var media_volume_chg = Storage.getValue("media_volume_inc");
             var media_volume_max = Storage.getValue("media_volume_max");
-            media_volume += media_volume_inc;
+            media_volume += media_volume_chg;
             if (media_volume > media_volume_max) {
                 media_volume = media_volume_max;
             }
@@ -77,7 +77,16 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         if (_view._showVolume) {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onNextPage volume down");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_DOWN, "Value" => 0, "Tick" => System.getTimer()});
-            _controller._tesla.mediaVolumeDown(_vehicle, method(:onCommandReturn));
+            //_controller._tesla.mediaVolumeDown(_vehicle, method(:onCommandReturn));
+            var media_volume = Storage.getValue("media_volume");
+            var media_volume_chg = Storage.getValue("media_volume_inc");
+            var media_volume_max = Storage.getValue("media_volume_max");
+            media_volume -= media_volume_chg;
+            if (media_volume < 0.0) {
+                media_volume = 0.0;
+            }
+            //Storage.setValue("media_volume", media_volume);
+            _controller._tesla.adjustVolume(_vehicle, media_volume, method(:onCommandReturn));
         }
         else {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onNextPage previous song");
@@ -116,6 +125,10 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 		var x = coords[0];
 		var y = coords[1];
 
+        var media_volume = Storage.getValue("media_volume");
+        var media_volume_chg = Storage.getValue("media_volume_inc");
+        var media_volume_max = Storage.getValue("media_volume_max");
+
         // Center of screen where play button is
         if (x > width / 2 - bm_width / 2 && x < width / 2 + bm_width / 2 && y > height / 2 - bm_height / 2 + _fontHeight - height / 20 && y < height / 2 + bm_height / 2 + _fontHeight - height / 20) {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onTap Play toggle");
@@ -134,23 +147,27 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
             else {
                 //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onTap volume down");
                 //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_DOWN, "Value" => 0, "Tick" => System.getTimer()});
-                _controller._tesla.mediaVolumeDown(_vehicle, method(:onCommandReturn));
+                //_controller._tesla.mediaVolumeDown(_vehicle, method(:onCommandReturn));
+                media_volume -= media_volume_chg;
+                if (media_volume < 0.0) {
+                    media_volume = 0.0;
+                }
+                //Storage.setValue("media_volume", media_volume);
+                _controller._tesla.adjustVolume(_vehicle, media_volume, method(:onCommandReturn));
             }
         }
         // Top right
         else if (y < height / 2 + _fontHeight - height / 20) {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onTap next song");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_NEXT_SONG, "Value" => 0, "Tick" => System.getTimer()});
+            //_controller._tesla.mediaVolumeUp(_vehicle, method(:onCommandReturn));
             _controller._tesla.mediaNextTrack(_vehicle, method(:onCommandReturn));
         }
         // Bottom right
         else {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onTap volume up");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_UP, "Value" => 0, "Tick" => System.getTimer()});
-            var media_volume = Storage.getValue("media_volume");
-            var media_volume_inc = Storage.getValue("media_volume_inc");
-            var media_volume_max = Storage.getValue("media_volume_max");
-            media_volume += media_volume_inc;
+            media_volume += media_volume_chg;
             if (media_volume > media_volume_max) {
                 media_volume = media_volume_max;
             }
