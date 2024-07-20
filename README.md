@@ -46,6 +46,7 @@ You can find more details on how to use the application by reading the [Operatin
 ## Changelog since forking from srwalter:
 V7.19.0 Added the following
 - Teslemetry as a proxy to the Tesla Fleet API. Selectable in the App configuration. See documentation on how to use. Tesla-Link Tessie remains unchanged.
+- You can toggle the locking of the vehicle when launched from complications (ie, a watch face like Crystal Tesla), 
 - Compiled with CIQ 7.2.1
 
 V7.18.0 Fixed the 412 error message thanks to a post I saw in the teslamate GitHub

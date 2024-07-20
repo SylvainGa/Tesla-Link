@@ -1,5 +1,6 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics;
+using Toybox.Application.Storage;
 
 class MediaControlDelegate extends Ui.BehaviorDelegate {
     var _view;
@@ -37,7 +38,17 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         if (_view._showVolume) {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onSelect volume up");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_UP, "Value" => 0, "Tick" => System.getTimer()});
-            _controller._tesla.mediaVolumeUp(_vehicle, method(:onCommandReturn));
+            //_controller._tesla.mediaVolumeUp(_vehicle, method(:onCommandReturn));
+            var media_volume = Storage.getValue("media_volume");
+            var media_volume_inc = Storage.getValue("media_volume_inc");
+            var media_volume_max = Storage.getValue("media_volume_max");
+            media_volume += media_volume_inc;
+            if (media_volume > media_volume_max) {
+                media_volume = media_volume_max;
+            }
+            //Storage.setValue("media_volume", media_volume);
+            _controller._tesla.adjustVolume(_vehicle, media_volume, method(:onCommandReturn));
+
         }
         else {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onSelect next song");
@@ -136,7 +147,15 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         else {
             //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onTap volume up");
             //_controller._pendingActionRequests.add({"Action" => ACTION_TYPE_MEDIA_CONTROL, "Option" => ACTION_OPTION_MEDIA_VOLUME_UP, "Value" => 0, "Tick" => System.getTimer()});
-            _controller._tesla.mediaVolumeUp(_vehicle, method(:onCommandReturn));
+            var media_volume = Storage.getValue("media_volume");
+            var media_volume_inc = Storage.getValue("media_volume_inc");
+            var media_volume_max = Storage.getValue("media_volume_max");
+            media_volume += media_volume_inc;
+            if (media_volume > media_volume_max) {
+                media_volume = media_volume_max;
+            }
+            //Storage.setValue("media_volume", media_volume);
+            _controller._tesla.adjustVolume(_vehicle, media_volume, method(:onCommandReturn));
         }
 
         Ui.requestUpdate();
@@ -152,7 +171,19 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 		}
 
 		if (responseCode == 200) {
-            _controller._stateMachineCounter = 5; // Get new vehicle data after 0.5sec so it has time to process it
+			if (data != null && data instanceof Lang.Dictionary) {
+				var response = data.get("response");
+				/*DEBUG*/ logMessage("onCommandReturn: received " + response);
+				if (response != null && response instanceof Lang.Dictionary && response.get("result") == false) {
+                    if (response.get("reason").equals("user_not_present") == true) {
+            			_handler.invoke(Ui.loadResource(Rez.Strings.label_no_user));
+                        _controller._stateMachineCounter = 20; // Next query event in two seconds
+                    }
+                }
+            }
+            else {
+                _controller._stateMachineCounter = 5; // Get new vehicle data after 0.5sec so it has time to process it
+            }
         }
         else {
             _controller._stateMachineCounter = 20; // Next query event in two seconds

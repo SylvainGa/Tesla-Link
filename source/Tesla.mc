@@ -403,28 +403,43 @@ class Tesla {
     }
 
     function mediaTogglePlayback(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_toggle_playback";
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_toggle_playback?use_command_protocol=1";
         genericPost(url, notify);
     }
 
     function mediaPrevTrack(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_prev_track";
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_prev_track?use_command_protocol=1";
         genericPost(url, notify);
     }
 
     function mediaNextTrack(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_next_track";
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_next_track?use_command_protocol=1";
         genericPost(url, notify);
     }
 
     function mediaVolumeDown(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_down";
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_down?use_command_protocol=1";
         genericPost(url, notify);
     }
 
-    function mediaVolumeUp(vehicle, notify) {
-        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/media_volume_up";
-        genericPost(url, notify);
+    function adjustVolume(vehicle, volume, notify) {
+        var url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/command/adjust_volume?use_command_protocol=1";
+        Communications.makeWebRequest(
+            url,
+            {
+                "volume" => volume,
+            },
+            {
+                :method => Communications.HTTP_REQUEST_METHOD_POST,
+                :headers => {
+                    "Authorization" => _token,
+				   "User-Agent" => "Tesla-Link for Garmin",
+                   "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
+                },
+                :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            },
+            notify
+        );
     }
 
     function revoke(notify) {

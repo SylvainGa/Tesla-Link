@@ -87,6 +87,7 @@
             <listEntry value="3">@Strings.menu_label_open_port</listEntry>
             <listEntry value="4">@Strings.menu_label_vent</listEntry>
             <listEntry value="5">@Strings.menu_label_climate</listEntry>
+            <listEntry value="6">@Strings.menu_label_toggle_lock</listEntry>
             <listEntry value="0">@Strings.menu_label_none</listEntry>
         </settingConfig>
     </setting>

@@ -72,6 +72,7 @@
     <string id="menu_label_battery_range">Rated</string>  <!--  NEW -->
     <string id="menu_label_est_battery_range">Estimated</string>  <!--  NEW -->
     <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
+    <string id="menu_label_toggle_lock">Toggle vehicle locking</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API Token</string>
@@ -173,6 +174,7 @@
     <string id="label_ask_manual_wake">Please manually wake\nthe vehicle</string>  <!--  NEW -->
     <string id="label_too_many_request">Too many requests\nslowing down</string>  <!--  NEW -->
     <string id="label_no_token">Token saknas</string>
+    <string id="label_no_user">Audio off</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Öppna frunk</string>

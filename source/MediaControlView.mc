@@ -55,7 +55,7 @@ class MediaControlView extends Ui.View {
         var now_playing_title = Storage.getValue("now_playing_title");
         var player_state = Storage.getValue("media_playback_status");
         var bm_player = (player_state == null || player_state.equals("Stopped")) ? _bm_play_song : _bm_pause_song;
-        var media_volume = Storage.getValue("media_volume");
+        var media_volume = (Storage.getValue("media_volume") * 10).toNumber();
 
         if (_useTouch) {
             var image_x_left = width / 4 - bm_width / 2;
@@ -99,7 +99,7 @@ class MediaControlView extends Ui.View {
 
         if (_text != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
-			dc.drawText(width / 2, height - _fontHeight, Graphics.FONT_TINY, _text, Graphics.TEXT_JUSTIFY_CENTER);
+			dc.drawText(width / 2, height - _fontHeight * 2, Graphics.FONT_TINY, _text, Graphics.TEXT_JUSTIFY_CENTER);
             _text = null;
         }
     }

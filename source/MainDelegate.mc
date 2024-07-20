@@ -1169,10 +1169,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		if (!_data._vehicle_data.get("vehicle_state").get("locked")) {
-			_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
-		} else {
+		if (_data._vehicle_data.get("vehicle_state").get("locked")) {
 			_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+		} else {
+			_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 		}
 	}
 
@@ -1619,6 +1619,13 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						_pendingActionRequests.add({"Action" => ACTION_TYPE_CLIMATE_ON, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
 						break;
 
+					case 6:
+						if (_data._vehicle_data.get("vehicle_state").get("locked")) {
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+						} else {
+							_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+						break;
+
 					default:
 						//DEBUG 2023-10-02*/ logMessage("onHold: Upper Left WARNING Invalid");
 						break;
@@ -1826,7 +1833,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							var media_info = response.get("vehicle_state").get("media_info");
 							Storage.setValue("media_playback_status", media_info.get("media_playback_status"));
 							Storage.setValue("now_playing_title", media_info.get("now_playing_title"));
-							Storage.setValue("media_volume", ($.validateFloat(media_info.get("audio_volume"), 0.0) * 10).toNumber());
+							Storage.setValue("media_volume", ($.validateFloat(media_info.get("audio_volume"), 0.0)).toFloat());
+							Storage.setValue("media_volume_inc", ($.validateFloat(media_info.get("audio_volume_increment"), (1.0/3.0))).toFloat());
+							Storage.setValue("media_volume_max", ($.validateFloat(media_info.get("audio_volume_max"), 11.0)).toFloat());
 						}
 
 						// Update the glance data
