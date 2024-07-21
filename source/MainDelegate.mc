@@ -1880,6 +1880,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 							status.put("vehicleAwake", "online");
 
 							Storage.setValue("status", status);
+							logMessage("onReceiveVehicleData: calling sendComplication");
 							$.sendComplication(status);
 							
 							//2023-03-03 logMessage("onReceiveVehicleData: set status to '" + Storage.getValue("status") + "'");

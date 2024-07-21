@@ -32,7 +32,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             vehicle = Storage.getValue("vehicle");
         }
         if (token != null && vehicle != null) {
-            //DEBUG*/ logMessage("onTemporalEvent getting data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             Communications.makeWebRequest(
                 "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
                 {
@@ -47,25 +47,25 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            //DEBUG*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             Background.exit({"responseCode" => 401});
         }
     }
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
-        //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
+        //DEBUG 2023-10-02*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("BG-onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG 2023-10-02*/ var myStats = System.getSystemStats();
-        //DEBUG 2023-10-02*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG 2023-10-02*/ logMessage("BG-Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
     
         var data = Background.getBackgroundData();
         if (data == null) {
             data = {};
 		}
         else {
-            //DEBUG*/ logMessage("onReceiveVehicleData already has background data! -> '" + data + "'");
+            //DEBUG*/ logMessage("BG-onReceiveVehicleData already has background data! -> '" + data + "'");
         }
 
         data.put("responseCode", responseCode);
@@ -157,7 +157,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             data.put("vehicleAwake", "asleep");
         }
 
-        //DEBUG*/ logMessage("onReceiveVehicleData exiting with data=" + data);
+        //DEBUG*/ logMessage("BG-onReceiveVehicleData exiting with data=" + data);
         Background.exit(data);
     }
 }
@@ -176,7 +176,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _fromTeslemetry = false;
         _data = Background.getBackgroundData();
         if (_data == null) {
-            //DEBUG*/ logMessage("Init: tokens <- prop");
+            //DEBUG*/ logMessage("BG-Init: tokens <- prop");
             _data = {};
             _data.put("token", Storage.getValue("token"));
             _data.put("TokenExpiresIn", Storage.getValue("TokenExpiresIn"));
@@ -184,14 +184,14 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("refreshToken", Properties.getValue("refreshToken"));
         }
         else {
-            //DEBUG*/ logMessage("Init: tokens <- buffer");
+            //DEBUG*/ logMessage("BG-Init: tokens <- buffer");
         }
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            //DEBUG 2023-10-02*/ logMessage("onTemporalEvent: In main view, skipping reading data");
+            //DEBUG 2023-10-02*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
@@ -206,7 +206,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             vehicle = Storage.getValue("vehicle");
         }
         if (token != null && vehicle != null) {
-            //DEBUG*/ logMessage("onTemporalEvent getting data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             _fromTokenRefresh = false;
             Communications.makeWebRequest(
                 "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
@@ -222,7 +222,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            //DEBUG 2023-10-02*/ logMessage("onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG 2023-10-02*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
             $.sendComplication(_data);
@@ -233,11 +233,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: " + responseCode);
-        //DEBUG*/ logMessage("onReceiveVehicleData: responseData=" + responseData);
+        /*DEBUG*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("BG-onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG*/ var myStats = System.getSystemStats();
-        //DEBUG*/ logMessage("Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
+        //DEBUG*/ logMessage("BG-Total memory: " + myStats.totalMemory + " Used memory: " + myStats.usedMemory + " Free memory: " + myStats.freeMemory);
 
         _data.put("responseCode", responseCode);
 
@@ -291,7 +291,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 return;
             }
             else {
-                //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: !!! refreshAccessToken!");
+                //DEBUG 2023-10-02*/ logMessage("BG-onReceiveVehicleData: !!! refreshAccessToken!");
             }
         }
         else if (responseCode == 408) {
@@ -302,19 +302,20 @@ class MyServiceDelegate extends System.ServiceDelegate {
             if (!System.getDeviceSettings().phoneConnected) {
                 // var ignore = Storage.getValue("PhoneLostDontAsk");
                 // if (ignore == null) {
-                    //DEBUG 2023-10-02*/ logMessage("onReceiveVehicleData: Not connected to phone?");
+                    //DEBUG 2023-10-02*/ logMessage("BG-onReceiveVehicleData: Not connected to phone?");
                     Background.requestApplicationWake(App.loadResource(Rez.Strings.label_AskIfForgotPhone));
                 // }
             }
         }
         //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
+        /*DEBUG*/ logMessage("BG-Sending background complication");
         $.sendComplication(_data);
 
         Background.exit(_data);
     }
 
     function testAwake() {
-        //DEBUG*/ logMessage("testAwake called");
+        /*DEBUG*/ logMessage("BG-testAwake called");
         var token = _data.get("token");
 
         Communications.makeWebRequest(
@@ -332,8 +333,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
 	function onReceiveVehicles(responseCode, data) {
-		//DEBUG 2023-10-02*/ logMessage("onReceiveVehicles: " + responseCode);
-		//logMessage("onReceiveVehicles: data is " + data);
+		/*DEBUG*/ logMessage("BG-onReceiveVehicles: " + responseCode);
+		//logMessage("BG-onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
@@ -352,17 +353,17 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 }
 
                 if (vehicle_index == size) {
-                    //DEBUG 2023-10-02*/ logMessage("onReceiveVehicles: Not found");
+                    //DEBUG 2023-10-02*/ logMessage("BG-onReceiveVehicles: Not found");
                     _data.put("vehicleAwake", "Not found");
                 }
                 else {
                     var vehicle_state = vehicles[vehicle_index].get("state");
-                    //DEBUG*/ logMessage("onReceiveVehicles: vehicle state: " + vehicle_state);
+                    //DEBUG*/ logMessage("BG-onReceiveVehicles: vehicle state: " + vehicle_state);
                     _data.put("vehicleAwake", vehicle_state);
 				}
 			}
             else {
-                //DEBUG 2023-10-02*/ logMessage("onReceiveVehicles: No vehicle");
+                //DEBUG 2023-10-02*/ logMessage("BG-onReceiveVehicles: No vehicle");
                 _data.put("vehicleAwake", "No vehicle");
             }
         }
@@ -377,10 +378,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
     function refreshAccessToken() {
-        //DEBUG*/ logMessage("refreshAccessToken called");
+        //DEBUG*/ logMessage("BG-refreshAccessToken called");
         var refreshToken = _data.get("refreshToken");
         if (refreshToken == null || refreshToken.equals("") == true) {
-            //DEBUG 2023-10-02*/ logMessage("refreshAccessToken: WARNIGN refreshToken in data stream empty!");
+            //DEBUG 2023-10-02*/ logMessage("BG-refreshAccessToken: WARNIGN refreshToken in data stream empty!");
             refreshToken = Properties.getValue("refreshToken");
         }
         if (refreshToken != null && refreshToken.equals("") == false) {
@@ -412,7 +413,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     // Do NOT call from a background process since we're setting registry data here
     function onReceiveToken(responseCode, data) {
-        //DEBUG 2023-10-02*/ logMessage("onReceiveToken: " + responseCode);
+        //DEBUG 2023-10-02*/ logMessage("BG-onReceiveToken: " + responseCode);
 
         if (responseCode == 200) {
             var token = data["access_token"];
@@ -424,9 +425,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
 			//DEBUG*/ var expireAt = new Time.Moment(created_at + expires_in);
 			//DEBUG*/ var clockTime = Gregorian.info(expireAt, Time.FORMAT_MEDIUM);
 			//DEBUG*/ var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
-			//DEBUG*/ logMessage("onReceiveToken: Expires at " + dateStr);
+			//DEBUG*/ logMessage("BG-onReceiveToken: Expires at " + dateStr);
 
-            //logMessage("onReceiveToken: state field is '" + state + "'");
+            //logMessage("BG-onReceiveToken: state field is '" + state + "'");
 
             _data.put("token", token);
             _data.put("TokenExpiresIn", expires_in);
@@ -435,10 +436,10 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("refreshToken", refreshToken);
             }
             else {
-                //DEBUG 2023-10-02*/ logMessage("onReceiveToken: WARNIGN refreshToken received was empty!");
+                //DEBUG 2023-10-02*/ logMessage("BG-onReceiveToken: WARNIGN refreshToken received was empty!");
             }
 
-            //DEBUG*/ logMessage("onReceiveToken getting data");
+            //DEBUG*/ logMessage("BG-onReceiveToken getting data");
             var vehicle = Storage.getValue("vehicle");
 
             _fromTokenRefresh = true;

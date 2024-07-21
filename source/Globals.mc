@@ -191,7 +191,7 @@ function sendComplication(data) {
 			}
 		}
 
-		//DEBUG 2023-10-02*/ logMessage("Sending Complication: " + value);
+		/*DEBUG*/ logMessage("Sending Complication: " + value);
 		// Send it to whoever is listening
 		var comp = {
 			:value => value,
@@ -202,7 +202,12 @@ function sendComplication(data) {
 		try {
 			Complications.updateComplication(0, comp);
 		}
-		catch (e) {}
+		catch (e) {
+			/*DEBUG*/ logMessage("Error sending Complication!");
+		}
+	}
+	else {
+		/*DEBUG*/ logMessage("Complication not available?");
 	}
 }
 
