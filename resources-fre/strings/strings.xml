@@ -73,18 +73,22 @@
     <string id="menu_label_est_battery_range">Estimée</string>  <!--  NEW -->
     <string id="menu_label_ideal_battery_range">Idéale</string>  <!--  NEW -->
     <string id="menu_label_toggle_lock">Basculer le verrouillage du véhicule</string>
+    <string id="menu_label_lock">Verrouiller le vehicle</string>
+    <string id="menu_label_unlock">Déverrouiller le vehicle</string>
     
     <!--  Items in Settings only -->
-    <string id="setting_token_label">Jeton d'API</string>
-    <string id="setting_token_prompt">Jeton Tesla (optionnel) ou Teslemetry (requis)</string>
-    <string id="setting_teslemetry">Utilisez l'API de Teslemetry ?</string>
+    <string id="setting_token_label">Jeton d'API (requis pour Teslemetry et Tessie)</string>
+    <string id="setting_which_api">Quel API</string>
+    <string id="setting_tesla">Tesla</string>
+    <string id="setting_tessie">Tessie</string>
+    <string id="setting_teslemetry">Teslemetry</string>
     <string id="setting_enhancedTouch">Touche améliorée ?</string>
     <string id="setting_useTouch">Utilisez l'écran tactile (pour les montres avec boutons et écran tactile) ?</string>
     <string id="setting_screenBottomLeft">Au bas de l'écran à gauche</string>
     <string id="setting_screenBottomRight">Au bas de l'écran à droite</string>
     <string id="setting_HansshowFrunk">Possède un Hansshow frunk ?</string>
-    <string id="setting_api_server_location_label">Location du serveur API de Tesla ou Teslemetry</string>
-    <string id="setting_auth_server_location_label">Location du serveur Auth de Tesla (non requis pour Teslemetry)</string>
+    <string id="setting_api_server_location_label">URL de l'API (laisser vide pour valeur pas défaut)</string>
+    <string id="setting_auth_server_location_label">URL du serveur Auth de Tesla (non requis pour Teslemetry et Tessie)</string>
     <string id="setting_server_location_prompt">Entrez le nom de domaine du serveur</string>
 	<string id="setting_menu_order">Ordre du menu (voir guide d'opération pour aide)</string>
     <string id="menu_label_vent">Ventilé</string>

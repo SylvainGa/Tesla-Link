@@ -14,7 +14,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function initialize() {
         System.ServiceDelegate.initialize();
-        _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
+        _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
+        if (_serverAPILocation.equals("")) {
+            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
+            _serverAPILocation = APIs[$.getProperty("whichAPI", 0, method(:validateNumber))];
+        }
     }
 
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
@@ -25,7 +29,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         var token = Storage.getValue("token");
         var vehicle;
-        if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
+        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
             vehicle = Storage.getValue("vehicleVIN");
         }
         else {
@@ -166,14 +170,21 @@ class MyServiceDelegate extends System.ServiceDelegate {
 class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
     var _fromTokenRefresh;
-    var _fromTeslemetry;
+    var _fromTesla;
     hidden var _serverAPILocation;
 
     function initialize() {
         System.ServiceDelegate.initialize();
-        _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
+        _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
+        if (_serverAPILocation.equals("")) {
+            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
+            _serverAPILocation = APIs[$.getProperty("whichAPI", 0, method(:validateNumber))];
+        }
+
+        /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
+
         _fromTokenRefresh = false;
-        _fromTeslemetry = false;
+        _fromTesla = true;
         _data = Background.getBackgroundData();
         if (_data == null) {
             //DEBUG*/ logMessage("BG-Init: tokens <- prop");
@@ -197,12 +208,12 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         var token = _data.get("token");
         var vehicle;
-        if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
-            _fromTeslemetry = true;
+        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
+            _fromTesla = false;
             vehicle = Storage.getValue("vehicleVIN");
         }
         else {
-            _fromTeslemetry = false;
+            _fromTesla = true;
             vehicle = Storage.getValue("vehicle");
         }
         if (token != null && vehicle != null) {
@@ -286,7 +297,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         }
         else if (responseCode == 401) {
-            if (_fromTokenRefresh == false && _fromTeslemetry == false) {
+            if (_fromTokenRefresh == false && _fromTesla == true) {
                 refreshAccessToken();
                 return;
             }

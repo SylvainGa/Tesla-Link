@@ -15,7 +15,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         BehaviorDelegate.initialize();
         _view = view;
         _controller = controller;
-        if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
+        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
             _vehicle = _controller._vehicle_vin;
         }
         else {

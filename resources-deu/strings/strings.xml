@@ -73,18 +73,22 @@
     <string id="menu_label_est_battery_range">Estimated</string>  <!--  NEW -->
     <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
     <string id="menu_label_toggle_lock">Toggle vehicle locking</string>  <!--  NEW -->
+    <string id="menu_label_lock">Lock vehicle</string>  <!--  NEW -->
+    <string id="menu_label_unlock">Unlock vehicle</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">API Token</string>
-    <string id="setting_token_prompt">Tesla Refresh-token (optioneel) of Teslemetry-token (vereist)</string>
-    <string id="setting_teslemetry">Gebruik de Telemetry-API?</string>
+    <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
+    <string id="setting_which_api">Which API</string>  <!--  NEW -->
+    <string id="setting_tesla">Tesla</string>  <!--  NEW -->
+    <string id="setting_tessie">Tessie</string>  <!--  NEW -->
+    <string id="setting_teslemetry">Teslemetry</string>  <!--  NEW -->
     <string id="setting_enhancedTouch">Verbesserte Touch-Funktionen?</string>
     <string id="setting_useTouch">Nutze Touch (für Geräte mit Knöpfen und Touchscreen)?</string>
     <string id="setting_screenBottomLeft">Für Bildschirmbereich unten links</string>
     <string id="setting_screenBottomRight">Für Bildschirmbereich unten rechts</string>
     <string id="setting_HansshowFrunk">Fahrzeug hat elektr. Frunk von Hansshow?</string>
-    <string id="setting_api_server_location_label">Locatie van Tesla's of Telemetry API-servers?</string>
-    <string id="setting_auth_server_location_label">Standort des Tesla Auth servers (niet gebruikt door Telemetrie)?</string>
+    <string id="setting_api_server_location_label">API URL (leave blank for default value)</string>  <!--  NEW -->
+    <string id="setting_auth_server_location_label">Tesla's Auth servers URL (not used by Teslemetry/Tessie)?</string>  <!--  NEW -->
     <string id="setting_server_location_prompt">Gib den Server domain name ein</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
     <string id="menu_label_vent">Fensterspalt</string>

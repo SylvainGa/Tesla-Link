@@ -77,7 +77,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _tesla;
 	var _data;
 	var _token;
-	var _useTeslemetry;
+	var _useTeslaAPI;
 	var _code_verifier;
 	var _workTimer;
 	var _vehicle_id;
@@ -145,8 +145,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function settingsChanged(fromInit) {
 		_serverAUTHLocation = $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString));
 		_settings = System.getDeviceSettings();
-		if ($.getProperty("useTeslemetry", false, method(:validateBoolean))) {
-			_useTeslemetry = true;
+		if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
+			_useTeslaAPI = false;
 			_vehicle_id = Storage.getValue("vehicle");
 			_vehicle_vin = Storage.getValue("vehicleVIN");
 			_token = Settings.getRefreshToken();
@@ -158,11 +158,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_need_auth = false;
 			_auth_done = true;
 
-			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using teslemetry"); } { logMessage("settingsChanged:Using teslemetry"); }
+			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using teslemetry or Tessie"); } { logMessage("settingsChanged:Using teslemetry or Tessie"); }
 		}
 		else {
 			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using Tesla API"); } { logMessage("settingsChanged:Using Tesla API"); }
-			_useTeslemetry = false;
+			_useTeslaAPI = true;
 			_vehicle_id = Storage.getValue("vehicle");
 			_vehicle_vin = _vehicle_id; // Teslemetry needs a VIN to talk to cars, but Tesla's API need the vehicle_id. 
 			_token = Settings.getToken();
@@ -1627,6 +1627,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						}
 						break;
 
+					case 7:
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_LOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+						break;
+
+					case 8:
+						_pendingActionRequests.add({"Action" => ACTION_TYPE_UNLOCK, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
+						break;
+
 					default:
 						//DEBUG 2023-10-02*/ logMessage("onHold: Upper Left WARNING Invalid");
 						break;
@@ -1753,11 +1761,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				_check_wake = false;
 
 				_vehicle_id = vehicles[vehicle_index].get("id");
-				if (_useTeslemetry) {
-					_vehicle_vin = vehicles[vehicle_index].get("vin");
+				if (_useTeslaAPI) {
+					_vehicle_vin = _vehicle_id;
 				}
 				else {
-					_vehicle_vin = _vehicle_id;
+					_vehicle_vin = vehicles[vehicle_index].get("vin");
 				}
 				Storage.setValue("vehicle", _vehicle_id);
 				Storage.setValue("vehicleVIN", _vehicle_vin);
@@ -1773,14 +1781,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		else {
 			_stateMachineCounter = 50;
 			if (responseCode == 401) {
-				if (_useTeslemetry) {
-					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
-				}
-				else {
+				if (_useTeslaAPI) {
 					// Unauthorized
 					_stateMachineCounter = 1;
 					_resetToken();
 					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				}
+				else {
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
@@ -1960,15 +1968,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 				}
 				else if (responseCode == 401) {
-					if (_useTeslemetry) {
-						_stateMachineCounter = 50;
-						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
-					}
-					else {
+					if (_useTeslaAPI) {
 						// Unauthorized, retry
 						_need_auth = true;
 						_resetToken();
 						_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+					}
+					else {
+						_stateMachineCounter = 50;
+						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 					}
 				}
 				else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
@@ -2005,14 +2013,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				return;
 			}
 			else if (responseCode == 401) { // Unauthorized, retry
-				if (_useTeslemetry) {
-					_stateMachineCounter = 50;
-					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
-				}
-				else {
+				if (_useTeslaAPI) {
 					_resetToken();
 					_need_auth = true;
 					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
+				}
+				else {
+					_stateMachineCounter = 50;
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
 				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429

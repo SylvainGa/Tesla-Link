@@ -73,21 +73,25 @@
     <string id="menu_label_est_battery_range">Estimated</string>  <!--  NEW -->
     <string id="menu_label_ideal_battery_range">Ideal</string>  <!--  NEW -->
     <string id="menu_label_toggle_lock">Toggle vehicle locking</string>  <!--  NEW -->
+    <string id="menu_label_lock">Lock vehicle</string>  <!--  NEW -->
+    <string id="menu_label_unlock">Unlock vehicle</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
-    <string id="setting_token_label">API Token</string>
-    <string id="setting_token_prompt">Tesla Refresh-token (valfritt) eller Teslemetry-token (krävs)</string>
-    <string id="setting_teslemetry">Använd Teslemetry API?</string>
+    <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
+    <string id="setting_which_api">Which API</string>  <!--  NEW -->
+    <string id="setting_tesla">Tesla</string>  <!--  NEW -->
+    <string id="setting_tessie">Tessie</string>  <!--  NEW -->
+    <string id="setting_teslemetry">Teslemetry</string>  <!--  NEW -->
     <string id="setting_enhancedTouch">Förbättrad touch</string>
     <string id="setting_useTouch">Använd pekskärm (om du har både pekskärm och knappar)</string>
     <string id="setting_screenBottomLeft">Skärm nere till vänster</string>
     <string id="setting_screenBottomRight">Skärm nere till höger</string>
     <string id="setting_HansshowFrunk">För Hansshow elektrisk frunk</string>
-    <string id="setting_api_server_location_label">Placering av Teslas eller Teslemetry API-servrar?</string>
-    <string id="setting_auth_server_location_label">Lokalisering av Tesla's Auth servers (not used by Teslemetry)</string>
+    <string id="setting_api_server_location_label">API URL (leave blank for default value)</string>  <!--  NEW -->
+    <string id="setting_auth_server_location_label">Tesla's Auth servers URL (not used by Teslemetry/Tessie)?</string>  <!--  NEW -->
     <string id="setting_server_location_prompt">Serverns domännamn</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>  <!--  NEW -->
-    <string id="menu_label_vent">Ventilation</string>  <!--  NEW -->
+    <string id="menu_label_vent">Vent</string>  <!--  NEW -->
     <string id="menu_label_defrost">Defroster</string>  <!--  NEW -->
 	<string id="menu_label_climate">Climate On</string>  <!--  NEW -->
     <string id="setting_complicationAction">Launch from Complication action</string>  <!--  NEW -->

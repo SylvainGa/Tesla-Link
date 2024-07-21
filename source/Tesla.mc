@@ -9,7 +9,13 @@ class Tesla {
         if (token != null) {
             _token = "Bearer " + token;
         }
-        _serverAPILocation = $.getProperty("serverAPILocation", "owner-api.teslamotors.com", method(:validateString));
+        _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
+        if (_serverAPILocation.equals("")) {
+            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
+            _serverAPILocation = APIs[$.getProperty("whichAPI", 0, method(:validateNumber))];
+        }
+        
+        /*DEBUG*/ logMessage("Tesla: Using " + _serverAPILocation);
     }
 
     hidden function genericGet(url, notify) {

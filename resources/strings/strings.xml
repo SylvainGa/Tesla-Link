@@ -74,18 +74,22 @@
     <string id="menu_label_est_battery_range">Estimated</string>
     <string id="menu_label_ideal_battery_range">Ideal</string>
     <string id="menu_label_toggle_lock">Toggle vehicle locking</string>
+    <string id="menu_label_lock">Lock vehicle</string>
+    <string id="menu_label_unlock">Unlock vehicle</string>
 
 	<!--  Items in Settings only -->
-    <string id="setting_token_label">API Token</string>
-    <string id="setting_token_prompt">Tesla Refresh token (optional) or Teslemetry Token (required)</string>
-    <string id="setting_teslemetry">Use Teslemetry API?</string>
+    <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>
+    <string id="setting_which_api">Which API</string>
+    <string id="setting_tesla">Tesla</string>
+    <string id="setting_tessie">Tessie</string>
+    <string id="setting_teslemetry">Teslemetry</string>
     <string id="setting_enhancedTouch">Enhanced touch experience?</string>
     <string id="setting_useTouch">Use Touch (for devices with both buttons and touchscreen)?</string>
     <string id="setting_screenBottomLeft">For screen bottom left</string>
     <string id="setting_screenBottomRight">For screen bottom right</string>
     <string id="setting_HansshowFrunk">Has a Hansshow powered frunk?</string>
-    <string id="setting_api_server_location_label">Location of Tesla's or Teslemetry API servers?</string>
-    <string id="setting_auth_server_location_label">Location of Tesla's Auth servers (not used by Teslemetry)?</string>
+    <string id="setting_api_server_location_label">API URL (leave blank for default value)</string>
+    <string id="setting_auth_server_location_label">Tesla's Auth servers URL (not used by Teslemetry/Tessie)?</string>
     <string id="setting_server_location_prompt">Enter the server domain name</string>
 	<string id="setting_menu_order">Menu order (see operating guide for help)</string>
 	<string id="menu_label_vent">Vent</string>
