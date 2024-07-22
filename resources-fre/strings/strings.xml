@@ -107,10 +107,11 @@
 	<string id="setting_smallfontsize">Utiliser une police de caractères plus petite en mode aperçu rapide ?</string>
 	<string id="setting_scrollclearsedges">Défilement jusqu'à ce que tout le texte est visible</string>
 	<string id="setting_CrystalTesla">Envoi de Complications avancées à Crystal-Tesla</string>
-	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>  <!--  NEW -->
+	<string id="setting_WarnWhenPhoneNotConnected">Avertir si le téléphone n'est pas connecté à la montre ?</string>
 	<string id="setting_batteryRangeType">Distance à utiliser</string>
-	<string id="setting_askWakeVehicle">Demande de réveiller le véhicule au lancement?</string>  <!--  NEW -->
-	<string id="setting_showVehicleNameInGlance">Afficher le nom du véhicule en mode Glance?</string>  <!--  NEW -->
+	<string id="setting_askWakeVehicle">Demande de réveiller le véhicule au lancement?</string>
+	<string id="setting_showVehicleNameInGlance">Afficher le nom du véhicule en mode Glance?</string>
+	<string id="setting_useTessieCacheMode">Utilisez le mode en cache de Tessie</string>
 
     <!--  Text view -->
     <string id="label_cabin">Temp: </string>

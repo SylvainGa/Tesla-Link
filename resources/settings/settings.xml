@@ -130,16 +130,20 @@
         <settingConfig type="alphaNumeric" />
     </setting>
 
-    <setting propertyKey="@Properties.refreshToken" title="@Strings.setting_token_label">
-        <settingConfig type="alphaNumeric" />
-    </setting>
-
     <setting propertyKey="@Properties.whichAPI" title="@Strings.setting_which_api">
         <settingConfig type="list">
             <listEntry value="0">@Strings.setting_tesla</listEntry>
             <listEntry value="1">@Strings.setting_tessie</listEntry>
             <listEntry value="2">@Strings.setting_teslemetry</listEntry>
         </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.useTessieCacheMode" title="@Strings.setting_useTessieCacheMode">
+        <settingConfig type="boolean" required="true"/>
+    </setting>
+
+    <setting propertyKey="@Properties.refreshToken" title="@Strings.setting_token_label">
+        <settingConfig type="alphaNumeric" />
     </setting>
 
     <setting propertyKey="@Properties.serverAPILocation" title="@Strings.setting_api_server_location_label" prompt="@Strings.setting_server_location_prompt">

@@ -88,6 +88,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _check_wake;
 	var _need_wake;
 	var _wake_done;
+	var _in_menu;
 	var _waitingFirstData;
 	var _wakeWasConfirmed;
 	var _refreshTimeInterval;
@@ -115,6 +116,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		settingsChanged(true);
 
 		_vehicle_state = "online"; // Assume we're online
+		_data._vehicle_state = _vehicle_state;
 		_workTimer = new Timer.Timer();
 		_waitingForCommandReturn = false;
 
@@ -123,6 +125,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_check_wake = false; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
 		_need_wake = false; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
 		_wake_done = true;
+		_in_menu = false;
 		gWaitTime = System.getTimer();
 		_waitingFirstData = 1; // So the Waking up is displayed right away if it's the first time
 		_wakeWasConfirmed = false; // So we only display the Asking to wake only once
@@ -216,7 +219,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_refreshTimeInterval = 4000;
 		}
 
-		_tesla = null;
+		if (_token == null) {
+			_tesla = null;
+		}
+		else {
+			_tesla = new Tesla(_token);
+		}
 	}
 
 	function onReceive(args) {
@@ -974,6 +982,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
+				_in_menu = true;
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
 				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
@@ -1010,6 +1019,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function workerTimer() {
+		if (_in_menu) { // If we're waiting for input in a menu, skip this iteration
+			return;
+		}
+
 		// If we have changed our settings, update
 		if (gSettingsChanged) {
 			gSettingsChanged = false;
@@ -1076,17 +1089,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//DEBUG*/ logMessage("wakeConfirmed: Waking the vehicle");
 
 		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_waking_vehicle)]);
-
+		_in_menu = false;
 		_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
 	}
 
 	function wakeCanceled() {
-		_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
 		gWaitTime = System.getTimer();
 		Storage.setValue("launchedFromComplication", false); // If we came from a watchface complication and we canceled the wake, ignore the complication event
 		//DEBUG*/ logMessage("wakeCancelled:");
-		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
+
+		if (_tesla.getTessieCacheMode()) { 
+			_need_wake = false;
+		}
+		else {
+			_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
+			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
+		}
 		_stateMachineCounter = 1;
+		_in_menu = false;
 	}
 
 	function openVentConfirmed() {
@@ -1716,6 +1736,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				vinsId[i] = vehicles[i].get("id");
 				vinsVIN[i] = vehicles[i].get("vin");
 			}
+			_in_menu = true;
 			Ui.pushView(new CarPicker(vinsName), new CarPickerDelegate(vinsName, vinsId, vinsVIN, self), Ui.SLIDE_UP);
 		}
 		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
@@ -1753,6 +1774,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 
 				_vehicle_state = vehicles[vehicle_index].get("state");
+				_data._vehicle_state = _vehicle_state;
 				//DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
 				if (_vehicle_state.equals("online") == false && _vehicle_id != null && _vehicle_id > 0) { // We're not awake and we have a vehicle ID, next iteration of StateMachine will call the wake function
 					_need_wake = true;
@@ -1820,10 +1842,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			_lastError = null;
 			_vehicle_state = "online"; // We got data so we got to be online
+			_data._vehicle_state = _vehicle_state;
 
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
-			if (data != null && data instanceof Lang.Dictionary) {
-				var response = data.get("response");
+			if (data != null && data instanceof Lang.Dictionary && _tesla != null) {
+				var response;
+				if (_tesla.getTessieCacheMode()) {
+					response = data;
+				}
+				else {
+					response = data.get("response");
+				}
 				//DEBUG*/ logMessage("onReceiveVehicleData: received " + response);
 				if (response != null && response instanceof Lang.Dictionary && response.get("climate_state") != null && response.get("charge_state") != null && response.get("vehicle_state") != null && response.get("drive_state") != null) {
 					if ($.validateLong(response.get("charge_state").get("timestamp"), 0) > _lastTimeStamp) {
@@ -1901,15 +1930,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
 							_waitingFirstData = 0;
-							if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
-								/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
-								_need_wake = false;
-								_wake_done = false;
-								_waitingForCommandReturn = false;
-								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-								_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
-								return;
-							}
+							// if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
+							// 	/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
+							// 	_need_wake = false;
+							// 	_wake_done = false;
+							// 	_waitingForCommandReturn = false;
+							// 	_stateMachineCounter = 1; // Make sure we check on the next workerTimer
+							// 	_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
+							// 	return;
+							// }
 						}
 
 						if (_waitingForCommandReturn) {

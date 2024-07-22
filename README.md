@@ -44,10 +44,17 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
-V7.19.0 Added the following
-- Teslemetry as a proxy to the Tesla Fleet API. Selectable in the App configuration. See documentation on how to use. Tesla-Link Tessie remains unchanged.
-- You can toggle the locking of the vehicle when launched from complications (ie, a watch face like Crystal Tesla), 
+V9.0.0 Is the merging of the Legacy and Tessie app (so a new major version) in one app with some new additions
+- A drop down in the config is used to choose between Tesla, Tessie and Teslemetry as proxy (Teslemetry is new). You don't need to enter the URL anymore as they default to their optimal value. You can still make them point to something else if you prefer
+- You can toggle the locking of the vehicle, lock it or unlock it when launched from complications (ie, a watch face like Crystal Tesla)
+- Media volume adjustments as well as Play/Pause is now working in the Media panel! Still waiting for Tesla to activate the other commands :-(
 - Compiled with CIQ 7.2.1
+
+V8.1.0
+- Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
+- Fixed a crash in the preconditioning code and discrepencies between the SoC when running as a glance
+
+V8.0.0 Replaced Tesla's Owners unsupported API for Tessie's Dev API. See documentation on how to use
 
 V7.18.0 Fixed the 412 error message thanks to a post I saw in the teslamate GitHub
 

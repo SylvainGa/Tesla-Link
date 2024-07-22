@@ -170,8 +170,9 @@ class MyServiceDelegate extends System.ServiceDelegate {
 class MyServiceDelegate extends System.ServiceDelegate {
     var _data;
     var _fromTokenRefresh;
-    var _fromTesla;
+    var _fromWhichAPI;
     hidden var _serverAPILocation;
+
 
     function initialize() {
         System.ServiceDelegate.initialize();
@@ -184,7 +185,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
 
         _fromTokenRefresh = false;
-        _fromTesla = true;
+        _fromWhichAPI = 0;
         _data = Background.getBackgroundData();
         if (_data == null) {
             //DEBUG*/ logMessage("BG-Init: tokens <- prop");
@@ -202,22 +203,21 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            //DEBUG 2023-10-02*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
+            /*DEBUG*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
         var token = _data.get("token");
         var vehicle;
-        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
-            _fromTesla = false;
-            vehicle = Storage.getValue("vehicleVIN");
-        }
-        else {
-            _fromTesla = true;
+        _fromWhichAPI = $.getProperty("whichAPI", 0, method(:validateNumber));
+        if (_fromWhichAPI == 0) {
             vehicle = Storage.getValue("vehicle");
         }
+        else {
+            vehicle = Storage.getValue("vehicleVIN");
+        }
         if (token != null && vehicle != null) {
-            //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
+            /*DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             _fromTokenRefresh = false;
             Communications.makeWebRequest(
                 "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
@@ -233,7 +233,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            //DEBUG 2023-10-02*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            /*DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
             $.sendComplication(_data);
@@ -297,7 +297,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         }
         else if (responseCode == 401) {
-            if (_fromTokenRefresh == false && _fromTesla == true) {
+            if (_fromTokenRefresh == false && _fromWhichAPI == 0) {
                 refreshAccessToken();
                 return;
             }
