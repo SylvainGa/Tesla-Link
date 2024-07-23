@@ -218,7 +218,7 @@ function logMessage(message) {
 	System.println(dateStr + " : " + message);
 }
 
-/* DEBUG
+
 (:release, :background)
 function logMessage(message) {
 }
@@ -250,4 +250,3 @@ function logMessageAndData(message, data) {
 		logMessage(message + " responseCode=" + responseCode + " status=" + status + " timestamp=" + timestamp + " token=" + token + " refreshToken=" + refreshToken + " vehicleAwake=" + vehicleAwake);
 	}
 }
-//DEBUG*/

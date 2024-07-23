@@ -3,7 +3,7 @@
 	<property id="smallfontsize" type="boolean">false</property>
 	<property id="scrollclearsedge" type="boolean">false</property>
 	<property id="refreshToken" type="string"></property>
-	<property id="whichAPI" type="number">0</property>
+	<property id="whichAPI" type="number">-1</property>
 	<property id="useTessieCacheMode" type="boolean">true</property>
 	<property id="serverAPILocation" type="string"></property>
 	<property id="serverAUTHLocation" type="string">auth.tesla.com</property>

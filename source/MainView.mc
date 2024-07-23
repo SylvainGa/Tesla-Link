@@ -532,7 +532,7 @@ class MainView extends Ui.View {
 					charging_current = 0;
 				}
 				
-				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : (vehicle_state.equals("asleep") ? "%s " : "% ")) + charging_current + "A " + inside_temp);
+				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : (vehicle_state == null ? "%? " : (vehicle_state.equals("online") ? "% " : "%s "))) + charging_current + "A " + inside_temp);
 				status_drawable.draw(dc);
 
 				// Draw the text in the middle of the screen with departure time (if set)

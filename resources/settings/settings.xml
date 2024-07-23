@@ -132,6 +132,7 @@
 
     <setting propertyKey="@Properties.whichAPI" title="@Strings.setting_which_api">
         <settingConfig type="list">
+            <listEntry value="-1">@Strings.setting_needConfig</listEntry>
             <listEntry value="0">@Strings.setting_tesla</listEntry>
             <listEntry value="1">@Strings.setting_tessie</listEntry>
             <listEntry value="2">@Strings.setting_teslemetry</listEntry>

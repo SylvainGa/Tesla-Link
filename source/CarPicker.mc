@@ -35,9 +35,10 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onCancel () {
-        _controller._vehicle_id = -2;
         gWaitTime = System.getTimer();
+        _controller._vehicle_id = -2;
         _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
+        _controller._in_menu = false;
         //DEBUG*/ logMessage("CarPickerDelegate: Cancel called");
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
@@ -80,6 +81,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         WatchUi.requestUpdate();
         _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
+        _controller._in_menu = false;
         return true;
     }
 }

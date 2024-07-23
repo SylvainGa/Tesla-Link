@@ -27,6 +27,7 @@ class GlanceView extends Ui.GlanceView {
     var _steps;
     var _showLaunch;
     var _showVehicleName;
+    var _whichAPI;
 
     function initialize() {
         GlanceView.initialize();
@@ -49,6 +50,7 @@ class GlanceView extends Ui.GlanceView {
         else {
             expired = true;
         }
+
         _showLaunch = (Storage.getValue("token") == null || Storage.getValue("vehicle") == null || expired);
         
         _refreshTimer.start(method(:refreshView), 50, true);
@@ -72,9 +74,9 @@ class GlanceView extends Ui.GlanceView {
 
         var noToken = (Storage.getValue("token") == null);
         var noVehicle = (Storage.getValue("vehicle") == null);
-        var noRefreshToken = (Properties.getValue("refreshToken") == null);
-        _showLaunch = (expired || noToken || noVehicle || noRefreshToken);
-
+        var refreshToken = Properties.getValue("refreshToken");
+        _showLaunch = (expired || noToken || noVehicle || (refreshToken == null || refreshToken.equals("")));
+ 
         _refreshTimer.start(method(:refreshView), 50, true);
 
         resetSavedPosition();
@@ -93,6 +95,11 @@ class GlanceView extends Ui.GlanceView {
         _fontHeight = Graphics.getFontHeight(_usingFont);
         _dcHeight = dc.getHeight();
         _showVehicleName = $.getProperty("vehicleNameGlance", true, method(:validateBoolean));
+        _whichAPI = Properties.getValue("whichAPI");
+        var refreshToken = Properties.getValue("refreshToken");
+        if (_whichAPI > 0 && (refreshToken == null || refreshToken.equals(""))) {
+            _whichAPI = -2;
+        }
 
         if (_dcHeight / _fontHeight >= 3.0 || _showVehicleName == false) {
             _threeLines = true;
@@ -162,117 +169,128 @@ class GlanceView extends Ui.GlanceView {
         var line2;
         var line3;
 
-        line1 = Storage.getValue("vehicle_name");
-        if (line1 != null) {
-            line1 = line1.toUpper();
+        // Make sure we're configured first
+        if (_whichAPI == null || _whichAPI == -1) {
+            line1 = Ui.loadResource(Rez.Strings.label_needConfig);
+            line2 = Ui.loadResource(Rez.Strings.label_seeDoc);
+        }
+        else if (_whichAPI == -2) {
+            line1 = Ui.loadResource(Rez.Strings.label_no_token);
+            line2 = Ui.loadResource(Rez.Strings.label_seeDoc);
         }
         else {
-            line1 = Ui.loadResource(Rez.Strings.vehicle);
-        }
-
-        //DEBUG*/ logMessage("Glance height=" + dc.getHeight());
-        //DEBUG*/ logMessage("Glance width=" + dc.getWidth());
-        //DEBUG*/ logMessage("Font height=" +  Graphics.getFontHeight(Graphics.FONT_TINY));
-
-        var status = Storage.getValue("status");
-        if (status != null && status instanceof Lang.Dictionary) { // Dictionary? Yep, new format. Otherwise wait until we get one.
-            responseCode = status["responseCode"];
-            timestamp = status["timestamp"];
-            battery_level = status["battery_level"];
-            charging_state = status["charging_state"];
-            battery_range = status["battery_range"];
-            inside_temp = status["inside_temp"];
-            sentry = status["sentry"];
-            preconditioning = status["preconditioning"];
-            shift_state = status["shift_state"];
-            vehicleAwake = status["vehicleAwake"];
-            if (vehicleAwake == null) {
-                vehicleAwake = "";
-            }
-        }
-
-        var suffix = "";
-        var txt;
-
-        // Build our third line in case we need it
-        if (inside_temp != null) {
-            inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? inside_temp + "°C" : ((inside_temp * 9) / 5 + 32).format("%d") + "°F");
-        }
-        else {
-            inside_temp = "";
-        }
-        if (sentry != null) {
-            sentry = " " + Ui.loadResource(sentry ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
-        }
-        else {
-            sentry = "";
-        }
-        if (preconditioning != null) {
-            preconditioning = " " + Ui.loadResource(preconditioning ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
-        }
-        else {
-            preconditioning = "";
-        }
-
-        // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
-        if (responseCode == 200) {
-            if (charging_state != null && charging_state.equals("Charging")) {
-                suffix = "+";
-            }
-        }
-        else if (responseCode == 408) {
-            if (vehicleAwake.equals("asleep")) {
-                txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
-                if (!_threeLines) {
-                    suffix = "s";
-                }
+            line1 = Storage.getValue("vehicle_name");
+            if (line1 != null) {
+                line1 = line1.toUpper();
             }
             else {
-                txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning + " " + vehicleAwake;
+                line1 = Ui.loadResource(Rez.Strings.vehicle);
             }
-        }
-        else if (responseCode == 401 || responseCode == null) {
-            txt =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
-            if (!_threeLines) {
-                line2 = txt;
+
+            //DEBUG*/ logMessage("Glance height=" + dc.getHeight());
+            //DEBUG*/ logMessage("Glance width=" + dc.getWidth());
+            //DEBUG*/ logMessage("Font height=" +  Graphics.getFontHeight(Graphics.FONT_TINY));
+
+            var status = Storage.getValue("status");
+            if (status != null && status instanceof Lang.Dictionary) { // Dictionary? Yep, new format. Otherwise wait until we get one.
+                responseCode = status["responseCode"];
+                timestamp = status["timestamp"];
+                battery_level = status["battery_level"];
+                charging_state = status["charging_state"];
+                battery_range = status["battery_range"];
+                inside_temp = status["inside_temp"];
+                sentry = status["sentry"];
+                preconditioning = status["preconditioning"];
+                shift_state = status["shift_state"];
+                vehicleAwake = status["vehicleAwake"];
+                if (vehicleAwake == null) {
+                    vehicleAwake = "";
+                }
             }
-        }
-        else {
-            txt = Ui.loadResource(Rez.Strings.label_error) + responseCode;
-        }
 
-        // Build or main glance line
-        if (battery_level != null && battery_range != null && line2 == null) {
-            line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? (battery_range * 1.6).format("%d") + " km" : battery_range + " miles") + timestamp;
+            var suffix = "";
+            var txt;
 
-            if (txt == null && _threeLines) {
-                if (shift_state != null && shift_state.equals("") == false && shift_state.equals("P") == false) { // We're moving
-                    line3 = inside_temp + " " + Ui.loadResource(Rez.Strings.label_driving);
+            // Build our third line in case we need it
+            if (inside_temp != null) {
+                inside_temp = (System.getDeviceSettings().temperatureUnits == System.UNIT_METRIC ? inside_temp + "°C" : ((inside_temp * 9) / 5 + 32).format("%d") + "°F");
+            }
+            else {
+                inside_temp = "";
+            }
+            if (sentry != null) {
+                sentry = " " + Ui.loadResource(sentry ? Rez.Strings.label_s_on : Rez.Strings.label_s_off);
+            }
+            else {
+                sentry = "";
+            }
+            if (preconditioning != null) {
+                preconditioning = " " + Ui.loadResource(preconditioning ? Rez.Strings.label_p_on : Rez.Strings.label_p_off);
+            }
+            else {
+                preconditioning = "";
+            }
+
+            // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
+            if (responseCode == 200) {
+                if (charging_state != null && charging_state.equals("Charging")) {
+                    suffix = "+";
+                }
+            }
+            else if (responseCode == 408) {
+                if (vehicleAwake.equals("online") == false) {
+                    txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
+                    if (!_threeLines) {
+                        suffix = "s";
+                    }
                 }
                 else {
-                    line3 = inside_temp + sentry + preconditioning;
+                    txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning + " " + vehicleAwake;
                 }
             }
-        }
-
-        // Last chance to build line2
-        if (line2 == null) {
-            if (txt == null) {
-                line2 =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
+            else if (responseCode == 401 || responseCode == null) {
+                txt =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
+                if (!_threeLines) {
+                    line2 = txt;
+                }
             }
             else {
-                line2 = txt;
+                txt = Ui.loadResource(Rez.Strings.label_error) + responseCode;
             }
-        }
-        // And if we have a line2, see if we should also build line3
-        else if (line3 == null && _threeLines) {
-            line3 = txt;
-        }
 
-        if (_showVehicleName == false && line3 != null) {
-            line1 = line2;
-            line2 = line3;
-            line3 = null;
+            // Build or main glance line
+            if (battery_level != null && battery_range != null && line2 == null) {
+                line2 = battery_level + "%" + suffix + " / " + (System.getDeviceSettings().distanceUnits == System.UNIT_METRIC ? (battery_range * 1.6).format("%d") + " km" : battery_range + " miles") + timestamp;
+
+                if (txt == null && _threeLines) {
+                    if (shift_state != null && shift_state.equals("") == false && shift_state.equals("P") == false) { // We're moving
+                        line3 = inside_temp + " " + Ui.loadResource(Rez.Strings.label_driving);
+                    }
+                    else {
+                        line3 = inside_temp + sentry + preconditioning;
+                    }
+                }
+            }
+
+            // Last chance to build line2
+            if (line2 == null) {
+                if (txt == null) {
+                    line2 =  Ui.loadResource(_showLaunch ? Rez.Strings.label_launch_widget : Rez.Strings.label_waiting_data);
+                }
+                else {
+                    line2 = txt;
+                }
+            }
+            // And if we have a line2, see if we should also build line3
+            else if (line3 == null && _threeLines) {
+                line3 = txt;
+            }
+
+            if (_showVehicleName == false && line3 != null) {
+                line1 = line2;
+                line2 = line3;
+                line3 = null;
+            }
         }
 
         var text1Width = dc.getTextWidthInPixels(line1, _usingFont);

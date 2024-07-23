@@ -115,7 +115,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		settingsChanged(true);
 
-		_vehicle_state = "online"; // Assume we're online
+		_vehicle_state = (_tesla.getTessieCacheMode() ? null : "online"); // Assume we're online unless its Tessie Cache mode, where we'll get the real state since GetVehicleData won't return 408
 		_data._vehicle_state = _vehicle_state;
 		_workTimer = new Timer.Timer();
 		_waitingForCommandReturn = false;
@@ -966,11 +966,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		if (_vehicle_vin == null || _vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
+		if (_vehicle_state == null || _vehicle_vin == null || _vehicle_id == null || _vehicle_id == -1 || _check_wake) { // -1 means the vehicle ID needs to be refreshed.
 			//DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_id is " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake);
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
+			else if (_vehicle_state == null) {
+	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_vehicleStatus)]);
+			}
+
 			_tesla.getVehicleId(method(:onReceiveVehicles));
 			_stateMachineCounter = 50; // Wait five second before running again so we don't start flooding the communication
 			return;
@@ -1100,6 +1104,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (_tesla.getTessieCacheMode()) { 
 			_need_wake = false;
+			_wake_done = true;
 		}
 		else {
 			_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
@@ -1841,8 +1846,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200) {
 			_lastError = null;
-			_vehicle_state = "online"; // We got data so we got to be online
-			_data._vehicle_state = _vehicle_state;
+			if (_tesla.getTessieCacheMode() == false) {
+				_vehicle_state = "online"; // We got data so we got to be online (not for Tessie cache mode)
+				_data._vehicle_state = _vehicle_state;
+			}
 
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
 			if (data != null && data instanceof Lang.Dictionary && _tesla != null) {
@@ -1930,15 +1937,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
 							_waitingFirstData = 0;
-							// if (!_wakeWasConfirmed) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
-							// 	/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
-							// 	_need_wake = false;
-							// 	_wake_done = false;
-							// 	_waitingForCommandReturn = false;
-							// 	_stateMachineCounter = 1; // Make sure we check on the next workerTimer
-							// 	_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
-							// 	return;
-							// }
+							if (!_wakeWasConfirmed && _tesla.getTessieCacheMode() == false) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
+								/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
+								_need_wake = false;
+								_wake_done = false;
+								_waitingForCommandReturn = false;
+								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
+								_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
+								return;
+							}
 						}
 
 						if (_waitingForCommandReturn) {
@@ -1980,7 +1987,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				var i = _408_count + 1;
 				//DEBUG*/ logMessage("onReceiveVehicleData: 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
 				if (_waitingFirstData > 0 && _view._data._ready == false) { // We haven't received any data yet and we have already a message displayed
-					_handler.invoke([3, i, Ui.loadResource(_vehicle_state.equals("online") == true ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
+					_handler.invoke([3, i, Ui.loadResource(_vehicle_state != null && _vehicle_state.equals("online") == true ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
 				}
 
 	        	if ((_408_count % 10 == 0 && _waitingFirstData > 0) || (_408_count % 10 == 1 && _waitingFirstData == 0)) { // First (if we've starting up), and every consecutive 10th 408 recieved (skipping a spurious 408 when we aren't started up) will generate a test for the vehicle state. 

@@ -80,6 +80,11 @@ class TeslaLink extends App.AppBase {
             return [ new OfflineView() ];
         }
 
+        var whichAPI = Properties.getValue("whichAPI");
+        if (whichAPI == null || whichAPI < 0) {
+            return [ new NeedConfigView() ];
+        }
+
         Storage.setValue("runBG", false);
 
 		//Storage.setValue("canGlance", (System.getDeviceSettings() has :isGlanceModeEnabled && System.getDeviceSettings().isGlanceModeEnabled) == true);

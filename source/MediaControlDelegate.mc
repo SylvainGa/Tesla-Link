@@ -80,7 +80,6 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
             //_controller._tesla.mediaVolumeDown(_vehicle, method(:onCommandReturn));
             var media_volume = Storage.getValue("media_volume");
             var media_volume_chg = Storage.getValue("media_volume_inc");
-            var media_volume_max = Storage.getValue("media_volume_max");
             media_volume -= media_volume_chg;
             if (media_volume < 0.0) {
                 media_volume = 0.0;
