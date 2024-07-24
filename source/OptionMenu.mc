@@ -156,8 +156,9 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
             _controller._pendingActionRequests.add({"Action" => ACTION_TYPE_TOGGLE_SENTRY, "Option" => ACTION_OPTION_NONE, "Value" => 0, "Tick" => System.getTimer()});
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :wake) {
-            _controller._need_wake = true;
-            _controller._wake_done = false;
+            //_controller._need_wake = true;
+            //_controller._wake_done = false;
+            _controller._wake_state = WAKE_NEEDED;
             _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1); // Unless we missed data, restore _stateMachineCounter
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         } else if (item == :refresh) {

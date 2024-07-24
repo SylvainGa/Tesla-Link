@@ -64,10 +64,11 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     _controller._waitingFirstData = 1;
                     _controller._408_count = 0;
                     _controller._check_wake = false;
-                    _controller._need_wake = false;
-                    _controller._wake_done = true;
+                    //_controller._need_wake = false;
+                    //_controller._wake_done = true;
+                    _controller._wake_state = WAKE_UNKNOWN;
                     _controller._wakeWasConfirmed = false;
-            		_controller._vehicle_state = "online";
+                    _controller._vehicle_state = (_controller._tesla.getTessieCacheMode() ? null : "online");
                     _controller._vehicle_id = _carsId[i];
                     _controller._vehicle_vin = _carsVIN[i];
                 }
@@ -82,6 +83,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
         WatchUi.requestUpdate();
         _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
         _controller._in_menu = false;
+        _controller._lastTimeStamp = 0;
         return true;
     }
 }
