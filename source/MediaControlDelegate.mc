@@ -15,7 +15,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
         BehaviorDelegate.initialize();
         _view = view;
         _controller = controller;
-        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
+        if ($.getProperty("whichAPI", API_TESLA, method(:validateNumber)) != API_TESLA) {
             _vehicle = _controller._vehicle_vin;
         }
         else {

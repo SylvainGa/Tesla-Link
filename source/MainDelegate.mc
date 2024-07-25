@@ -13,64 +13,85 @@ const OAUTH_CODE = "myOAuthCode";
 const OAUTH_ERROR = "myOAuthError";
 
 enum /* ACTION_OPTIONS */ {
-	ACTION_OPTION_NONE = 0,
+	ACTION_OPTION_NONE =                0,
 	ACTION_OPTION_BYPASS_CONFIRMATION = 1,
-	ACTION_OPTION_SEAT_DRIVER = 2,
-	ACTION_OPTION_SEAT_PASSENGER = 3,
-	ACTION_OPTION_SEAT_REAR_DRIVER = 4,
-	ACTION_OPTION_SEAT_REAR_CENTER = 5,
+	ACTION_OPTION_SEAT_DRIVER =         2,
+	ACTION_OPTION_SEAT_PASSENGER =      3,
+	ACTION_OPTION_SEAT_REAR_DRIVER =    4,
+	ACTION_OPTION_SEAT_REAR_CENTER =    5,
 	ACTION_OPTION_SEAT_REAR_PASSENGER = 6,
-	ACTION_OPTION_MEDIA_PLAY_TOGGLE = 7,
-	ACTION_OPTION_MEDIA_PREV_SONG = 8,
-	ACTION_OPTION_MEDIA_NEXT_SONG = 9,
-	ACTION_OPTION_MEDIA_VOLUME_DOWN = 10,
-	ACTION_OPTION_MEDIA_VOLUME_UP = 11
+	ACTION_OPTION_MEDIA_PLAY_TOGGLE =   7,
+	ACTION_OPTION_MEDIA_PREV_SONG =     8,
+	ACTION_OPTION_MEDIA_NEXT_SONG =     9,
+	ACTION_OPTION_MEDIA_VOLUME_DOWN =  10,
+	ACTION_OPTION_MEDIA_VOLUME_UP =    11
 }
 
 enum /* ACTION_TYPES */ {
-	ACTION_TYPE_RESET = 0,
-	ACTION_TYPE_HONK = 1,
-	ACTION_TYPE_SELECT_CAR = 2, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_OPEN_PORT = 3,
-	ACTION_TYPE_CLOSE_PORT = 4,
-	ACTION_TYPE_OPEN_FRUNK = 5,
-	ACTION_TYPE_OPEN_TRUNK = 6,
-	ACTION_TYPE_TOGGLE_VIEW = 7, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_SWAP_FRUNK_FOR_PORT = 8, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_SET_CHARGING_AMPS = 9,
-	ACTION_TYPE_SET_CHARGING_LIMIT = 10,
-	ACTION_TYPE_SET_SEAT_HEAT = 11,
+	ACTION_TYPE_RESET =                    0,
+	ACTION_TYPE_HONK =                     1,
+	ACTION_TYPE_SELECT_CAR =               2, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_OPEN_PORT =                3,
+	ACTION_TYPE_CLOSE_PORT =               4,
+	ACTION_TYPE_OPEN_FRUNK =               5,
+	ACTION_TYPE_OPEN_TRUNK =               6,
+	ACTION_TYPE_TOGGLE_VIEW =              7, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_SWAP_FRUNK_FOR_PORT =      8, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_SET_CHARGING_AMPS =        9,
+	ACTION_TYPE_SET_CHARGING_LIMIT =      10,
+	ACTION_TYPE_SET_SEAT_HEAT =           11,
 	ACTION_TYPE_SET_STEERING_WHEEL_HEAT = 12,
-	ACTION_TYPE_VENT = 13,
-	ACTION_TYPE_TOGGLE_CHARGE = 14,
-	ACTION_TYPE_ADJUST_DEPARTURE = 15,
-	ACTION_TYPE_TOGGLE_SENTRY = 16,
-	ACTION_TYPE_WAKE = 17, // Done in OptionMenu, not ActionMachine
-	ACTION_TYPE_REFRESH = 18,
-	ACTION_TYPE_DATA_SCREEN = 19,
-	ACTION_TYPE_HOMELINK = 20,
-	ACTION_TYPE_REMOTE_BOOMBOX = 21,
-	ACTION_TYPE_CLIMATE_MODE = 22,
-	ACTION_TYPE_CLIMATE_DEFROST = 23,
-	ACTION_TYPE_CLIMATE_SET = 24,
-	ACTION_TYPE_MEDIA_CONTROL = 25,
+	ACTION_TYPE_VENT =                    13,
+	ACTION_TYPE_TOGGLE_CHARGE =           14,
+	ACTION_TYPE_ADJUST_DEPARTURE =        15,
+	ACTION_TYPE_TOGGLE_SENTRY =           16,
+	ACTION_TYPE_WAKE =                    17, // Done in OptionMenu, not ActionMachine
+	ACTION_TYPE_REFRESH =                 18,
+	ACTION_TYPE_DATA_SCREEN =             19,
+	ACTION_TYPE_HOMELINK =                20,
+	ACTION_TYPE_REMOTE_BOOMBOX =          21,
+	ACTION_TYPE_CLIMATE_MODE =            22,
+	ACTION_TYPE_CLIMATE_DEFROST =         23,
+	ACTION_TYPE_CLIMATE_SET =             24,
+	ACTION_TYPE_MEDIA_CONTROL =           25,
 	// Following are through buttons or touch screen input
-	ACTION_TYPE_CLIMATE_ON = 26,
-	ACTION_TYPE_CLIMATE_OFF = 27,
-	ACTION_TYPE_LOCK = 28,
-	ACTION_TYPE_UNLOCK = 29
+	ACTION_TYPE_CLIMATE_ON =              26,
+	ACTION_TYPE_CLIMATE_OFF =             27,
+	ACTION_TYPE_LOCK =                    28, // (from Complication call also)
+	ACTION_TYPE_UNLOCK =                  29  // (from Complication call also)
 }
 
 enum { /* Wake state */
-	WAKE_NEEDED =    0,
-	WAKE_TEST,     // 1
-	WAKE_SENT,     // 2
-	WAKE_RECEIVED, // 3
-	WAKE_WAITING,  // 4
-	WAKE_ONLINE,   // 5
-	WAKE_UNKNOWN   // 6
+	WAKE_NEEDED =   0,
+	WAKE_TEST =     1,
+	WAKE_SENT =     2,
+	WAKE_RECEIVED = 3,
+	WAKE_WAITING =  4,
+	WAKE_RETEST =   5,
+	WAKE_UNKNOWN =  6,
+	WAKE_OFFLINE =  7,
+	WAKE_ONLINE =   8
 }
 
+enum { /* Which API */
+	API_NO_TOKEN =    -2,
+	API_NEED_CONFIG = -1,
+	API_TESLA =        0,
+	API_TESSIE =       1,
+	API_TESLEMETRY =   2
+}
+
+enum { /* v_ehicle_id type */
+	VEHICLE_ID_NEED_LIST =  -2,
+	VEHICLE_ID_NEED_ID =    -1,
+	VEHICLE_ID_VALID_ID =    0
+}
+
+enum { /* _check_wake option */
+	CHECK_WAKE_NO_CHECK = 0,
+	CHECK_WAKE_CHECK_SILENT = 1,
+	CHECK_WAKE_CHECK_AND_WAKE = 2,
+}
 /* _stateMachineCounter DEFINITION
 -3 In onReceiveVehicleData, means actionMachine is running so ignore the data received
 -2 In onReceiveVehicleData, means as we're in a menu (flagged by -1), we got a SECOND vehicleData, should NOT happen
@@ -115,26 +136,26 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _stateMachineCounter;
 	var _serverAUTHLocation;
 
-//TODO Need to replace the check for equals("online") by using the _wake_state variable. Need to see of we can replace WAKE_UNKNOWN for WAKE_CACHED or WAKE_OFFLINE
-
 	function initialize(view as MainView, data, handler) {
 		BehaviorDelegate.initialize();
 	
+		/*DEBUG*/ logMessage("initialize:Starting up");
+
 		_view = view;
 		_handler = handler;
 		_data = data;
 
 		settingsChanged(true);
 
-		_vehicle_state = (_tesla.getTessieCacheMode() ? null : "online"); // Assume we're online unless its Tessie Cache mode, where we'll get the real state since GetVehicleData won't return 408
+		_vehicle_state = "online"; // Assume we're online so we try to display our data asap
 		_data._vehicle_state = _vehicle_state;
 		_workTimer = new Timer.Timer();
 		_waitingForCommandReturn = false;
 
 		// _debugTimer = System.getTimer(); Storage.setValue("overrideCode", 0);
 
-		_check_wake = false; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
-		_wake_state = WAKE_UNKNOWN; // Assume we're awake and if we get a 408, then wake up (just like _vehicle_state is set to online)
+		_check_wake = CHECK_WAKE_NO_CHECK; // If we get a 408 on first try or after 20 consecutive 408, see if we should wake up again 
+		_wake_state = WAKE_UNKNOWN; // We don't know the state of our waken status yet. Once we show our data screen, go get it
 		_in_menu = false;
 		gWaitTime = System.getTimer();
 		_waitingFirstData = 1; // So the Waking up is displayed right away if it's the first time
@@ -158,7 +179,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	function settingsChanged(fromInit) {
 		_serverAUTHLocation = $.getProperty("serverAUTHLocation", "auth.tesla.com", method(:validateString));
 		_settings = System.getDeviceSettings();
-		if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
+		if ($.getProperty("whichAPI", 0, method(:validateNumber)) != API_TESLA) {
 			_useTeslaAPI = false;
 			_vehicle_id = Storage.getValue("vehicle");
 			_vehicle_vin = Storage.getValue("vehicleVIN");
@@ -171,10 +192,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_need_auth = false;
 			_auth_done = true;
 
-			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using teslemetry or Tessie"); } { logMessage("settingsChanged:Using teslemetry or Tessie"); }
+			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using teslemetry or Tessie"); } else { logMessage("settingsChanged:Using teslemetry or Tessie"); }
 		}
 		else {
-			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using Tesla API"); } { logMessage("settingsChanged:Using Tesla API"); }
+			/*DEBUG*/ if (fromInit) { logMessage("initialize:Using Tesla API"); } else { logMessage("settingsChanged:Using Tesla API"); }
 			_useTeslaAPI = true;
 			_vehicle_id = Storage.getValue("vehicle");
 			_vehicle_vin = _vehicle_id; // Teslemetry needs a VIN to talk to cars, but Tesla's API need the vehicle_id. 
@@ -291,7 +312,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			}
 		}
 
-		//DEBUG*/ logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
+		/*DEBUG*/ logMessage("onOAuthMessage: responseCode=" + responseCode + " error=" + error + " code=" + (code == null ? "null" : code.substring(0,10) + "..."));
 
 		if (error == null && code != null) {
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data)]);
@@ -331,7 +352,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onReceiveToken(responseCode, data) {
-		//DEBUG*/ logMessage("onReceiveToken: " + responseCode);
+		/*DEBUG*/ logMessage("onReceiveToken: " + responseCode);
 
 		if (responseCode == 200) {
 			_auth_done = true;
@@ -452,7 +473,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function actionMachine() {
-		//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is " + _pendingActionRequests.size() + (_vehicle_id != null && _vehicle_id > 0 ? "" : "vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + " _wake_state: " + _wake_state) + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+		/*DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is " + _pendingActionRequests.size() + " _vehicle_vin=" + (_vehicle_vin != null && _vehicle_vin.length() > 0 ? "valid" : _vehicle_vin) + " _vehicle_id=" +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake + " _wake_state=" + _wake_state + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 		// Sanity check
 		if (_pendingActionRequests.size() <= 0) {
@@ -849,7 +870,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function stateMachine() {
-		//DEBUG*/ logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake ? " _check_wake true" : "") + " _wake_state: " + _wake_state) + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
+		//DEBUG*/ logMessage("stateMachine:" + (_vehicle_id != null && _vehicle_id > 0 ? "" : " vehicle_id " + _vehicle_id) + " vehicle_state " + _vehicle_state + (_need_auth ? " _need_auth true" : "") + (!_auth_done ? " _auth_done false" : "") + (_check_wake > CHECK_WAKE_NO_CHECK ? " _check_wake " + _check_wake : "") + " _wake_state: " + _wake_state) + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 
 /* DEBUG
 		if (_debug_view) {
@@ -868,7 +889,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		var resetNeeded = Storage.getValue("ResetNeeded");
 		if (resetNeeded != null && resetNeeded == true) {
 			Storage.setValue("ResetNeeded", false);
-			_vehicle_id = -1;
+			_vehicle_id = VEHICLE_ID_NEED_ID;
 			_need_auth = true;
 		}
 
@@ -878,12 +899,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			// Do we have a refresh token? If so, try to use it instead of login in
 			var _refreshToken = Settings.getRefreshToken();
 			if (_debug_auth == false && _refreshToken != null && _refreshToken.length() != 0) {
-				//DEBUG*/ logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
+				/*DEBUG*/ logMessage("stateMachine: auth through refresh token '" + _refreshToken.substring(0,10) + "''... lenght=" + _refreshToken.length());
 	    		_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_token)]);
 				GetAccessToken(_refreshToken, method(:onReceiveToken));
 			}
 			else {
-				//DEBUG*/ logMessage("stateMachine: Building an OAUTH2 request");
+				/*DEBUG*/ logMessage("stateMachine: Building an OAUTH2 request");
 	        	_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_requesting_data) + "\n" + Ui.loadResource(Rez.Strings.label_authenticating_with_login)]);
 
 	            _code_verifier = StringUtil.convertEncodedString(Cryptography.randomBytes(86/2), {
@@ -967,48 +988,67 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_tesla = new Tesla(_token);
 		}
 
-		if (_vehicle_id == -2) {
+		if (_vehicle_id == VEHICLE_ID_NEED_LIST) {
             _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			_stateMachineCounter = -1;
 			_tesla.getVehicleId(method(:onSelectVehicle));
-			_vehicle_id = -1;
+			_vehicle_id = VEHICLE_ID_NEED_ID;
 			return;
 		}
 
-		if (_vehicle_state == null || _vehicle_vin == null || _vehicle_id == null || _vehicle_id == -1 || _check_wake || _wake_state == WAKE_RECEIVED) { // -1 means the vehicle ID needs to be refreshed.
-			//DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_state= " + _vehicle_state +  _vehicle_vin= " + _vehicle_vin + " _vehicle_id= " +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake + " _wake_state=" + _wake_state);
+		if (_wake_state == WAKE_TEST) {
+			// Waiting for our wake test to finish
+			return;
+		}
+
+		// Get vehicle ID and wake state if we have no VIN, no ID or asked to get our ID, asked to wake or received confirmation or wake packet was received by the server
+		if (_vehicle_vin == null || _vehicle_id == null || _vehicle_id == VEHICLE_ID_NEED_ID || _check_wake > CHECK_WAKE_NO_CHECK || _wake_state == WAKE_RECEIVED || _wake_state == WAKE_RETEST) { 
+			/*DEBUG*/ logMessage("StateMachine: Getting vehicles, _vehicle_vin=" + (_vehicle_vin != null && _vehicle_vin.length() > 0 ? "valid" : _vehicle_vin ) + " _vehicle_id=" +  (_vehicle_id != null && _vehicle_id > 0 ? "valid" : _vehicle_id) + " _check_wake=" + _check_wake + " _wake_state=" + _wake_state + (_waitingFirstData ? " _waitingFirstData=" + _waitingFirstData : ""));
 			if (_vehicle_id == null) {
 	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 			}
-			else if (_vehicle_state == null) {
-	            _handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_vehicleStatus)]);
-			}
 
-			if (_wake_state != WAKE_RECEIVED) { // We are waiting for the vehicle to become online, not just testing.
+			if (_check_wake >= CHECK_WAKE_CHECK_SILENT && _wake_state >= WAKE_UNKNOWN) {
+				// We're asked to check our wake state (and potentialy wake it, make sure we don't come back here until we received something from onReceiveVehicles)
 				_wake_state = WAKE_TEST;
 			}
+
+			// If we're waiting for receiving our wake status, flag it so we don't come back here and request again
+			if (_wake_state == WAKE_RECEIVED || _wake_state == WAKE_RETEST) {
+				_wake_state = WAKE_WAITING;
+			}
+
+			// This, beside getting our vehicle ID, will get the wake state of the vehicle. It will also request a wake if _check_wake is CHECK_WAKE_CHECK_AND_WAKE
+			/*DEBUG*/ logMessage("StateMachine: Calling getVehicleId with _wake_state=" + _wake_state);
 			_tesla.getVehicleId(method(:onReceiveVehicles));
-			_stateMachineCounter = 50; // Wait five second before running again so we don't start flooding the communication
+			_stateMachineCounter = 20; // Wait 2 second before running again so we don't start flooding the communication
 			return;
 		}
 
 		if (_wake_state == WAKE_NEEDED) { // Asked to wake up
 			if (_waitingFirstData > 0 && !_wakeWasConfirmed && $.getProperty("askWakeVehicle", true, method(:validateBoolean))) { // Ask if we should wake the vehicle
-				//DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
+				/*DEBUG*/ logMessage("stateMachine: Asking if OK to wake");
 	            var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_should_we_wake) + Storage.getValue("vehicle_name") + "?");
 				_stateMachineCounter = -1;
 	            var delegate = new SimpleConfirmDelegate(method(:wakeConfirmed), method(:wakeCanceled));
 				_in_menu = true;
 	            Ui.pushView(view, delegate, Ui.SLIDE_UP);
 			} else {
-				/*DEBUG*/ logMessage("stateMachine: Waking vehicle");
+				/*DEBUG*/ logMessage("stateMachine: Waking vehicle without asking");
 				_wake_state = WAKE_SENT;
 				_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake));
 			}
 			return;
 		}
 
-		if (_wake_state < WAKE_ONLINE) { // Until _wake_state is less than WAKE_ONLINE, we stop here
+		if (_wake_state < WAKE_UNKNOWN) { // Until _wake_state is less than WAKE_UNKNOWN, we stop here
+			return;
+		}
+
+		// We've got data but don't know our wake state yet (tessie in cache mode), get that state
+		if (_waitingFirstData == 0 && _wake_state == WAKE_UNKNOWN) {
+			_check_wake = CHECK_WAKE_CHECK_SILENT;
+			_stateMachineCounter = 1;
 			return;
 		}
 
@@ -1029,7 +1069,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		_lastDataRun = System.getTimer();
-		// 2023-03-25 logMessage("StateMachine: getVehicleData");
+		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
 	}
 
@@ -1039,19 +1079,31 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		// If we have changed our settings, update
-		if (gSettingsChanged) {
+		if (gSettingsChanged != null && gSettingsChanged) {
 			gSettingsChanged = false;
 			settingsChanged(false);
 		}
-		// We're not waiting for a command to return, we're waiting for an action to be performed and we're online
-		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0 && _wake_state >= WAKE_ONLINE) {
-			// We're not displaying a message on screen and the last webRequest returned responseCode 200, do you thing actionMenu!
-			if (_tesla.getTessieCacheMode() && _vehicle_state.equals("online") == false) { // We need to wake up the car first (only happens with Tessie in Cache mode)
-				_wake_state = WAKE_NEEDED;
-				_stateMachineCounter = 1;
-				stateMachine();
+		// We're not waiting for a command to return, we're waiting for an action to be performed
+		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0) {
+			if (_wake_state < WAKE_ONLINE) {
+				// We're not online (probably in Tessie cache mode), if we haven't already sent a wake command, send one
+				if (_wake_state < WAKE_SENT && _wake_state > WAKE_RETEST) {
+					/*DEBUG*/ logMessage("workerTimer: Need to wake before sending command");
+					_wake_state = WAKE_NEEDED;
+					_stateMachineCounter = 1;
+				}
+
+				// Now we need to run our stateMachine function that will have the job of waking the car
+				if (_stateMachineCounter <= 1) {
+					stateMachine();
+					_stateMachineCounter = 10; // Try again in 1 second
+				} else {
+					_stateMachineCounter--;
+				}
 			}
-			else if (_view._data._ready == true && _lastError == null) { //Sanity check. Only call the action machine if we have at least seen our main screen once (ie, all data are filled)
+			else if (_view._data._ready == true && _lastError == null) {
+				// We're not displaying a message on screen and the last webRequest returned responseCode 200, do you thing actionMenu!
+				/*DEBUG*/ logMessage("workerTimer: Do action");
 				actionMachine();
 			}
 			// Call stateMachine as soon as it's out of it (_stateMachineCounter will get modified in onReceiveVehicleData). That's in case we have no data yet.
@@ -1061,7 +1113,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				stateMachine();
 			}
 		}
-		// We have no priority tasks to do and no actions waiting
+		// We have no actions waiting
 		else {
 			// Get the current states of the vehicle if it's time, otherwise we do nothing this time around.
 			if (_stateMachineCounter > 0) { 
@@ -1083,7 +1135,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 
 		// If we are still waiting for our first set of data, not at a login prompt and not waiting to wake, once we reach 150 iterations of the 0.1sec workTimer (ie, 15 seconds has elapsed since we started)
-		if (_waitingFirstData > 0 && _auth_done && _wake_state >= WAKE_ONLINE) {
+		if (_waitingFirstData > 0 && _auth_done && _wake_state >= WAKE_UNKNOWN) {
 			_waitingFirstData++;
 			if (_waitingFirstData % 150 == 0) {
 				_handler.invoke([3, 0, Ui.loadResource(Rez.Strings.label_still_waiting_data)]); // Say we're still waiting for data
@@ -1118,10 +1170,10 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		//DEBUG*/ logMessage("wakeCancelled:");
 
 		if (_tesla.getTessieCacheMode()) {
-			_wake_state = (_vehicle_state.equals("online") ? WAKE_ONLINE : WAKE_UNKNOWN);
+			_wake_state = (_vehicle_state.equals("online") ? WAKE_ONLINE : WAKE_OFFLINE);
 		}
 		else {
-			_vehicle_id = -2; // Tells StateMachine to popup a list of vehicles
+			_vehicle_id = VEHICLE_ID_NEED_LIST; // Tells StateMachine to popup a list of vehicles
 			_handler.invoke([3, _408_count, Ui.loadResource(Rez.Strings.label_getting_vehicles)]);
 		}
 		_stateMachineCounter = 1; // 0.1 second
@@ -1741,7 +1793,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onSelectVehicle(responseCode, data) {
-		//DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
+		/*DEBUG*/ logMessage("onSelectVehicle: " + responseCode);
 
 		if (responseCode == 200) {
 			var vehicles = data.get("response");
@@ -1768,6 +1820,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 	}
 
+	// Get the vehicle ID and the wake state of the vehicle. It will also request a wake if not awoken and _check_wake is CHECK_WAKE_CHECK_AND_WAKE
+	// If there are no vehicles, it will pop up a message saying so
+	// If there is no current vehicle and the list has more than one, it will request a menu to show asking to choose a vehicle by setting _vehicle_id to VEHICLE_ID_NEED_LIST
 	function onReceiveVehicles(responseCode, data) {
 		/*DEBUG*/ logMessage("onReceiveVehicles: " + responseCode);
 		//logMessage("onReceiveVehicles: data is " + data);
@@ -1790,26 +1845,30 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 
 					if (vehicle_index == size) {
-						vehicle_index = 0;
-					}
-				}
-
-				_vehicle_state = vehicles[vehicle_index].get("state");
-				_data._vehicle_state = _vehicle_state;
-				//DEBUG*/ logMessage("onReceiveVehicles: Vehicle '" + vehicles[vehicle_index].get("display_name") + "' (" + _vehicle_id + ") state is '" + _vehicle_state + "'");
-				if (_vehicle_state.equals("online") == false && _vehicle_id != null && _vehicle_id > 0) { // We're not awake and we have a vehicle ID
-					if (_wake_state == WAKE_RECEIVED) { // We've already sent our Wake command and waiting for the result, don't ask it to wake it again here
-						_stateMachineCounter = 20; // Try again in 2 seconds (leaving _wake_state at WAKE_RECEIVED will trigger a new wake check)
-					}
-					else {
-						_wake_state = WAKE_NEEDED; // Next iteration of StateMachine will call the wake function
+						/*DEBUG*/logMessage("onReceiveVehicles: couldn't find " + vehicle_name);
+						if (size > 1) {
+							// We had a vehicle but it's no longer in our list, our list has more than one vehicle so pop a menu asking which one
+							_vehicle_id = VEHICLE_ID_NEED_LIST;
+							if (_wake_state == WAKE_TEST) {
+								_wake_state = WAKE_UNKNOWN;
+							}
+						/*DEBUG*/logMessage("onReceiveVehicles: Vehicle not in list, display list");
+							return;		
+						}
+						vehicle_index = 0; // Use first one
 					}
 				}
 				else {
-					_wake_state = WAKE_ONLINE; // We're online! It's time to get the data!
+					// No vehicle currently stored. If we have just one in our list, use that one, otherwise pop a menu asking which one
+					if (size > 1) {
+						_vehicle_id = VEHICLE_ID_NEED_LIST;
+						if (_wake_state == WAKE_TEST) {
+							_wake_state = WAKE_UNKNOWN;
+						}
+						/*DEBUG*/logMessage("onReceiveVehicles: No vehicle saved, display list");
+						return;		
+					}
 				}
-
-				_check_wake = false;
 
 				_vehicle_id = vehicles[vehicle_index].get("id");
 				if (_useTeslaAPI) {
@@ -1818,19 +1877,45 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				else {
 					_vehicle_vin = vehicles[vehicle_index].get("vin");
 				}
+
+				_vehicle_state = vehicles[vehicle_index].get("state");
+				_data._vehicle_state = _vehicle_state;
+				if (_vehicle_state.equals("online")) {
+					_wake_state = WAKE_ONLINE; // We're online! It's time to get the data!
+				}
+				else if (_wake_state == WAKE_WAITING) { // We've already sent our Wake command and waiting for the result, don't ask it to wake it again here
+					_stateMachineCounter = 20; // Try again in  seconds (leaving _wake_state at WAKE_RECEIVED will trigger a new wake check)
+					_wake_state = WAKE_RETEST;
+				}
+				else if (_check_wake != CHECK_WAKE_CHECK_SILENT) { // If we're WAKE_UNKMOWN state, we simply silently want our wake state, don't wake up
+					_wake_state = WAKE_NEEDED; // Next iteration of StateMachine will call the wake function
+				}
+				else {
+					_wake_state = WAKE_OFFLINE;
+				}
+				/*DEBUG*/ logMessage("onReceiveVehicles: Vehicle state is '" + _vehicle_state + "', wake state is " + _wake_state);
+
+				_check_wake = CHECK_WAKE_NO_CHECK;
+
 				Storage.setValue("vehicle", _vehicle_id);
 				Storage.setValue("vehicleVIN", _vehicle_vin);
 				Storage.setValue("vehicle_name", vehicles[vehicle_index].get("display_name"));
 
 				return;
-			} else {
+			}
+			else {
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_no_vehicles)]);
 				_stateMachineCounter = 100; // 10 seconds
 			}
 		}
 		else {
 			_stateMachineCounter = 50; // 5 seconds
-			_check_wake = true;
+			if (_wake_state == WAKE_TEST) {
+				_wake_state = WAKE_UNKNOWN;
+			}
+			if (_check_wake == CHECK_WAKE_NO_CHECK) {
+				_check_wake = CHECK_WAKE_CHECK_AND_WAKE;
+			}
 			
 			if (responseCode == 401) {
 				if (_useTeslaAPI) {
@@ -1872,19 +1957,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			_lastError = null;
 			if (_tesla.getTessieCacheMode() == false) {
-				_vehicle_state = "online"; // We got data so we got to be online (not for Tessie cache mode)
+				// We got data so we got to be online (not for Tessie cache mode)
+				_vehicle_state = "online";
 				_data._vehicle_state = _vehicle_state;
+				_wake_state = WAKE_ONLINE;
 			}
 
 			// Check if this data feed is older than the previous one and if so, ignore it (two timers could create this situation)
 			if (data != null && data instanceof Lang.Dictionary && _tesla != null) {
 				var response;
-				if (_tesla.getTessieCacheMode()) {
+				response = data.get("response");
+				if (response == null) {
 					response = data;
 				}
-				else {
-					response = data.get("response");
-				}
+
 				//DEBUG*/ logMessage("onReceiveVehicleData: received " + response);
 				if (response != null && response instanceof Lang.Dictionary && response.get("climate_state") != null && response.get("charge_state") != null && response.get("vehicle_state") != null && response.get("drive_state") != null) {
 					var dataTimeStamp = $.validateLong(response.get("charge_state").get("timestamp"), 0);
@@ -1964,14 +2050,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 						if (_waitingFirstData > 0) { // We got our first responseCode 200 since launching
 							_waitingFirstData = 0;
+							_waitingForCommandReturn = false; // TODO Why? Can't have commands waiting if we're just starting
+							_stateMachineCounter = 1; // Make sure we check on the next workerTimer
+
 							if (!_wakeWasConfirmed && _tesla.getTessieCacheMode() == false) { // And we haven't asked to wake the vehicle, so it was already awoken when we got in, so send a gratious wake command ao we stay awake for the app running time
 								/*DEBUG*/ logMessage("onReceiveVehicleData: sending gratious wake");
-								_waitingForCommandReturn = false;
-								_stateMachineCounter = 1; // Make sure we check on the next workerTimer
 								_wake_state = WAKE_SENT;
 								_tesla.wakeVehicle(_vehicle_vin, method(:onReceiveAwake)); // 
-								return;
 							}
+							return;
 						}
 
 						if (_waitingForCommandReturn) {
@@ -2006,7 +2093,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_stateMachineCounter = 5; // 0.5 second
 			_lastError = responseCode;
 
-			if (_waitingFirstData > 0) { // Reset that counter if what we got was an error packet. We're interested in gap between packets received.
+			if (_waitingFirstData > 0) { // Reset that counter if what we got was an error packet. We're interested in gap between packets received, not if it's an error.
 				_waitingFirstData = 1;
 			}
 
@@ -2014,21 +2101,24 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				var i = _408_count + 1;
 				/*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode + " 408_count=" + i + " _waitingFirstData=" + _waitingFirstData);
 				if (_waitingFirstData > 0 && _view._data._ready == false) { // We haven't received any data yet and we have already a message displayed
-					_handler.invoke([3, i, Ui.loadResource(_vehicle_state != null && _vehicle_state.equals("online") == true ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
+					_handler.invoke([3, i, Ui.loadResource(_wake_state >= WAKE_UNKNOWN ? Rez.Strings.label_requesting_data : Rez.Strings.label_waking_vehicle)]);
 				}
 
 	        	if ((_408_count % 10 == 0 && _waitingFirstData > 0) || (_408_count % 10 == 1 && _waitingFirstData == 0)) { // First (if we've starting up), and every consecutive 10th 408 recieved (skipping a spurious 408 when we aren't started up) will generate a test for the vehicle state. 
 					if (_408_count < 2 && _waitingFirstData == 0) { // Only when we first started to get the errors do we keep the start time, unless we've started because our start time has been recorded already
 						gWaitTime = System.getTimer();
 					}
-					// 2022-10-10 logMessage("onReceiveVehicleData: Got 408, Check if we need to wake up the car?");
-					_check_wake = true;
+					/*DEBUG*/ logMessage("onReceiveVehicleData: Got 408, wake the vehicle if it's asleep (offline) and NOT in cache mode");
+					if (_tesla.getTessieCacheMode() == false) {
+						// We're not in cache mode, we need to wake to get fresh data 
+						_check_wake = CHECK_WAKE_CHECK_AND_WAKE;
+					}
 	            }
 				_408_count++;
 			} else {
 				if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
 					/*DEBUG*/ logMessage("onReceiveVehicleData: " + responseCode);
-					_vehicle_id = -2;
+					_vehicle_id = VEHICLE_ID_NEED_LIST;
 		            _handler.invoke([0, -1, buildErrorString(responseCode)]);
 				}
 				else if (responseCode == 401) {
@@ -2072,12 +2162,12 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		   // We were unable to wake, try again
 			_wake_state = WAKE_NEEDED;
 			if (responseCode == 404) { // Car not found? invalidate the vehicle and the next refresh will try to query what's our car
-				_vehicle_id = -2;
+				_vehicle_id = VEHICLE_ID_NEED_LIST;
 				_handler.invoke([0, -1, buildErrorString(responseCode)]);
 			}
 			else if (responseCode == 403) { // Forbiden, ask to manually wake the vehicle and test its state through the vehicle states returned by onReceiveVehicles
 				_stateMachineCounter = 50; // Wait a second so we don't flood the communication. Wait 5 seconds
-				_vehicle_id = -1;
+				_vehicle_id = VEHICLE_ID_NEED_ID;
 				_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_ask_manual_wake)]);
 				return;
 			}
@@ -2108,21 +2198,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 		if (responseCode == 200) {
 			if ($.getProperty("quickReturn", false, method(:validateBoolean))) {
-				//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+				/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 				_stateMachineCounter = 1; // 0.1 second
 			} else {
 				// Wait a second to let time for the command change to be recorded on Tesla's server
-				//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
+				/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 1 sec");
 				_stateMachineCounter = 10; // 1 second
 				_waitingForCommandReturn = true;
 			}
+			_tesla.setNoCacheNextVehicleData(); // Tell the next vehicle data query to get the real data, not the cached one
 		}
 		else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
+			/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_too_many_request)]);
 			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down! Wait 10 seconds
 		}
 		else { // Our call failed, say the error and back to the main code
-			//DEBUG 2023-10-02*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+			/*DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1; // 0.1 second
 		}

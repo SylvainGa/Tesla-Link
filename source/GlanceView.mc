@@ -33,7 +33,7 @@ class GlanceView extends Ui.GlanceView {
         GlanceView.initialize();
         gSettingsChanged = true;
 
-		//DEBUG 2023-10-02*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
+		/*DEBUG*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
         _refreshTimer = new Timer.Timer();
     }
 
@@ -97,8 +97,8 @@ class GlanceView extends Ui.GlanceView {
         _showVehicleName = $.getProperty("vehicleNameGlance", true, method(:validateBoolean));
         _whichAPI = Properties.getValue("whichAPI");
         var refreshToken = Properties.getValue("refreshToken");
-        if (_whichAPI > 0 && (refreshToken == null || refreshToken.equals(""))) {
-            _whichAPI = -2;
+        if (_whichAPI > API_TESLA && (refreshToken == null || refreshToken.equals(""))) {
+            _whichAPI = API_NO_TOKEN;
         }
 
         if (_dcHeight / _fontHeight >= 3.0 || _showVehicleName == false) {
@@ -148,7 +148,7 @@ class GlanceView extends Ui.GlanceView {
         // Retrieve the name of the vehicle if we have it, or the generic string otherwise
         //DEBUG 2023-10-02*/ var showLog = false;
 
-        if (gSettingsChanged) {
+        if (gSettingsChanged != null && gSettingsChanged) {
             //DEBUG 2023-10-02*/ showLog = true;
             gSettingsChanged = false;
             onLayout(dc);
@@ -170,11 +170,11 @@ class GlanceView extends Ui.GlanceView {
         var line3;
 
         // Make sure we're configured first
-        if (_whichAPI == null || _whichAPI == -1) {
+        if (_whichAPI == null || _whichAPI == API_NEED_CONFIG) {
             line1 = Ui.loadResource(Rez.Strings.label_needConfig);
             line2 = Ui.loadResource(Rez.Strings.label_seeDoc);
         }
-        else if (_whichAPI == -2) {
+        else if (_whichAPI == API_NO_TOKEN) {
             line1 = Ui.loadResource(Rez.Strings.label_no_token);
             line2 = Ui.loadResource(Rez.Strings.label_seeDoc);
         }

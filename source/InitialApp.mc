@@ -16,7 +16,7 @@ class TeslaLink extends App.AppBase {
         AppBase.initialize();
 
 		//DEBUG*/ logMessage("App: Initialising");
-        gSettingsChanged = false;
+        //gSettingsChanged = false; // No, let it stay at null. That way, a background task initilazing will no trigger a setting change
     }
 
     (:can_glance, :bkgnd64kb)
@@ -50,7 +50,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance)
 	function onSettingsChanged() {
-		//DEBUG*/ logMessage("App: Settings changed");
+		/*DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; 
         Ui.requestUpdate();
     }
@@ -119,7 +119,11 @@ class TeslaLink extends App.AppBase {
             return;
         }
         
-        gSettingsChanged = true;
+		if ($.getProperty("whichAPI", 0, method(:validateNumber)) == API_TESLA) {
+            gSettingsChanged = true;
+        }
+        
+        /*DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 

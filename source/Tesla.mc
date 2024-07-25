@@ -5,6 +5,7 @@ class Tesla {
     hidden var _notify;
     hidden var _serverAPILocation;
     hidden var _useTessieCacheMode;
+    hidden var _noCacheNextVehicleData;
 
     function initialize(token) {
         if (token != null) {
@@ -12,13 +13,14 @@ class Tesla {
         }
 
         _useTessieCacheMode = false;
+        _noCacheNextVehicleData = false;
 
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
             var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            var whichAPI = $.getProperty("whichAPI", 0, method(:validateNumber));
+            var whichAPI = $.getProperty("whichAPI", API_TESLA, method(:validateNumber));
             _serverAPILocation = APIs[whichAPI];
-            if (whichAPI == 1) { //1 = Tessie
+            if (whichAPI == API_TESSIE) {
                 _useTessieCacheMode = $.getProperty("useTessieCacheMode", true, method(:validateBoolean));
             }
         }
@@ -29,7 +31,11 @@ class Tesla {
     function getTessieCacheMode() {
         return _useTessieCacheMode;
     }
-    
+
+    function setNoCacheNextVehicleData() {
+        _noCacheNextVehicleData = true;
+    }
+
     hidden function genericGet(url, notify) {
         Communications.makeWebRequest(
             url, null,
@@ -75,12 +81,15 @@ class Tesla {
 
     function getVehicleData(vehicle, notify) {
         var url;
-        if (_useTessieCacheMode) {
+        if (_useTessieCacheMode && _noCacheNextVehicleData == false) {
             url = "https://" + _serverAPILocation + "/" + vehicle.toString() + "/state?use_cache=true";
         }
         else {
             url = "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data";
         }
+
+        _noCacheNextVehicleData = false;
+
         genericGet(url, notify);
     }
 

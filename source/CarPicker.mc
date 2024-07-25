@@ -36,7 +36,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
 
     function onCancel () {
         gWaitTime = System.getTimer();
-        _controller._vehicle_id = -2;
+        _controller._vehicle_id = VEHICLE_ID_NEED_LIST;
         _controller._stateMachineCounter = 1; // This is called from the stateMachine or OptionMenu. In both case, it returns to the stateMachine so we need to set it to 1 here otherwise stateMachine will not run again
         _controller._in_menu = false;
         //DEBUG*/ logMessage("CarPickerDelegate: Cancel called");
@@ -68,7 +68,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     //_controller._wake_done = true;
                     _controller._wake_state = WAKE_UNKNOWN;
                     _controller._wakeWasConfirmed = false;
-                    _controller._vehicle_state = (_controller._tesla.getTessieCacheMode() ? null : "online");
+                    _controller._vehicle_state = "online";
                     _controller._vehicle_id = _carsId[i];
                     _controller._vehicle_vin = _carsVIN[i];
                 }

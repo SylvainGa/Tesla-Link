@@ -17,7 +17,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
             var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            _serverAPILocation = APIs[$.getProperty("whichAPI", 0, method(:validateNumber))];
+            _serverAPILocation = APIs[$.getProperty("whichAPI", API_TESLA, method(:validateNumber))];
         }
     }
 
@@ -29,7 +29,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         var token = Storage.getValue("token");
         var vehicle;
-        if ($.getProperty("whichAPI", 0, method(:validateNumber)) != 0) {
+        if ($.getProperty("whichAPI", API_TESLA, method(:validateNumber)) != API_TESLA) {
             vehicle = Storage.getValue("vehicleVIN");
         }
         else {
@@ -179,13 +179,13 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
             var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            _serverAPILocation = APIs[$.getProperty("whichAPI", 0, method(:validateNumber))];
+            _serverAPILocation = APIs[$.getProperty("whichAPI", API_TESLA, method(:validateNumber))];
         }
 
         /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
 
         _fromTokenRefresh = false;
-        _fromWhichAPI = 0;
+        _fromWhichAPI = API_TESLA;
         _data = Background.getBackgroundData();
         if (_data == null) {
             //DEBUG*/ logMessage("BG-Init: tokens <- prop");
@@ -209,8 +209,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         var token = _data.get("token");
         var vehicle;
-        _fromWhichAPI = $.getProperty("whichAPI", 0, method(:validateNumber));
-        if (_fromWhichAPI == 0) {
+        _fromWhichAPI = $.getProperty("whichAPI", API_TESLA, method(:validateNumber));
+        if (_fromWhichAPI == API_TESLA) {
             vehicle = Storage.getValue("vehicle");
         }
         else {
@@ -297,7 +297,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         }
         else if (responseCode == 401) {
-            if (_fromTokenRefresh == false && _fromWhichAPI == 0) {
+            if (_fromTokenRefresh == false && _fromWhichAPI == API_TESLA) {
                 refreshAccessToken();
                 return;
             }

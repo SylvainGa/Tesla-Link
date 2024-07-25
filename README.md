@@ -45,10 +45,10 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 V9.0.0 Is the merging of the Legacy and Tessie app (so a new major version) in one app with some new additions
-- A drop down in the config is used to choose between Tesla, Tessie and Teslemetry as proxy (Teslemetry is new). You don't need to enter the URL anymore as they default to their optimal value. You can still make them point to something else if you prefer
+- A drop down in the config is used to choose between Tesla, Tessie and Teslemetry as proxy (Teslemetry is new). You don't need to enter the URL anymore as they default to their optimal value. You can still make them point to something else if you prefer. I higly suggest you see the documentation on how to use.
 - You can toggle the locking of the vehicle, lock it or unlock it when launched from complications (ie, a watch face like Crystal Tesla)
 - Media volume adjustments as well as Play/Pause is now working in the Media panel! Still waiting for Tesla to activate the other commands :-(
-- Compiled with CIQ 7.2.1
+- Reverted CIQ to 6.4.2 since it messed up sending Complications to the Crystal-Tesla watchface with CIQ 7.x.
 
 V8.1.0
 - Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
