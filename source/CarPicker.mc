@@ -63,7 +63,7 @@ class CarPickerDelegate extends WatchUi.PickerDelegate {
                     // Start fresh as if we just loaded
                     _controller._waitingFirstData = 1;
                     _controller._408_count = 0;
-                    _controller._check_wake = false;
+                    _controller._check_wake = CHECK_WAKE_NO_CHECK;
                     //_controller._need_wake = false;
                     //_controller._wake_done = true;
                     _controller._wake_state = WAKE_UNKNOWN;
