@@ -203,11 +203,11 @@ function sendComplication(data) {
 			Complications.updateComplication(0, comp);
 		}
 		catch (e) {
-			/*DEBUG*/ logMessage("Error sending Complication!");
+			//DEBUG*/ logMessage("Error sending Complication!");
 		}
 	}
 	else {
-		/*DEBUG*/ logMessage("Complication not available?");
+		//DEBUG*/ logMessage("Complication not available?");
 	}
 }
 

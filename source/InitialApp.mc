@@ -50,7 +50,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance)
 	function onSettingsChanged() {
-		/*DEBUG*/ logMessage("App: Settings changed");
+		//DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; 
         Ui.requestUpdate();
     }
@@ -123,7 +123,7 @@ class TeslaLink extends App.AppBase {
             gSettingsChanged = true;
         }
         
-        /*DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
+        //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 

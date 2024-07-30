@@ -33,7 +33,7 @@ class GlanceView extends Ui.GlanceView {
         GlanceView.initialize();
         gSettingsChanged = true;
 
-		/*DEBUG*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
+		//DEBUG*/ logMessage("GlanceView:initialize: _refreshTimer is " + _refreshTimer);
         _refreshTimer = new Timer.Timer();
     }
 

@@ -189,7 +189,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 		if (responseCode == 200) {
 			if (data != null && data instanceof Lang.Dictionary) {
 				var response = data.get("response");
-				/*DEBUG*/ logMessage("onCommandReturn: received " + response);
+				//DEBUG*/ logMessage("onCommandReturn: received " + response);
 				if (response != null && response instanceof Lang.Dictionary && response.get("result") == false) {
                     if (response.get("reason").equals("user_not_present") == true) {
             			_handler.invoke(Ui.loadResource(Rez.Strings.label_no_user));
