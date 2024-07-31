@@ -18,7 +18,7 @@
     <string id="label_no_token" scope="background">Token saknas</string>
     <string id="label_needConfig" scope="background">Need configuration</string>  <!--  NEW -->
     <string id="label_seeDoc" scope="background">See documentation</string>  <!--  NEW -->
-$
+
     <!-- No glance view -->
     <string id="label_touch">Pekskärm</string>
     <string id="label_press">Tryck på start</string>
@@ -83,7 +83,6 @@ $
     <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
     <string id="setting_which_api">Which API</string>  <!--  NEW -->
     <string id="setting_needConfig">Select one from below</string>  <!--  NEW -->
-    <string id="setting_tesla">Tesla</string>  <!--  NEW -->
     <string id="setting_tesla">Tesla</string>  <!--  NEW -->
     <string id="setting_tessie">Tessie</string>  <!--  NEW -->
     <string id="setting_teslemetry">Teslemetry</string>  <!--  NEW -->
@@ -185,6 +184,7 @@ $
     <string id="label_too_many_request">Too many requests\nslowing down</string>  <!--  NEW -->
     <string id="label_no_user">Audio off</string>  <!--  NEW -->
     <string id="label_vehicleStatus">Getting vehicle status</string>  <!--  NEW -->
+    <string id="label_invalid_token">Invalid token</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Öppna frunk</string>

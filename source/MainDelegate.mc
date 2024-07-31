@@ -1925,7 +1925,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_unauthorized)]);
 				}
 				else {
-					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_invalid_token)]);
 				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
@@ -2131,7 +2131,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					}
 					else {
 						_stateMachineCounter = 50;  // 5 seconds
-						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+						_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_invalid_token)]);
 					}
 				}
 				else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
@@ -2179,7 +2179,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				}
 				else {
 					_stateMachineCounter = 50; // Wait a second so we don't flood the communication. Wait 5 seconds
-					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_login_on_phone)]);
+					_handler.invoke([3, -1, Ui.loadResource(Rez.Strings.label_invalid_token)]);
 				}
 			}
 			else if (responseCode == 429 || responseCode == -400) { // -400 because that's what I received instead of 429 for some reason, although the http traffic log showed 429
