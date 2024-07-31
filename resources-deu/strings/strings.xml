@@ -184,6 +184,7 @@
     <string id="label_too_many_request">Too many requests\nslowing down</string>  <!--  NEW -->
     <string id="label_no_user">Audio off</string>  <!--  NEW -->
     <string id="label_vehicleStatus">Getting vehicle status</string>  <!--  NEW -->
+    <string id="label_invalid_token">Invalid token</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>

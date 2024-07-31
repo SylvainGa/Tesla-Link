@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V9.0.0b7</string>
+    <string id="AppNameVersion">Tesla Link V9.0.0.b8</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
@@ -185,6 +185,7 @@
     <string id="label_too_many_request">Too many requests\nslowing down</string>
     <string id="label_no_user">Audio off</string>
     <string id="label_vehicleStatus">Getting vehicle status</string>
+    <string id="label_invalid_token">Invalid token</string>
     
 	<!--  Popup text -->
     <string id="label_open_frunk">Open Frunk?</string>
