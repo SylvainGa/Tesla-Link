@@ -1,14 +1,14 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V9.0.0.b8</string>
+    <string id="AppNameVersion">Tesla Link V9.0.0</string>
     <string id="shortComplicationLabel">TeslaLink</string>
     <string id="longComplicationLabel">Tesla-Link</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">No vehicle</string>
     <string id="label_asleep" scope="background">Asleep</string>
-    <string id="label_launch_widget" scope="background">Launch widget</string>  <!--  NEW -->
-    <string id="label_waiting_data" scope="background">Waiting for data</string>  <!--  NEW -->
+    <string id="label_launch_widget" scope="background">Launch widget</string>
+    <string id="label_waiting_data" scope="background">Waiting for data</string>
     <string id="label_error" scope="background">Error: </string>
     <string id="label_driving" scope="background">Driving</string>
     <string id="label_s_off" scope="background">S Off</string>
@@ -39,10 +39,10 @@
     <string id="menu_label_reset">Reset</string>
     <string id="menu_label_honk">Honk</string>
     <string id="menu_label_open_port">Open Port</string>
-    <string id="menu_label_close_port">Close Port</string>  <!--  NEW -->
-    <string id="menu_label_unlock_port">Unlock Port</string>  <!--  NEW -->
+    <string id="menu_label_close_port">Close Port</string>
+    <string id="menu_label_unlock_port">Unlock Port</string>
     <string id="menu_label_open_frunk">Open Frunk</string>
-    <string id="menu_label_close_frunk">Close Frunk</string>  <!--  NEW -->
+    <string id="menu_label_close_frunk">Close Frunk</string>
     <string id="menu_label_open_frunk_opened">Frunk already opened</string>
     <string id="menu_label_toggle_view">Toggle View</string>
     <string id="menu_label_swap_frunk_for_port">Alternate Trunk/Frunk/Port</string>
