@@ -1087,7 +1087,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0) {
 			if (_wake_state < WAKE_ONLINE) {
 				// We're not online (probably in Tessie cache mode), if we haven't already sent a wake command, send one
-				if (_wake_state < WAKE_SENT && _wake_state > WAKE_RETEST) {
+				if (_wake_state < WAKE_SENT || _wake_state > WAKE_RETEST) {
 					//DEBUG*/ logMessage("workerTimer: Need to wake before sending command");
 					_wake_state = WAKE_NEEDED;
 					_stateMachineCounter = 1;
