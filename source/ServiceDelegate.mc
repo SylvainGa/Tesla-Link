@@ -280,6 +280,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (responseCode == 200 && responseData != null && responseData instanceof Lang.Dictionary) {
 			var response = responseData.get("response");
             if (response != null && response instanceof Lang.Dictionary && response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
+                logMessage("BG-onReceiveVehicleData: Building _data");
                 var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"), 0);
                 var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
                 var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
@@ -292,6 +293,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
                 _data.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
                 _data.put("vehicleAwake", "online"); // Hard code that we're online if we get a 200
+                logMessage("BG-onReceiveVehicleData: _data has " + _data);
             }
             //DEBUG*/ else { _data.put("battery_level", 100); }
 
@@ -318,8 +320,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 // }
             }
         }
-        //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
-        /*DEBUG*/ logMessage("BG-Sending background complication");
+        /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
+        //DEBUG*/ logMessage("BG-Sending background complication");
         $.sendComplication(_data);
 
         Background.exit(_data);
