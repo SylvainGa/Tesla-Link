@@ -119,7 +119,7 @@ class TeslaLink extends App.AppBase {
             return;
         }
         
-		if ($.getProperty("whichAPI", 0, method(:validateNumber)) == API_TESLA) {
+		if ($.getProperty("whichAPI", API_TESLA, method(:validateNumber)) == API_TESLA) {
             gSettingsChanged = true;
         }
         

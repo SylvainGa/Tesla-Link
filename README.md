@@ -41,14 +41,14 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 If you want to have the widget translated to your language, contact me through email or github.
 
-You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/master/Tesla-Link-OperatingGuide.pdf).
+You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
-V9.0.0 Is the merging of the Legacy and Tessie app (so a new major version) in one app with some new additions
+V9.0.0 Is the merging of the Legacy and Tessie app (so a new major version) in one app with some new additions. Beside this version to ring the bell that a new version is here, the Legacy app is now end of life. Head over to https://apps.garmin.com/apps/3ca805c7-b4e6-469e-a3fc-7a5c707fca54 to keep your app up to date in the future
 - A drop down in the config is used to choose between Tesla, Tessie and Teslemetry as proxy (Teslemetry is new). You don't need to enter the URL anymore as they default to their optimal value. You can still make them point to something else if you prefer. I higly suggest you see the documentation on how to use.
 - You can toggle the locking of the vehicle, lock it or unlock it when launched from complications (ie, a watch face like Crystal Tesla)
 - Media volume adjustments as well as Play/Pause is now working in the Media panel! Still waiting for Tesla to activate the other commands :-(
-- Reverted CIQ to 6.4.2 since it messed up sending Complications to the Crystal-Tesla watchface with CIQ 7.x.
+- Reverted CIQ to 6.4.2 since it messed up sending Complications to the Crystal-Tesla watchface with CIQ 7.x. No features were lost with the downgrade.
 
 V8.1.0
 - Compiled with CIQ 7.1.1 to add the Forerunner 165 and 165m. 
