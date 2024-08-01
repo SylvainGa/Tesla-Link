@@ -180,8 +180,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (_serverAPILocation.equals("")) {
             var APIs = [ "", "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ]; // "" is for the -1 option meaning not configured
             _serverAPILocation = APIs[$.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)) + 1]; // +1 because we default to -1 when mot configured
-            logMessage("WhichAPI has " + $.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)));
-            logMessage("APIs is " + APIs);            
+            /*DEBUG*/ logMessage("WhichAPI has " + $.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)));
+            /*DEBUG*/ logMessage("APIs is " + APIs);            
         }
 
         /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
