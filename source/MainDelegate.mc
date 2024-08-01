@@ -1887,6 +1887,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					_stateMachineCounter = 20; // Try again in  seconds (leaving _wake_state at WAKE_RECEIVED will trigger a new wake check)
 					_wake_state = WAKE_RETEST;
 				}
+				else if (_wake_state == WAKE_UNKNOWN && _tesla.getTessieCacheMode() && _waitingFirstData > 0) { // We don't know our wake state, we're in Tessie Cache mode and we're waiting for our first set of data, don't "Ask to wake" 
+					_wake_state = WAKE_OFFLINE;
+				}
 				else if (_check_wake != CHECK_WAKE_CHECK_SILENT) { // If we're WAKE_UNKMOWN state, we simply silently want our wake state, don't wake up
 					_wake_state = WAKE_NEEDED; // Next iteration of StateMachine will call the wake function
 				}

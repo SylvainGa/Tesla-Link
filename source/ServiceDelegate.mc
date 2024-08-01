@@ -16,8 +16,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         System.ServiceDelegate.initialize();
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
-            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            _serverAPILocation = APIs[$.getProperty("whichAPI", API_TESLA, method(:validateNumber))];
+            var APIs = [ "", "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ]; // "" is for the -1 option meaning not configured
+            _serverAPILocation = APIs[$.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)) + 1]; // +1 because we default to -1 when mot configured
         }
     }
 
@@ -178,8 +178,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
         System.ServiceDelegate.initialize();
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
-            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            _serverAPILocation = APIs[$.getProperty("whichAPI", API_TESLA, method(:validateNumber))];
+            var APIs = [ "", "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ]; // "" is for the -1 option meaning not configured
+            _serverAPILocation = APIs[$.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)) + 1]; // +1 because we default to -1 when mot configured
         }
 
         //DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);

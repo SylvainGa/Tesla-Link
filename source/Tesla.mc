@@ -17,9 +17,9 @@ class Tesla {
 
         _serverAPILocation = $.getProperty("serverAPILocation", "", method(:validateString));
         if (_serverAPILocation.equals("")) {
-            var APIs = [ "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ];
-            var whichAPI = $.getProperty("whichAPI", API_TESLA, method(:validateNumber));
-            _serverAPILocation = APIs[whichAPI];
+            var APIs = [ "", "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ]; // "" is for the -1 option meaning not configured
+            var whichAPI = $.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber));
+            _serverAPILocation = APIs[whichAPI + 1]; // +1 because we default to -1 when mot configured
             if (whichAPI == API_TESSIE) {
                 _useTessieCacheMode = $.getProperty("useTessieCacheMode", true, method(:validateBoolean));
             }
