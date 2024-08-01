@@ -182,7 +182,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _serverAPILocation = APIs[$.getProperty("whichAPI", API_TESLA, method(:validateNumber))];
         }
 
-        /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
+        //DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
 
         _fromTokenRefresh = false;
         _fromWhichAPI = API_TESLA;
@@ -203,7 +203,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
@@ -217,7 +217,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             vehicle = Storage.getValue("vehicleVIN");
         }
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("BG-onTemporalEvent getting data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             _fromTokenRefresh = false;
             Communications.makeWebRequest(
                 "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
@@ -233,7 +233,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            /*DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
             $.sendComplication(_data);
@@ -244,7 +244,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("BG-onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG*/ var myStats = System.getSystemStats();
@@ -280,6 +280,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (responseCode == 200 && responseData != null && responseData instanceof Lang.Dictionary) {
 			var response = responseData.get("response");
             if (response != null && response instanceof Lang.Dictionary && response.get("charge_state") != null && response.get("climate_state") != null && response.get("drive_state") != null) {
+                //DEBUG*/ logMessage("BG-onReceiveVehicleData: Building _data");
                 var battery_level = $.validateNumber(response.get("charge_state").get("battery_level"), 0);
                 var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
                 var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
@@ -292,6 +293,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 _data.put("sentry", $.validateBoolean(response.get("vehicle_state").get("sentry_mode"), false));
                 _data.put("preconditioning", $.validateBoolean(response.get("charge_state").get("preconditioning_enabled"), false));
                 _data.put("vehicleAwake", "online"); // Hard code that we're online if we get a 200
+                //DEBUG*/ logMessage("BG-onReceiveVehicleData: _data has " + _data);
             }
             //DEBUG*/ else { _data.put("battery_level", 100); }
 
@@ -318,15 +320,15 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 // }
             }
         }
-        //DEBUG*/ logMessageAndData("onReceiveVehicleData exiting with data=", _data);
-        /*DEBUG*/ logMessage("BG-Sending background complication");
+        //DEBUG*/ logMessage("BG-Sending background complication=" + _data);
+        //DEBUG*/ logMessage("BG-Sending background complication");
         $.sendComplication(_data);
 
         Background.exit(_data);
     }
 
     function testAwake() {
-        /*DEBUG*/ logMessage("BG-testAwake called");
+        //DEBUG*/ logMessage("BG-testAwake called");
         var token = _data.get("token");
 
         Communications.makeWebRequest(
@@ -344,7 +346,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
 	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("BG-onReceiveVehicles: " + responseCode);
+		//DEBUG*/ logMessage("BG-onReceiveVehicles: " + responseCode);
 		//logMessage("BG-onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
