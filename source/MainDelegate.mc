@@ -1880,6 +1880,14 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				_vehicle_state = vehicles[vehicle_index].get("state");
 				_data._vehicle_state = _vehicle_state;
+
+				var status = Storage.getValue("status");
+				if (status != null) {
+					status.put("vehicleAwake", _vehicle_state);
+					Storage.setValue("status", status);
+					$.sendComplication(status);
+				}
+				
 				if (_vehicle_state.equals("online")) {
 					_wake_state = WAKE_ONLINE; // We're online! It's time to get the data!
 				}

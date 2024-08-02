@@ -123,7 +123,7 @@ class TeslaLink extends App.AppBase {
             gSettingsChanged = true;
         }
         
-        /*DEBUG*/ logMessage("onBackgroundData with data=" + data);
+        //DEBUG*/ logMessage("onBackgroundData with data=" + data);
         if (data != null) {
             //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
 
