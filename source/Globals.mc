@@ -211,7 +211,9 @@ function sendComplication(data) {
 	}
 }
 
-(:debug, :background)
+/*DEBUG    Don't move over to release!!!!!*/ 
+// (:debug, :background)
+(:background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
@@ -219,14 +221,9 @@ function logMessage(message) {
 }
 
 
-(:release, :background)
-function logMessage(message) {
-}
-(:release, :background)
-function logMessageAndData(message, data) {
-}
-
-(:debug, :background)
+/*DEBUG    Don't move over to release!!!!!*/ 
+// (:debug, :background)
+(:background)
 function logMessageAndData(message, data) {
 	if (data == null) {
 		logMessage(message + "No DATA");
@@ -249,4 +246,11 @@ function logMessageAndData(message, data) {
 
 		logMessage(message + " responseCode=" + responseCode + " status=" + status + " timestamp=" + timestamp + " token=" + token + " refreshToken=" + refreshToken + " vehicleAwake=" + vehicleAwake);
 	}
+
+// (:release, :background)
+// function logMessage(message) {
+// }
+// (:release, :background)
+// function logMessageAndData(message, data) {
+// }
 }
