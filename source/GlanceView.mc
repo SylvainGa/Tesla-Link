@@ -232,20 +232,15 @@ class GlanceView extends Ui.GlanceView {
             }
 
             // If responseCode is null, we don't have anything, ask to launch or wait for data (if we have tokens)
-            if (responseCode == 200) {
+            if (responseCode == 200 || responseCode == 408) {
                 if (charging_state != null && charging_state.equals("Charging")) {
                     suffix = "+";
                 }
-            }
-            else if (responseCode == 408) {
-                if (vehicleAwake.equals("online") == false) {
+                else if (vehicleAwake.equals("online") == false) {
                     txt = Ui.loadResource(Rez.Strings.label_asleep) + preconditioning;
                     if (!_threeLines) {
                         suffix = "s";
                     }
-                }
-                else {
-                    txt = Ui.loadResource(Rez.Strings.label_error) + responseCode + preconditioning + " " + vehicleAwake;
                 }
             }
             else if (responseCode == 401 || responseCode == null) {
