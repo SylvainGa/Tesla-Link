@@ -214,4 +214,6 @@
             <color>000000</color>
         </palette>
     </bitmap>
+    <bitmap id="dogmode_black_bg" filename="DogBlackBG.png" dithering="none" scaleX="50%" scaleY="50%" scaleRelativeTo="screen" automaticPalette="false">
+    </bitmap>
 </drawables>

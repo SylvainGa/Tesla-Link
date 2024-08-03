@@ -54,11 +54,12 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_CLIMATE_DEFROST =         23,
 	ACTION_TYPE_CLIMATE_SET =             24,
 	ACTION_TYPE_MEDIA_CONTROL =           25,
+	ACTION_TYPE_DOGMODE_WATCH =           26,
 	// Following are through buttons or touch screen input
-	ACTION_TYPE_CLIMATE_ON =              26,
-	ACTION_TYPE_CLIMATE_OFF =             27,
-	ACTION_TYPE_LOCK =                    28, // (from Complication call also)
-	ACTION_TYPE_UNLOCK =                  29  // (from Complication call also)
+	ACTION_TYPE_CLIMATE_ON =              27,
+	ACTION_TYPE_CLIMATE_OFF =             28,
+	ACTION_TYPE_LOCK =                    29, // (from Complication call also)
+	ACTION_TYPE_UNLOCK =                  30  // (from Complication call also)
 }
 
 enum { /* Wake state */
@@ -103,6 +104,7 @@ enum { /* _check_wake option */
 
 class MainDelegate extends Ui.BehaviorDelegate {
 	var _view as MainView;
+	var _subView;
 	var _settings;
 	var _handler;
 	var _tesla;
@@ -1071,6 +1073,11 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastDataRun = System.getTimer();
 		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
+
+		// If we're showing a subview, ask it to be refreshed
+		if (_subView != null) {
+			_subView.requestUpdate();
+		}
 	}
 
 	function workerTimer() {
@@ -1517,6 +1524,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 			case 25:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_media_control, null, :media_control, {}));
+				break;
+			case 26:
+				menu.addItem(new MenuItem(Rez.Strings.menu_label_dogmodewatch, null, :dogmode_watch, {}));
 				break;
 			default:
 				//DEBUG 2023-10-02*/ logMessage("addMenuItem: Index " + index + " out of range");

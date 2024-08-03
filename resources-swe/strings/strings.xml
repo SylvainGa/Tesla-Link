@@ -78,6 +78,7 @@
     <string id="menu_label_toggle_lock">Toggle vehicle locking</string>  <!--  NEW -->
     <string id="menu_label_lock">Lock vehicle</string>  <!--  NEW -->
     <string id="menu_label_unlock">Unlock vehicle</string>  <!--  NEW -->
+    <string id="menu_label_dogmodewatch">Dog Mode watch</string>  <!--  NEW -->
 
     <!--  Items in Settings only -->
     <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
@@ -185,6 +186,9 @@
     <string id="label_no_user">Audio off</string>  <!--  NEW -->
     <string id="label_vehicleStatus">Getting vehicle status</string>  <!--  NEW -->
     <string id="label_invalid_token">Invalid token</string>  <!--  NEW -->
+    <string id="label_dogmode_nodata">No data received!\nCheck your vehicle!</string>  <!--  NEW -->
+    <string id="label_dogmode_toohigh">Temperature alert!\nCheck your vehicle!</string>  <!--  NEW -->
+    <string id="label_mode_notavail">Sorry, this mode is\nnot availble for\nyour watch</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Öppna frunk</string>
