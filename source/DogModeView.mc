@@ -54,18 +54,29 @@ class DogModeView extends Ui.View {
 		dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(
 			width / 2,
-			height / 4,
+			height / 16,
 			Graphics.FONT_MEDIUM,
 			hours + ":" + minutes + ":" + seconds + amPmText,
+			Graphics.TEXT_JUSTIFY_CENTER
+		);
+
+        var charge = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
+		dc.setColor(charge < 25 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+		dc.drawText(
+			width / 3,
+			height / 4 + _fontHeightMedium / 4,
+			Graphics.FONT_MEDIUM,
+			charge + "%",
 			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
 		);
 
         var inside_temp = $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0);
+        
         var inside_temp_str = Sys.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? (((inside_temp * 9) / 5) + 32) + "°F" : inside_temp + "°C";
 		dc.setColor(inside_temp > 25 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(
-			width / 2,
-			height / 4 + _fontHeightMedium,
+			(width * 2) / 3,
+			height / 4 + _fontHeightMedium / 4,
 			Graphics.FONT_MEDIUM,
 			inside_temp_str,
 			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
@@ -73,6 +84,24 @@ class DogModeView extends Ui.View {
 
         var dataTimeStamp = $.validateLong(_data._vehicle_data.get("climate_state").get("timestamp"), 0) / 1000;
         var curTimeStamp = Time.now().value();
+        var variation = curTimeStamp - dataTimeStamp;
+        var variation_str;
+        if (variation > 59) {
+            var variation_min = (variation / 60).toNumber();
+            variation_str = variation_min + "m" + (((variation / 60.0) - variation_min) * 60.0).toNumber() + "s";
+        }
+        else {
+            variation_str = variation + "s";
+        }
+		dc.setColor(variation > 120 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+		dc.drawText(
+			width / 2,
+			height / 4 + _fontHeightMedium,
+			Graphics.FONT_MEDIUM,
+			variation_str,
+			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+		);
+
         if (curTimeStamp - dataTimeStamp > 120 || inside_temp > 25) {
             if (Attention has :vibrate) {
                 var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
@@ -118,14 +147,14 @@ class DogModeView extends Ui.View {
                 if (hour > 12) {
                     hour = hour - 12;
                 }
-                amPm = "P";
+                amPm = "am";
             } else {
                 
                 // #27 Ensure midnight is shown as 12, not 00.
                 if (hour == 0) {
                     hour = 12;
                 }
-                amPm = "A";
+                amPm = "pm";
             }
         }
 
