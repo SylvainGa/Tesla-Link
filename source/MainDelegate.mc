@@ -2258,7 +2258,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_stateMachineCounter = 100; // We're pounding the Tesla's server, slow down! Wait 10 seconds
 		}
 		else { // Our call failed, say the error and back to the main code
-			logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
+			//DEBUG*/ logMessage("onCommandReturn: " + responseCode + " running StateMachine in 100msec");
 			_handler.invoke([0, -1, Ui.loadResource(Rez.Strings.label_might_have_failed) + "\n" + buildErrorString(responseCode)]);
 			_stateMachineCounter = 1; // 0.1 second
 		}

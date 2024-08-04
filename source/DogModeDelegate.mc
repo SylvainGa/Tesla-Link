@@ -23,7 +23,6 @@ class DogModeDelegate extends Ui.BehaviorDelegate {
         var delegate = new SimpleConfirmDelegate(method(:LeaveDogMode), method(:StayDogMode));
         _controller._subViewExitCounter = 150;
         Ui.pushView(view, delegate, Ui.SLIDE_UP);
-        // Unless we missed data, restore _stateMachineCounter
         return true;
     }
 
