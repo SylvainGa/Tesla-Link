@@ -349,6 +349,7 @@ class MainView extends Ui.View {
 			var inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((($.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) * 9) / 5) + 32) + "°F" : $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) + "°C";
 			var door_open = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("df"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("dr"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pf"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pr"), 0);
 			var vehicle_state = $.validateString(_data._vehicle_state, "");
+			var climate_keeper_mode = $.validateString(_data._vehicle_data.get("climate_state").get("climate_keeper_mode"), "off");
 
 			// Draw the charge status
 			dc.setColor(Graphics.COLOR_DK_GREEN, Graphics.COLOR_BLACK);
@@ -524,7 +525,31 @@ class MainView extends Ui.View {
 				else if (defrost_mode == 2) {
 					dc.drawBitmap(image_x_right + bm_width / 2 + bm_width / 8, image_y_top + bm_height / 2 + bm_height / 8, bm_waves);
 				}
-				
+
+				// Show with state the climate_keeper is in
+				var bm_center = null;
+				if (climate_keeper_mode != null) {
+					// var mode = "";
+					if (climate_keeper_mode.equals("dog")) {
+						// mode = "D";
+						bm_center = Ui.loadResource(Rez.Drawables.dogpaw_icon) as BitmapResource;
+					}
+					else if (climate_keeper_mode.equals("camp")) {
+						// mode = "C";
+						bm_center = Ui.loadResource(Rez.Drawables.tent_icon) as BitmapResource;
+					}
+					else if (climate_keeper_mode.equals("on")) {
+						// mode = "K";
+						bm_center = Ui.loadResource(Rez.Drawables.padlock_icon) as BitmapResource;
+					}
+
+					if (bm_center != null) {
+						dc.drawBitmap(image_x_right + bm_width / 2 - bm_width / 8, image_y_top + bm_height / 2 - bm_height / 8, bm_center);
+					}
+
+					// dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+					// dc.drawText(image_x_right + bm_width / 2, image_y_top + bm_height / 2, Graphics.FONT_SMALL, mode, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+				}				
 				// Update the text at the bottom of the screen with charge and temperature
 				var status_drawable = View.findDrawableById("status");
 				var charging_current = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_current_request"), 0);

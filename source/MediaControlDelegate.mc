@@ -191,7 +191,7 @@ class MediaControlDelegate extends Ui.BehaviorDelegate {
 				var response = data.get("response");
 				/*DEBUG*/ logMessage("onCommandReturn: received " + response);
 				if (response != null && response instanceof Lang.Dictionary && response.get("result") == false) {
-                    if (response.get("reason").equals("user_not_present") == true) {
+                    if ((response.get("reason") != null && get("reason").equals("user_not_present") == true) || (response.get("string") != null && response.get("string").find("user_not_present") != null)) {
             			_handler.invoke(Ui.loadResource(Rez.Strings.label_no_user));
                         _controller._stateMachineCounter = 20; // Next query event in two seconds
                     }

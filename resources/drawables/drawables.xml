@@ -135,6 +135,33 @@
             <color>000000</color>
         </palette>
     </bitmap>
+    <bitmap id="padlock_icon" filename="padlock.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>CCCCCC</color>
+            <color>888888</color>
+            <color>444444</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="dogpaw_icon" filename="dogpaw.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>CCCCCC</color>
+            <color>888888</color>
+            <color>444444</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="tent_icon" filename="tent.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+            <color>CCCCCC</color>
+            <color>888888</color>
+            <color>444444</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
     <bitmap id="locked_icon" filename="locked.png" dithering="none" scaleX="28.6%" scaleY="28.6%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>00AA00</color>
@@ -213,5 +240,7 @@
             <color>FFFFFF</color>
             <color>000000</color>
         </palette>
+    </bitmap>
+    <bitmap id="dogmode_black_bg" filename="DogBlackBG.png" dithering="none" scaleX="50%" scaleY="50%" scaleRelativeTo="screen" automaticPalette="false">
     </bitmap>
 </drawables>

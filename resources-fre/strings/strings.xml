@@ -71,13 +71,14 @@
     <string id="menu_label_remote_boombox">Boombox à distance</string>
     <string id="menu_label_climate_mode">Mode de la climatisation</string>
     <string id="menu_label_select">Sélectionner</string>
-    <string id="menu_label_media_control">Contrôle média</string>  <!--  NEW -->
-    <string id="menu_label_battery_range">Nominale</string>  <!--  NEW -->
-    <string id="menu_label_est_battery_range">Estimée</string>  <!--  NEW -->
-    <string id="menu_label_ideal_battery_range">Idéale</string>  <!--  NEW -->
+    <string id="menu_label_media_control">Contrôle média</string>
+    <string id="menu_label_battery_range">Nominale</string>
+    <string id="menu_label_est_battery_range">Estimée</string>
+    <string id="menu_label_ideal_battery_range">Idéale</string>
     <string id="menu_label_toggle_lock">Basculer le verrouillage du véhicule</string>
     <string id="menu_label_lock">Verrouiller le vehicle</string>
     <string id="menu_label_unlock">Déverrouiller le vehicle</string>
+    <string id="menu_label_dogmodewatch">Suivi d'animale de compagnie</string>
     
     <!--  Items in Settings only -->
     <string id="setting_token_label">Jeton d'API (requis pour Teslemetry et Tessie)</string>
@@ -181,10 +182,15 @@
     <string id="label_climate_mode">Mode climat à </string>
     <string id="label_still_waiting_data">Toujours en attente</string>
     <string id="label_ask_manual_wake">SVP réveiller le\nvéhicule manuellement</string>
-    <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>  <!--  NEW -->
+    <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>
     <string id="label_no_user">Audio éteint</string>
     <string id="label_vehicleStatus">Acquisition du statut\ndu véhicule</string>
     <string id="label_invalid_token">Jeton invalide</string>
+    <string id="label_dogmode_off">Suivi d'animale de compagnie\nnon activé!\nVérifiez véhicule!</string>
+    <string id="label_dogmode_nodata">Aucune donnée reçue\nVérifiez véhicule!</string>
+    <string id="label_dogmode_toohigh">Alert température!\nVérifiez véhicule!</string>
+    <string id="label_mode_notavail">Désolé, ce mode n'est\npas disponible pour\nvotre montre</string>
+    <string id="label_leave_dog_mode">Confirmer la Sortie?</string>
 
     <!--  Popup text -->
     <string id="label_open_frunk">Ouvrir le coffre ?</string>

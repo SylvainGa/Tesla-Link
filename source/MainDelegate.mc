@@ -54,11 +54,12 @@ enum /* ACTION_TYPES */ {
 	ACTION_TYPE_CLIMATE_DEFROST =         23,
 	ACTION_TYPE_CLIMATE_SET =             24,
 	ACTION_TYPE_MEDIA_CONTROL =           25,
+	ACTION_TYPE_DOGMODE_WATCH =           26,
 	// Following are through buttons or touch screen input
-	ACTION_TYPE_CLIMATE_ON =              26,
-	ACTION_TYPE_CLIMATE_OFF =             27,
-	ACTION_TYPE_LOCK =                    28, // (from Complication call also)
-	ACTION_TYPE_UNLOCK =                  29  // (from Complication call also)
+	ACTION_TYPE_CLIMATE_ON =              27,
+	ACTION_TYPE_CLIMATE_OFF =             28,
+	ACTION_TYPE_LOCK =                    29, // (from Complication call also)
+	ACTION_TYPE_UNLOCK =                  30  // (from Complication call also)
 }
 
 enum { /* Wake state */
@@ -103,6 +104,7 @@ enum { /* _check_wake option */
 
 class MainDelegate extends Ui.BehaviorDelegate {
 	var _view as MainView;
+	var _subView;
 	var _settings;
 	var _handler;
 	var _tesla;
@@ -128,6 +130,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastDataRun;
 	var _waitingForCommandReturn;
 	var _useTouch;
+	var _subViewCounter;
+	var _subViewExitCounter;
 	var _debug_auth;
 	var _debug_view;
 	// 2023-03-20 var _debugTimer;
@@ -164,6 +168,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_408_count = 0;
 		_lastError = null;
 		_lastTimeStamp = 0;
+		_subViewCounter = 0;
+		_subViewExitCounter = 0;
 
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
@@ -265,21 +271,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		else if (args == 1) { // Swiped left from main screen, show subview 1
 			var view = new ChargeView(_view._data);
-			var delegate = new ChargeDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new ChargeDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 2) { // Swiped left on subview 1, show subview 2
 			var view = new ClimateView(_view._data);
-			var delegate = new ClimateDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new ClimateDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 3) { // Swiped left on subview 2, show subview 3
 			var view = new DriveView(_view._data);
-			var delegate = new DriveDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new DriveDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else { // Swiped left on subview 3, we're back at the main display
 			_stateMachineCounter = 1; // 0.1 second
+			_subView = null;
 		}
 	    Ui.requestUpdate();
 	}
@@ -1078,6 +1088,15 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
+		// Check 
+		if (_subViewExitCounter > 1) {
+			_subViewExitCounter--;
+		}
+		else if (_subViewExitCounter == 1) {
+        	_subViewExitCounter = 0;
+	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+		}
+
 		// If we have changed our settings, update
 		if (gSettingsChanged != null && gSettingsChanged) {
 			gSettingsChanged = false;
@@ -1139,6 +1158,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_waitingFirstData++;
 			if (_waitingFirstData % 150 == 0) {
 				_handler.invoke([3, 0, Ui.loadResource(Rez.Strings.label_still_waiting_data)]); // Say we're still waiting for data
+			}
+		}
+
+		// If we're showing a subView, request a one second view refresh
+		if (_subView != null) {
+			if (_subViewCounter >= 10) {
+				_subViewCounter = 0;
+				Ui.requestUpdate();
+			}
+			else {
+				_subViewCounter++;
 			}
 		}
 	}
@@ -1517,6 +1547,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				break;
 			case 25:
 				menu.addItem(new MenuItem(Rez.Strings.menu_label_media_control, null, :media_control, {}));
+				break;
+			case 26:
+				menu.addItem(new MenuItem(Rez.Strings.menu_label_dogmodewatch, null, :dogmode_watch, {}));
 				break;
 			default:
 				//DEBUG 2023-10-02*/ logMessage("addMenuItem: Index " + index + " out of range");

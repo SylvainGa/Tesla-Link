@@ -8,12 +8,14 @@ using Toybox.Graphics;
 
 class ClimateDelegate extends Ui.BehaviorDelegate {
 	var _view as ClimateView;
+	var _controller;
     var _handler;
 	
-    function initialize(view as ClimateView, handler) {
+    function initialize(view as ClimateView, controller, handler) {
         BehaviorDelegate.initialize();
 
     	_view = view;
+		_controller = controller;
         _handler = handler;
     }
 
@@ -52,12 +54,14 @@ class ClimateDelegate extends Ui.BehaviorDelegate {
 
     function onBack() {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
+		_controller._subView = null;
 		_handler.invoke(0);
         return true;
     }
 
     function onTap(click) {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
+		_controller._subView = null;
 		_handler.invoke(1);
         return true;
     }

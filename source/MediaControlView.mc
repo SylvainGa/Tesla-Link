@@ -104,3 +104,4 @@ class MediaControlView extends Ui.View {
         }
     }
 }
+
