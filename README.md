@@ -33,7 +33,7 @@ Features include:
 - text and graphics display modes to suit your device
 - touch and button based controls to suit your device
 - battery status in glance view with background service on supported devices
-- Subview for the charge, vehicle and climate data to see additionnal data not provided by the Tesla App
+- Subview for the charge, vehicle and climate data to see additionnal data not provided by the Tesla App and a Dog mode watcher to make sure the car's climate is safe for the dog
 
 Please raise an issue if anything doesn't work correctly, or if you use an unsupported Garmin device, via the [Github issues page](https://github.com/SylvainGa/Tesla-Link/issues).
 
@@ -41,12 +41,13 @@ If you like the widget, please consider [leaving a positive review](https://apps
 
 If you want to have the widget translated to your language, contact me through email or github.
 
-You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
+You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.1.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
 V9.1.0
 - Climate icon on the main screen will display padlock in the center of the climate blades if keep mode is activated, a small tent for Camp mode and a dog paw print for Dog mode.
 - New feature: Dog mode watch. Available only for watches that can run the app from the Activity wheel. Do NOT run the app from the Glance wheel since that wheel terminates the app after just a few minutes, unlike the Activity wheel which will leave the app running for as long as the user terminates it or the watch runs out of battery. This mode will change the display to just the time, the SoC, the inside temperature and how many seconds since the watch last received valid data from the car. If the SoC gets below 20%, the temperature gets above 25C (77F) or no data has been received for 2 minutes, for as long as these conditions are met, the watch will vibrate and emit a sound (whatever attention your watch has) every second. Use at your own risk. I can't be held responsible if the app fails to work as advertised and the climate fails in the car.
+
 V9.0.0 Is the merging of the Legacy and Tessie app (so a new major version) in one app with some new additions. Beside this version to ring the bell that a new version is here, the Legacy app is now end of life. Head over to https://apps.garmin.com/apps/3ca805c7-b4e6-469e-a3fc-7a5c707fca54 to keep your app up to date in the future
 - A drop down in the config is used to choose between Tesla, Tessie and Teslemetry as proxy (Teslemetry is new). You don't need to enter the URL anymore as they default to their optimal value. You can still make them point to something else if you prefer. I higly suggest you see the documentation on how to use.
 - You can toggle the locking of the vehicle, lock it or unlock it when launched from complications (ie, a watch face like Crystal Tesla)
