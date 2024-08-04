@@ -71,7 +71,6 @@ class DogModeView extends Ui.View {
 		);
 
         var inside_temp = $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0);
-        
         var inside_temp_str = Sys.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? (((inside_temp * 9) / 5) + 32) + "°F" : inside_temp + "°C";
 		dc.setColor(inside_temp > 25 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(

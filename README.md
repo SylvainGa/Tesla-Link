@@ -44,6 +44,10 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
+V9.1.1 Added the following:
+- Added an indication that the vehicle is being awaken first when a command is sent while the vehicle is sleeping with Tessie Cache enabled.
+- Similar to the Dog Mode watch view, the dog paw print icon color in the main view will change red if the temperature gets too high, the SoC gets below 25% or no data has been received from the vehicle in the last 2 minutes.
+
 V9.1.0
 - Climate icon on the main screen will display padlock in the center of the climate blades if keep mode is activated, a small tent for Camp mode and a dog paw print for Dog mode.
 - New feature: Dog mode watch. Available only for watches that can run the app from the Activity wheel. Do NOT run the app from the Glance wheel since that wheel terminates the app after just a few minutes, unlike the Activity wheel which will leave the app running for as long as the user terminates it or the watch runs out of battery. This mode will change the display to just the time, the SoC, the inside temperature and how many seconds since the watch last received valid data from the car. If the SoC gets below 20%, the temperature gets above 25C (77F) or no data has been received for 2 minutes, for as long as these conditions are met, the watch will vibrate and emit a sound (whatever attention your watch has) every second. Use at your own risk. I can't be held responsible if the app fails to work as advertised and the climate fails in the car.

@@ -1088,7 +1088,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			return;
 		}
 
-		// Check 
+		// Check if we are in a subview with a "should we exit" countdown
 		if (_subViewExitCounter > 1) {
 			_subViewExitCounter--;
 		}
@@ -1102,6 +1102,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			gSettingsChanged = false;
 			settingsChanged(false);
 		}
+
 		// We're not waiting for a command to return, we're waiting for an action to be performed
 		if (_waitingForCommandReturn == false && _pendingActionRequests.size() > 0) {
 			if (_wake_state < WAKE_ONLINE) {
@@ -1110,6 +1111,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 					/*DEBUG*/ logMessage("workerTimer: Need to wake before sending command");
 					_wake_state = WAKE_NEEDED;
 					_stateMachineCounter = 1;
+					_handler.invoke([3, 0, Ui.loadResource(Rez.Strings.label_waking_vehicle)]); // Say we're still waiting for data
 				}
 
 				// Now we need to run our stateMachine function that will have the job of waking the car

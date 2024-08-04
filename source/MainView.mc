@@ -346,7 +346,8 @@ class MainView extends Ui.View {
 			var battery_level = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
 			var charge_limit = $.validateNumber(_data._vehicle_data.get("charge_state").get("charge_limit_soc"), 0);
 			var charging_state = $.validateString(_data._vehicle_data.get("charge_state").get("charging_state"), "");
-			var inside_temp = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? ((($.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) * 9) / 5) + 32) + "°F" : $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0) + "°C";
+			var inside_temp = $.validateNumber(_data._vehicle_data.get("climate_state").get("inside_temp"), 0);
+			var inside_temp_str = System.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? (((inside_temp * 9) / 5) + 32) + "°F" : inside_temp + "°C";
 			var door_open = $.validateNumber(_data._vehicle_data.get("vehicle_state").get("df"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("dr"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pf"), 0) + $.validateNumber(_data._vehicle_data.get("vehicle_state").get("pr"), 0);
 			var vehicle_state = $.validateString(_data._vehicle_state, "");
 			var climate_keeper_mode = $.validateString(_data._vehicle_data.get("climate_state").get("climate_keeper_mode"), "off");
@@ -483,13 +484,13 @@ class MainView extends Ui.View {
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_off) as BitmapResource;
 					}
 					else if (left_temp_direction < 0 && !climate_defrost) {
-						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Cooling drv:" + driver_temp + " inside:" + inside_temp); }
+						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Cooling drv:" + driver_temp + " inside:" + inside_temp_str); }
 						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_blue) as BitmapResource;
 						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_blue) as BitmapResource;
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_blue) as BitmapResource;
 					}
 					else {
-						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Heating drv:" + driver_temp + " inside:" + inside_temp); }
+						// 2023-03-20 if (_showLogMessage) { logMessage("MainView:onUpdate: Heating drv:" + driver_temp + " inside:" + inside_temp_str); }
 						bm = Ui.loadResource(Rez.Drawables.climate_on_icon_red) as BitmapResource;
 						bm_waves = Ui.loadResource(Rez.Drawables.climate_waves_red) as BitmapResource;
 						bm_blades = Ui.loadResource(Rez.Drawables.climate_blades_red) as BitmapResource;
@@ -532,7 +533,10 @@ class MainView extends Ui.View {
 					// var mode = "";
 					if (climate_keeper_mode.equals("dog")) {
 						// mode = "D";
-						bm_center = Ui.loadResource(Rez.Drawables.dogpaw_icon) as BitmapResource;
+						var dataTimeStamp = $.validateLong(_data._vehicle_data.get("climate_state").get("timestamp"), 0) / 1000;
+						var curTimeStamp = Time.now().value();
+						var variation = curTimeStamp - dataTimeStamp;
+						bm_center = Ui.loadResource((battery_level < 25 || inside_temp > 25 || variation > 120) ? Rez.Drawables.dogpaw_red_icon : Rez.Drawables.dogpaw_white_icon) as BitmapResource;
 					}
 					else if (climate_keeper_mode.equals("camp")) {
 						// mode = "C";
@@ -557,7 +561,7 @@ class MainView extends Ui.View {
 					charging_current = 0;
 				}
 				
-				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : (vehicle_state == null ? "%? " : (vehicle_state.equals("online") ? "% " : "%s "))) + charging_current + "A " + inside_temp);
+				status_drawable.setText(battery_level + (charging_state.equals("Charging") ? "%+ " : (vehicle_state == null ? "%? " : (vehicle_state.equals("online") ? "% " : "%s "))) + charging_current + "A " + inside_temp_str);
 				status_drawable.draw(dc);
 
 				// Draw the text in the middle of the screen with departure time (if set)
@@ -647,7 +651,7 @@ class MainView extends Ui.View {
 
 				// Update the temperature text
 				var inside_temp_drawable = View.findDrawableById("inside_temp");
-				inside_temp_drawable.setText(Ui.loadResource(Rez.Strings.label_cabin) + inside_temp);
+				inside_temp_drawable.setText(Ui.loadResource(Rez.Strings.label_cabin) + inside_temp_str);
 
 				// Update the climate state text
 				var climate_state_drawable = View.findDrawableById("climate_state");

@@ -144,12 +144,21 @@
             <color>000000</color>
         </palette>
     </bitmap>
-    <bitmap id="dogpaw_icon" filename="dogpaw.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
+    <bitmap id="dogpaw_white_icon" filename="dogpaw.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
         <palette disableTransparency="false">
             <color>FFFFFF</color>
             <color>CCCCCC</color>
             <color>888888</color>
             <color>444444</color>
+            <color>000000</color>
+        </palette>
+    </bitmap>
+    <bitmap id="dogpaw_red_icon" filename="dogpaw.png" dithering="none" scaleX="8%" scaleY="8%" scaleRelativeTo="screen">
+        <palette disableTransparency="false">
+            <color>FF0000</color>
+            <color>CC0000</color>
+            <color>880000</color>
+            <color>440000</color>
             <color>000000</color>
         </palette>
     </bitmap>
