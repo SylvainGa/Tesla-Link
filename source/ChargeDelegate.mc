@@ -8,12 +8,14 @@ using Toybox.Graphics;
 
 class ChargeDelegate extends Ui.BehaviorDelegate {
 	var _view as ChargeView;
+	var _controller;
 	var _handler;
 	
-    function initialize(view as ChargeView, handler) {
+    function initialize(view as ChargeView, controller, handler) {
         BehaviorDelegate.initialize();
 
     	_view = view;
+		_controller = controller;
         _handler = handler;
     }
 
@@ -52,6 +54,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
 	
     function onBack() {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
+		_controller._subView = null;
 		_handler.invoke(0);
         return true;
     }
@@ -59,6 +62,7 @@ class ChargeDelegate extends Ui.BehaviorDelegate {
     function onTap(click) {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
+		_controller._subView = null;
         return true;
     }
 }

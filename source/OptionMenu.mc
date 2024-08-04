@@ -209,6 +209,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         else if (item == :media_control) {
             var view = new MediaControlView();
             var delegate = new MediaControlDelegate(view, _controller, _previous_stateMachineCounter, view.method(:onReceive));
+            _controller._subView = view;
             Ui.switchToView(view, delegate, Ui.SLIDE_UP);
         }
         else if (item == :dogmode_watch) {

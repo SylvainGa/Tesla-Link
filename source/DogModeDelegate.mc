@@ -19,11 +19,26 @@ class DogModeDelegate extends Ui.BehaviorDelegate {
     }
 
     function onBack() {
+        var view = new Ui.Confirmation(Ui.loadResource(Rez.Strings.label_leave_dog_mode));
+        var delegate = new SimpleConfirmDelegate(method(:LeaveDogMode), method(:StayDogMode));
+        _controller._subViewExitCounter = 150;
+        Ui.pushView(view, delegate, Ui.SLIDE_UP);
         // Unless we missed data, restore _stateMachineCounter
+        return true;
+    }
+
+    function LeaveDogMode()
+    {
         _controller._stateMachineCounter = (_controller._stateMachineCounter != -2 ? _previous_stateMachineCounter : 1);
         _controller._subView = null;
-        //DEBUG 2023-10-02*/ logMessage("MediaControlDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
+        _controller._subViewExitCounter = 0;
+        //DEBUG 2023-10-02*/ logMessage("DogModeDelegate:onBack, returning _stateMachineCounter to " + _controller._stateMachineCounter);
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function StayDogMode()
+    {
         return true;
     }
 }

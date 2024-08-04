@@ -9,11 +9,13 @@ using Toybox.Graphics;
 class DriveDelegate extends Ui.BehaviorDelegate {
 	var _view as DriveView;
     var _handler;
+	var _controller;
 	
-    function initialize(view as DriveView, handler) {
+    function initialize(view as DriveView, controller, handler) {
         BehaviorDelegate.initialize();
 
     	_view = view;
+		_controller = controller;
         _handler = handler;
     }
 
@@ -53,12 +55,14 @@ class DriveDelegate extends Ui.BehaviorDelegate {
     function onBack() {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(0);
+		_controller._subView = null;
         return true;
     }
 
     function onTap(click) {
 		Ui.popView(Ui.SLIDE_IMMEDIATE);
 		_handler.invoke(2);
+		_controller._subView = null;
         return true;
     }
 }

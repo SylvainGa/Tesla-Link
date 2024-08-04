@@ -9,7 +9,7 @@ class DogModeView extends Ui.View {
     var _data;
     var _text;
     var _fontHeightTiny;
-    var _fontHeightMedium;
+    var _fontHeightSmall;
     var _bg;
     var _lastVehicleData;
 
@@ -24,7 +24,7 @@ class DogModeView extends Ui.View {
 
     function onLayout(dc) {
         _fontHeightTiny = Graphics.getFontHeight(Graphics.FONT_TINY);
-        _fontHeightMedium = Graphics.getFontHeight(Graphics.FONT_MEDIUM);
+        _fontHeightSmall = Graphics.getFontHeight(Graphics.FONT_SMALL);
     }
 
 	function onReceive(args) {
@@ -63,9 +63,9 @@ class DogModeView extends Ui.View {
         var charge = $.validateNumber(_data._vehicle_data.get("charge_state").get("battery_level"), 0);
 		dc.setColor(charge < 25 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(
-			width / 3,
-			height / 4 + _fontHeightMedium / 4,
-			Graphics.FONT_MEDIUM,
+			width / 4,
+			height / 4 + _fontHeightSmall / 2,
+			Graphics.FONT_SMALL,
 			charge + "%",
 			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
 		);
@@ -75,9 +75,9 @@ class DogModeView extends Ui.View {
         var inside_temp_str = Sys.getDeviceSettings().temperatureUnits == System.UNIT_STATUTE ? (((inside_temp * 9) / 5) + 32) + "°F" : inside_temp + "°C";
 		dc.setColor(inside_temp > 25 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(
-			(width * 2) / 3,
-			height / 4 + _fontHeightMedium / 4,
-			Graphics.FONT_MEDIUM,
+			width / 2,
+			height / 4 + _fontHeightSmall / 2,
+			Graphics.FONT_SMALL,
 			inside_temp_str,
 			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
 		);
@@ -95,14 +95,16 @@ class DogModeView extends Ui.View {
         }
 		dc.setColor(variation > 120 ? Graphics.COLOR_RED : Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(
-			width / 2,
-			height / 4 + _fontHeightMedium,
-			Graphics.FONT_MEDIUM,
+			(width * 3) / 4,
+			height / 4 + _fontHeightSmall / 2,
+			Graphics.FONT_SMALL,
 			variation_str,
 			Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
 		);
 
-        if (curTimeStamp - dataTimeStamp > 120 || inside_temp > 25) {
+        var dogModeActive = $.validateString(_data._vehicle_data.get("climate_state").get("climate_keeper_mode"), "off").equals("dog");
+
+        if (curTimeStamp - dataTimeStamp > 120 || inside_temp > 25 || !dogModeActive) {
             if (Attention has :vibrate) {
                 var vibeData = [ new Attention.VibeProfile(50, 200) ]; // On for half a second
                 Attention.vibrate(vibeData);
@@ -115,12 +117,11 @@ class DogModeView extends Ui.View {
     		dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 width / 2,
-                height / 4 + (_fontHeightMedium * 2.5).toNumber(),
+                height / 4 + (_fontHeightSmall * 2.5).toNumber(),
                 Graphics.FONT_MEDIUM,
-                Ui.loadResource(inside_temp > 25.0 ? Rez.Strings.label_dogmode_toohigh : Rez.Strings.label_dogmode_nodata),
+                Ui.loadResource(!dogModeActive ? Rez.Strings.label_dogmode_off : inside_temp > 25.0 ? Rez.Strings.label_dogmode_toohigh : Rez.Strings.label_dogmode_nodata),
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             );
-
         }
 
         if (_text != null) {
@@ -147,14 +148,14 @@ class DogModeView extends Ui.View {
                 if (hour > 12) {
                     hour = hour - 12;
                 }
-                amPm = "am";
+                amPm = "pm";
             } else {
                 
                 // #27 Ensure midnight is shown as 12, not 00.
                 if (hour == 0) {
                     hour = 12;
                 }
-                amPm = "pm";
+                amPm = "am";
             }
         }
 

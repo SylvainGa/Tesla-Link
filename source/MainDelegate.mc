@@ -130,6 +130,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 	var _lastDataRun;
 	var _waitingForCommandReturn;
 	var _useTouch;
+	var _subViewCounter;
+	var _subViewExitCounter;
 	var _debug_auth;
 	var _debug_view;
 	// 2023-03-20 var _debugTimer;
@@ -166,6 +168,8 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_408_count = 0;
 		_lastError = null;
 		_lastTimeStamp = 0;
+		_subViewCounter = 0;
+		_subViewExitCounter = 0;
 
 		_pendingActionRequests = [];
 		_stateMachineCounter = 0;
@@ -267,21 +271,25 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		}
 		else if (args == 1) { // Swiped left from main screen, show subview 1
 			var view = new ChargeView(_view._data);
-			var delegate = new ChargeDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new ChargeDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 2) { // Swiped left on subview 1, show subview 2
 			var view = new ClimateView(_view._data);
-			var delegate = new ClimateDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new ClimateDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else if (args == 3) { // Swiped left on subview 2, show subview 3
 			var view = new DriveView(_view._data);
-			var delegate = new DriveDelegate(view, method(:onReceive));
+			_subView = view;
+			var delegate = new DriveDelegate(view, self, method(:onReceive));
 			Ui.pushView(view, delegate, Ui.SLIDE_LEFT);
 		}
 		else { // Swiped left on subview 3, we're back at the main display
 			_stateMachineCounter = 1; // 0.1 second
+			_subView = null;
 		}
 	    Ui.requestUpdate();
 	}
@@ -1073,16 +1081,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		_lastDataRun = System.getTimer();
 		/*DEBUG*/ logMessage("StateMachine: getVehicleData");
 		_tesla.getVehicleData(_vehicle_vin, method(:onReceiveVehicleData));
-
-		// If we're showing a subview, ask it to be refreshed
-		if (_subView != null) {
-			_subView.requestUpdate();
-		}
 	}
 
 	function workerTimer() {
 		if (_in_menu) { // If we're waiting for input in a menu, skip this iteration
 			return;
+		}
+
+		// Check 
+		if (_subViewExitCounter > 1) {
+			_subViewExitCounter--;
+		}
+		else if (_subViewExitCounter == 1) {
+        	_subViewExitCounter = 0;
+	        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 		}
 
 		// If we have changed our settings, update
@@ -1146,6 +1158,17 @@ class MainDelegate extends Ui.BehaviorDelegate {
 			_waitingFirstData++;
 			if (_waitingFirstData % 150 == 0) {
 				_handler.invoke([3, 0, Ui.loadResource(Rez.Strings.label_still_waiting_data)]); // Say we're still waiting for data
+			}
+		}
+
+		// If we're showing a subView, request a one second view refresh
+		if (_subView != null) {
+			if (_subViewCounter >= 10) {
+				_subViewCounter = 0;
+				Ui.requestUpdate();
+			}
+			else {
+				_subViewCounter++;
 			}
 		}
 	}

@@ -186,9 +186,11 @@
     <string id="label_no_user">Audio off</string>  <!--  NEW -->
     <string id="label_vehicleStatus">Getting vehicle status</string>  <!--  NEW -->
     <string id="label_invalid_token">Invalid token</string>  <!--  NEW -->
+    <string id="label_dogmode_off">Dog mode not activated!\nCheck your vehicle!</string>  <!--  NEW -->
     <string id="label_dogmode_nodata">No data received!\nCheck your vehicle!</string>  <!--  NEW -->
     <string id="label_dogmode_toohigh">Temperature alert!\nCheck your vehicle!</string>  <!--  NEW -->
     <string id="label_mode_notavail">Sorry, this mode is\nnot availble for\nyour watch</string>  <!--  NEW -->
+    <string id="label_leave_dog_mode">Exit dog mode watch?</string>  <!--  NEW -->
 
     <!--  Popup text -->
     <string id="label_open_frunk">Frunk öffnen?</string>
