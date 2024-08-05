@@ -84,6 +84,9 @@ class DogModeView extends Ui.View {
         var dataTimeStamp = $.validateLong(_data._vehicle_data.get("climate_state").get("timestamp"), 0) / 1000;
         var curTimeStamp = Time.now().value();
         var variation = curTimeStamp - dataTimeStamp;
+        if (variation < 0) {
+            variation = 0;
+        }
         var variation_str;
         if (variation > 59) {
             var variation_min = (variation / 60).toNumber();
