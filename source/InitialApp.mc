@@ -125,8 +125,6 @@ class TeslaLink extends App.AppBase {
         
         //DEBUG*/ logMessage("onBackgroundData with data=" + data);
         if (data != null) {
-            //DEBUG*/ logMessageAndData("onBackgroundData with data=", data);
-
             // Refresh our tokens
             var token = data["token"];
             if (token != null && token.equals("") == false) {

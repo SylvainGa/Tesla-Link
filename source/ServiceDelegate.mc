@@ -388,7 +388,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         $.sendComplication(_data);
 
-        //DEBUG*/ logMessageAndData("onReceiveVehicles exiting with data=", _data);
         Background.exit(_data);
     }
 
@@ -422,7 +421,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         $.sendComplication(_data);
 
-        //DEBUG*/ logMessageAndData("refreshAccessToken exiting with data=", _data);
         Background.exit(_data);
     }
 
@@ -472,7 +470,6 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            //DEBUG*/ logMessageAndData("onReceiveToken exiting with data=", _data);
             $.sendComplication(_data);
 
             Background.exit(_data);
