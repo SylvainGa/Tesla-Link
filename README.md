@@ -47,6 +47,7 @@ You can find more details on how to use the application by reading the [Operatin
 V9.1.1 Added the following:
 - Added an indication that the vehicle is being awaken first when a command is sent while the vehicle is sleeping with Tessie Cache enabled.
 - Similar to the Dog Mode watch view, the dog paw print icon color in the main view will change red if the temperature gets too high, the SoC gets below 25% or no data has been received from the vehicle in the last 2 minutes.
+- Compiler hack to have the Enduro 2 showing as a supported device again. 
 
 V9.1.0
 - Climate icon on the main screen will display padlock in the center of the climate blades if keep mode is activated, a small tent for Camp mode and a dog paw print for Dog mode.
