@@ -25,7 +25,7 @@ class Tesla {
             }
         }
 
-        /*DEBUG*/ logMessage("Tesla: Using " + _serverAPILocation);
+        //DEBUG*/ logMessage("Tesla: Using " + _serverAPILocation);
     }
 
     function getTessieCacheMode() {

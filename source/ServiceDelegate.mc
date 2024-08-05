@@ -180,11 +180,11 @@ class MyServiceDelegate extends System.ServiceDelegate {
         if (_serverAPILocation.equals("")) {
             var APIs = [ "", "owner-api.teslamotors.com", "api.tessie.com", "api.teslemetry.com" ]; // "" is for the -1 option meaning not configured
             _serverAPILocation = APIs[$.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)) + 1]; // +1 because we default to -1 when mot configured
-            /*DEBUG*/ logMessage("WhichAPI has " + $.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)));
-            /*DEBUG*/ logMessage("APIs is " + APIs);            
+            //DEBUG*/ logMessage("WhichAPI has " + $.getProperty("whichAPI", API_NEED_CONFIG, method(:validateNumber)));
+            //DEBUG*/ logMessage("APIs is " + APIs);            
         }
 
-        /*DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
+        //DEBUG*/ logMessage("BG-Init: Using " + _serverAPILocation);
 
         _fromTokenRefresh = false;
         _fromWhichAPI = API_TESLA;
@@ -205,7 +205,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     // This fires on our temporal event - we're going to go off and get the vehicle data, only if we have a token and vehicle ID
     function onTemporalEvent() {
         if (Storage.getValue("runBG") == false) { // We're in our Main View. it will refresh 'status' there by itself
-            /*DEBUG*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent: In main view, skipping reading data");
             Background.exit(null);
         }
 
@@ -219,7 +219,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             vehicle = Storage.getValue("vehicleVIN");
         }
         if (token != null && vehicle != null) {
-            /*DEBUG*/ logMessage("BG-onTemporalEvent getting data");
+            //DEBUG*/ logMessage("BG-onTemporalEvent getting data");
             _fromTokenRefresh = false;
             Communications.makeWebRequest(
                 "https://" + _serverAPILocation + "/api/1/vehicles/" + vehicle.toString() + "/vehicle_data", null,
@@ -235,7 +235,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
-            /*DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
+            //DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
             $.sendComplication(_data);
@@ -246,7 +246,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
     function onReceiveVehicleData(responseCode, responseData) {
         // The API request has returned check for any other background data waiting. There shouldn't be any. Log it if logging is enabled
-        /*DEBUG*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
+        //DEBUG*/ logMessage("BG-onReceiveVehicleData: " + responseCode);
         //DEBUG*/ logMessage("BG-onReceiveVehicleData: responseData=" + responseData);
 
         //DEBUG*/ var myStats = System.getSystemStats();
@@ -322,7 +322,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
                 // }
             }
         }
-        /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
+        //DEBUG*/ logMessage("BG-Sending background complication=" + _data);
         //DEBUG*/ logMessage("BG-Sending background complication");
         $.sendComplication(_data);
 
@@ -330,7 +330,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
     function testAwake() {
-        /*DEBUG*/ logMessage("BG-testAwake called");
+        //DEBUG*/ logMessage("BG-testAwake called");
         var token = _data.get("token");
 
         Communications.makeWebRequest(
@@ -348,7 +348,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
     }
 
 	function onReceiveVehicles(responseCode, data) {
-		/*DEBUG*/ logMessage("BG-onReceiveVehicles: " + responseCode);
+		//DEBUG*/ logMessage("BG-onReceiveVehicles: " + responseCode);
 		//logMessage("BG-onReceiveVehicles: data is " + data);
 
 		if (responseCode == 200) {
