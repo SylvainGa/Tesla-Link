@@ -2,7 +2,7 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Lang;
-using Toybox.Application;
+using Toybox.Application as App;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 using Toybox.Complications;
