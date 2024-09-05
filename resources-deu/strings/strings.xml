@@ -1,7 +1,5 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="shortComplicationLabel">TeslaLink</string>
-    <string id="longComplicationLabel">Tesla-Link</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">Fahrzeug</string>

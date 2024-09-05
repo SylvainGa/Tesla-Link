@@ -2,6 +2,7 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.Lang;
+using Toybox.Application;
 using Toybox.Application.Storage;
 using Toybox.Application.Properties;
 using Toybox.Complications;
@@ -195,8 +196,8 @@ function sendComplication(data) {
 		// Send it to whoever is listening
 		var comp = {
 			:value => value,
-			:shortLabel => "TESLA",
-			:longLabel => "TESLA-LINK",
+			:shortLabel => App.loadResource(Rez.Strings.shortComplicationLabel),
+			:longLabel => App.loadResource(Rez.Strings.longComplicationLabel),
 			:units => "%",
 		};
 		try {
