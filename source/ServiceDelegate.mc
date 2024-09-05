@@ -238,6 +238,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             /*DEBUG*/ logMessage("BG-onTemporalEvent with token at " + (token == null ? token : token.substring(0, 10)) + " vehicle at " + vehicle);
             _data.put("responseCode", 401);
 
+            /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
             $.sendComplication(_data);
 
             Background.exit(_data);
@@ -386,6 +387,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             _data.put("vehicleAwake", "error");
         }
 
+        /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
         $.sendComplication(_data);
 
         Background.exit(_data);
@@ -419,6 +421,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
 
         _data.put("responseCode", 401);
 
+        /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
         $.sendComplication(_data);
 
         Background.exit(_data);
@@ -470,6 +473,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
             );
         }
         else {
+            /*DEBUG*/ logMessage("BG-Sending background complication=" + _data);
             $.sendComplication(_data);
 
             Background.exit(_data);

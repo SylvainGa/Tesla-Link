@@ -1,8 +1,8 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V9.1.1.b3</string>
-    <string id="shortComplicationLabel">TeslaLink</string>
-    <string id="longComplicationLabel">Tesla-Link</string>
+    <string id="AppNameVersion">Tesla Link V9.1.2b1</string>
+    <string id="shortComplicationLabel" scope="background">TeslaLink</string>
+    <string id="longComplicationLabel" scope="background">Tesla-Link</string>
 
     <!--  Glance view -->
     <string id="vehicle" scope="glance">No vehicle</string>
