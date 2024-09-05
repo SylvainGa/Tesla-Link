@@ -44,6 +44,11 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
+V9.1.2 Added the following:
+- Compiled with CIQ 7.3.0
+- Added Enduro3 and new Fenix8 watches, including the Fenix E
+- Small code optimisation for Telsa's complications
+
 V9.1.1 Added the following:
 - Added an indication that the vehicle is being awaken first when a command is sent while the vehicle is sleeping with Tessie Cache enabled.
 - Similar to the Dog Mode watch view, the dog paw print icon color in the main view will change red if the temperature gets too high, the SoC gets below 25% or no data has been received from the vehicle in the last 2 minutes.
