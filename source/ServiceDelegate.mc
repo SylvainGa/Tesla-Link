@@ -147,8 +147,8 @@ class MyServiceDelegate extends System.ServiceDelegate {
             if (Toybox has :Complications) {
                 var comp = {
                     :value => battery_level,
-                    :shortLabel => "TESLA",
-                    :longLabel => "TESLA-LINK",
+                    :shortLabel => App.loadResource(Rez.Strings.shortComplicationLabel),
+                    :longLabel => App.loadResource(Rez.Strings.longComplicationLabel),
                     :units => "%",
                 };
                 try {

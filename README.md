@@ -44,7 +44,9 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
-V9.1.3 Tesla has increased the size of the return data so much that the background process has not enough memory to treat it as a dictionary. This version parsed the raw data to fetch the required fields.
+V9.1.3 Added the following:
+- Compiled with CIQ 7.4.3
+- Tesla has increased the size of the return data so much that the background process has not enough memory to treat it as a dictionary. This version parsed the raw data to fetch the required fields.
 
 V9.1.2 Added the following:
 - Compiled with CIQ 7.3.0
