@@ -82,7 +82,7 @@
     <string id="setting_token_label">API Token (required for Teslemetry and Tessie)</string>  <!--  NEW -->
     <string id="setting_which_api">Which API</string>  <!--  NEW -->
     <string id="setting_needConfig">Select one from below</string>  <!--  NEW -->
-    <string id="setting_tesla">Tesla</string>  <!--  NEW -->
+    <string id="setting_tesla">Tesla (Legacy S and X ONLY)</string>  <!--  NEW -->
     <string id="setting_tessie">Tessie</string>  <!--  NEW -->
     <string id="setting_teslemetry">Teslemetry</string>  <!--  NEW -->
     <string id="setting_enhancedTouch">Förbättrad touch</string>

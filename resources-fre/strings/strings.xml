@@ -82,7 +82,7 @@
     <string id="setting_token_label">Jeton d'API (requis pour Teslemetry et Tessie)</string>
     <string id="setting_which_api">Quel API</string>
     <string id="setting_needConfig">Choisir une option ci-dessous</string>
-    <string id="setting_tesla">Tesla</string>
+    <string id="setting_tesla">Tesla (ancien S et X seulement!)</string>
     <string id="setting_tessie">Tessie</string>
     <string id="setting_teslemetry">Teslemetry</string>
     <string id="setting_enhancedTouch">Touche améliorée ?</string>
