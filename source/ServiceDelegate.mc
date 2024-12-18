@@ -280,7 +280,7 @@ class MyServiceDelegate extends System.ServiceDelegate {
         _data.put("timestamp", timestamp);
 
         // Read what we need from the data received (if any) (typecheck since ERA reported Unexpected Type Error for 'response')
-        if (responseCode == 200) && responseData != null) {
+        if (responseCode == 200 && responseData != null) {
             if (responseData instanceof Lang.Dictionary) {
                 /*DEBUG*/ logMessage("BG-onReceiveVehicleData: data is a dictionnary");
                 var response = responseData.get("response");
@@ -299,51 +299,52 @@ class MyServiceDelegate extends System.ServiceDelegate {
                     _data.put("vehicleAwake", "online"); // Hard code that we're online if we get a 200
                     //DEBUG*/ logMessage("BG-onReceiveVehicleData: _data has " + _data);
                 }
-                else if (responseData instanceof Lang.Strings) {
-                /*DEBUG*/ logMessage("BG-onReceiveVehicleData: data is a string");
-                    var pos = responseData.find("battery_level");
-                    var str = responseData.substring(pos + 15, pos + 20);
-                    var posEnd = str.find(",");
-                    var battery_level = $.validateNumber(str.substring(0, posEnd), 0);
-                    _data.put("battery_level", battery_level);
+            }
+            else if (responseData instanceof Lang.String) {
+            /*DEBUG*/ logMessage("BG-onReceiveVehicleData: data is a string");
+                var pos = responseData.find("battery_level");
+                var str = responseData.substring(pos + 15, pos + 20);
+                var posEnd = str.find(",");
+                var battery_level = $.validateNumber(str.substring(0, posEnd), 0);
+                _data.put("battery_level", battery_level);
 
-                    var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
-                    var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
-                    var bat_range_pos = [ 15, 19, 21];
-                    pos = responseData.find(bat_range_str[which_battery_type]) + bat_range_pos[which_battery_type];
-                    str = responseData.substring(pos, pos + 8);
-                    posEnd = str.find(",");
-                    _data.put("battery_range", $.validateNumber(str.substring(0, posEnd), 0));
+                var which_battery_type = $.getProperty("batteryRangeType", 0, method(:validateNumber));
+                var bat_range_str = [ "battery_range", "est_battery_range", "ideal_battery_range"];
+                var bat_range_pos = [ 15, 19, 21];
+                pos = responseData.find(bat_range_str[which_battery_type]) + bat_range_pos[which_battery_type];
+                str = responseData.substring(pos, pos + 8);
+                posEnd = str.find(",");
+                _data.put("battery_range", $.validateNumber(str.substring(0, posEnd), 0));
 
-                    pos = responseData.find("charging_state");
-                    str = responseData.substring(pos + 17, pos + 37);
-                    posEnd = str.find("\"");
-                    _data.put("charging_state", $.validateString(str.substring(0, posEnd), ""));
+                pos = responseData.find("charging_state");
+                str = responseData.substring(pos + 17, pos + 37);
+                posEnd = str.find("\"");
+                _data.put("charging_state", $.validateString(str.substring(0, posEnd), ""));
 
-                    pos = responseData.find("inside_temp");
-                    str = responseData.substring(pos + 13, pos + 20);
-                    posEnd = str.find(",");
-                    _data.put("inside_temp", $.validateNumber(str.substring(0, posEnd), 0));
+                pos = responseData.find("inside_temp");
+                str = responseData.substring(pos + 13, pos + 20);
+                posEnd = str.find(",");
+                _data.put("inside_temp", $.validateNumber(str.substring(0, posEnd), 0));
 
-                    pos = responseData.find("shift_state");
-                    str = responseData.substring(pos + 13, pos + 20);
-                    posEnd = str.find(",");
-                    var value = $.validateString(str.substring(0, posEnd), "");
-                    _data.put("shift_state", (value.equals("null") ? "P" : value));
+                pos = responseData.find("shift_state");
+                str = responseData.substring(pos + 13, pos + 20);
+                posEnd = str.find(",");
+                var value = $.validateString(str.substring(0, posEnd), "");
+                _data.put("shift_state", (value.equals("null") ? "P" : value));
 
-                    pos = responseData.find("sentry_mode");
-                    str = responseData.substring(pos + 13, pos + 20);
-                    posEnd = str.find(",");
-                    _data.put("sentry", $.validateString(str.substring(0, posEnd), "").equals("true"));
+                pos = responseData.find("sentry_mode");
+                str = responseData.substring(pos + 13, pos + 20);
+                posEnd = str.find(",");
+                _data.put("sentry", $.validateString(str.substring(0, posEnd), "").equals("true"));
 
-                    pos = responseData.find("preconditioning_enabled");
-                    str = responseData.substring(pos + 25, pos + 32);
-                    posEnd = str.find(",");
-                    _data.put("preconditioning", $.validateString(str.substring(0, posEnd), "").equals("true"));
-                }
-                else {
-                    /*DEBUG*/ logMessage("BG-onReceiveVehicleData: data is not a dictionnary or a string!");
-                }
+                pos = responseData.find("preconditioning_enabled");
+                str = responseData.substring(pos + 25, pos + 32);
+                posEnd = str.find(",");
+                _data.put("preconditioning", $.validateString(str.substring(0, posEnd), "").equals("true"));
+            }
+            else {
+                /*DEBUG*/ logMessage("BG-onReceiveVehicleData: data is not a dictionnary or a string!");
+            }
             //DEBUG*/ else { _data.put("battery_level", 100); }
         }
         else if (responseCode == 401) {
