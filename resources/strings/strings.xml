@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">Tesla Link</string>
-    <string id="AppNameVersion">Tesla Link V9.1.3.b3</string>
+    <string id="AppNameVersion">Tesla Link V9.1.3.b4</string>
     <string id="shortComplicationLabel" scope="background">TeslaLink</string>
     <string id="longComplicationLabel" scope="background">Tesla-Link</string>
 
