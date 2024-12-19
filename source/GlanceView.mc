@@ -39,7 +39,7 @@ class GlanceView extends Ui.GlanceView {
 
 (:bkgnd32kb)
     function onShow() {
-		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
+		/*DEBUG*/ logMessage("GlanceView (32b):onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -60,7 +60,7 @@ class GlanceView extends Ui.GlanceView {
 
 (:bkgnd64kb)
     function onShow() {
-		//DEBUG 2023-10-02*/ logMessage("GlanceView:onShow");
+		/*DEBUG*/ logMessage("GlanceView:onShow");
         var tokenCreatedAt = Storage.getValue("TokenCreatedAt");
         var tokenExpiresIn = Storage.getValue("TokenExpiresIn");
         var expired;
@@ -83,7 +83,7 @@ class GlanceView extends Ui.GlanceView {
     }
 
     function onHide() {
-		//DEBUG 2023-10-02*/ logMessage("GlanceView:onHide");
+		/*DEBUG*/ logMessage("GlanceView:onHide");
         if (_refreshTimer) {
             _refreshTimer.stop();
             //_refreshTimer = null;
