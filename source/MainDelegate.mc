@@ -706,35 +706,29 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				//DEBUG*/ logMessage("actionMachine: Setting seat heat - waiting for onCommandReturn");
-				var seat_heat_chosen_label = Storage.getValue("seat_heat_chosen");
+				var seat_heat_chosen_string = Storage.getValue("seat_heat_chosen");
 				var seat_heat_chosen;
-				switch (seat_heat_chosen_label) {
-					case Rez.Strings.label_seat_auto:
-						seat_heat_chosen = -1;
-						break;
-
-					case Rez.Strings.label_seat_off:
-						seat_heat_chosen = 0;
-						break;
-
-					case Rez.Strings.label_seat_low:
-						seat_heat_chosen = 1;
-						break;
-
-					case Rez.Strings.label_seat_medium:
-						seat_heat_chosen = 2;
-						break;
-
-					case Rez.Strings.label_seat_high:
-						seat_heat_chosen = 3;
-						break;
-						
-					default:
-						//DEBUG*/ logMessage("actionMachine: seat_heat_chosen is invalid '" + seat_heat_chosen_label + "'");
-						seat_heat_chosen = 0;
-						_stateMachineCounter = 1; // 0.1 second
-			            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-						return;
+				if (seat_heat_chosen_string.equals(Ui.loadResource(Rez.Strings.label_seat_auto))) {
+					seat_heat_chosen = -1;
+				}
+				else if (seat_heat_chosen_string.equals(Ui.loadResource(Rez.Strings.label_seat_off))) {
+					seat_heat_chosen = 0;
+				}
+				else if (seat_heat_chosen_string.equals(Ui.loadResource(Rez.Strings.label_seat_low))) {
+					seat_heat_chosen = 1;
+				}
+				else if (seat_heat_chosen_string.equals(Ui.loadResource(Rez.Strings.label_seat_medium))) {
+					seat_heat_chosen = 2;
+				}
+				else if (seat_heat_chosen_string.equals(Ui.loadResource(Rez.Strings.label_seat_high))) {
+					seat_heat_chosen = 3;
+				}
+				else {
+					/*DEBUG*/ logMessage("actionMachine: seat_heat_chosen is invalid '" + seat_heat_chosen_string + "'");
+					seat_heat_chosen = 0;
+					_stateMachineCounter = 1; // 0.1 second
+					WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+					return;
 				}
 
 				var label;
@@ -742,23 +736,23 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				switch (option) {
 					case ACTION_OPTION_SEAT_DRIVER:
-						label = Rez.Strings.label_seat_driver;
+						label = Ui.loadResource(Rez.Strings.label_seat_driver);
 						position = 0;
 						break;
 					case ACTION_OPTION_SEAT_PASSENGER:
-						label = Rez.Strings.label_seat_passenger;
+						label = Ui.loadResource(Rez.Strings.label_seat_passenger);
 						position = 1;
 						break;
 					case ACTION_OPTION_SEAT_REAR_DRIVER:
-						label = Rez.Strings.label_seat_rear_left;
+						label = Ui.loadResource(Rez.Strings.label_seat_rear_left);
 						position = 2;
 						break;
 					case ACTION_OPTION_SEAT_REAR_CENTER:
-						label = Rez.Strings.label_seat_rear_center;
+						label = Ui.loadResource(Rez.Strings.label_seat_rear_center);
 						position = 4;
 						break;
 					case ACTION_OPTION_SEAT_REAR_PASSENGER:
-						label = Rez.Strings.label_seat_rear_right;
+						label = Ui.loadResource(Rez.Strings.label_seat_rear_right);
 						position = 5;
 						break;
 					default:
@@ -766,7 +760,7 @@ class MainDelegate extends Ui.BehaviorDelegate {
 						break;
 				}
 
-				_handler.invoke([_handlerType, -1, Ui.loadResource(label) + " - " + Ui.loadResource(seat_heat_chosen_label)]);
+				_handler.invoke([_handlerType, -1, label + " - " + seat_heat_chosen_string]);
 				_tesla.climateSeatHeat(_vehicle_vin, method(:onCommandReturn), position, seat_heat_chosen);
 				break;
 
@@ -835,22 +829,20 @@ class MainDelegate extends Ui.BehaviorDelegate {
 
 				var mode_chosen;
 
-				switch (value) {
-					case Rez.Strings.label_climate_off:
-						mode_chosen = 0;
-						break;
-					case Rez.Strings.label_climate_on:
-						mode_chosen = 1;
-						break;
-					case Rez.Strings.label_climate_dog:
-						mode_chosen = 2;
-						break;
-					case Rez.Strings.label_climate_camp:
-						mode_chosen = 3;
-						break;
+				if (value.equals(Ui.loadResource(Rez.Strings.label_climate_off))) {
+					mode_chosen = 0;
+				}
+				else if (value.equals(Ui.loadResource(Rez.Strings.label_climate_on))) {
+					mode_chosen = 1;
+				}
+				else if (value.equals(Ui.loadResource(Rez.Strings.label_climate_dog))) {
+					mode_chosen = 2;
+				}
+				else if (value.equals(Ui.loadResource(Rez.Strings.label_climate_camp))) {
+					mode_chosen = 3;
 				}
 				//DEBUG*/ logMessage("actionMachine: ClimateMode - setting mode to " + Ui.loadResource(value) + "- calling onCommandReturn");
-				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + Ui.loadResource(value)]);
+				_handler.invoke([_handlerType, -1, Ui.loadResource(Rez.Strings.label_climate_mode) + value]);
 				_tesla.setClimateMode(_vehicle_vin, method(:onCommandReturn), mode_chosen);
 				break;
 

@@ -29,7 +29,7 @@ class DepartureTimePicker extends WatchUi.Picker {
         } else {
             factories = new Array<PickerFactory or Text>[$.FACTORY_COUNT_12_HOUR];
             factories[0] = new $.NumberFactory(1, 12, 1, {});
-            factories[3] = new $.WordFactory([$.Rez.Strings.label_morning, $.Rez.Strings.label_afternoon] as Array<Symbol>);
+            factories[3] = new $.WordFactory([WatchUi.loadResource(Rez.Strings.label_morning), WatchUi.loadResource(Rez.Strings.label_afternoon)]);
         }
 
         factories[1] = new WatchUi.Text({:text=>$.Rez.Strings.label_timeSeparator, :font=>Graphics.FONT_MEDIUM,
@@ -108,7 +108,7 @@ class DepartureTimePickerDelegate extends WatchUi.PickerDelegate {
                 }
 
                 var ampm = values[3];
-                if (ampm == Rez.Strings.label_afternoon) {
+                if (ampm.equals(WatchUi.loadResource(Rez.Strings.label_afternoon))) {
                 	hour += 12;
                 }
             }

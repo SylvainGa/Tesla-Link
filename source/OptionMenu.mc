@@ -127,18 +127,18 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
 			var rear_seats_avail = _controller._data._vehicle_data.get("climate_state").get("seat_heater_rear_left");
 	        var seats = new [rear_seats_avail != null ? 8 : 3];
 
-	        seats[0] = Rez.Strings.label_seat_driver;
-	        seats[1] = Rez.Strings.label_seat_passenger;
+	        seats[0] = Ui.loadResource(Rez.Strings.label_seat_driver);
+	        seats[1] = Ui.loadResource(Rez.Strings.label_seat_passenger);
 	        if (rear_seats_avail != null) {
-		        seats[2] = Rez.Strings.label_seat_rear_left;
-		        seats[3] = Rez.Strings.label_seat_rear_center;
-		        seats[4] = Rez.Strings.label_seat_rear_right;
-		        seats[5] = Rez.Strings.label_seat_front;
-		        seats[6] = Rez.Strings.label_seat_rear;
-		        seats[7] = Rez.Strings.label_seat_all;
+		        seats[2] = Ui.loadResource(Rez.Strings.label_seat_rear_left);
+		        seats[3] = Ui.loadResource(Rez.Strings.label_seat_rear_center);
+		        seats[4] = Ui.loadResource(Rez.Strings.label_seat_rear_right);
+		        seats[5] = Ui.loadResource(Rez.Strings.label_seat_front);
+		        seats[6] = Ui.loadResource(Rez.Strings.label_seat_rear);
+		        seats[7] = Ui.loadResource(Rez.Strings.label_seat_all);
 	        }
 	        else {
-		        seats[2] = Rez.Strings.label_seat_front;
+		        seats[2] = Ui.loadResource(Rez.Strings.label_seat_front);
 	        }
 
 	        Ui.switchToView(new SeatPicker(seats), new SeatPickerDelegate(_controller), Ui.SLIDE_UP);
@@ -199,10 +199,10 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         else if (item == :climate_mode) {
 	        var modes = new [4];
 
-	        modes[0] = Rez.Strings.label_climate_off;
-	        modes[1] = Rez.Strings.label_climate_on;
-	        modes[2] = Rez.Strings.label_climate_dog;
-	        modes[3] = Rez.Strings.label_climate_camp;
+	        modes[0] = Ui.loadResource(Rez.Strings.label_climate_off);
+	        modes[1] = Ui.loadResource(Rez.Strings.label_climate_on);
+	        modes[2] = Ui.loadResource(Rez.Strings.label_climate_dog);
+	        modes[3] = Ui.loadResource(Rez.Strings.label_climate_camp);
 
 	        Ui.switchToView(new ClimateModePicker(modes), new ClimateModePickerDelegate(_controller), Ui.SLIDE_UP);
         }
