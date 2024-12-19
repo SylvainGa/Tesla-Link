@@ -549,8 +549,9 @@ class MainDelegate extends Ui.BehaviorDelegate {
 				//DEBUG*/ logMessage("actionMachine: _pendingActionRequest size is now " + _pendingActionRequests.size());
 
 				//DEBUG*/ logMessage("actionMachine: Climate Defrost - waiting for onCommandReturn");
-				_handler.invoke([_handlerType, -1, Ui.loadResource(_data._vehicle_data.get("climate_state").get("defrost_mode") == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
-				_tesla.climateDefrost(_vehicle_vin, method(:onCommandReturn), _data._vehicle_data.get("climate_state").get("defrost_mode"));
+				var defrostMode = _data._vehicle_data.get("climate_state").get("defrost_mode");
+				_handler.invoke([_handlerType, -1, Ui.loadResource(defrostMode == 2 ? Rez.Strings.label_defrost_off : Rez.Strings.label_defrost_on)]);
+				_tesla.climateDefrost(_vehicle_vin, method(:onCommandReturn), defrostMode);
 				break;
 
 			case ACTION_TYPE_CLIMATE_SET:
@@ -1129,16 +1130,16 @@ class MainDelegate extends Ui.BehaviorDelegate {
 		// We have no actions waiting
 		else {
 			// Get the current states of the vehicle if it's time, otherwise we do nothing this time around.
-			if (_stateMachineCounter > 0) { 
+			if (_stateMachineCounter > 0) { // Keep counting down until it reaches 1, then run the state machine.
 				if (_stateMachineCounter == 1) {
 					stateMachine();
 				} else {
 					_stateMachineCounter--;
 					//logMessage("workerTimer: " + _stateMachineCounter);
 				}
-			} else {
+			} else if (_stateMachineCounter == 0) { // We're waiting for a return from MakeWebRequest so do nothing in the mean time
 				var timeDelta = System.getTimer() - _lastDataRun;
-				if (timeDelta > 15000) {
+				if (timeDelta > 15000) { // Except if we haven't received data for some time and we're not in a menu (_stateMachineCounter would be < 0), ask for data again
 					//DEBUG 2023-10-02*/ logMessage("workerTimer: We've been waiting for data for " + timeDelta + "ms. Assume we lost this packet and try again");
 					_lastDataRun = System.getTimer();
 					_stateMachineCounter = 1; // 0.1 second

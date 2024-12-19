@@ -12,6 +12,9 @@ var gSettingsChanged;
 
 (:background)
 class TeslaLink extends App.AppBase {
+    var _glanceView;
+    var _mainView;
+
     function initialize() {
         AppBase.initialize();
 
@@ -21,7 +24,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
 	function onStart(state) {
-   		//DEBUG 2023-10-02*/ logMessage("App: starting");
+   		/*DEBUG*/ logMessage("App: starting");
         if (state != null) {
             //DEBUG 2023-10-02*/ logMessage("full state: " + state.toString());
             //DEBUG 2023-10-02*/ logMessage("resume: " + state.get(:resume ));
@@ -38,15 +41,44 @@ class TeslaLink extends App.AppBase {
         }
 	}
 
-    // (:can_glance, :bkgnd64kb)
-	// function onStop(state) {
-    //     if (Storage.getValue("runBG")) {
-    // 		//DEBUG*/ logMessage("App: stopping with runBG True");
-    //     }
-    //     else {
-    // 		//DEBUG*/ logMessage("App: stopping with runBG False");
-    //     }
-	// }
+    (:can_glance, :bkgnd64kb)
+	function onStop(state) {
+        if (Storage.getValue("runBG")) {
+    		/*DEBUG*/ logMessage("App: stopping with runBG True");
+        }
+        else {
+    		/*DEBUG*/ logMessage("App: stopping with runBG False");
+        }
+
+        if (_mainView) {
+            /*DEBUG*/ logMessage("App:onStop _mainView is available");
+            if (_mainView._refreshTimer) {
+                /*DEBUG*/ logMessage("App:onStop _mainView timer was set");
+                _mainView._refreshTimer.stop();
+                _mainView._refreshTimer = null;
+            }
+            else {
+                /*DEBUG*/ logMessage("App:onStop _mainView timer was NOT set");
+            }
+        }
+        else {
+            /*DEBUG*/ logMessage("App:onStop no _mainView");
+        }
+        if (_glanceView) {
+            /*DEBUG*/ logMessage("App:onStop _glanceView is available");
+            if (_glanceView._refreshTimer) {
+                /*DEBUG*/ logMessage("App:onStop _glanceView timer was set");
+                _glanceView._refreshTimer.stop();
+                _glanceView._refreshTimer = null;
+            }
+            else {
+                /*DEBUG*/ logMessage("App:onStop _glanceView timer was NOT set");
+            }
+        }
+        else {
+            /*DEBUG*/ logMessage("App:onStop no _glanceView");
+        }
+    }
 
     (:can_glance)
 	function onSettingsChanged() {
@@ -68,8 +100,8 @@ class TeslaLink extends App.AppBase {
         Storage.setValue("runBG", true);
 
         Background.registerForTemporalEvent(new Time.Duration(60 * 5));
-
-        return [ new GlanceView() ];
+        _glanceView = new GlanceView();
+        return [ _glanceView ];
     }
 
     function getInitialView() {
@@ -102,8 +134,8 @@ class TeslaLink extends App.AppBase {
         var data = new TeslaData();
         if ($.validateBoolean(Storage.getValue("fromGlance"), false) || useTouch) { // Up/Down buttons work when launched from glance (or if we don't have/need buttons)
             Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
-            var view = new MainView(data);
-            return [ view, new MainDelegate(view, data, view.method(:onReceive)) ];
+            _mainView = new MainView(data);
+            return [ _mainView, new MainDelegate(_mainView, data, _mainView.method(:onReceive)) ];
         }
         else { // Sucks, but we have to have an extra view so the Up/Down button work in our main view
             Storage.setValue("fromGlance", false); // In case we change our watch setting later on that we want to start from the widget and not the glance
