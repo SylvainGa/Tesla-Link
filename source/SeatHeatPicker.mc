@@ -59,7 +59,7 @@ class SeatHeatPickerDelegate extends WatchUi.PickerDelegate {
         var selected = values[0];
 		Storage.setValue("seat_heat_chosen", selected);
 
-        /*DEBUG*/ logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
+        //DEBUG*/ logMessage("SeatHeatPickerDelegate: onAccept called with selected set to " + selected);
 
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         var seat = Storage.getValue("seat_chosen");
