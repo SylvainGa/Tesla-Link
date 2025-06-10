@@ -24,7 +24,7 @@ class TeslaLink extends App.AppBase {
 
     (:can_glance, :bkgnd64kb)
 	function onStart(state) {
-   		/*DEBUG*/ logMessage("App: starting");
+   		//DEBUG*/ logMessage("App: starting");
         if (state != null) {
             //DEBUG 2023-10-02*/ logMessage("full state: " + state.toString());
             //DEBUG 2023-10-02*/ logMessage("resume: " + state.get(:resume ));
@@ -44,45 +44,45 @@ class TeslaLink extends App.AppBase {
     (:can_glance, :bkgnd64kb)
 	function onStop(state) {
         if (Storage.getValue("runBG")) {
-    		/*DEBUG*/ logMessage("App: stopping with runBG True");
+    		//DEBUG*/ logMessage("App: stopping with runBG True");
         }
         else {
-    		/*DEBUG*/ logMessage("App: stopping with runBG False");
+    		//DEBUG*/ logMessage("App: stopping with runBG False");
         }
 
         if (_mainView) {
-            /*DEBUG*/ logMessage("App:onStop _mainView is available");
+            //DEBUG*/ logMessage("App:onStop _mainView is available");
             if (_mainView._refreshTimer) {
-                /*DEBUG*/ logMessage("App:onStop _mainView timer was set");
+                //DEBUG*/ logMessage("App:onStop _mainView timer was set");
                 _mainView._refreshTimer.stop();
                 _mainView._refreshTimer = null;
             }
             else {
-                /*DEBUG*/ logMessage("App:onStop _mainView timer was NOT set");
+                //DEBUG*/ logMessage("App:onStop _mainView timer was NOT set");
             }
         }
         else {
-            /*DEBUG*/ logMessage("App:onStop no _mainView");
+            //DEBUG*/ logMessage("App:onStop no _mainView");
         }
         if (_glanceView) {
-            /*DEBUG*/ logMessage("App:onStop _glanceView is available");
+            //DEBUG*/ logMessage("App:onStop _glanceView is available");
             if (_glanceView._refreshTimer) {
-                /*DEBUG*/ logMessage("App:onStop _glanceView timer was set");
+                //DEBUG*/ logMessage("App:onStop _glanceView timer was set");
                 _glanceView._refreshTimer.stop();
                 _glanceView._refreshTimer = null;
             }
             else {
-                /*DEBUG*/ logMessage("App:onStop _glanceView timer was NOT set");
+                //DEBUG*/ logMessage("App:onStop _glanceView timer was NOT set");
             }
         }
         else {
-            /*DEBUG*/ logMessage("App:onStop no _glanceView");
+            //DEBUG*/ logMessage("App:onStop no _glanceView");
         }
     }
 
     (:can_glance)
 	function onSettingsChanged() {
-		/*DEBUG*/ logMessage("App: Settings changed");
+		//DEBUG*/ logMessage("App: Settings changed");
         gSettingsChanged = true; 
         Ui.requestUpdate();
     }

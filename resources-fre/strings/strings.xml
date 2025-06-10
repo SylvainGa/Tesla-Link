@@ -183,7 +183,7 @@
     <string id="label_too_many_request">Trop de requêtes\nDoit ralentir</string>
     <string id="label_no_user">Audio éteint</string>
     <string id="label_vehicleStatus">Acquisition du statut\ndu véhicule</string>
-    <string id="label_invalid_token">Jeton invalide</string>
+    <string id="label_invalid_token">Accès interdit</string>
     <string id="label_dogmode_off">Suivi d'animale de compagnie\nnon activé!\nVérifiez véhicule!</string>
     <string id="label_dogmode_nodata">Aucune donnée reçue\nVérifiez véhicule!</string>
     <string id="label_dogmode_toohigh">Alert température!\nVérifiez véhicule!</string>
