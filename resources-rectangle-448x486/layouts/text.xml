@@ -1,0 +1,10 @@
+<layout id="TextLayout">
+    <label id="name" x="center" y="8%" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="climate" x="84%" y="21%" font="Graphics.FONT_XTINY" text="@Strings.button_climate_on" color="Gfx.COLOR_BLUE" justification="Gfx.TEXT_JUSTIFY_RIGHT" />
+    <label id="frunk" x="18%" y="21%" font="Graphics.FONT_XTINY" text="@Strings.button_frunk" color="Gfx.COLOR_BLUE" justification="Gfx.TEXT_JUSTIFY_LEFT" />
+    <label id="door" x="18%" y="71%" font="Graphics.FONT_XTINY" text="@Strings.button_door" color="Gfx.COLOR_BLUE" justification="Gfx.TEXT_JUSTIFY_LEFT" />
+    <label id="status" x="center" y="83%" font="Graphics.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="battery_level" x="center" y="33%" font="Graphics.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="inside_temp" x="center" y="44%" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+    <label id="climate_state" x="center" y="55%" font="Graphics.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+</layout>

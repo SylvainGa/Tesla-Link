@@ -266,15 +266,6 @@ class MainView extends Ui.View {
 			var penWidth = Math.round(width/33+0.5).toNumber();
 			dc.setPenWidth(penWidth);
 
-			var radius;
-			if (center_x < center_y) {
-				radius = center_x - penWidth / 2;
-				center_y = center_y + (height - width) / 2;
-			}
-			else {
-				radius = center_y - penWidth / 2;
-			}
-
 			// If we have the vehicle data back from the API, this is where the good stuff happens
 			// Retrieve and display the vehicle name
 			var vehicle_name = $.validateString(_data._vehicle_data.get("vehicle_state").get("vehicle_name"), "");
@@ -288,6 +279,9 @@ class MainView extends Ui.View {
 				_scrollEndTimer = 0;
 				_scrollStartTimer = 0;
 			}
+
+			var radius = center_y - penWidth / 2;
+
 			//DEBUG*/ vehicle_name = "VeryLongTeslaName";
 			var fontHeight = Graphics.getFontHeight(Graphics.FONT_SMALL);
 			var textWidth = dc.getTextWidthInPixels(vehicle_name, Graphics.FONT_SMALL);
@@ -297,6 +291,8 @@ class MainView extends Ui.View {
 			if (screenShape == System.SCREEN_SHAPE_RECTANGLE && width < height) {
 				textPos = 0;
 				textMaxWidth = width;
+				center_y = center_y + fontHeight / 2;
+				radius = center_x - penWidth / 2;
 			}
 			else if ($.getProperty("titleScrolling", false, method(:validateBoolean))) {
 				textPos = center_x / 14;

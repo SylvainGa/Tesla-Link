@@ -45,9 +45,11 @@ You can find more details on how to use the application by reading the [Operatin
 
 ## Changelog since forking from srwalter:
 V9.1.3 Added the following:
-- Compiled with CIQ 7.4.3
+- Compiled with CIQ 8.2.1
 - Tesla has increased the size of the return data so much that the background process has not enough memory to treat it as a dictionary. This version parsed the raw data to fetch the required fields.
 - Fix at crash when setting seat heat caused by Garmin changing the way labels (text) are used
+- Added devices Approach50, Descent G2, Forerunner 570s/970, Venu X1 and VivoActive 6
+- Removed the Venu SQ as it doesn't have enough memory to accomomdate the app anymore.
 
 V9.1.2 Added the following:
 - Compiled with CIQ 7.3.0
