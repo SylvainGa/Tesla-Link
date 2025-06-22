@@ -192,7 +192,7 @@ function sendComplication(data) {
 			}
 		}
 
-		/*DEBUG*/ logMessage("Sending Complication: " + value);
+		//DEBUG*/ logMessage("Sending Complication: " + value);
 		// Send it to whoever is listening
 		var comp = {
 			:value => value,
@@ -204,26 +204,21 @@ function sendComplication(data) {
 			Complications.updateComplication(0, comp);
 		}
 		catch (e) {
-			/*DEBUG*/ logMessage("Error sending Complication!");
+			//DEBUG*/ logMessage("Error sending Complication!");
 		}
 	}
 	else {
-		/*DEBUG*/ logMessage("Complication not available?");
+		//DEBUG*/ logMessage("Complication not available?");
 	}
 }
 
-/*DEBUG    Don't move over to release!!!!!*/ 
-// (:debug, :background)
-(:background)
+(:debug, :background)
 function logMessage(message) {
 	var clockTime = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
 	var dateStr = clockTime.hour + ":" + clockTime.min.format("%02d") + ":" + clockTime.sec.format("%02d");
 	System.println(dateStr + " : " + message);
 }
 
-/*DEBUG    Don't move over to release!!!!!*/ 
-// (:debug, :background)
-
-// (:release, :background)
-// function logMessage(message) {
-// }
+(:release, :background)
+function logMessage(message) {
+}

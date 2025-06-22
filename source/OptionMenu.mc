@@ -15,7 +15,7 @@ class OptionMenuDelegate extends Ui.Menu2InputDelegate {
         _controller._stateMachineCounter = -1;
         _controller._waitingForCommandReturn = false;
 
-        /*DEBUG*/ logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
+        //DEBUG*/ logMessage("OptionMenuDelegate: initialize, _stateMachineCounter was " + _previous_stateMachineCounter);
         //logMessage("OptionMenuDelegate: initialize");
     }
 

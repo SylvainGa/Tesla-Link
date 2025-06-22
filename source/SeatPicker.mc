@@ -6,7 +6,7 @@ class SeatPicker extends WatchUi.Picker {
     function initialize (seats) {
         var title = new WatchUi.Text({:text=>Rez.Strings.label_temp_choose_seat, :locX =>WatchUi.LAYOUT_HALIGN_CENTER, :locY=>WatchUi.LAYOUT_VALIGN_BOTTOM, :color=>Graphics.COLOR_WHITE});
         var factory = new WordFactory(seats);
-        /*DEBUG*/ logMessage("SeatPickerDelegate: Initialize called with seats set to " + seats + " and factory filled with " + factory);
+        //DEBUG*/ logMessage("SeatPickerDelegate: Initialize called with seats set to " + seats + " and factory filled with " + factory);
         Picker.initialize({:pattern => [factory], :title => title});
     }
 
@@ -35,10 +35,10 @@ class SeatPickerDelegate extends WatchUi.PickerDelegate {
     }
 
     function onAccept (values) {
-        /*DEBUG*/ logMessage("SeatPickerDelegate: onAccept called with values set to " + values);
+        //DEBUG*/ logMessage("SeatPickerDelegate: onAccept called with values set to " + values);
         var selected = values[0];
 		Storage.setValue("seat_chosen", selected);
-        /*DEBUG*/ logMessage("SeatPickerDelegate: onAccept called with selected set to " + selected);
+        //DEBUG*/ logMessage("SeatPickerDelegate: onAccept called with selected set to " + selected);
 
         WatchUi.switchToView(new SeatHeatPicker(selected), new SeatHeatPickerDelegate(_controller), WatchUi.SLIDE_UP);
         return true;

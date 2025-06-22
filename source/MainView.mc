@@ -60,13 +60,13 @@ class MainView extends Ui.View {
 		_scrollEndTimer = 0;
 		_scrollStartTimer = 0;
 
-		/*DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
+		//DEBUG*/ logMessage("MainView:initialize: _refreshTimer is " + _refreshTimer);
 		//_refreshTimer = new Timer.Timer();
 		if (_refreshTimer == null) {
 			_refreshTimer = new Timer.Timer();
 		}
 		else {
-			/*DEBUG*/ logMessage("MainView:initialize: _refreshTimer was already there!");
+			//DEBUG*/ logMessage("MainView:initialize: _refreshTimer was already there!");
 		}
 		Storage.setValue("spinner", "-");
 		if (Storage.getValue("refreshTimeInterval") == null) {
@@ -89,7 +89,7 @@ class MainView extends Ui.View {
 	}
 
 	function onShow() {
-		/*DEBUG*/ logMessage("MainView:onShow");
+		//DEBUG*/ logMessage("MainView:onShow");
 		// if (_refreshTimer == null) {
 		// 	_refreshTimer = new Timer.Timer();
 		// }
@@ -102,7 +102,7 @@ class MainView extends Ui.View {
 	}
 	
 	function onHide() {
-		/*DEBUG*/ logMessage("MainView:onHide");
+		//DEBUG*/ logMessage("MainView:onHide");
         Storage.setValue("runBG", true); // Make sure that the background jobs can run when we leave the main view
 		_refreshTimer.stop();
 		//_refreshTimer = null;
