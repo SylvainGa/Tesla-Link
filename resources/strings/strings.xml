@@ -187,7 +187,7 @@
     <string id="label_too_many_request">Too many requests\nslowing down</string>
     <string id="label_no_user">Audio off</string>
     <string id="label_vehicleStatus">Getting vehicle status</string>
-    <string id="label_invalid_token">Invalid token</string>
+    <string id="label_invalid_token">Access denied</string>
     <string id="label_dogmode_off">Dog mode not activated!\nCheck your vehicle!</string>
     <string id="label_dogmode_nodata">No data received!\nCheck your vehicle!</string>
     <string id="label_dogmode_toohigh">Temperature alert!\nCheck your vehicle!</string>
