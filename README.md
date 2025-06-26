@@ -44,6 +44,8 @@ If you want to have the widget translated to your language, contact me through e
 You can find more details on how to use the application by reading the [Operating Guide] (https://github.com/SylvainGa/Tesla-Link/blob/V9.0.0/Tesla-Link-OperatingGuide.pdf).
 
 ## Changelog since forking from srwalter:
+V9.1.4 Added back the Enduro3 and the Fenix8 watches, including the Fenix E that disappeared with 9.1.3.
+
 V9.1.3 Added the following:
 - Compiled with CIQ 8.2.1
 - Tesla has increased the size of the return data so much that the background process has not enough memory to treat it as a dictionary. This version parsed the raw data to fetch the required fields.
